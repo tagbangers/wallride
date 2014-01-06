@@ -64,7 +64,7 @@ public class CategoryService {
 //		categoryRepository.incrementSortBySortGreaterThanEqual(sort, form.getLanguage());
 
 		category.setParent(parent);
-		category.setCode(form.getCode());
+		category.setCode(form.getCode() != null ? form.getCode() : form.getName());
 		category.setName(form.getName());
 		category.setDescription(form.getDescription());
 		category.setLft(rgt);
@@ -73,14 +73,7 @@ public class CategoryService {
 //		category.setSort(sort);
 		category.setLanguage(form.getLanguage());
 
-		category = categoryRepository.save(category);
-
-		if (category.getCode() == null) {
-			category.setCode(Long.toString(category.getId()));
-			category = categoryRepository.save(category);
-		}
-
-		return category;
+		return categoryRepository.save(category);
 	}
 
 	@CacheEvict(value=CATEGORY_CACHE_KEY, key="#form.language")
@@ -119,7 +112,7 @@ public class CategoryService {
 //		}
 
 		category.setParent(parent);
-		category.setCode(form.getCode());
+		category.setCode(form.getCode() != null ? form.getCode() : form.getName());
 		category.setName(form.getName());
 		category.setDescription(form.getDescription());
 		category.setLft(rgt);
@@ -128,14 +121,7 @@ public class CategoryService {
 //		category.setSort(sort);
 		category.setLanguage(form.getLanguage());
 
-		category = categoryRepository.save(category);
-
-		if (category.getCode() == null) {
-			category.setCode(Long.toString(category.getId()));
-			category = categoryRepository.save(category);
-		}
-
-		return category;
+		return categoryRepository.save(category);
 	}
 
 	@CacheEvict(value=CATEGORY_CACHE_KEY, allEntries=true)

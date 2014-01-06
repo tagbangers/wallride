@@ -16,8 +16,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.jndi.JndiTemplate;
 
+import javax.inject.Inject;
 import javax.naming.NamingException;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,6 +29,9 @@ import java.util.Properties;
 @Configuration
 @EnableCaching
 public class CacheConfig {
+
+	@Inject
+	private Environment environment;
 
 	private static Logger logger = LoggerFactory.getLogger(CacheConfig.class);
 
@@ -41,15 +46,19 @@ public class CacheConfig {
 			throw new RuntimeException(e);
 		}
 
-		System.setProperty("jgroups.s3.access_key", System.getProperty("s3.accessKey"));
-		System.setProperty("jgroups.s3.secret_access_key", System.getProperty("s3.secretKey"));
-		System.setProperty("jgroups.s3.bucket",  "wallride-20131127");
+		//TODO 判定基準の変更
+		if (System.getProperties().containsKey("AWS_ACCESS_KEY_ID")) {
+			System.setProperty("jgroups.s3.access_key", System.getProperty("AWS_ACCESS_KEY_ID"));
+		}
+		if (System.getProperties().containsKey("AWS_SECRET_KEY")) {
+			System.setProperty("jgroups.s3.secret_access_key", System.getProperty("AWS_SECRET_KEY"));
+		}
+		if (environment.containsProperty("jgroups.s3.bucket")) {
+			System.setProperty("jgroups.s3.bucket",  environment.getProperty("jgroups.s3.bucket"));
+		}
 		System.setProperty("jgroups.bind_addr", ipaddress);
 
-//		SearchFactoryIntegrator
-
 		ConfigurationBuilderHolder holder = new ConfigurationBuilderHolder();
-
 
 //		GlobalConfigurationBuilder globalBuilder = new GlobalConfigurationBuilder();
 		GlobalConfigurationBuilder globalBuilder = holder.getGlobalConfigurationBuilder();
@@ -143,6 +152,7 @@ public class CacheConfig {
 		holder.getNamedConfigurationBuilders().put("categories", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("pages", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("medias", cacheBuilder);
+		holder.getNamedConfigurationBuilders().put("banners", cacheBuilder);
 
 //		holder.getNamedConfigurationBuilders().put("resources", cacheBuilder);
 
