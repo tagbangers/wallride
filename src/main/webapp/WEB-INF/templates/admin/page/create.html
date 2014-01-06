@@ -36,7 +36,7 @@
 										<div class="dragover hide"><span class="help-block">Drop files here</span></div>
 										<div class="progress hide"><div class="progress-bar progress-bar-success"></div></div>
 										<input type="hidden" th:field="*{coverId}" />
-										<img th:if="${form.coverId ne null}" th:src="@{${_utils.getMediaUrl(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+										<img th:if="${form.coverId ne null}" th:src="@{${#medias.link(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
 									</div>
 								</div>
 								<script th:inline="javascript">

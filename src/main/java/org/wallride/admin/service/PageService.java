@@ -138,7 +138,7 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.default.url");
+			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -227,7 +227,7 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.default.url");
+			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -351,7 +351,7 @@ public class PageService {
 		
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.default.url");
+			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {
