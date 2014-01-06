@@ -29,26 +29,28 @@
 </head>
 <body>
 <header th:fragment="header" id="header" class="navbar navbar-inverse navbar-static-top">
-	<div class="navbar-header">
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-		</button>
-		<a href="../" class="navbar-brand" th:text="${WEBSITE_TITLE}">WallRide</a>
-	</div>
-	<!-- Collect the nav links, forms, and other content for toggling -->
-	<div class="collapse navbar-collapse navbar-ex1-collapse">
-		<ul class="nav navbar-nav navbar-left">
-		</ul>
-		<ul class="nav navbar-nav navbar-right">
-			<li><a th:href="@{${WEBSITE_LINK}}" href="#" target="_blank" style="font-size:15px;"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${WEBSITE_LINK}">公開画面</span></a></li>
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle wr-current-language" data-toggle="dropdown" th:text="${#messages.msg('Language.' + #locale.language)}"> <b class="caret"></b></a>
-				<ul class="dropdown-menu">
-					<li class="disabled"><a href="#">Languages</a></li>
-					<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${#messages.msg('Language.' + key)}">English</a></li>
-				</ul>
-			</li>
-		</ul>
+	<div class="container">
+		<div class="navbar-header">
+			<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+				<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+			</button>
+			<a href="../" class="navbar-brand" th:text="${WEBSITE_TITLE}">WallRide</a>
+		</div>
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse navbar-ex1-collapse">
+			<ul class="nav navbar-nav navbar-left">
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a th:href="@{${WEBSITE_LINK}}" href="#" target="_blank" style="font-size:15px;"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${WEBSITE_LINK}">公開画面</span></a></li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle wr-current-language" data-toggle="dropdown" th:text="${#messages.msg('Language.' + #locale.language)}"> <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li class="disabled"><a href="#">Languages</a></li>
+						<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${#messages.msg('Language.' + key)}">English</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
 	</div>
 </header>
 <div>

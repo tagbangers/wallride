@@ -64,7 +64,7 @@ pre {
 }
 /***** bootstrap *****/
 .container {
-	max-width: 100%;
+	width: 100%;
 }
 #sidebar .img-thumbnail {
 	background-color: transparent;
