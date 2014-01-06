@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>wallride</title>
-		<link href="#" th:href="@{/resources/lib/bootstrap-3.0.1/css/bootstrap.min.css}" rel="stylesheet" />
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" />
 		<link rel="stylesheet" th:href="@{/_admin/resources/css/admin.css}" />
 		<link rel="stylesheet" th:href="@{/_admin/resources/css/wallride.css}" />
 	</head>
@@ -17,6 +17,13 @@
 				<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}">Oops</p>
 				<fieldset>
 					<legend>User</legend>
+					<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{Email}">E-mail</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{email}" class="form-control" th:attr="placeholder=#{Email}" autocomplete="off" />
+							<span class="help-block" th:each="err : ${#fields.errors('email')}" th:text="${err}" />
+						</div>
+					</div>
 					<div class="form-group" th:classappend="${#fields.hasErrors('loginId')}? has-error">
 						<label class="col-sm-2 control-label" th:text="#{LoginId}">Login ID</label>
 						<div class="col-sm-5">
@@ -40,13 +47,6 @@
 						<div class="col-sm-5">
 							<input type="text" th:field="*{name.lastName}" placeholder="Last Name" th:attr="placeholder=#{LastName}" class="form-control" />
 							<span class="help-block" th:each="err : ${#fields.errors('name.lastName')}" th:text="${err}" />
-						</div>
-					</div>
-					<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
-						<label class="col-sm-2 control-label" th:text="#{Email}">E-mail</label>
-						<div class="col-sm-5">
-							<input type="text" th:field="*{email}" class="form-control" th:attr="placeholder=#{Email}" autocomplete="off" />
-							<span class="help-block" th:each="err : ${#fields.errors('email')}" th:text="${err}" />
 						</div>
 					</div>
 				</fieldset>

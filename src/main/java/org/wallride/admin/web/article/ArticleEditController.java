@@ -92,7 +92,7 @@ public class ArticleEditController {
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/edit?id={id}";
+		return "redirect:/_admin/{language}/articles/describe?id={id}";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")
@@ -121,7 +121,7 @@ public class ArticleEditController {
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/edit?id={id}";
+		return "redirect:/_admin/{language}/articles/describe?id={id}";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="cancel")

@@ -32,6 +32,10 @@
 				</div>
 				<div class="row" th:if="${article ne null}">
 					<div class="col-sm-9 wr-describe-main">
+						<div class="alert alert-success" th:if="${savedArticle ne null}">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<span th:text="#{SavedArticle}">Article saved.</span>
+						</div>
 						<div class="page-header clearfix">
 							<img th:if="${article.cover ne null}" th:src="@{${_utils.getMediaUrl(article.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
 							<h1 th:text="${article.title}?:'(No Titled)'">(No Titled)</h1>
