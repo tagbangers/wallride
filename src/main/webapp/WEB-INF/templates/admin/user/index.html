@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div th:replace="layout::sidebar"></div>
+			<div id="main">
+				<ol class="breadcrumb">
+					<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">ダッシュボード</a></li>
+					<li class="active" th:text="#{AllUsers}">ユーザ一覧</li>
+				</ol>
+				<div class="page-header clearfix">
+					<ul class="list-inline">
+						<li><h1 th:text="#{Users}">Users</h1></li>
+						<li><a th:href="@{__${ADMIN_PATH}__/users/invitations/index}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{InviteNew}">ユーザーを招待</span></a></li>
+					</ul>
+				</div>
+				<section class="search-condition">
+					<div class="search-condition-quick clearfix">
+						<form class="form-inline" method="post" th:action="@{__${ADMIN_PATH}__/users/index}" th:object="${form}">
+							<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
+							<input type="hidden" />
+							<div class="form-group pull-left">
+								<ul class="list-inline" style="line-height: 30px;">
+									<li><a th:text="#{All}">すべて</a> <span class="total" >(0)</span></li>
+								</ul>
+							</div>
+							<div class="form-group pull-right" style="width: 300px;">
+								<div class="input-group simple-search pull-right">
+									<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+									<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
+								</div>
+							</div>
+						</form>
+					</div>
+				</section>
+					<section class="search-result">
+						<form method="post">
+							<input type="hidden" name="token" th:value="${token}" />
+							<div class="search-result-header clearfix">
+								<div class="btn-toolbar wr-bulk-action pull-left">
+									<div class="btn-group">
+										<a th:href="@{__${ADMIN_PATH}__/users/index(part=bulk-delete-dialog)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+									</div>
+								</div>
+								<div class="pagination-group pull-right" th:if="${paginator}">
+									<div class="pull-left pagination-summary"><span th:text="${paginator.start}"></span> - <span th:text="${paginator.end}"></span> / <span th:text="${paginator.total}"></span></div>
+									<div class="pull-right">
+										<ul class="pagination paginateon-sm">
+											<li th:classappend="${paginator.hasPrevious() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/users/index(page=${paginator.previousNumber},token=${token})}" th:text="#{Prev}">前</a></li>
+											<li th:each="no : ${paginator.numbers}" th:classappend="${paginator.number eq no ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/users/index(page=${no},token=${token})}" th:text="${no}"></a></li>
+											<li th:classappend="${paginator.hasNext() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/users/index(page=${paginator.nextNumber},token=${token})}" th:text="#{Next}">次</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<table class="table table-hover list">
+								<thead>
+									<tr>
+										<th class="wr-tr-checkbox"><input type="checkbox" /></th>
+										<th th:text="#{Name}">名前</th>
+										<th th:text="#{LoginId}">ログインID</th>
+										<th th:text="#{Email}">メールアドレス</th>
+										<th th:text="#{Posts}" class="text-right">投稿記事数</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="user : ${users}" th:attr="data-href=@{__${ADMIN_PATH}__/users/describe(id=${user.id},token=${token})}" class="clickable">
+										<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${user.id}" /></td>
+										<td th:text="${user.name}"></td>
+										<td th:text="${user.loginId}"></td>
+										<td th:text="${user.email}"></td>
+										<td th:text="${user.articleCount}" class="text-right"></td>
+									</tr>
+								</tbody>
+							</table>
+							<!-- #bulk-delete-modal -->
+							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="bulk-delete-dialog" class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title">Delete Articles</h4>
+										</div>
+										<div class="modal-body">
+											<p th:text="#{MakeSureDelete}">本当に削除しますか？</p>
+											<label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">キャンセル</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/bulk-delete}" disabled="true" th:text="#{Delete}">削除</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/#bulk-delete-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function() {
+									$('#bulk-delete-modal').on('hidden.bs.modal', function() {
+										$(this).removeData('bs.modal');
+									});
+									$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
+										var confirmed = $(this);
+										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
+									});
+									$('#main .search-result').on('click', '[data-href]', function(e) {
+										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')){
+											window.location = $(e.target).closest('tr').data('href');
+										};
+									});
+									$('#main .search-result').on('click', '[data-action]', function(e) {
+										var form = $(this).closest('form');
+										form.attr('action', $(this).data('action'));
+										form.submit();
+										e.preventDefault();
+									});
+									$('#main .search-result td.wr-tr-checkbox').shiftcheckbox({
+										checkboxSelector: ':checkbox',
+										selectAll: '.search-result th.wr-tr-checkbox'
+									});
+									$('#main .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
+										e.stopPropagation();
+									});
+									$('#main .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
+										var checked = $(this).prop('checked');
+										if (checked) {
+											$(this).closest('tr').addClass('warning');
+										}
+										else {
+											$(this).closest('tr').removeClass('warning');
+										}
+										var checkedSomeone = false;
+										$(this).each(function(i, e) {
+											if ($(e).prop('checked')) {
+												checkedSomeone = true;
+												return;
+											}
+										});
+										if (checkedSomeone) {
+											$('#main .search-result .wr-bulk-action .btn').removeClass('disabled');
+										}
+										else {
+											$('#main .search-result .wr-bulk-action .btn').addClass('disabled');
+										}
+									});
+								});
+								// ]]>
+							</script>
+						</form>
+					</section>
+				</div>
+			</div>
+		<footer>
+		</footer>
+	</body>
+</html>

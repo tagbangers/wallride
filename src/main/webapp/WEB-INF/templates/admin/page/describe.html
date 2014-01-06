@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div th:replace="layout::sidebar"></div>
+			<div id="main">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="pull-left">
+							<ol class="breadcrumb">
+								<li><a th:href="@{__${ADMIN_PATH}__/}">Dashboard</a></li>
+								<li><a th:href="@{__${ADMIN_PATH}__/pages/index}">Pages</a></li>
+								<li class="active" th:text="${page.title}"></li>
+							</ol>
+						</div>
+						<div class="pull-right">
+							<ul class="pager">
+								<li th:classappend="${prevId eq null}?'disabled'" class="previous">
+									<a th:href="${prevId ne null} ? @{__${ADMIN_PATH}__/pages/describe(id=${prevId},token=${token})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+								</li>
+								<li th:classappend="${nextId eq null}?'disabled'" class="next">
+									<a th:href="${nextId ne null} ? @{__${ADMIN_PATH}__/pages/describe(id=${nextId},token=${token})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-9 wr-describe-main">
+						<div class="page-header clearfix">
+							<img th:if="${page.cover ne null}" th:src="@{${_utils.getMediaUrl(page.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+							<h1 th:text="${page.title}">
+							</h1>
+						</div>
+						<pre th:utext="${page.body}"></pre>
+						<hr/>
+						<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a>
+					</div>
+					<div class="col-sm-3 wr-tool-panel">
+						<div class="tools clearfix">
+							<div class="pull-left">
+								<div class="status">
+									<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
+									<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
+									<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+									<a th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
+										<span class="glyphicon glyphicon-globe"></span>
+										<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+									</a>
+								</div>
+							</div>
+							<div class="btn-toolbar pull-right" role="toolbar">
+								<div class="btn-group">
+									<a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${page.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
+<!--									<a class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></a>
+									<ul class="dropdown-menu pull-right" role="menu">
+										<li class="disabled"><a href="#">記事をコピー</a></li>
+										<li><a href="">英語版</a></li>
+										<li><a href="">ドイツ語版</a></li>
+										<li><a href="">フランス語版</a></li>
+									</ul>-->
+								</div>
+							</div>
+						</div>
+						<dl>
+							<dt th:text="#{Date}">公開日</dt>
+							<dd th:if="${page.date ne null}" th:text="${page.date.toString('yyyy/MM/dd')}"></dd>
+						</dl>
+						<dl>
+							<dt th:text="#{ParentPage}">親ページ</dt>
+							<dd>
+							<ul class="list-unstyled">
+								<li th:if="${page.parent ne null}" th:text="${page.parent.title}">Category Name</li>
+							</ul>
+							</dd>
+						</dl>
+						<a ><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>

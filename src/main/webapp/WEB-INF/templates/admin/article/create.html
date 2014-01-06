@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div th:replace="layout::sidebar"></div>
+			<div id="main">
+				<ol class="breadcrumb">
+					<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">Dashboard</a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" th:text="#{Articles}">Articles</a></li>
+					<li class="active" th:text="#{AddNewArticle}">Add new article</li>
+				</ol>
+				<form th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
+					<input type="hidden" name="id" th:if="${article} ne null" th:value="${article.id}"  />
+					<div class="row">
+						<div class="col-sm-9 wr-post-main">
+							<div class="page-header">
+								<h1 th:text="${title}?:#{AddNewArticle}">Add New Article</h1>
+							</div>
+							<div class="alert alert-success" th:if="${savedArticle ne null}">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								Article saved.
+							</div>
+							<div class="alert alert-danger" th:if="${#fields.hasErrors('all')}">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								Error.
+							</div>
+							<fieldset>
+								<div class="form-group">
+									<div id="post-cover-dropzone" class="wr-post-cover-dropzone col-sm-12" style="">
+										<p class="placeholder help-block" th:text="#{CoverImage}">Cover Image</p>
+										<div class="dragover hide"><span class="help-block">Drop files here</span></div>
+										<div class="wrap-hover">
+											<div class="message hide">
+												<span class="help-block">Drop files to replace image</span>
+											</div>
+											<div class="remove hide"><a href=""><span class="glyphicon glyphicon-remove"></span></a></div>
+										</div>
+										<div class="progress hide"><div class="progress-bar progress-bar-success"></div></div>
+										<input type="hidden" th:field="*{coverId}" />
+										<img th:if="${form.coverId ne null}" th:src="@{${_utils.getMediaUrl(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+									</div>
+								</div>
+								<script th:inline="javascript">
+								$(function() {
+									$('#post-cover-dropzone').mouseenter(function() {
+										if($('#post-cover-dropzone input[name="coverId"]').val() != '') {
+											$('#post-cover-dropzone .message').text('Drop files here to replace image').removeClass('hide');
+											$('#post-cover-dropzone .remove').removeClass('hide');
+											$('#post-cover-dropzone .wrap-hover').addClass('has');
+										} else {
+											$('#post-cover-dropzone .message').text('Drop files here').removeClass('hide');
+											$('#post-cover-dropzone .remove').addClass('hide');
+											$('#post-cover-dropzone .wrap-hover').removeClass('has');
+										}
+									}).mouseleave(function() {
+										$('#post-cover-dropzone .wrap-hover').addClass('hide');
+									});
+
+									$('#post-cover-dropzone').fileupload({
+										url: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+										paramName: 'file',
+										dropZone: $('#post-cover-dropzone'),
+										dragover: function(e) {
+											var dropZone = $('#post-cover-dropzone');
+											var timeout = window.dropZoneTimeout;
+											if (!timeout) {
+												$('#post-cover-dropzone .dragover').removeClass('hide');
+											} else {
+												clearTimeout(timeout);
+											}
+											var found = false;
+											var node = e.target;
+											do {
+												if (node === dropZone[0]) {
+													found = true;
+													break;
+												}
+												node = node.parentNode;
+											} while (node != null);
+											if (found) {
+												$('#post-cover-dropzone .dragover').removeClass('hide');
+											}
+											else {
+												$('#post-cover-dropzone .dragover').addClass('hide');
+											}
+											window.dropZoneTimeout = setTimeout(function () {
+												window.dropZoneTimeout = null;
+												$('#post-cover-dropzone .dragover').addClass('hide');
+											}, 100);
+										},
+										start: function(e) {
+											$('#post-cover-dropzone .progress').removeClass('hide');
+										},
+										progressall: function (e, data) {
+											var progress = parseInt(data.loaded / data.total * 100, 10);
+											$('#post-cover-dropzone .progress-bar').css('width', progress + '%');
+										},
+										done: function(e, data) {
+											$('#post-cover-dropzone :input[name="coverId"]').val(data.result.id);
+											var img = $('<img class="wr-post-cover" />').attr('src', data.result.filelink + '?' + $.param({w: 1200, h: 500, m: 1}));
+											$('#post-cover-dropzone img').remove();
+											$('#post-cover-dropzone').append(img);
+											$('#post-cover-dropzone .progress').addClass('hide');
+											$('#post-cover-dropzone .progress-bar').css('width', '0%');
+										}
+									});
+								});
+								</script>
+							</fieldset>
+							<fieldset>
+								<div class="form-group" th:classappend="${#fields.hasErrors('title')}? has-error">
+									<input type="text" th:field="*{title}" class="form-control" th:attr="placeholder=#{EnterTitle}" placeholder="Enter title here" />
+									<span class="help-block" th:each="err : ${#fields.errors('title')}" th:text="${err}" />
+								</div>
+							</fieldset>
+							<fieldset>
+								<div class="form-group" th:classappend="${#fields.hasErrors('code')}? has-error">
+									<span th:text="${WEBSITE_LINK + '/'}"></span> <input type="text" th:field="*{code}" name="path" class="form-control input-sm wr-code" th:attr="placeholder=#{URLPath}" placeholder="URLパス" />
+									<span class="help-block" th:each="err : ${#fields.errors('code')}" th:text="${err}" />
+								</div>
+							</fieldset>
+							<fieldset>
+								<div class="form-group" th:classappend="${#fields.hasErrors('body')}? has-error">
+									<textarea th:field="*{body}" class="form-control" th:attr="placeholder=#{EnterBody}" placeholder="Enter body here"></textarea>
+									<span class="help-block" th:each="err : ${#fields.errors('body')}" th:text="${err}" />
+									<script th:inline="javascript">
+										$(function() {
+											$('#main :input[name="body"]').redactor({
+												minHeight: 300,
+												convertImageLinks: true,
+												convertVideoLinks: true,
+												imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+												imageGetJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#'
+											});
+										});
+									</script>
+								</div>
+							</fieldset>
+						</div>
+						<div class="col-sm-3 wr-tool-panel">
+							<div class="tools clearfix">
+								<div class="pull-left">
+									<div class="btn-group">
+										<button name="draft" class="btn btn-default" th:text="#{SaveDraft}">Save Draft</button>
+									</div>
+								</div>
+								<div class="pull-right">
+									<div class="btn-group">
+										<button name="publish" class="btn btn-primary" th:text="#{Publish}">Publish</button>
+									</div>
+								</div>
+							</div>
+							<div class="clearfix wr-tool-check">
+								<div class="pull-left">
+									<a id="page-preview" href="#"><span class="glyphicon glyphicon-eye-open"></span> <span th:text="#{Preview}">Preview</span></a>
+								</div>
+								<div class="pull-right">
+									<div class="status" th:if="${article} ne null">
+										<span th:if="${#strings.toString(article.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
+										<span th:if="${#strings.toString(article.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
+										<span th:if="${#strings.toString(article.status) eq 'PUBLISHED'}" class="glyphicon glyphicon-globe"></span>
+										<span th:text="${#messages.msg('Post.Status.' + article.status)}">Published</span><br />
+									</div>
+								</div>
+							</div>
+							<script th:inline="javascript">
+								$(function() {
+									$('#main').on('click', '#article-preview', function(e) {
+										e.preventDefault();
+										var form = $(this).closest('form').clone();
+										var action = /*[[@{__${ADMIN_PATH}__/articles/preview}]]*/ '#';
+										form.attr('action', action);
+										form.attr('target', '_blank');
+										$(':input[name="body"]', form).val($('#main :input[name="body"]').redactor('get'));
+										form.submit();
+									});
+								});
+							</script>
+							<fieldset>
+								<legend th:text="#{Date}">Date</legend>
+								<div class="form-group row" th:classappend="${#fields.hasErrors('date')}? has-error">
+									<div class="col-sm-12">
+										<input type="text" name="date" th:value="*{date ne null ? date.toString('yyyy/MM/dd') : ''}" class="form-control" placeholder="yyyy/MM/dd"/>
+									</div>
+									<span class="help-block" th:each="err : ${#fields.errors('date')}" th:text="${err}" />
+								</div>
+							</fieldset>
+							<fieldset id="category-fieldset">
+								<legend th:text="#{Categories}">Categories</legend>
+								<section>
+									<ul th:unless="${#lists.isEmpty(categoryTree.rootNodes)}" th:include="article/create::category-index(${categoryTree.rootNodes})" id="category-index" class="list-unstyled"></ul>
+									<ul th:fragment="category-index(nodes)">
+										<li th:each="node : ${nodes}" class="checkbox">
+											<label><input type="checkbox" name="categoryIds" th:value="${node.category.id}" th:text="${node.category.name}" th:checked="${#sets.contains(form.categoryIds, node.category.id)}" /></label>
+											<ul th:unless="${#lists.isEmpty(node.children)}" th:include="article/create::category-index(${node.children})" class="list-unstyled"></ul>
+										</li>
+									</ul>
+									<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-dialog}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
+									<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
+								</section>
+							</fieldset>
+							<script th:inline="javascript">
+								$(function() {
+									$('#main').on('click', '#save-category', function(e) {
+										e.preventDefault();
+										var self = $(this);
+										self.button('loading');
+										var form = self.closest('form');
+										var checked = [];
+										$('input[name="categoryIds"]:checked', form).each(function(i, element) {
+											checked.push($(element).val());
+										});
+										var data = {
+											parentId: $(':input[name="parentId"]', form).val(),
+											code: $(':input[name="code"]', form).val(),
+											name: $(':input[name="name"]', form).val(),
+											description: $(':input[name="description"]', form).val()
+										};
+										$.ajax({
+											url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+											type: 'post',
+											data: data,
+											success: function(savedCategory) {
+												checked.push(savedCategory.id.toString());
+												$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
+													data = $(data);
+													$(':input[name="categoryIds"]', data).each(function(i, element) {
+														if ($.inArray($(element).val(), checked) != -1) {
+															$(element).prop('checked', true);
+														}
+													});
+													$('#category-fieldset').html(data);
+												});
+												self.closest('.modal').modal('hide');
+											},
+											error: function(jqXHR) {
+												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+													var field = $(':input[name="' + field + '"]', form);
+													$(field).closest('.form-group').addClass('has-error');
+												});
+											},
+											complete: function() {
+												$(self).button('reset');
+											}
+										});
+									});
+									$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
+										$(this).removeData('bs.modal');
+									});
+								});
+							</script>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>

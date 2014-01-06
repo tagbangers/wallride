@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head th:fragment="head(title)" th:remove="tag">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title th:text="${title}"></title>
+	<link rel="shortcut icon" th:href="@{/_admin/resource/favicon.png}" />
+	<link rel="stylesheet" th:href="@{/_admin/resources/lib/bootstrap-3.0.1/css/bootstrap.min.css}" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+	<link rel="stylesheet" th:href="@{/_admin/resources/lib/select2-3.4.2/select2.css}" href="../../resources/admin/lib/select2-3.4.2/select2.css"/>
+	<link rel="stylesheet" th:href="@{/_admin/resources/lib/redactor/redactor.css}" href="#"/>
+	<link rel="stylesheet" th:href="@{/_admin/resources/lib/jquery-file-upload-9.0.2/css/jquery.fileupload.css}" />
+	<link rel="stylesheet" th:href="@{/_admin/resources/css/admin.css}" />
+	<link rel="stylesheet" th:href="@{/_admin/resources/css/wallride.css}" />
+	<link rel="stylesheet" th:href="@{/_admin/resources/font/flaticon.css}" />
+	<!--[if lt IE 9]>
+	<script src="../../resources/admin/js/html5shiv.js"></script>
+	<script src="../../resources/admin/js/respond.min.js"></script>
+	<![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<script th:src="@{/_admin/resources/lib/bootstrap-3.0.1/js/bootstrap.min.js}" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script th:src="@{/_admin/resources/lib/select2-3.4.2/select2.js}" src="../../resources/admin/lib/select2-3.4.2/select2.js"></script>
+	<script th:src="@{/_admin/resources/lib/redactor/redactor.min.js}" src="#"></script>
+	<script th:src="@{/_admin/resources/lib/jquery-file-upload-9.0.2/js/vendor/jquery.ui.widget.js}" src="#"></script>
+	<script th:src="@{/_admin/resources/lib/jquery-file-upload-9.0.2/js/jquery.fileupload.js}" src="#"></script>
+	<script th:src="@{/_admin/resources/lib/jquery.mjs.nestedSortable.js}"></script>
+	<script th:src="@{/_admin/resources/lib/jquery.shiftcheckbox.js}"></script>
+	<script th:src="@{/_admin/resources/js/common.js}"></script>
+</head>
+<body>
+<header th:fragment="header" id="header" class="navbar navbar-inverse navbar-static-top">
+	<div class="navbar-header">
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+		</button>
+		<a href="../" class="navbar-brand" th:text="${WEBSITE_TITLE}">WallRide</a>
+	</div>
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse navbar-ex1-collapse">
+		<ul class="nav navbar-nav navbar-left">
+		</ul>
+		<ul class="nav navbar-nav navbar-right">
+			<li><a th:href="@{${WEBSITE_LINK}}" href="#" target="_blank" style="font-size:15px;"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${WEBSITE_LINK}">公開画面</span></a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle wr-current-language" data-toggle="dropdown" th:text="${#messages.msg('Language.' + #locale.language)}"> <b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					<li class="disabled"><a href="#">Languages</a></li>
+					<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${#messages.msg('Language.' + key)}">English</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</header>
+<div>
+	<div th:fragment="sidebar" id="sidebar">
+		<div class="accordion-group">
+			<div class="accordion-heading account">
+				<a href="#collapseZero" class="wr-account accordion-toggle collapsed" data-toggle="collapse" data-parent="#sidebar">
+					<img th:src="@{${USER.getGravatarUrl(300)}}" src="../../resources/admin/img/tb-logo.png" class="wr-account-picture img-thumbnail"/>
+					<span class="wr-account-name" th:text="${USER.name}"></span>
+				</a>
+			</div>
+			<div id="collapseZero" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<ul class="nav">
+						<li><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${USER.id})}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Profile}">プロフィール</span></a></li>
+						<li><a th:href="@{/_admin/logout}"><span class="glyphicon glyphicon-off"></span> <span th:text="#{LogOut}">ログアウト</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<ul class="nav nav-stacked">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Articles}">Articles</span></a>
+				<ul class="nav dropdown-menu">
+					<li><a th:href="@{__${ADMIN_PATH}__/articles/create}" href="article-create.html"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New Article</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" href="articles.html"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Articles}">Articles</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/categories/index}"><span class="glyphicon glyphicon-folder-open"></span> <span th:text="#{Categories}">Categories</span></a></li>
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> <span th:text="#{Pages}">Pages</span></a>
+				<ul class="nav dropdown-menu">
+					<li><a th:href="@{__${ADMIN_PATH}__/pages/create}"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New Page</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/pages/index}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Pages}">Pages</span></a></li>
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Users}">Users</span></a>
+				<ul class="nav dropdown-menu">
+					<li><a th:href="@{__${ADMIN_PATH}__/users/invitations/index}"><span class="glyphicon glyphicon-send"></span> <span th:text="#{InviteNew}">Invite New</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/users/index}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Users}">Users</span></a></li>
+				</ul>
+			</li>
+		</ul>
+		<script>
+			$(function() {
+				$('#sidebar').on('click', '[data-toggle=collapse]', function(e) {
+					var $this = $(this);
+					var $target = $this.next();
+					var $parent = $('#sidebar');
+					$parent.find('.nav.in').collapse('hide');
+					$target.collapse('toggle');
+				});
+			});
+		</script>
+	</div>
+	<div id="main">
+		<div class="page-header clearfix">
+			<h1>Dashboard</h1>
+		</div>
+		<div class="row wr-dashboard">
+			<div class="col-sm-2">
+				<h2>Content</h2>
+				<table class="table">
+					<tr>
+						<th th:text="${articleCount}">11</th>
+						<td>Posts</td>
+					</tr>
+					<tr>
+						<th th:text="${pageCount}">11</th>
+						<td>Pages</td>
+					</tr>
+					<tr>
+						<th th:text="${categoryCount}">11</th>
+						<td>Categories</td>
+					</tr>
+				</table>
+			</div>
+			<div class="col-sm-5">
+				<h2>New Posts</h2>
+				<dl th:each="article : ${recentPublishedArticles}" class="list-inline">
+					<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}">Title</a></dt>
+					<dd th:text="${article.date.toString('yyyy/MM/dd')}">yyyy/MM/dd</dd>
+				</dl>
+			</div>
+			<div class="col-sm-5">
+				<h2>Drafts</h2>
+				<dl th:each="article : ${recentDraftArticles}" class="list-inline">
+					<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}?:'(No Titled)'">Title</a></dt>
+					<dd th:text="${article.updatedAt.toString('yyyy/MM/dd HH:mm') + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</div>
+<footer>
+</footer>
+</body>
+</html>

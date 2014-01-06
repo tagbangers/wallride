@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
+		<title></title>
+	</head>
+	<body>
+		<div id="wrap">
+			<div th:replace="layout::nav"></div>
+			<img th:if="${article.cover ne null}" th:src="@{${_utils.getMediaUrl(article.cover)}(w=1200,h=500,m=1)}" class="post-cover" />
+			<article class="container" style="padding-top: 0px;">
+				<div class="page-header">
+					<h1 th:text="${article.title}"></h1>
+				</div>
+				<p th:utext="${_utils.replaceMediaUrlForResized(article.body)}"></p>
+				<time></time>
+			</article>
+		</div>
+		<div th:replace="layout::footer" id="footer"></div>
+	</body>
+</html>

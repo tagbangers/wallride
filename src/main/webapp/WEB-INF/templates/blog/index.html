@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head th:fragment="head(title)" th:remove="tag">
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="" />
+		<meta name="author" content="" />
+		<title th:text="${title}"></title>
+		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
+		<link rel="stylesheet" th:href="@{/resources/lib/bootstrap-3.0.2/css/bootstrap.min.css}" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+		<link rel="stylesheet" th:href="@{/resources/css/sticky-footer-navbar.css}" href="#" />
+		<link rel="stylesheet" th:href="@{/resources/css/common.css}" href="#" />
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		<![endif]-->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script th:src="@{/resources/lib/bootstrap-3.0.2/js/bootstrap.min.js}" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+		<script th:src="@{/resources/lib/jquery.lazyload.min.js}" src="#"></script>
+	</head>
+	<body>
+		<!-- Wrap all page content here -->
+		<div id="wrap">
+			<!-- Fixed navbar -->
+			<div th:fragment="nav" class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a th:text="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_PATH}__/}" class="navbar-brand" href="#">Blog Title</a>
+					</div>
+					<div class="collapse navbar-collapse">
+						<ul class="nav navbar-nav">
+							<li class="active"><a th:href="@{__${WEBSITE_PATH}__/}">Home</a></li>
+							<li th:each="node : ${PAGE_TREE.rootNodes}"><a th:href="@{__${WEBSITE_PATH}__/__${node.page.code}__}" th:text="${node.page.title}">About</a></li>
+						</ul>
+						<ul class="nav navbar-nav navbar-right">
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Language <b class="caret"></b></a>
+								<ul class="dropdown-menu">
+									<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${key}" href="#" >日本語</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</div>
+
+			<!-- Begin page content -->
+			<div class="container">
+				<div class="page-header">
+					<h1>Sticky footer with fixed navbar</h1>
+				</div>
+				<p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added within <code>#wrap</code> with <code>padding-top: 60px;</code> on the <code>.container</code>.</p>
+				<p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>
+			</div>
+		</div>
+		<div th:fragment="footer" id="footer">
+			<div class="container">
+				<p class="text-muted credit">Example courtesy <a href="http://martinbean.co.uk">Martin Bean</a> and <a href="http://ryanfait.com/sticky-footer/">Ryan Fait</a>.</p>
+			</div>
+		</div>
+	</body>
+</html>

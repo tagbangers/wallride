@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div th:replace="layout::sidebar"></div>
+			<div id="main">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="pull-left">
+							<ol class="breadcrumb">
+								<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">ダッシュボード</a></li>
+								<li><a th:href="@{__${ADMIN_PATH}__/users/index}" th:text="#{AllUsers}">ユーザ一覧</a></li>
+								<li class="active" th:text="${user.name}"></li>
+							</ol>
+						</div>
+						<div class="pull-right">
+							<ul class="pager">
+								<li th:classappend="${prevId eq null}?'disabled'" class="previous">
+									<a th:href="${prevId ne null} ? @{__${ADMIN_PATH}__/users/describe(id=${prevId},token=${token})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+								</li>
+								<li th:classappend="${nextId eq null}?'disabled'" class="next">
+									<a th:href="${nextId ne null} ? @{__${ADMIN_PATH}__/users/describe(id=${nextId},token=${token})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-9 describe">
+						<div class="page-header">
+							<h1 th:text="${user.name}">Name</h1>
+						</div>
+						<table class="table">
+							<tr>
+								<th th:text="#{LoginId}">ログインID</th>
+								<td th:text="${user.loginId}">ログインID</td>
+							</tr>
+							<tr>
+								<th th:text="#{Email}">メールアドレス</th>
+								<td th:text="${user.email}">メールアドレス</td>
+							</tr>
+							<tr>
+								<th th:text="#{Posts}">投稿記事数</th>
+								<td th:text="${user.articleCount}">投稿記事数</td>
+							</tr>
+						</table>
+					</div>
+					<div class="col-sm-3">
+						<div class="thumbnail">
+							<img src="http://placehold.it/170/eeeeee/ffffff"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>

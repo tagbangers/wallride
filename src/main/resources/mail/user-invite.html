@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title th:remove="all">Template for HTML email (simple)</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</head>
+	<body>
+		<p><span th:text="${invitation.createdBy}">CreatedBy</span> invited you to become an editor on <span th:text="${websiteTitle}">Website Title</span></p>
+		<p th:text="${invitation.message}"></p>
+		<a th:href="${signupLink}" th:text="${signupLink}"></a>
+	</body>
+</html>

@@ -1,0 +1,174 @@
+.wr-post-cover {
+	width: 100%;
+}
+.wr-post-cover-dropzone {
+	position: relative;
+	min-height: 100px;
+	border: 1px solid #ccc;
+	padding: 0;
+}
+.wr-post-cover-dropzone .placeholder {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	text-align: center;
+}
+.wr-post-cover-dropzone .dragover {
+	position: absolute;
+	top: 3px;
+	bottom: 3px;
+	left: 3px;
+	right: 3px;
+	border: 5px dashed #ccc;
+}
+.wr-post-cover-dropzone .dragover .help-block {
+	vertical-align: middle;
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	color: #ccc;
+}
+.wr-post-cover-dropzone .progress {
+	position: absolute;
+	bottom: 5px;
+	left: 5px;
+	right: 5px;
+	margin-bottom: 0;
+}
+.wr-post-cover-dropzone .wrap-hover {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	vertical-align: middle;
+}
+.wr-post-cover-dropzone:hover .wrap-hover {
+	cursor: pointer;
+	display: inline-block!important;
+	color: #ccc;
+}
+.wr-post-cover-dropzone:hover .wrap-hover.has {
+	background-color: #000;
+	opacity: 0.4;
+}
+.wr-post-cover-dropzone .message {
+	top:15px;
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 40px;
+}
+.wr-post-cover-dropzone .wrap-hover .message .help-block {
+	color: #ccc;
+	opacity: 1;
+	z-index:200;
+}
+.wr-post-cover-dropzone .wrap-hover.has .message .help-block {
+	color: #ffffff;
+	opacity: 1;
+	z-index:200;
+}
+.wr-post-cover-dropzone .remove {
+	position: absolute;
+	top: 15px;
+	right: 5px;
+	font-size: 15px;
+}
+.wr-post-cover-dropzone .remove a {
+	padding: 15px;
+}
+.form-control.wr-code {
+	width: 20%;
+	display: inline;
+}
+.wr-tree-options .disclose {
+	padding:10px;
+}
+.wr-tree-options .title {
+	font-weight: bold;
+	padding-right: 15px;
+}
+.wr-tree-options a,
+.wr-tree-options button {
+	padding: 10px 5px;
+}
+.wr-tree-options button .glyphicon-remove {
+	width: 25px;
+}
+#main .wr-describe-main h1 {
+	line-height: 1.5em;
+	font-size: 28px;
+	font-weight: bold;
+}
+.wr-tool-panel .tools {
+	margin-bottom: 0.5em;
+}
+.wr-tool-panel .status {
+	font-size: 15px;
+	color: #5A5A5A;
+	font-weight: bold;
+}
+.wr-tool-panel .wr-tool-check {
+	line-height: 34px;
+	padding: 0 3px;
+}
+.wr-tool-panel dl {
+	margin: 1.5em 0;
+}
+.wr-tool-panel dl dt {
+	font-weight: normal;
+	font-size: 14.5px;
+	line-height: 32px;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 7px;
+}
+.wr-tool-panel dl dd {
+	font-size:14px;
+}
+.wr-tool-panel .publish-date {
+	font-size: 15px;
+}
+#header.navbar-inverse .navbar-brand {
+	color: #574E4E;
+	font-weight: bold;
+}
+#header.navbar-inverse .navbar-nav>li>a.wr-current-language {
+	background-color: #E25656;
+	/*background-color: #9DA9AD;*/
+	color: #FFFFFF;
+}
+#header.navbar-inverse .navbar-nav>.open>a.wr-current-language,
+#header.navbar-inverse .navbar-nav>.open>a.wr-current-language:hover,
+#header.navbar-inverse .navbar-nav>.open>a.wr-current-language:focus {
+	background-color: #868383;
+}
+.wr-post-author {
+	text-align: center;
+}
+.wr-post-author .wr-post-author-thumbnail {
+	width:80px;
+	height:80px;
+}
+.wr-post-author .wr-post-author-thumbnail img {
+	width: 100%;
+	border:transparent;
+	-webkit-border-radius: 100%;
+	-moz-border-radius: 100%;
+	border-radius: 100%;
+}
+.wr-post-author .wr-post-author-info {
+	text-align: left;
+}
+.wr-post-author .wr-post-author-info a {
+	/*font-weight: 700;*/
+	font-size: 16px;
+}
+.wr-dashboard dl dt {
+	font-size: 15px;
+}
+.wr-dashboard table tr th {
+	font-size: 15px;
+	text-align: right;
+}
+.wr-dashboard table tr th, .wr-dashboard table tr td {
+	border-top: transparent;
+}

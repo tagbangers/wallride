@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div th:replace="layout::sidebar"></div>
+			<div id="main">
+				<ol class="breadcrumb">
+					<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">Dashboard</a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/pages/index}" th:text="#{Pages}">Pages</a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/pages/describe(id=${form.id})}" th:text="${form.title}"></a></li>
+					<li class="active">Edit Page</li>
+				</ol>
+				<form th:include="page/create::form(title=#{EditPage},id=${form.id})" th:action="@{__${ADMIN_PATH}__/pages/edit(id=${form.id})}" th:object="${form}" action="#" method="post">
+				</form>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>
