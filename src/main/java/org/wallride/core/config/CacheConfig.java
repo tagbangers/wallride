@@ -46,15 +46,11 @@ public class CacheConfig {
 			throw new RuntimeException(e);
 		}
 
-		//TODO 判定基準の変更
-		if (System.getProperties().containsKey("AWS_ACCESS_KEY_ID")) {
+		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");
+		if ("jgroups-ec2.xml".equals("jgroupsConfigurationFile")) {
 			System.setProperty("jgroups.s3.access_key", System.getProperty("AWS_ACCESS_KEY_ID"));
-		}
-		if (System.getProperties().containsKey("AWS_SECRET_KEY")) {
 			System.setProperty("jgroups.s3.secret_access_key", System.getProperty("AWS_SECRET_KEY"));
-		}
-		if (environment.containsProperty("jgroups.s3.bucket")) {
-			System.setProperty("jgroups.s3.bucket",  environment.getProperty("jgroups.s3.bucket"));
+			System.setProperty("jgroups.s3.bucket",  environment.getRequiredProperty("jgroups.s3.bucket"));
 		}
 		System.setProperty("jgroups.bind_addr", ipaddress);
 
@@ -68,8 +64,7 @@ public class CacheConfig {
 			.transport()
 				.defaultTransport()
 				.clusterName("wallride-cluster")
-				.addProperty("configurationFile", "jgroups-tcp.xml"); //TODO
-//				.addProperty("configurationFile", "jgroups-ec2.xml");
+				.addProperty("configurationFile", jgroupsConfigurationFile);
 
 		Properties props = new Properties();
 		props.put("hibernate.search.default.directory_provider", "infinispan");
