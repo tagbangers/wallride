@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -38,6 +39,7 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.ValidationException;
+import java.text.MessageFormat;
 import java.util.*;
 
 @Service
@@ -68,6 +70,9 @@ public class UserService {
 
 	@Inject
 	private Environment environment;
+
+	@Inject
+	private MessageSourceAccessor messageSourceAccessor;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -155,14 +160,21 @@ public class UserService {
 					.buildAndExpand().toString();
 
 			final Context ctx = new Context(LocaleContextHolder.getLocale());
-			ctx.setVariable("websiteTitle", websiteTitle);
+			ctx.setVariable("invitationAutoMessage", MessageFormat.format(
+					messageSourceAccessor.getMessage("InvitationMessageContent"),
+					authorizedUser.toString(),
+					websiteTitle));
 			ctx.setVariable("signupLink", signupLink);
 			ctx.setVariable("invitation", invitation);
 
 			final MimeMessage mimeMessage = mailSender.createMimeMessage();
 			final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
-			message.setSubject(String.format(
-					"%s invited you to become an user on %s",
+//			message.setSubject(String.format(
+//					"%s invited you to become an user on %s",
+//					authorizedUser.toString(),
+//					websiteTitle)); //TODO
+			message.setSubject(MessageFormat.format(
+					messageSourceAccessor.getMessage("InvitationMessageTitle"),
 					authorizedUser.toString(),
 					websiteTitle)); //TODO
 			message.setFrom(environment.getRequiredProperty("mail.from")); //TODO
@@ -194,14 +206,17 @@ public class UserService {
 				.buildAndExpand().toString();
 
 		final Context ctx = new Context(LocaleContextHolder.getLocale());
-		ctx.setVariable("websiteTitle", websiteTitle);
+		ctx.setVariable("invitationAutoMessage", MessageFormat.format(
+				messageSourceAccessor.getMessage("InvitationMessageContent"),
+				authorizedUser.toString(),
+				websiteTitle));
 		ctx.setVariable("signupLink", signupLink);
 		ctx.setVariable("invitation", invitation);
 
 		final MimeMessage mimeMessage = mailSender.createMimeMessage();
 		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
-		message.setSubject(String.format(
-				"%s invited you to become an user on %s",
+		message.setSubject(MessageFormat.format(
+				messageSourceAccessor.getMessage("InvitationMessageTitle"),
 				authorizedUser.toString(),
 				websiteTitle)); //TODO
 		message.setFrom(environment.getRequiredProperty("mail.from")); //TODO
