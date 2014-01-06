@@ -41,9 +41,6 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 	private PageTreeService pageTreeService;
 
 	@Inject
-	private TemplateUtils templateUtils;
-
-	@Inject
 	private Environment environment;
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultModelAttributeInterceptor.class);
@@ -69,21 +66,6 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
 
-		mv.addObject("_utils", templateUtils); //TODO
-		mv.addObject("_mediaUrl", environment.getRequiredProperty("media.default.url")); //TODO
-
-//		@SuppressWarnings("unchecked")
-//		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-//		String language = (String) pathVariables.get("language");
-//		mv.addObject("_language", language);
-
-//		Locale locale = LocaleContextHolder.getLocale();
-//		String language = locale.getLanguage();
-//		mv.addObject("_language", language);
-
-//		LanguageSetting languageSetting = settingService.readLanguageSetting(LocaleContextHolder.getLocale().getLanguage());
-//		mv.addObject("CURRENT_SETTING", languageSetting);
-		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		AuthorizedUser authorizedUser = null;
 		if (authentication != null && authentication.getPrincipal() instanceof AuthorizedUser) {

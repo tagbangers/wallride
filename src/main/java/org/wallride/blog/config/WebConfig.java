@@ -151,7 +151,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public ServletContextTemplateResolver templateResolver() {
 		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getProperty("blog.default.template.path"));
+		resolver.setPrefix(environment.getRequiredProperty("blog.template.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
 		// NB, selecting HTML5 as the template mode.

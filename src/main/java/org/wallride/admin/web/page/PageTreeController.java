@@ -42,7 +42,7 @@ public class PageTreeController {
 	@RequestMapping(params="part=page-edit-dialog")
 	public String partPageEditDialog(@PathVariable String language, @RequestParam long id, Model model) {
 		PageTree pageTree = pageService.readPageTree(language);
-		Page page = pageTree.getPage(id);
+		Page page = pageTree.getPageById(id);
 		model.addAttribute("pageTree", pageTree);
 		model.addAttribute("page", page);
 		return "/page/tree::#page-edit-dialog";

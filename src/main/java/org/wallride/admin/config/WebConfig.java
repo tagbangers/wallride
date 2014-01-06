@@ -132,7 +132,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="adminTemplateResolver")
 	public ServletContextTemplateResolver adminTemplateResolver() {
 		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getProperty("admin.default.template.path"));
+		resolver.setPrefix(environment.getRequiredProperty("admin.template.path"));
 		resolver.setSuffix(".html");
         resolver.setCharacterEncoding("UTF-8");
 		// NB, selecting HTML5 as the template mode.
@@ -145,7 +145,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="blogTemplateResolver")
 	public ServletContextTemplateResolver blogTemplateResolver() {
 		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getProperty("blog.default.template.path"));
+		resolver.setPrefix(environment.getRequiredProperty("blog.template.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
 		resolver.setTemplateMode("HTML5");
