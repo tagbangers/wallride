@@ -201,62 +201,62 @@
 										</li>
 									</ul>
 									<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-dialog}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
-									<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
 								</section>
 							</fieldset>
-							<script th:inline="javascript">
-								$(function() {
-									$('#main').on('click', '#save-category', function(e) {
-										e.preventDefault();
-										var self = $(this);
-										self.button('loading');
-										var form = self.closest('form');
-										var checked = [];
-										$('input[name="categoryIds"]:checked', form).each(function(i, element) {
-											checked.push($(element).val());
-										});
-										var data = {
-											parentId: $(':input[name="parentId"]', form).val(),
-											code: $(':input[name="code"]', form).val(),
-											name: $(':input[name="name"]', form).val(),
-											description: $(':input[name="description"]', form).val()
-										};
-										$.ajax({
-											url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
-											type: 'post',
-											data: data,
-											success: function(savedCategory) {
-												checked.push(savedCategory.id.toString());
-												$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
-													data = $(data);
-													$(':input[name="categoryIds"]', data).each(function(i, element) {
-														if ($.inArray($(element).val(), checked) != -1) {
-															$(element).prop('checked', true);
-														}
-													});
-													$('#category-fieldset').html(data);
-												});
-												self.closest('.modal').modal('hide');
-											},
-											error: function(jqXHR) {
-												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-													var field = $(':input[name="' + field + '"]', form);
-													$(field).closest('.form-group').addClass('has-error');
-												});
-											},
-											complete: function() {
-												$(self).button('reset');
-											}
-										});
-									});
-									$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
-										$(this).removeData('bs.modal');
-									});
-								});
-							</script>
 						</div>
 					</div>
 				</form>
+				<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
+				<script th:inline="javascript">
+					$(function() {
+						$('#main').on('click', '#save-category', function(e) {
+							e.preventDefault();
+							var self = $(this);
+							self.button('loading');
+							var form = self.closest('form');
+							var checked = [];
+							$('input[name="categoryIds"]:checked', form).each(function(i, element) {
+								checked.push($(element).val());
+							});
+							var data = {
+								parentId: $(':input[name="parentId"]', form).val(),
+								code: $(':input[name="code"]', form).val(),
+								name: $(':input[name="name"]', form).val(),
+								description: $(':input[name="description"]', form).val()
+							};
+							$.ajax({
+								url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+								type: 'post',
+								data: data,
+								success: function(savedCategory) {
+									checked.push(savedCategory.id.toString());
+									$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
+										data = $(data);
+										$(':input[name="categoryIds"]', data).each(function(i, element) {
+											if ($.inArray($(element).val(), checked) != -1) {
+												$(element).prop('checked', true);
+											}
+										});
+										$('#category-fieldset').html(data);
+									});
+									self.closest('.modal').modal('hide');
+								},
+								error: function(jqXHR) {
+									$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+										var field = $(':input[name="' + field + '"]', form);
+										$(field).closest('.form-group').addClass('has-error');
+									});
+								},
+								complete: function() {
+									$(self).button('reset');
+								}
+							});
+						});
+						$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
+							$(this).removeData('bs.modal');
+						});
+					});
+				</script>
 			</div>
 		</div>
 		<footer>
