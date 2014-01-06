@@ -1,5 +1,6 @@
 package org.wallride.admin.service;
 
+import org.hibernate.cfg.Settings;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,24 +161,18 @@ public class UserService {
 					.buildAndExpand().toString();
 
 			final Context ctx = new Context(LocaleContextHolder.getLocale());
-			ctx.setVariable("invitationAutoMessage", MessageFormat.format(
-					messageSourceAccessor.getMessage("InvitationMessageContent"),
-					authorizedUser.toString(),
-					websiteTitle));
+			ctx.setVariable("websiteTitle", websiteTitle);
+			ctx.setVariable("authorizedUser", authorizedUser);
 			ctx.setVariable("signupLink", signupLink);
 			ctx.setVariable("invitation", invitation);
 
 			final MimeMessage mimeMessage = mailSender.createMimeMessage();
 			final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
-//			message.setSubject(String.format(
-//					"%s invited you to become an user on %s",
-//					authorizedUser.toString(),
-//					websiteTitle)); //TODO
 			message.setSubject(MessageFormat.format(
-					messageSourceAccessor.getMessage("InvitationMessageTitle"),
+					messageSourceAccessor.getMessage("InvitationMessageTitle", LocaleContextHolder.getLocale()),
 					authorizedUser.toString(),
-					websiteTitle)); //TODO
-			message.setFrom(environment.getRequiredProperty("mail.from")); //TODO
+					websiteTitle));
+			message.setFrom(authorizedUser.getEmail());
 			message.setTo(invitation.getEmail());
 
 			final String htmlContent = templateEngine.process("user-invite", ctx);
@@ -206,20 +201,18 @@ public class UserService {
 				.buildAndExpand().toString();
 
 		final Context ctx = new Context(LocaleContextHolder.getLocale());
-		ctx.setVariable("invitationAutoMessage", MessageFormat.format(
-				messageSourceAccessor.getMessage("InvitationMessageContent"),
-				authorizedUser.toString(),
-				websiteTitle));
+		ctx.setVariable("websiteTitle", websiteTitle);
+		ctx.setVariable("authorizedUser", authorizedUser);
 		ctx.setVariable("signupLink", signupLink);
 		ctx.setVariable("invitation", invitation);
 
 		final MimeMessage mimeMessage = mailSender.createMimeMessage();
 		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
 		message.setSubject(MessageFormat.format(
-				messageSourceAccessor.getMessage("InvitationMessageTitle"),
+				messageSourceAccessor.getMessage("InvitationMessageTitle", LocaleContextHolder.getLocale()),
 				authorizedUser.toString(),
-				websiteTitle)); //TODO
-		message.setFrom(environment.getRequiredProperty("mail.from")); //TODO
+				websiteTitle));
+		message.setFrom(authorizedUser.getEmail());
 		message.setTo(invitation.getEmail());
 
 		final String htmlContent = templateEngine.process("user-invite", ctx);

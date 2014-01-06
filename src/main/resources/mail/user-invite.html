@@ -5,7 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	</head>
 	<body>
-		<p><span th:text="${invitationAutoMessage}"></span></p>
+		<p><span th:text="${#messages.msg('InvitationMessageContent', authorizedUser, websiteTitle)}"></span></p>
 		<p th:text="${invitation.message}"></p>
 		<a th:href="${signupLink}" th:text="#{AcceptInvitation}"></a>
 	</body>
