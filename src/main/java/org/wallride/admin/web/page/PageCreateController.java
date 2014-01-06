@@ -85,7 +85,7 @@ public class PageCreateController {
 		redirectAttributes.addFlashAttribute("savedPage", page);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", page.getId());
-		return "redirect:/_admin/{language}/pages/edit?id={id}";
+		return "redirect:/_admin/{language}/pages/describe?id={id}";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")
@@ -115,7 +115,7 @@ public class PageCreateController {
 		redirectAttributes.addFlashAttribute("savedPage", page);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", page.getId());
-		return "redirect:/_admin/{language}/pages/edit?id={id}";
+		return "redirect:/_admin/{language}/pages/describe?id={id}";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="cancel")

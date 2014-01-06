@@ -5,6 +5,7 @@
 	position: relative;
 	min-height: 100px;
 	border: 1px solid #ccc;
+	margin-bottom: 15px;
 	padding: 0;
 }
 .wr-post-cover-dropzone .placeholder {

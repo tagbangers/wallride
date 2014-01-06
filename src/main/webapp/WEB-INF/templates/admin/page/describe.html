@@ -32,12 +32,15 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-9 wr-describe-main">
-						<div class="page-header clearfix">
-							<img th:if="${page.cover ne null}" th:src="@{${_utils.getMediaUrl(page.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
-							<h1 th:text="${page.title}">
-							</h1>
+						<div class="alert alert-success" th:if="${savedPage ne null}">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<span th:text="#{SavedPage}">Page saved.</span>
 						</div>
-						<pre th:utext="${page.body}"></pre>
+						<div class="page-header clearfix">
+							<img th:if="${page.cover ne null}" th:src="@{${#medias.link(page.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+							<h1 th:text="${page.title}">Page Title</h1>
+						</div>
+						<pre th:utext="${page.body}">Page Body</pre>
 						<hr/>
 						<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a>
 					</div>
@@ -57,13 +60,15 @@
 							<div class="btn-toolbar pull-right" role="toolbar">
 								<div class="btn-group">
 									<a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${page.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
-<!--									<a class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></a>
+<!--
+									<a class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></a>
 									<ul class="dropdown-menu pull-right" role="menu">
 										<li class="disabled"><a href="#">記事をコピー</a></li>
 										<li><a href="">英語版</a></li>
 										<li><a href="">ドイツ語版</a></li>
 										<li><a href="">フランス語版</a></li>
-									</ul>-->
+									</ul>
+-->
 								</div>
 							</div>
 						</div>

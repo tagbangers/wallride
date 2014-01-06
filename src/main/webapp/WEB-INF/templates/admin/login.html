@@ -57,7 +57,7 @@
 	<body>
 		<div class="container">
 			<form th:action="@{login}" action="#" method="post" class="form-signin">
-				<h2 class="form-signin-heading">WallRide</h2>
+				<h2 th:text="${WEBSITE_TITLE}" class="form-signin-heading">WallRide</h2>
 				<input type="text" name="username" class="form-control" th:attr="placeholder=#{UserName}" autofocus="autofocus" autocomplete="off" />
 				<input type="password" name="password" class="form-control" th:attr="placeholder=#{Password}" autocomplete="off" />
 				<label class="checkbox"> <input type="checkbox" name="remember-me" th:text="#{RememberMe}"/></label>
