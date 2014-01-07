@@ -380,6 +380,9 @@ ul.sortable {
 	cursor: move;
 	background: #ffffff;
 }
+.sortable li div.category.off, .sortable li div.banner.off  {
+	background: #F5F5F5;
+}
 .sortable li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
 	border-color: #999;
 	background: #fafafa;

@@ -173,3 +173,14 @@
 .wr-dashboard table tr th, .wr-dashboard table tr td {
 	border-top: transparent;
 }
+.wr-post-status-PUBLISHED {
+	color: #016B66;
+}
+
+.wr-post-status-DRAFT {
+	color: #cd5c5c;
+}
+
+.wr-post-status-SCHEDULED {
+	color: #ffc31e;
+}

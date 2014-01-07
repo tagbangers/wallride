@@ -66,11 +66,12 @@
 				<ul th:unless="${#lists.isEmpty(pageTree.rootNodes)}" th:replace="page/tree::page(${pageTree.rootNodes})"></ul>
 				<ul id="page-tree" class="sortable" th:fragment="page(nodes)">
 					<li th:each="node : ${nodes}" th:id="${'page-tree_' + node.page.id}">
-						<div class="category clearfix">
+						<div class="category clearfix" th:classappend="${#strings.toString(node.page.status) ne 'PUBLISHED'} ? 'off'">
 							<div class="wr-tree-options pull-left">
 								<span class="wr-tree-option disclose"><span class="glyphicon glyphicon-chevron-right"></span></span>
 								<span class="wr-tree-option title" th:text="${node.page.title}"></span>
 								<span class="wr-tree-option" th:text="${'/' + node.page.code}">/cate1</span>
+								<span class="wr-tree-option small" style="margin-left: 10px;" th:classappend="'wr-post-status-' + ${node.page.status}">● <span th:text="#{Post.Status. + ${node.page.status}}"></span></span>
 							</div>
 							<div class="wr-tree-options pull-right">
 								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/edit(id=${node.page.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
