@@ -59,9 +59,9 @@ public class PostUtils {
 			params.put("language", LocaleContextHolder.getLocale().getLanguage());
 		}
 		builder.path("/{year}/{month}/{day}/{code}");
-		params.put("year", article.getDate().getYear());
-		params.put("month", article.getDate().getMonthOfYear());
-		params.put("day", article.getDate().getDayOfMonth());
+		params.put("year", String.format("%04d", article.getDate().getYear()));
+		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
+		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
 		params.put("code", article.getCode());
 		return builder.buildAndExpand(params).toUriString();
 	}

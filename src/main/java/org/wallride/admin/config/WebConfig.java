@@ -22,12 +22,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.admin.web.AuthorizedUserMethodArgumentResolver;
+import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.web.DefaultModelAttributeInterceptor;
 import org.wallride.core.web.PathVariableLocaleResolver;
 import org.wallride.core.web.SetupCheckInterceptor;
@@ -54,6 +56,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Inject
 	private SetupCheckInterceptor setupCheckInterceptor;
+
+	@Inject
+	private CustomThymeleafDialect customThymeleafDialect;
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -161,6 +166,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		resolvers.add(emailTemplateResolver());
 		resolvers.add(adminTemplateResolver());
 		engine.setTemplateResolvers(resolvers);
+
+		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(customThymeleafDialect);
+		engine.setAdditionalDialects(dialects);
 		return engine;
 	}
 
@@ -170,6 +179,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		Set<TemplateResolver> resolvers = new HashSet<>();
 		resolvers.add(blogTemplateResolver());
 		engine.setTemplateResolvers(resolvers);
+
+		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(customThymeleafDialect);
+		engine.setAdditionalDialects(dialects);
 		return engine;
 	}
 

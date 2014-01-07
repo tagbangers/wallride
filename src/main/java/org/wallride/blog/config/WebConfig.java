@@ -23,12 +23,14 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
+import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.wallride.admin.web.AuthorizedUserMethodArgumentResolver;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.service.SettingService;
+import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.web.DefaultModelAttributeInterceptor;
 import org.wallride.core.web.PathVariableLocaleResolver;
 
@@ -38,8 +40,10 @@ import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Configuration
 //@EnableWebMvc
@@ -51,6 +55,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
 	
 	@Inject
 	private DefaultModelAttributeInterceptor defaultModelAttributeInterceptor;
+
+	@Inject
+	private CustomThymeleafDialect customThymeleafDialect;
 
 	@Inject
 	private SettingService settingService;
@@ -165,6 +172,10 @@ public class WebConfig extends WebMvcConfigurationSupport {
 	public SpringTemplateEngine templateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
 		engine.setTemplateResolver(templateResolver());
+
+		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(customThymeleafDialect);
+		engine.setAdditionalDialects(dialects);
 		return engine;
 	}
 

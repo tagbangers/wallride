@@ -1,6 +1,7 @@
 package org.wallride.admin.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
@@ -25,11 +26,8 @@ public class MediaService {
 	@Inject
 	private ResourceLoader resourceLoader;
 
-//	@Inject
-//	private Environment environment;
-
-	@Value("#{systemProperties['media.path']}")
-	private String mediaPath;
+	@Inject
+	private Environment environment;
 
 	public Media createMedia(MultipartFile file) {
 		Media media = new Media();
@@ -38,7 +36,7 @@ public class MediaService {
 		media = mediaRepository.saveAndFlush(media);
 
 		try {
-			Resource prefix = resourceLoader.getResource(mediaPath);
+			Resource prefix = resourceLoader.getResource(environment.getRequiredProperty("media.path"));
 			Resource resource = prefix.createRelative(media.getId());
 			AmazonS3ResourceUtils.writeMultipartFile(file, resource);
 		}

@@ -16,8 +16,8 @@ public class MediaIndexModel implements Serializable {
 	private String folder;
 
 	public MediaIndexModel(Media media, Environment environment) {
-		this.thumb = environment.getRequiredProperty("media.default.url") + media.getId() + "?w=100&h=100&m=1";
-		this.image = environment.getRequiredProperty("media.default.url") + media.getId();
+		this.thumb = environment.getRequiredProperty("media.url") + media.getId() + "?w=100&h=100&m=1";
+		this.image = environment.getRequiredProperty("media.url") + media.getId();
 		this.title = media.getOriginalName();
 		this.folder = media.getCreatedAt().toString("yyyy/MM");
 	}

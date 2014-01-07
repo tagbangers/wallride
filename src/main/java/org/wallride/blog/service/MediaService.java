@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -35,11 +36,8 @@ public class MediaService {
 	@Inject
 	private ResourceLoader resourceLoader;
 
-//	@Inject
-//	private Environment environment;
-
-	@Value("#{systemProperties['media.path']}")
-	private String mediaPath;
+	@Inject
+	private Environment environment;
 
 	private static Logger logger = LoggerFactory.getLogger(MediaService.class);
 
@@ -55,7 +53,7 @@ public class MediaService {
 
 //	@Cacheable("resources")
 	public Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException, EncoderException {
-		final Resource prefix = resourceLoader.getResource(mediaPath);
+		final Resource prefix = resourceLoader.getResource(environment.getRequiredProperty("media.path"));
 		final Resource resource = prefix.createRelative(media.getId());
 		if (!resource.exists()) {
 			return null;

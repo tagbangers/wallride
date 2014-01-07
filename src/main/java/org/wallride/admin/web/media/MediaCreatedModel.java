@@ -13,7 +13,7 @@ public class MediaCreatedModel implements Serializable {
 
 	public MediaCreatedModel(Media media, Environment environment) {
 		this.id = media.getId();
-		this.filelink = environment.getRequiredProperty("media.default.url") + media.getId();
+		this.filelink = environment.getRequiredProperty("media.url") + media.getId();
 	}
 
 	public String getId() {
