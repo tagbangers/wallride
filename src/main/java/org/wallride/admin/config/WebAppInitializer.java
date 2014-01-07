@@ -24,17 +24,11 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 	private AmazonS3Client amazonS3Client;
 
 	public WebAppInitializer() {
-//		System.setProperty("jgroups.s3.access_key", environment.getRequiredProperty("amazon.s3.accesskey"));
-//		System.setProperty("jgroups.s3.secret_access_key", environment.getRequiredProperty("amazon.s3.secretkey"));
-
-		final String s3AccessKey = System.getProperty("s3.accessKey");
-		final String s3SecretKey = System.getProperty("s3.secretKey");
-		BasicAWSCredentials basicAWSCredentials = null;
-
+		final String s3AccessKey = System.getProperty("AWS_ACCESS_KEY_ID");
+		final String s3SecretKey = System.getProperty("AWS_SECRET_KEY");
 		if (s3AccessKey != null && s3SecretKey != null) {
 			ClientConfiguration configuration = new ClientConfiguration();
 			configuration.setMaxConnections(1000);
-//			configuration.setSocketBufferSizeHints(10 * 1024 * 1024, 10 * 1024 * 1024);
 			amazonS3Client = new AmazonS3Client(new BasicAWSCredentials(s3AccessKey, s3SecretKey), configuration);
 		}
 	}

@@ -5,13 +5,16 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.wallride.admin.support.AuthorizedUser;
 import org.wallride.admin.web.signup.SignupForm;
+import org.wallride.core.domain.Article;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
+import org.wallride.core.web.HttpForbiddenException;
 
 import javax.inject.Inject;
 
@@ -33,6 +36,9 @@ public class SignupService {
 		if (invitation == null) {
 			return false;
 		}
+		if (invitation.isAccepted()) {
+			return false;
+		}
 		LocalDateTime now = new LocalDateTime();
 		if (now.isAfter(invitation.getExpiredAt())) {
 			return false;
@@ -41,19 +47,22 @@ public class SignupService {
 	}
 
 	@CacheEvict(value="users", allEntries=true)
-	public AuthorizedUser signup(SignupForm form, BindingResult result) {
+	public AuthorizedUser signup(SignupForm form, BindingResult errors) throws BindException {
 		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(form.getToken());
 		boolean valid = false;
 		if (invitation != null) {
 			valid = validateInvitation(invitation);
 		}
 		if (!valid) {
-			//TODO
+			throw new HttpForbiddenException();
 		}
 
 		User duplicate = userRepository.findByLoginId(form.getLoginId());
 		if (duplicate != null) {
-			//TODO
+			errors.rejectValue("loginId", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			throw new BindException(errors);
 		}
 
 		LocalDateTime now = new LocalDateTime();

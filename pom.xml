@@ -13,7 +13,7 @@
 		<org.springframework.batch.version>2.2.1.RELEASE</org.springframework.batch.version>
 		<org.hibernate.version>4.2.2.Final</org.hibernate.version>
 		<org.hibernate-search.version>4.4.0.Final</org.hibernate-search.version>
-		<org.infinispan.version>6.0.0.Final</org.infinispan.version>
+		<org.infinispan.version>5.3.0.Final</org.infinispan.version>
 		<org.thymeleaf.version>2.1.2.RELEASE</org.thymeleaf.version>
 	</properties>
 

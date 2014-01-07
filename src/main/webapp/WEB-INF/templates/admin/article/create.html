@@ -14,7 +14,7 @@
 					<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" th:text="#{Articles}">Articles</a></li>
 					<li class="active" th:text="#{AddNewArticle}">Add new article</li>
 				</ol>
-				<form th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
+				<form id="article-create-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
 					<input type="hidden" name="id" th:if="${article} ne null" th:value="${article.id}"  />
 					<div class="row">
 						<div class="col-sm-9 wr-post-main">
@@ -27,7 +27,7 @@
 							</div>
 							<div class="alert alert-danger" th:if="${#fields.hasErrors('all')}">
 								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-								Error.
+								<span th:text="#{Error}">Error</span>
 							</div>
 							<fieldset>
 								<div class="form-group">
@@ -157,7 +157,7 @@
 							</div>
 							<div class="clearfix wr-tool-check">
 								<div class="pull-left">
-									<a id="page-preview" href="#"><span class="glyphicon glyphicon-eye-open"></span> <span th:text="#{Preview}">Preview</span></a>
+									<a id="article-preview" href="#"><span class="glyphicon glyphicon-eye-open"></span> <span th:text="#{Preview}">Preview</span></a>
 								</div>
 								<div class="pull-right">
 									<div class="status" th:if="${article} ne null">
@@ -213,11 +213,11 @@
 							e.preventDefault();
 							var self = $(this);
 							self.button('loading');
-							var form = self.closest('form');
 							var checked = [];
-							$('input[name="categoryIds"]:checked', form).each(function(i, element) {
+							$('input[name="categoryIds"]:checked', '#article-create-form').each(function(i, element) {
 								checked.push($(element).val());
 							});
+							var form = self.closest('form');
 							var data = {
 								parentId: $(':input[name="parentId"]', form).val(),
 								code: $(':input[name="code"]', form).val(),

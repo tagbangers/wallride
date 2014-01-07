@@ -5,8 +5,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	</head>
 	<body>
-		<p><span th:text="${invitation.createdBy}">CreatedBy</span> invited you to become an editor on <span th:text="${websiteTitle}">Website Title</span></p>
+		<p><span th:text="${#messages.msg('InvitationMessageContent', authorizedUser, websiteTitle)}"></span></p>
 		<p th:text="${invitation.message}"></p>
-		<a th:href="${signupLink}" th:text="${signupLink}"></a>
+		<a th:href="${signupLink}" th:text="#{AcceptInvitation}"></a>
 	</body>
 </html>
