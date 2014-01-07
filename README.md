@@ -7,3 +7,7 @@ WallRide focuses on sophisticated UI, simple and clean source code
 and easy deploy to AWS BeansTalk(of course other servlet containers)
 
 We hope this CMS is loved by many developers of principles all over the world.
+
+Screen Shots
+========
+[Screen Shots is here.](https://github.com/tagbangers/wallride/wiki/Screen-shots)
