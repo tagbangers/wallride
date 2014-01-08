@@ -3,7 +3,6 @@ package org.wallride.core.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,7 @@ import java.util.Map;
 
 @Component
 public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter {
-	
+
 	@Inject
 	private SettingService settingService;
 
@@ -40,8 +39,8 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 	@Inject
 	private PageTreeService pageTreeService;
 
-	@Inject
-	private Environment environment;
+//	@Inject
+//	private TemplateUtils templateUtils;
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultModelAttributeInterceptor.class);
 
@@ -64,7 +63,11 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		if (mv.getView() instanceof RedirectView) return;
 		if (mv.getViewName().startsWith("redirect:")) return;
 
+		String[] languages = settingService.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
+
+		mv.addObject("LANGUAGES", languages);
+		mv.addObject("LANGUAGE_LINKS", buildLanguageLinks(currentLanguage, languages, request));
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		AuthorizedUser authorizedUser = null;
@@ -75,12 +78,10 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 		mv.addObject("WEBSITE_TITLE", settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, currentLanguage));
 		mv.addObject("WEBSITE_LINK", buildBlogLink());
-		mv.addObject("WEBSITE_PATH", buildBlogPath());
+		mv.addObject("WEBSITE_PATH", buildBlogPath(currentLanguage, languages));
 
 		mv.addObject("ADMIN_LINK", buildAdminLink());
-		mv.addObject("ADMIN_PATH", buildAdminPath());
-
-		mv.addObject("LANGUAGE_LINKS", buildLanguageLinks(request));
+		mv.addObject("ADMIN_PATH", buildAdminPath(currentLanguage));
 
 		CategoryTree categoryTreeHasArticle = categoryTreeService.readCategoryTree(currentLanguage, true);
 		CategoryTree categoryTreeAll = categoryTreeService.readCategoryTree(currentLanguage);
@@ -91,6 +92,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		PageTree pageTreeAll = pageTreeService.readPageTree(currentLanguage);
 		mv.addObject("PAGE_TREE", pageTreePublished);
 		mv.addObject("PAGE_TREE_ALL", pageTreeAll);
+
 	}
 
 	private String buildBlogLink() {
@@ -98,13 +100,12 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		return builder.buildAndExpand().toUriString();
 	}
 
-	private String buildBlogPath() {
+	private String buildBlogPath(String currentLanguage, String[] languages) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		String[] languages = settingService.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
 		if (languages != null && languages.length > 1) {
 			builder.path("/{language}");
 		}
-		return builder.buildAndExpand(LocaleContextHolder.getLocale().getLanguage()).toUriString();
+		return builder.buildAndExpand(currentLanguage).toUriString();
 	}
 
 	private String buildAdminLink() {
@@ -113,26 +114,25 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		return builder.buildAndExpand().toUriString();
 	}
 
-	private String buildAdminPath() {
+	private String buildAdminPath(String currentLanguage) {
 //		String contextPath = request.getContextPath();
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/_admin");
 		builder.path("/{language}");
-		return builder.buildAndExpand(LocaleContextHolder.getLocale().getLanguage()).toUriString();
+		return builder.buildAndExpand(currentLanguage).toUriString();
 	}
 
-	private Map<String, String> buildLanguageLinks(HttpServletRequest request) {
+	private Map<String, String> buildLanguageLinks(String currentLanguage, String[] languages, HttpServletRequest request) {
 		UrlPathHelper pathHelper = new UrlPathHelper();
 		Map<String, String> languageLinks = new LinkedHashMap<>();
 		String path = pathHelper.getPathWithinServletMapping(request);
-		if (path.startsWith("/" + LocaleContextHolder.getLocale().getLanguage() + "/")) {
-			path = path.substring(LocaleContextHolder.getLocale().getLanguage().length() + 1);
+		if (path.startsWith("/" + currentLanguage + "/")) {
+			path = path.substring(currentLanguage.length() + 1);
 		}
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder
 				.fromCurrentServletMapping()
 				.path("/{language}")
 				.path(path)
 				.query(pathHelper.getOriginatingQueryString(request));
-		String[] languages = settingService.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
 		if (languages != null) {
 			for (String language : languages) {
 				languageLinks.put(language, uriComponentsBuilder.buildAndExpand(language).toUriString());

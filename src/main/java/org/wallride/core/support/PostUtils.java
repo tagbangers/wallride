@@ -4,41 +4,50 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.thymeleaf.context.IProcessingContext;
 import org.wallride.core.domain.*;
-import org.wallride.core.service.PageTreeService;
 import org.wallride.core.service.SettingService;
 
-import javax.inject.Inject;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component
+//@Component
 public class PostUtils {
 
-	@Inject
+//	@Inject
+//	private SettingService settingService;
+//
+//	@Inject
+//	private DefaultModelAttributeService defaultModelAttributeService;
+//
+//	@Inject
+//	private Environment environment;
+
+	private IProcessingContext processingContext;
+
 	private SettingService settingService;
 
-	@Inject
-	private PageTreeService pageTreeService;
-
-	@Inject
 	private Environment environment;
+
+	public PostUtils(IProcessingContext processingContext, SettingService settingService, Environment environment) {
+		this.processingContext = processingContext;
+		this.settingService = settingService;
+		this.environment = environment;
+	}
 
 	public String link(Article article) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
 		return path(builder, article);
 	}
 
-	public String link(Page page) {
+	public String link(Page page, PageTree pageTree) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, page);
+		return path(builder, page, pageTree);
 	}
 
 	public String path(Article article) {
@@ -46,17 +55,17 @@ public class PostUtils {
 		return path(builder, article);
 	}
 
-	public String path(Page page) {
+	public String path(Page page, PageTree pageTree) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, page);
+		return path(builder, page, pageTree);
 	}
 
 	private String path(UriComponentsBuilder builder, Article article) {
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = settingService.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
+		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
 		if (languages != null && languages.length > 1) {
 			builder.path("/{language}");
-			params.put("language", LocaleContextHolder.getLocale().getLanguage());
+			params.put("language", processingContext.getContext().getLocale().getLanguage());
 		}
 		builder.path("/{year}/{month}/{day}/{code}");
 		params.put("year", String.format("%04d", article.getDate().getYear()));
@@ -66,22 +75,26 @@ public class PostUtils {
 		return builder.buildAndExpand(params).toUriString();
 	}
 
-	private String path(UriComponentsBuilder builder, Page page) {
+	private String path(UriComponentsBuilder builder, Page page, PageTree pageTree) {
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = settingService.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
+		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
 		if (languages != null && languages.length > 1) {
 			builder.path("/{language}");
-			params.put("language", LocaleContextHolder.getLocale().getLanguage());
+			params.put("language", processingContext.getContext().getLocale().getLanguage());
 		}
-		PageTree pageTree = pageTreeService.readPageTree(LocaleContextHolder.getLocale().getLanguage());
+
+		pageTree = (PageTree) processingContext.getContext().getVariables().get("PAGE_TREE_ALL");
+//		PageTree pageTree = defaultModelAttributeService.readPageTree(LocaleContextHolder.getLocale().getLanguage());
 		List<String> codes = new LinkedList<>();
 		Page parent = page.getParent();
 		while (parent != null) {
 			codes.add(parent.getCode());
 			parent = (parent.getParent() != null) ? pageTree.getPageByCode(parent.getParent().getCode()) : null;
 		}
+
 		Collections.reverse(codes);
 		codes.add(page.getCode());
+
 		for (int i = 0; i < codes.size(); i++) {
 			String key = "code" + i;
 			builder.path("/{" + key + "}");
@@ -103,7 +116,7 @@ public class PostUtils {
 	}
 
 	public String ogSiteName(Post post) {
-		return settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
+		return settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage());
 	}
 
 	public String ogTitle(Post post) {
@@ -118,8 +131,8 @@ public class PostUtils {
 		return link(article);
 	}
 
-	public String ogUrl(Page page) {
-		return link(page);
+	public String ogUrl(Page page, PageTree pageTree) {
+		return link(page, pageTree);
 	}
 
 	public String ogImage(Post post) {
@@ -129,7 +142,7 @@ public class PostUtils {
 	public String title(Post post) {
 		return String.format("%s | %s",
 				post.getTitle(),
-				settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage()));
+				settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage()));
 	}
 
 	public String body(Post post) {
