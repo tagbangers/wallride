@@ -82,7 +82,7 @@
 							</ul>
 							</dd>
 						</dl>
-						<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-dialog,id=${article.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> 記事を削除</a>
+						<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-dialog,id=${article.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>
 						<!-- #delete-modal -->
 						<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 							<div id="delete-dialog" class="modal-dialog">
