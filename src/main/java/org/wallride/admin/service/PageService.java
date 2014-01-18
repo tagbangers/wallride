@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -172,25 +173,28 @@ public class PageService {
 				errors.rejectValue("code", "NotDuplicate");
 			}
 		}
-
 		if (errors.hasErrors()) {
 			throw new BindException(errors);
 		}
 
-		pageRepository.shiftLftRgt(page.getLft(), page.getRgt());
-		pageRepository.shiftRgt(page.getRgt());
-		pageRepository.shiftLft(page.getRgt());
-
 		Page parent = (form.getParentId() != null) ? entityManager.getReference(Page.class, form.getParentId()) : null;
-		int rgt = 0;
-		if (parent == null) {
-			rgt = pageRepository.findMaxRgt();
-			rgt++;
-		}
-		else {
-			rgt = parent.getRgt();
-			pageRepository.unshiftRgt(rgt);
-			pageRepository.unshiftLft(rgt);
+		if (!(page.getParent() == null && parent == null) && !ObjectUtils.nullSafeEquals(page.getParent(), parent)) {
+			pageRepository.shiftLftRgt(page.getLft(), page.getRgt());
+			pageRepository.shiftRgt(page.getRgt());
+			pageRepository.shiftLft(page.getRgt());
+
+			int rgt = 0;
+			if (parent == null) {
+				rgt = pageRepository.findMaxRgt();
+				rgt++;
+			}
+			else {
+				rgt = parent.getRgt();
+				pageRepository.unshiftRgt(rgt);
+				pageRepository.unshiftLft(rgt);
+			}
+			page.setLft(rgt);
+			page.setRgt(rgt + 1);
 		}
 
 		page.setParent(parent);
@@ -222,8 +226,6 @@ public class PageService {
 		}
 		page.setDate(date);
 		page.setStatus(status);
-		page.setLft(rgt);
-		page.setRgt(rgt + 1);
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
