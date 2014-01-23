@@ -37,13 +37,13 @@ public class CoreConfig {
 
 //	@Configuration
 //	@Profile("test")
-//	@PropertySource("classpath:environment.test.properties")
+//	@PropertySource("classpath:environment-test.properties")
 //	static class Test extends PropertySourcesPlaceholderConfigurer {
 //	}
 
 	@Configuration
 	@Profile("product")
-	@PropertySource("classpath:environment.product.properties")
+	@PropertySource("classpath:environment-product.properties")
 	static class Product extends PropertySourcesPlaceholderConfigurer {
 	}
 
