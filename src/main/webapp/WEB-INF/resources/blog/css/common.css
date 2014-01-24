@@ -1,12 +1,18 @@
 .wr-post-summary {
 	margin-bottom: 20px;
 }
-.wr-post-cover {
-}
-.wr-post-titile {
-
-}
 
 .post-cover {
 	width: 100%;
+}
+
+#wrap > .post-cover + .container {
+	padding-top: 0px;
+}
+a {
+	color: #839CB1;
+}
+
+a:hover, a:focus {
+	color: #B2CDE4;
 }
