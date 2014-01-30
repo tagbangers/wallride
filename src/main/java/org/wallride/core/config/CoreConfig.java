@@ -11,7 +11,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 @Configuration
@@ -20,22 +19,6 @@ public class CoreConfig {
 
 	@Inject
 	private Environment environment;
-
-	@PostConstruct
-	public void init() {
-		// JGroups settings
-		/*		String ipaddress = null;
-		try {
-			ipaddress = InetAddress.getLocalHost().getHostAddress();
-		}
-		catch (UnknownHostException e) {
-			throw new RuntimeException(e);
-		}
-		System.setProperty("jgroups.s3.access_key", environment.getRequiredProperty("amazon.s3.accesskey"));
-		System.setProperty("jgroups.s3.secret_access_key", environment.getRequiredProperty("amazon.s3.secretkey"));
-		System.setProperty("jgroups.s3.bucket", environment.getRequiredProperty("amazon.s3.bucket"));
-		System.setProperty("jgroups.bind_addr", ipaddress);
-*/	}
 
 	@Configuration
 	@Profile("develop")
