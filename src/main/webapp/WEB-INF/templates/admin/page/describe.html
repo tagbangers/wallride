@@ -40,7 +40,9 @@
 							<img th:if="${page.cover ne null}" th:src="@{${#medias.link(page.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
 							<h1 th:text="${page.title}">Page Title</h1>
 						</div>
-						<pre th:utext="${page.body}">Page Body</pre>
+						<div class="clearfix">
+							<p th:utext="${#posts.body(page)}"></p>
+						</div>
 						<hr/>
 						<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a>
 					</div>
@@ -84,7 +86,37 @@
 							</ul>
 							</dd>
 						</dl>
-						<a ><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
+						<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-dialog,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
+						<!-- #delete-modal -->
+						<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+							<div id="delete-dialog" class="modal-dialog">
+								<form th:action="@{__${ADMIN_PATH}__/pages/delete(id=${page.id})}" method="post">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title" th:text="#{DeletePage}">ページを削除</h4>
+										</div>
+										<div class="modal-body">
+											<p th:text="#{MakeSureDelete}">本当に削除しますか？</p>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">キャンセル</button>
+											<button class="btn btn-primary" th:text="#{Delete}">削除</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+						<!--/#delete-modal -->
+						<script th:inline="javascript">
+							// <![CDATA[
+							$(function() {
+								$('#delete-modal').on('hidden.bs.modal', function() {
+									$(this).removeData('bs.modal');
+								});
+							});
+							// ]]>
+						</script>
 					</div>
 				</div>
 			</div>
