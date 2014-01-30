@@ -29,8 +29,8 @@ import org.thymeleaf.spring3.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.wallride.admin.web.AuthorizedUserMethodArgumentResolver;
 import org.wallride.core.domain.Setting;
-import org.wallride.core.service.SettingService;
 import org.wallride.core.support.CustomThymeleafDialect;
+import org.wallride.core.support.Settings;
 import org.wallride.core.web.DefaultModelAttributeInterceptor;
 import org.wallride.core.web.PathVariableLocaleResolver;
 
@@ -60,7 +60,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
 	private CustomThymeleafDialect customThymeleafDialect;
 
 	@Inject
-	private SettingService settingService;
+	private Settings settings;
 
 	@Override
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
@@ -69,9 +69,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
 		UrlPathHelper customUrlPathHelper = new UrlPathHelper() {
 			@Override
 			public String getLookupPathForRequest(HttpServletRequest request) {
-				String defaultLanguage = settingService.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
+				String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
 				if (defaultLanguage != null) {
-					String[] languages = StringUtils.commaDelimitedListToStringArray(settingService.readSettingAsString(Setting.Key.LANGUAGES));
+					String[] languages = StringUtils.commaDelimitedListToStringArray(settings.readSettingAsString(Setting.Key.LANGUAGES));
 //					String[] languages = StringUtils.split(settingService.readSettingAsString(Setting.Key.LANGUAGES), ",");
 					String path = super.getLookupPathForRequest(request);
 					boolean languagePath = false;
@@ -158,12 +158,12 @@ public class WebConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public ServletContextTemplateResolver templateResolver() {
 		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getRequiredProperty("blog.template.path"));
+		resolver.setPrefix(environment.getRequiredProperty("template.blog.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
 		// NB, selecting HTML5 as the template mode.
 		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(false);
+		resolver.setCacheable(environment.getRequiredProperty("template.blog.cache", Boolean.class));
 		return resolver;
 
 	}

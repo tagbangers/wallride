@@ -124,12 +124,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="emailTemplateResolver")
 	public TemplateResolver emailTemplateResolver() {
 		ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-		resolver.setPrefix("mail/");
+		resolver.setPrefix(environment.getRequiredProperty("template.mail.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
 		// NB, selecting HTML5 as the template mode.
 		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(false);
+		resolver.setCacheable(environment.getRequiredProperty("template.mail.cache", Boolean.class));
 		resolver.setOrder(1);
 		return resolver;
 	}
@@ -137,12 +137,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="adminTemplateResolver")
 	public ServletContextTemplateResolver adminTemplateResolver() {
 		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getRequiredProperty("admin.template.path"));
+		resolver.setPrefix(environment.getRequiredProperty("template.admin.path"));
 		resolver.setSuffix(".html");
         resolver.setCharacterEncoding("UTF-8");
 		// NB, selecting HTML5 as the template mode.
 		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(false);
+		resolver.setCacheable(environment.getRequiredProperty("template.admin.cache", Boolean.class));
 		resolver.setOrder(2);
 		return resolver;
 	}
@@ -150,11 +150,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="blogTemplateResolver")
 	public ServletContextTemplateResolver blogTemplateResolver() {
 		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getRequiredProperty("blog.template.path"));
+		resolver.setPrefix(environment.getRequiredProperty("template.blog.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
 		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(false);
+		resolver.setCacheable(environment.getRequiredProperty("template.blog.cache", Boolean.class));
 		resolver.setOrder(2);
 		return resolver;
 	}

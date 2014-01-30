@@ -4,6 +4,7 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import org.wallride.core.repository.ArticleFullTextSearchTerm;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.support.Paginator;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -33,7 +35,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class ArticleService {
 	
@@ -48,6 +50,9 @@ public class ArticleService {
 	
 	@Inject
 	private PlatformTransactionManager transactionManager;
+
+	@Inject
+	private Settings settings;
 
 	@Inject
 	private Environment environment;
@@ -114,7 +119,7 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
+			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -189,7 +194,7 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
+			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {

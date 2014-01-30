@@ -1,5 +1,6 @@
 package org.wallride.blog.web.page;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +15,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 public class PageIndexController {
 
 //	/page/[:yyyy]/[:mm]/[:dd]/[:code]

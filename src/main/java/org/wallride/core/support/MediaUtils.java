@@ -1,15 +1,17 @@
 package org.wallride.core.support;
 
-import org.springframework.core.env.Environment;
 import org.wallride.core.domain.Media;
+import org.wallride.core.domain.Setting;
 
 //@Component
 public class MediaUtils {
 
-	private Environment environment;
+//	private Environment environment;
 
-	public MediaUtils(Environment environment) {
-		this.environment = environment;
+	private Settings settings;
+
+	public MediaUtils(Settings settings) {
+		this.settings = settings;
 	}
 
 	public String link(Media media) {
@@ -17,6 +19,6 @@ public class MediaUtils {
 	}
 
 	public String link(String id) {
-		return environment.getRequiredProperty("media.url") + id;
+		return settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX) + id;
 	}
 }

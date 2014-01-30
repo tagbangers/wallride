@@ -1,7 +1,8 @@
 package org.wallride.admin.web.media;
 
-import org.springframework.core.env.Environment;
 import org.wallride.core.domain.Media;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.support.Settings;
 
 import java.io.Serializable;
 
@@ -15,9 +16,9 @@ public class MediaIndexModel implements Serializable {
 
 	private String folder;
 
-	public MediaIndexModel(Media media, Environment environment) {
-		this.thumb = environment.getRequiredProperty("media.url") + media.getId() + "?w=100&h=100&m=1";
-		this.image = environment.getRequiredProperty("media.url") + media.getId();
+	public MediaIndexModel(Media media, Settings settings) {
+		this.thumb = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX) + media.getId() + "?w=100&h=100&m=1";
+		this.image = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX) + media.getId();
 		this.title = media.getOriginalName();
 		this.folder = media.getCreatedAt().toString("yyyy/MM");
 	}

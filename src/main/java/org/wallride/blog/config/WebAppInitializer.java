@@ -1,7 +1,5 @@
 package org.wallride.blog.config;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
@@ -21,17 +19,17 @@ import java.net.URL;
 @Order(3)
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
-	private AmazonS3Client amazonS3Client;
-
-	public WebAppInitializer() {
-		final String s3AccessKey = System.getProperty("AWS_ACCESS_KEY_ID");
-		final String s3SecretKey = System.getProperty("AWS_SECRET_KEY");
-		if (s3AccessKey != null && s3SecretKey != null) {
-			ClientConfiguration configuration = new ClientConfiguration();
-			configuration.setMaxConnections(1000);
-			amazonS3Client = new AmazonS3Client(new BasicAWSCredentials(s3AccessKey, s3SecretKey), configuration);
-		}
-	}
+//	private AmazonS3Client amazonS3Client;
+//
+//	public WebAppInitializer() {
+//		final String s3AccessKey = System.getProperty("AWS_ACCESS_KEY_ID");
+//		final String s3SecretKey = System.getProperty("AWS_SECRET_KEY");
+//		if (s3AccessKey != null && s3SecretKey != null) {
+//			ClientConfiguration configuration = new ClientConfiguration();
+//			configuration.setMaxConnections(1000);
+//			amazonS3Client = new AmazonS3Client(new BasicAWSCredentials(s3AccessKey, s3SecretKey), configuration);
+//		}
+//	}
 
 	@Override
 	protected WebApplicationContext createServletApplicationContext() {
@@ -51,7 +49,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 					else {
 						bucketName = path;
 					}
-					return new AmazonS3Resource(amazonS3Client, bucketName, key);
+					return new AmazonS3Resource(getBean(AmazonS3Client.class), bucketName, key);
 				}
 				else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 					return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());

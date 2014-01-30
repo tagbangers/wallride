@@ -1,17 +1,15 @@
-package org.wallride.core.service;
+package org.wallride.core.support;
 
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.SettingRepository;
 
 import javax.inject.Inject;
 
-@Service
-@Transactional(rollbackFor=Exception.class)
-public class SettingService {
+@Component
+public class Settings {
 	
 	@Inject
 	private SettingRepository settingRepository;

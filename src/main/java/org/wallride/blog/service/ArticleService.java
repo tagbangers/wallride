@@ -1,6 +1,7 @@
 package org.wallride.blog.service;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wallride.blog.web.article.ArticleSearchForm;
@@ -13,7 +14,7 @@ import org.wallride.core.support.Paginator;
 import javax.inject.Inject;
 import java.util.*;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class ArticleService {
 

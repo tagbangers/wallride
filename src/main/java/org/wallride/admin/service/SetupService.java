@@ -2,6 +2,7 @@ package org.wallride.admin.service;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class SetupService {
 	
@@ -41,6 +42,12 @@ public class SetupService {
 		for (String language : languages) {
 			settingRepository.saveAndFlush(new Setting(Setting.Key.WEBSITE_TITLE, form.getWebsiteTitle(), language));
 		}
+
+		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_URL_PREFIX, form.getMediaUrlPrefix()));
+		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_PATH, form.getMediaPath()));
+
+		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_SMTP_HOST, form.getMailSmtpHost()));
+		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_FROM, form.getMailFrom()));
 
 		User user = new User();
 		user.setLoginId(form.getLoginId());

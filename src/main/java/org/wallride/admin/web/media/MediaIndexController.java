@@ -1,16 +1,17 @@
 package org.wallride.admin.web.media;
 
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.wallride.admin.service.MediaService;
 import org.wallride.core.domain.Media;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/media/index")
 public class MediaIndexController {
 
@@ -18,14 +19,14 @@ public class MediaIndexController {
 	private MediaService mediaService;
 
 	@Inject
-	private Environment environment;
+	private Settings settings;
 
 	@RequestMapping
 	public @ResponseBody MediaIndexModel[] index() {
 		List<Media> medias = mediaService.readAllMedias();
 		MediaIndexModel[] models = new MediaIndexModel[medias.size()];
 		for (int i = 0; i < medias.size(); i++) {
-			models[i] = new MediaIndexModel(medias.get(i), environment);
+			models[i] = new MediaIndexModel(medias.get(i), settings);
 		}
 		return models;
 	}

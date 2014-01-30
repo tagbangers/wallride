@@ -1,6 +1,7 @@
 package org.wallride.blog.web.article;
 
 import org.joda.time.LocalDateTime;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.AntPathMatcher;
@@ -21,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 public class ArticleIndexController {
 
 //	/article/[:yyyy]/[:mm]/[:dd]/[:code]

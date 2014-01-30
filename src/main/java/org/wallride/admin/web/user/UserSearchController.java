@@ -1,5 +1,6 @@
 package org.wallride.admin.web.user;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,7 +21,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/users/index")
 public class UserSearchController extends DomainObjectSearchController<User, UserSearchForm> {
 	

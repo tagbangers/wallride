@@ -2,6 +2,7 @@ package org.wallride.admin.service;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.wallride.admin.support.AuthorizedUser;
 import org.wallride.admin.web.signup.SignupForm;
-import org.wallride.core.domain.Article;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserInvitationRepository;
@@ -18,7 +18,7 @@ import org.wallride.core.web.HttpForbiddenException;
 
 import javax.inject.Inject;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class SignupService {
 

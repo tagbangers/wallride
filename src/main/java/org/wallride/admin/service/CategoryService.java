@@ -1,7 +1,7 @@
 package org.wallride.admin.service;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -14,12 +14,10 @@ import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.repository.CategoryRepository;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class CategoryService {
 

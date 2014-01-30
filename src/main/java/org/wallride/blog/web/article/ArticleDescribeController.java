@@ -1,6 +1,7 @@
 package org.wallride.blog.web.article;
 
 import org.joda.time.LocalDate;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +13,7 @@ import org.wallride.core.web.HttpNotFoundException;
 
 import javax.inject.Inject;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/{year}/{month}/{day}/{code}")
 public class ArticleDescribeController {
 

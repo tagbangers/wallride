@@ -4,13 +4,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.core.domain.*;
-import org.wallride.core.service.SettingService;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -30,14 +28,14 @@ public class PostUtils {
 
 	private IProcessingContext processingContext;
 
-	private SettingService settingService;
+	private Settings settings;
 
-	private Environment environment;
+//	private Environment environment;
 
-	public PostUtils(IProcessingContext processingContext, SettingService settingService, Environment environment) {
+	public PostUtils(IProcessingContext processingContext, Settings settings) {
 		this.processingContext = processingContext;
-		this.settingService = settingService;
-		this.environment = environment;
+		this.settings = settings;
+//		this.environment = environment;
 	}
 
 	public String link(Article article) {
@@ -116,7 +114,7 @@ public class PostUtils {
 	}
 
 	public String ogSiteName(Post post) {
-		return settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage());
+		return settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage());
 	}
 
 	public String ogTitle(Post post) {
@@ -142,7 +140,7 @@ public class PostUtils {
 	public String title(Post post) {
 		return String.format("%s | %s",
 				post.getTitle(),
-				settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage()));
+				settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage()));
 	}
 
 	public String body(Post post) {
@@ -153,7 +151,7 @@ public class PostUtils {
 		Elements elements = document.select("img");
 		for (Element element : elements) {
 			String src = element.attr("src");
-			if (src.startsWith(environment.getRequiredProperty("media.url"))) {
+			if (src.startsWith(settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX))) {
 				String style = element.attr("style");
 				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
 				Matcher matcher = pattern.matcher(element.attr("style"));

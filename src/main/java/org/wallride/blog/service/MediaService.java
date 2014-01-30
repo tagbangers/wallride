@@ -8,9 +8,8 @@ import org.im4java.core.IMOperation;
 import org.im4java.process.Pipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -18,15 +17,17 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Media;
+import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.support.AmazonS3ResourceUtils;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class MediaService {
 
@@ -37,7 +38,7 @@ public class MediaService {
 	private ResourceLoader resourceLoader;
 
 	@Inject
-	private Environment environment;
+	private Settings settings;
 
 	private static Logger logger = LoggerFactory.getLogger(MediaService.class);
 
@@ -53,7 +54,7 @@ public class MediaService {
 
 //	@Cacheable("resources")
 	public Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException, EncoderException {
-		final Resource prefix = resourceLoader.getResource(environment.getRequiredProperty("media.path"));
+		final Resource prefix = resourceLoader.getResource(settings.readSettingAsString(Setting.Key.MEDIA_PATH));
 		final Resource resource = prefix.createRelative(media.getId());
 		if (!resource.exists()) {
 			return null;

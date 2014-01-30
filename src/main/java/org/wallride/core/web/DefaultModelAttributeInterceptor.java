@@ -19,7 +19,7 @@ import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.service.CategoryTreeService;
 import org.wallride.core.service.PageTreeService;
-import org.wallride.core.service.SettingService;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter {
 
 	@Inject
-	private SettingService settingService;
+	private Settings settings;
 
 	@Inject
 	private CategoryTreeService categoryTreeService;
@@ -63,7 +63,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		if (mv.getView() instanceof RedirectView) return;
 		if (mv.getViewName().startsWith("redirect:")) return;
 
-		String[] languages = settingService.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
+		String[] languages = settings.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
 
 		mv.addObject("LANGUAGES", languages);
@@ -76,7 +76,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		}
 		mv.addObject("USER", authorizedUser);
 
-		mv.addObject("WEBSITE_TITLE", settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, currentLanguage));
+		mv.addObject("WEBSITE_TITLE", settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, currentLanguage));
 		mv.addObject("WEBSITE_LINK", buildBlogLink());
 		mv.addObject("WEBSITE_PATH", buildBlogPath(currentLanguage, languages));
 
