@@ -1,11 +1,11 @@
 package org.wallride.admin.service;
 
-import org.hibernate.cfg.Settings;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.core.env.Environment;
@@ -31,8 +31,8 @@ import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
-import org.wallride.core.service.SettingService;
 import org.wallride.core.support.Paginator;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -43,12 +43,12 @@ import javax.validation.ValidationException;
 import java.text.MessageFormat;
 import java.util.*;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class UserService {
 
 	@Inject
-	private SettingService settingService;
+	private Settings settings;
 
 	@Inject
 	private UserRepository userRepository;
@@ -154,7 +154,7 @@ public class UserService {
 		}
 
 		for (UserInvitation invitation : invitations) {
-			String websiteTitle = settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
+			String websiteTitle = settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
 			String signupLink = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/_admin/signup")
 					.queryParam("token", invitation.getToken())
@@ -194,7 +194,7 @@ public class UserService {
 		invitation.setUpdatedBy(authorizedUser.toString());
 		invitation = userInvitationRepository.saveAndFlush(invitation);
 
-		String websiteTitle = settingService.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
+		String websiteTitle = settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
 		String signupLink = ServletUriComponentsBuilder.fromCurrentContextPath()
 				.path("/_admin/signup")
 				.queryParam("token", invitation.getToken())

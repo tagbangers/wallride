@@ -1,5 +1,6 @@
 package org.wallride.blog.web.page;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +13,7 @@ import org.wallride.core.web.HttpNotFoundException;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/{code}")
 public class PageDescribeController {
 

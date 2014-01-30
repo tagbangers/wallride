@@ -1,5 +1,6 @@
 package org.wallride.admin.web;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,17 +14,17 @@ import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.service.CategoryTreeService;
-import org.wallride.core.service.SettingService;
 import org.wallride.core.support.Paginator;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 public class DashboardController {
 	
 	@Inject
-	private SettingService settingService;
+	private Settings settings;
 
 	@Inject
 	private ArticleService articleService;
@@ -36,7 +37,7 @@ public class DashboardController {
 	
 	@RequestMapping({"/","/dashboard"})
 	public String dashboard(RedirectAttributes redirectAttributes) {
-		String defaultLanguage = settingService.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
+		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
 		redirectAttributes.addAttribute("language", defaultLanguage);
 		return "redirect:/_admin/{language}/";
 	}

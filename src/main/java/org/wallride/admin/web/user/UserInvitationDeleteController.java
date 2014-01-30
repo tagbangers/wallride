@@ -1,5 +1,6 @@
 package org.wallride.admin.web.user;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,7 +15,7 @@ import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/users/invitations/delete")
 public class UserInvitationDeleteController {
 

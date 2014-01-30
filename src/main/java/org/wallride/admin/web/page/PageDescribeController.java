@@ -1,5 +1,6 @@
 package org.wallride.admin.web.page;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +13,7 @@ import org.wallride.core.web.DomainObjectDescribeController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-@Controller
+@Controller @Lazy
 @RequestMapping(value="/{language}/pages/describe", method=RequestMethod.GET)
 public class PageDescribeController extends DomainObjectDescribeController<Page, PageSearchForm> {
 	

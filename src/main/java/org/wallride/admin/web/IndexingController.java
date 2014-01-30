@@ -2,13 +2,14 @@ package org.wallride.admin.web;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/indexing")
 public class IndexingController {
 	

@@ -1,5 +1,6 @@
 package org.wallride.admin.web.user;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,7 +17,7 @@ import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/users/invitations/create")
 public class UserInvitationCreateController {
 

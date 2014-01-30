@@ -19,6 +19,12 @@ public class Setting extends DomainObject<String> {
 		DEFAULT_LANGUAGE,
 		LANGUAGES,
 		WEBSITE_TITLE,
+
+		MEDIA_URL_PREFIX,
+		MEDIA_PATH,
+
+		MAIL_SMTP_HOST,
+		MAIL_FROM,
 	}
 
 	@Id

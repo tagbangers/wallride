@@ -2,6 +2,7 @@ package org.wallride.admin.web.page;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
@@ -23,7 +24,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.groups.Default;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/pages/create")
 public class PageCreateController {
 

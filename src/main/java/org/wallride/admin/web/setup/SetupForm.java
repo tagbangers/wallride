@@ -4,6 +4,7 @@ import org.hibernate.validator.constraints.Email;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,25 @@ public class SetupForm implements Serializable {
 	
 	@NotNull
 	private String websiteTitle;
-	
+
+	@NotNull
+	private String defaultLanguage;
+
+	private List<String> languages = new ArrayList<>();
+
+	@NotNull
+	private String mediaUrlPrefix = "/media/";
+
+	@NotNull
+	private String mediaPath = "file:" + System.getProperty("java.io.tmpdir") + File.separator + "wallride" + File.separator + "media" + File.separator;
+
+	@NotNull
+	private String mailSmtpHost;
+
+	@NotNull
+	@Email
+	private String mailFrom;
+
 	@NotNull
 	private String loginId;
 	
@@ -27,17 +46,60 @@ public class SetupForm implements Serializable {
 	@Email
 	private String email;
 
-	@NotNull
-	private String defaultLanguage;
-
-	private List<String> languages = new ArrayList<>();
-
 	public String getWebsiteTitle() {
 		return websiteTitle;
 	}
 
 	public void setWebsiteTitle(String websiteTitle) {
 		this.websiteTitle = websiteTitle;
+	}
+
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
+
+	public void setDefaultLanguage(String defaultLanguage) {
+		this.defaultLanguage = defaultLanguage;
+	}
+
+	public List<String> getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(List<String> languages) {
+		this.languages = languages;
+	}
+
+	public String getMediaUrlPrefix() {
+		return mediaUrlPrefix;
+	}
+
+	public void setMediaUrlPrefix(String mediaUrlPrefix) {
+		this.mediaUrlPrefix = mediaUrlPrefix;
+	}
+
+	public String getMediaPath() {
+		return mediaPath;
+	}
+
+	public void setMediaPath(String mediaPath) {
+		this.mediaPath = mediaPath;
+	}
+
+	public String getMailSmtpHost() {
+		return mailSmtpHost;
+	}
+
+	public void setMailSmtpHost(String mailSmtpHost) {
+		this.mailSmtpHost = mailSmtpHost;
+	}
+
+	public String getMailFrom() {
+		return mailFrom;
+	}
+
+	public void setMailFrom(String mailFrom) {
+		this.mailFrom = mailFrom;
 	}
 
 	public String getLoginId() {
@@ -70,22 +132,6 @@ public class SetupForm implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getDefaultLanguage() {
-		return defaultLanguage;
-	}
-
-	public void setDefaultLanguage(String defaultLanguage) {
-		this.defaultLanguage = defaultLanguage;
-	}
-
-	public List<String> getLanguages() {
-		return languages;
-	}
-
-	public void setLanguages(List<String> languages) {
-		this.languages = languages;
 	}
 
 	public static class Name {

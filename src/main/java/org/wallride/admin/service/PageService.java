@@ -3,8 +3,8 @@ package org.wallride.admin.service;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -25,6 +25,7 @@ import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.PageFullTextSearchTerm;
 import org.wallride.core.repository.PageRepository;
 import org.wallride.core.support.Paginator;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -34,7 +35,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Service
+@Service @Lazy
 @Transactional(rollbackFor=Exception.class)
 public class PageService {
 	
@@ -53,7 +54,7 @@ public class PageService {
 	private PlatformTransactionManager transactionManager;
 
 	@Inject
-	private Environment environment;
+	private Settings settings;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -139,7 +140,7 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
+			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -229,7 +230,7 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
+			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -266,110 +267,6 @@ public class PageService {
 		}
 	}
 
-	/*
-	public Page updatePage(PageEditForm form, BindingResult errors, AuthorizedUser authorizedUser) throws BindException {
-		LocalDateTime now = new LocalDateTime();
-		Page page = pageRepository.findByIdForUpdate(form.getId());
-
-		pageRepository.shiftLftRgt(page.getLft(), page.getRgt());
-		pageRepository.shiftRgt(page.getRgt());
-		pageRepository.shiftLft(page.getRgt());
-
-		String code = (form.getCode() != null) ? form.getCode() : form.getTitle();
-		if (!StringUtils.hasText(code)) {
-			if (Post.Status.PUBLISHED.equals(form.getStatus())) {
-				errors.rejectValue("code", "NotNull");
-			}
-		}
-		else {
-			Page duplicate = pageRepository.findByCode(form.getCode(), form.getLanguage());
-			if (duplicate != null && !duplicate.equals(page)) {
-				errors.rejectValue("code", "NotDuplicate");
-			}
-		}
-
-		if (errors.hasErrors()) {
-			throw new BindException(errors);
-		}
-
-		Page parent = (form.getParentId() != null) ? pageRepository.findById(form.getParentId()) : null;
-		int rgt = 0;
-		if (parent == null) {
-			rgt = pageRepository.findMaxRgt();
-			rgt++;
-		}
-		else {
-			rgt = parent.getRgt();
-			pageRepository.unshiftRgt(rgt);
-			pageRepository.unshiftLft(rgt);
-		}
-
-//		int depth = (parent == null) ? 1 : parent.getDepth() + 1;
-//		int sort = page.getSort();
-//		if (depth != page.getDepth()) {
-//			sort = pageRepository.findMaxSortByDepth(depth, form.getLanguage());
-//			if (sort == 0 && parent != null) {
-//				sort = parent.getSort();
-//			}
-//			sort++;
-//			pageRepository.incrementSortBySortGreaterThanEqual(sort, form.getLanguage());
-//		}
-
-		page.setParent(parent);
-
-		Media cover = null;
-		if (form.getCoverId() != null) {
-			cover = entityManager.getReference(Media.class, form.getCoverId());
-		}
-		page.setCover(cover);
-		page.setTitle(form.getTitle());
-		page.setCode(code);
-		page.setBody(form.getBody());
-
-		User author = entityManager.getReference(User.class, authorizedUser.getId());
-//		User author = null;
-//		if (form.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, form.getAuthorId());
-//		}
-		page.setAuthor(author);
-		
-		LocalDateTime date = form.getDate();
-		Post.Status status = form.getStatus();
-		if (Post.Status.PUBLISHED.equals(form.getStatus())) {
-			if (date == null) {
-				date = now;
-			}
-			else if (date.isAfter(now)) {
-				status = Post.Status.SCHEDULED;
-			}
-		}
-		page.setDate(date);
-		page.setStatus(status);
-		page.setLft(rgt);
-		page.setRgt(rgt + 1);
-//		page.setDepth(depth);
-//		page.setSort(sort);
-		page.setLanguage(form.getLanguage());
-		
-		List<Media> medias = new ArrayList<>();
-		if (StringUtils.hasText(form.getBody())) {
-			String mediaUrlPrefix = environment.getRequiredProperty("media.url");
-			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
-			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
-			while (mediaUrlMatcher.find()) {
-				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
-				medias.add(media);
-			}
-		}
-		page.setMedias(medias);
-
-		page.setUpdatedAt(now);
-		page.setUpdatedBy(authorizedUser.toString());
-
-		return pageRepository.save(page);
-	}
-	*/
-	
 	public Page deletePage(PageDeleteForm form, BindingResult result) throws ValidationException {
 		Page page = pageRepository.findByIdForUpdate(form.getId());
 		Page parent = page.getParent();

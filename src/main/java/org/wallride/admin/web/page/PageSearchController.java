@@ -1,5 +1,6 @@
 package org.wallride.admin.web.page;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/pages/index")
 public class PageSearchController extends DomainObjectSearchController<Page, PageSearchForm> {
 	

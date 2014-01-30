@@ -2,6 +2,7 @@ package org.wallride.admin.web.page;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,7 +14,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
-@Controller
+@Controller @Lazy
 @RequestMapping(value="/pages/delete", method=RequestMethod.POST)
 public class PageDeleteController {
 	

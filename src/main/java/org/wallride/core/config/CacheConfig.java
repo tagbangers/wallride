@@ -22,12 +22,9 @@ import org.springframework.jndi.JndiTemplate;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
-import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 @Configuration
@@ -74,8 +71,8 @@ public class CacheConfig {
 
 		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");
 		if ("jgroups-ec2.xml".equals(jgroupsConfigurationFile)) {
-			System.setProperty("jgroups.s3.access_key", System.getProperty("AWS_ACCESS_KEY_ID"));
-			System.setProperty("jgroups.s3.secret_access_key", System.getProperty("AWS_SECRET_KEY"));
+			System.setProperty("jgroups.s3.access_key", environment.getRequiredProperty("aws.accessKey"));
+			System.setProperty("jgroups.s3.secret_access_key", environment.getRequiredProperty("aws.secretKey"));
 			System.setProperty("jgroups.s3.bucket",  environment.getRequiredProperty("jgroups.s3.bucket"));
 		}
 		System.setProperty("jgroups.bind_addr", ipaddress);

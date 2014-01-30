@@ -1,6 +1,6 @@
 package org.wallride.admin.web.media;
 
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.wallride.admin.service.MediaService;
 import org.wallride.core.domain.Media;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 
-@Controller
+@Controller @Lazy
 @RequestMapping("/{language}/media/create")
 public class MediaCreateController {
 
@@ -20,11 +21,11 @@ public class MediaCreateController {
 	private MediaService mediaService;
 
 	@Inject
-	private Environment environment;
+	private Settings settings;
 
 	@RequestMapping(method=RequestMethod.POST)
 	public @ResponseBody MediaCreatedModel create(@RequestParam MultipartFile file) {
 		Media media = mediaService.createMedia(file);
-		return new MediaCreatedModel(media, environment);
+		return new MediaCreatedModel(media, settings);
 	}
 }

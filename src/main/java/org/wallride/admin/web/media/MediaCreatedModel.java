@@ -1,7 +1,8 @@
 package org.wallride.admin.web.media;
 
-import org.springframework.core.env.Environment;
 import org.wallride.core.domain.Media;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.support.Settings;
 
 import java.io.Serializable;
 
@@ -11,9 +12,9 @@ public class MediaCreatedModel implements Serializable {
 
 	private String filelink;
 
-	public MediaCreatedModel(Media media, Environment environment) {
+	public MediaCreatedModel(Media media, Settings settings) {
 		this.id = media.getId();
-		this.filelink = environment.getRequiredProperty("media.url") + media.getId();
+		this.filelink = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX) + media.getId();
 	}
 
 	public String getId() {

@@ -1,11 +1,9 @@
 package org.wallride.core.support;
 
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionEnhancingDialect;
-import org.wallride.core.service.SettingService;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -16,16 +14,13 @@ import java.util.Map;
 public class CustomThymeleafDialect extends AbstractDialect implements IExpressionEnhancingDialect {
 
 	@Inject
-	private SettingService settingService;
-
-	@Inject
-	private Environment environment;
+	private Settings settings;
 
 	@Override
 	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
 		Map<String, Object> objects = new HashMap<>();
-		objects.put("posts", new PostUtils(processingContext, settingService, environment));
-		objects.put("medias", new MediaUtils(environment));
+		objects.put("posts", new PostUtils(processingContext, settings));
+		objects.put("medias", new MediaUtils(settings));
 		return Collections.unmodifiableMap(objects);
 	}
 

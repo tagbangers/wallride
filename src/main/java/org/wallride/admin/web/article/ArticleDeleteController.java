@@ -2,6 +2,7 @@ package org.wallride.admin.web.article;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -15,7 +16,7 @@ import org.wallride.core.domain.Article;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-@Controller
+@Controller @Lazy
 @RequestMapping(value="/{language}/articles/delete", method=RequestMethod.POST)
 public class ArticleDeleteController {
 	
