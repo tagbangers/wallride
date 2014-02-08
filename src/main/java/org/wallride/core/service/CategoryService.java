@@ -1,7 +1,6 @@
 package org.wallride.core.service;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -15,7 +14,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-@Service @Lazy
+@Service
 @Transactional(rollbackFor=Exception.class)
 public class CategoryService {
 

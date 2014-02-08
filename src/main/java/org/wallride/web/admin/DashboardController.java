@@ -1,6 +1,5 @@
 package org.wallride.web.admin;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,7 @@ import org.wallride.web.admin.article.ArticleSearchForm;
 import javax.inject.Inject;
 import java.util.List;
 
-@Controller @Lazy
+@Controller
 public class DashboardController {
 	
 	@Inject

@@ -1,6 +1,5 @@
 package org.wallride.web.admin.article;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +14,7 @@ import org.wallride.web.DomainObjectDescribeController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-@Controller @Lazy
+@Controller
 @RequestMapping(value="/{language}/articles/describe", method=RequestMethod.GET)
 public class ArticleDescribeController extends DomainObjectDescribeController<Article, ArticleSearchForm> {
 	

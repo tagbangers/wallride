@@ -1,4 +1,4 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -23,6 +23,13 @@ public class CoreConfig {
 	private Environment environment;
 
 	@Configuration
+	@Profile("default")
+	@PropertySource("classpath:environment-default.properties")
+	static class Product extends PropertySourcesPlaceholderConfigurer {
+	}
+
+
+	@Configuration
 	@Profile("develop")
 	@PropertySource("classpath:environment-develop.properties")
 	static class Develop extends PropertySourcesPlaceholderConfigurer {
@@ -33,12 +40,6 @@ public class CoreConfig {
 //	@PropertySource("classpath:environment-test.properties")
 //	static class Test extends PropertySourcesPlaceholderConfigurer {
 //	}
-
-	@Configuration
-	@Profile("product")
-	@PropertySource("classpath:environment-product.properties")
-	static class Product extends PropertySourcesPlaceholderConfigurer {
-	}
 
 	@Bean
 	public MessageSource messageSource() {

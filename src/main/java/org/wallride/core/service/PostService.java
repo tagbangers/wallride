@@ -4,7 +4,6 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -14,7 +13,7 @@ import org.wallride.core.repository.PostRepository;
 import javax.inject.Inject;
 import java.util.List;
 
-@Service @Lazy
+@Service
 @Transactional(rollbackFor=Exception.class)
 public class PostService {
 

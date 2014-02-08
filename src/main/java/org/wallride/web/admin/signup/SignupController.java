@@ -1,6 +1,5 @@
 package org.wallride.web.admin.signup;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -15,7 +14,7 @@ import org.wallride.web.HttpForbiddenException;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/signup")
 public class SignupController {
 

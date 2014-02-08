@@ -2,7 +2,6 @@ package org.wallride.web.admin.article;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
@@ -26,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/articles/preview")
 public class ArticlePreviewController {
 

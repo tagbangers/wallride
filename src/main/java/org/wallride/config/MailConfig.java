@@ -1,15 +1,13 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.support.CustomThymeleafDialect;
@@ -21,14 +19,13 @@ import java.util.Properties;
 import java.util.Set;
 
 @Configuration
-@Lazy
 public class MailConfig {
 
 	@Inject
 	private CustomThymeleafDialect customThymeleafDialect;
 
-	@Inject
-	private Settings settings;
+//	@Inject
+//	private Settings settings;
 
 	@Inject
 	private Environment environment;
@@ -38,12 +35,12 @@ public class MailConfig {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
 		Properties props = new Properties();
-//		props.put("mail.smtp.host", environment.getRequiredProperty("mail.smtp.host"));
-//		props.put("mail.from", environment.getRequiredProperty("mail.from"));
-//		props.put("mail.smtp.from", environment.getRequiredProperty("mail.smtp.from"));
-		props.put("mail.smtp.host", settings.readSettingAsString(Setting.Key.MAIL_SMTP_HOST));
-		props.put("mail.from", settings.readSettingAsString(Setting.Key.MAIL_FROM));
-		props.put("mail.smtp.from", settings.readSettingAsString(Setting.Key.MAIL_FROM));
+		props.put("mail.smtp.host", environment.getRequiredProperty("smtp.host"));
+		props.put("mail.from", environment.getRequiredProperty("smtp.from"));
+		props.put("mail.smtp.from", environment.getRequiredProperty("smtp.from"));
+//		props.put("mail.smtp.host", settings.readSettingAsString(Setting.Key.MAIL_SMTP_HOST));
+//		props.put("mail.from", settings.readSettingAsString(Setting.Key.MAIL_FROM));
+//		props.put("mail.smtp.from", settings.readSettingAsString(Setting.Key.MAIL_FROM));
 		mailSender.setJavaMailProperties(props);
 
 //		mailSender.setHost("");

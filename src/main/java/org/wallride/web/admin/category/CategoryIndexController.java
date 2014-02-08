@@ -1,6 +1,5 @@
 package org.wallride.web.admin.category;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,7 +12,7 @@ import org.wallride.core.service.CategoryService;
 
 import javax.inject.Inject;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/categories/index")
 public class CategoryIndexController {
 

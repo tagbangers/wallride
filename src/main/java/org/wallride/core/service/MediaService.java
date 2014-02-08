@@ -1,6 +1,5 @@
 package org.wallride.core.service;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
@@ -17,7 +16,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
-@Service @Lazy
+@Service
 @Transactional(rollbackFor=Exception.class)
 public class MediaService {
 

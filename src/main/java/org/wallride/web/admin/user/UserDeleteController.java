@@ -2,7 +2,6 @@ package org.wallride.web.admin.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -14,7 +13,7 @@ import org.wallride.core.service.UserService;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-@Controller @Lazy
+@Controller
 @RequestMapping(value="/{language}/users/delete", method= RequestMethod.POST)
 public class UserDeleteController {
 	

@@ -1,4 +1,4 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;

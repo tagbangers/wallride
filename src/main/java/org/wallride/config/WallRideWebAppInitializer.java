@@ -1,4 +1,4 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.core.annotation.Order;
@@ -24,7 +24,7 @@ public class WallRideWebAppInitializer extends AbstractContextLoaderInitializer 
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		servletContext.setInitParameter("spring.profiles.default", "develop");
+		servletContext.setInitParameter("spring.profiles.default", "default");
 		
 		EnumSet<DispatcherType> dispatcherTypes = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD);
 

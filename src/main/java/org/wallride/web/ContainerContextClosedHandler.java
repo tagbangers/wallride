@@ -17,12 +17,12 @@ import java.util.Enumeration;
 public class ContainerContextClosedHandler implements ServletContextListener {
 
 	@Override
-	public void contextInitialized(ServletContextEvent sce) {
+	public void contextInitialized(ServletContextEvent event) {
 		// nothing to do
 	}
 
 	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
+	public void contextDestroyed(ServletContextEvent event) {
 		// stop CacheManger
 		try {
 			JndiTemplate jndiTemplate = new JndiTemplate();

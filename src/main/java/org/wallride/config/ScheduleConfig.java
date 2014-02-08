@@ -1,4 +1,4 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;

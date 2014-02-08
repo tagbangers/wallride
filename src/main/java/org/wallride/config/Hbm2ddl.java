@@ -1,4 +1,4 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;

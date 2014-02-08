@@ -2,7 +2,6 @@ package org.wallride.web.admin.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Controller @Lazy
+@Controller
 @RequestMapping(value="/{language}/users/bulk-delete", method= RequestMethod.POST)
 public class UserBulkDeleteController {
 

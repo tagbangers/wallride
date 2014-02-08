@@ -4,7 +4,6 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,7 +32,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Service @Lazy
+@Service
 @Transactional(rollbackFor=Exception.class)
 public class ArticleService {
 	
@@ -58,17 +57,17 @@ public class ArticleService {
 	private static Logger logger = LoggerFactory.getLogger(ArticleService.class); 
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Article createArticle(ArticleCreateRequest form, BindingResult errors, Post.Status status, AuthorizedUser authorizedUser) throws BindException {
+	public Article createArticle(ArticleCreateRequest request, BindingResult errors, Post.Status status, AuthorizedUser authorizedUser) throws BindException {
 		LocalDateTime now = new LocalDateTime();
 
-		String code = (form.getCode() != null) ? form.getCode() : form.getTitle();
+		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
 			if (Post.Status.PUBLISHED.equals(status)) {
 				errors.rejectValue("code", "NotNull");
 			}
 		}
 		else {
-			Article duplicate = articleRepository.findByCode(form.getCode(), form.getLanguage());
+			Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
 			if (duplicate != null) {
 				errors.rejectValue("code", "NotDuplicate");
 			}
@@ -80,13 +79,13 @@ public class ArticleService {
 
 		Article article = new Article();
 		Media cover = null;
-		if (form.getCoverId() != null) {
-			cover = entityManager.getReference(Media.class, form.getCoverId());
+		if (request.getCoverId() != null) {
+			cover = entityManager.getReference(Media.class, request.getCoverId());
 		}
 		article.setCover(cover);
-		article.setTitle(form.getTitle());
+		article.setTitle(request.getTitle());
 		article.setCode(code);
-		article.setBody(form.getBody());
+		article.setBody(request.getBody());
 
 		User author = entityManager.getReference(User.class, authorizedUser.getId());
 //		if (request.getAuthorId() != null) {
@@ -94,7 +93,7 @@ public class ArticleService {
 //		}
 		article.setAuthor(author);
 
-		LocalDateTime date = form.getDate();
+		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(status)) {
 			if (date == null) {
 				date = now.withTime(0, 0, 0, 0);
@@ -105,18 +104,18 @@ public class ArticleService {
 		}
 		article.setDate(date);
 		article.setStatus(status);
-		article.setLanguage(form.getLanguage());
+		article.setLanguage(request.getLanguage());
 
 		article.getCategories().clear();
-		for (long categoryId : form.getCategoryIds()) {
+		for (long categoryId : request.getCategoryIds()) {
 			article.getCategories().add(entityManager.getReference(Category.class, categoryId));
 		}
 
 		List<Media> medias = new ArrayList<>();
-		if (StringUtils.hasText(form.getBody())) {
+		if (StringUtils.hasText(request.getBody())) {
 			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
-			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
+			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
 				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
 				medias.add(media);

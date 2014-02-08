@@ -1,6 +1,5 @@
 package org.wallride.web.admin.media;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,7 +12,7 @@ import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/media/create")
 public class MediaCreateController {
 

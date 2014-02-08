@@ -2,7 +2,6 @@ package org.wallride.core.service;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service @Lazy
+@Service
 @Transactional(rollbackFor=Exception.class)
 public class SetupService {
 	

@@ -1,6 +1,5 @@
 package org.wallride.web.admin.user;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +12,7 @@ import org.wallride.web.DomainObjectDescribeController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-@Controller @Lazy
+@Controller
 @RequestMapping(value="/{language}/users/describe", method= RequestMethod.GET)
 public class UserDescribeController extends DomainObjectDescribeController<User, UserSearchForm> {
 	

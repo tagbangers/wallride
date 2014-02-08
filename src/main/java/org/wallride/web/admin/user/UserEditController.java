@@ -2,7 +2,6 @@ package org.wallride.web.admin.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/users/edit")
 public class UserEditController {
 	

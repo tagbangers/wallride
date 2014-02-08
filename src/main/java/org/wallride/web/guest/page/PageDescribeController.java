@@ -1,6 +1,5 @@
 package org.wallride.web.guest.page;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +12,7 @@ import org.wallride.web.guest.article.ArticleIndexController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/{code}")
 public class PageDescribeController {
 

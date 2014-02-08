@@ -1,4 +1,4 @@
-package org.wallride.core.config;
+package org.wallride.config;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
@@ -29,11 +29,14 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.DomainObject;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.net.URI;
 import java.util.Properties;
 
 @Configuration
@@ -84,11 +87,15 @@ public class DataConfig implements BatchConfigurer {
 	
 	@Bean
 	public DataSource dataSource() {
+		String jdbcConnectionString = environment.getRequiredProperty("jdbc.connection.string");
+		UriComponents jdbcUriComponents = UriComponentsBuilder.fromUriString(jdbcConnectionString.substring("jdbc:".length())).build();
+
 		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(environment.getRequiredProperty("datasource.jdbc.driver"));
-		dataSource.setUsername(environment.getRequiredProperty("datasource.jdbc.username"));
-		dataSource.setPassword(environment.getRequiredProperty("datasource.jdbc.password"));
-		dataSource.setUrl(environment.getRequiredProperty("datasource.jdbc.url"));
+		dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driver"));
+		dataSource.setUsername(jdbcUriComponents.getQueryParams().getFirst("user"));
+		dataSource.setPassword(jdbcUriComponents.getQueryParams().getFirst("password"));
+		dataSource.setUrl(jdbcConnectionString.substring(0, jdbcConnectionString.indexOf("?")));
+
 		dataSource.setMaxActive(environment.getRequiredProperty("datasource.maxActive", Integer.class));
 		dataSource.setMaxIdle(environment.getRequiredProperty("datasource.maxIdle", Integer.class));
 		dataSource.setTimeBetweenEvictionRunsMillis(environment.getRequiredProperty("datasource.timeBetweenEvictionRunsMillis", Long.class));
@@ -104,23 +111,6 @@ public class DataConfig implements BatchConfigurer {
 		catch (NamingException e) {
 			logger.error("JNDI error.", e);
 		}
-
-//		try {
-//			Connection connection = dataSource.getConnection();
-//			DatabaseMetaData metaData = connection.getMetaData();
-//			ResultSet resultSet = metaData.getTables(null, null, "global_setting", new String[]{"TABLE"});
-//			boolean created = (resultSet.next());
-//			resultSet.close();
-//
-//			if (!created) {
-//				File createTableSqlFile = resourceLoader.getResource("classpath:/create-table.sql").getFile();
-//				connection.createStatement().executeUpdate(FileUtils.readFileToString(createTableSqlFile));
-//			}
-//			connection.close();
-//		}
-//		catch (Exception e) {
-//			throw new BeanInitializationException("Failed to initialize the DataSource", e);
-//		}
 
 		return dataSource;
 	}

@@ -1,6 +1,5 @@
 package org.wallride.web.admin.media;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,7 +10,7 @@ import org.wallride.core.support.Settings;
 import javax.inject.Inject;
 import java.util.List;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/media/index")
 public class MediaIndexController {
 

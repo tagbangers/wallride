@@ -1,6 +1,5 @@
 package org.wallride.web.admin.user;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +10,7 @@ import org.wallride.core.service.UserService;
 import javax.inject.Inject;
 import java.util.List;
 
-@Controller @Lazy
+@Controller
 @RequestMapping("/{language}/users/invitations/index")
 public class UserInvitationIndexController {
 
