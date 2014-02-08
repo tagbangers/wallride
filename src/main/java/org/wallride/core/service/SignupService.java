@@ -12,7 +12,7 @@ import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.web.HttpForbiddenException;
+import org.wallride.web.support.HttpForbiddenException;
 
 import javax.inject.Inject;
 
@@ -45,8 +45,8 @@ public class SignupService {
 	}
 
 	@CacheEvict(value="users", allEntries=true)
-	public AuthorizedUser signup(SignupRequest form, BindingResult errors) throws BindException {
-		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(form.getToken());
+	public AuthorizedUser signup(SignupRequest request, BindingResult errors) throws BindException {
+		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(request.getToken());
 		boolean valid = false;
 		if (invitation != null) {
 			valid = validateInvitation(invitation);
@@ -55,7 +55,7 @@ public class SignupService {
 			throw new HttpForbiddenException();
 		}
 
-		User duplicate = userRepository.findByLoginId(form.getLoginId());
+		User duplicate = userRepository.findByLoginId(request.getLoginId());
 		if (duplicate != null) {
 			errors.rejectValue("loginId", "NotDuplicate");
 		}
@@ -69,12 +69,12 @@ public class SignupService {
 		userInvitationRepository.saveAndFlush(invitation);
 
 		User user = new User();
-		user.setLoginId(form.getLoginId());
+		user.setLoginId(request.getLoginId());
 		Md5PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
-		user.setLoginPassword(passwordEncoder.encodePassword(form.getLoginPassword(), null));
-		user.getName().setFirstName(form.getName().getFirstName());
-		user.getName().setLastName(form.getName().getLastName());
-		user.setEmail(form.getEmail());
+		user.setLoginPassword(passwordEncoder.encodePassword(request.getLoginPassword(), null));
+		user.getName().setFirstName(request.getName().getFirstName());
+		user.getName().setLastName(request.getName().getLastName());
+		user.setEmail(request.getEmail());
 		user.setCreatedAt(now);
 		user.setUpdatedAt(now);
 		user = userRepository.saveAndFlush(user);

@@ -22,7 +22,7 @@ public class CategoryService {
 	private CategoryRepository categoryRepository;
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Category createCategory(CategoryCreateRequest request, Errors errors, AuthorizedUser authorizedUser) {
+	public Category createCategory(CategoryCreateRequest request, AuthorizedUser authorizedUser) {
 		Category category = new Category();
 
 		Category parent = null;
@@ -53,7 +53,7 @@ public class CategoryService {
 	}
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Category updateCategory(CategoryUpdateRequest request, Errors errors, AuthorizedUser authorizedUser) {
+	public Category updateCategory(CategoryUpdateRequest request, AuthorizedUser authorizedUser) {
 		Category category = categoryRepository.findByIdForUpdate(request.getId(), request.getLanguage());
 		Category parent = null;
 		if (request.getParentId() != null) {

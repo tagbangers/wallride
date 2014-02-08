@@ -80,7 +80,7 @@ public class PageService {
 		}
 
 		Page page = new Page();
-		Page parent = (request.getParentId() != null) ? pageRepository.findById(request.getParentId()) : null;
+		Page parent = (request.getParentId() != null) ? pageRepository.findById(request.getParentId(), request.getLanguage()) : null;
 		int rgt = 0;
 		if (parent == null) {
 			rgt = pageRepository.findMaxRgt();
@@ -244,7 +244,7 @@ public class PageService {
 		return pageRepository.save(page);
 	}
 
-	public void updatePageHierarchy(List<Map<String, Object>> data) {
+	public void updatePageHierarchy(List<Map<String, Object>> data, String language) {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {
@@ -252,7 +252,7 @@ public class PageService {
 				if (page != null) {
 					Page parent = null;
 					if (map.get("parent_id") != null) {
-						parent = pageRepository.findById(Long.parseLong((String) map.get("parent_id")));
+						parent = pageRepository.findById(Long.parseLong((String) map.get("parent_id")), language);
 					}
 					page.setParent(parent);
 					page.setLft(((int) map.get("left")) - 1);
@@ -360,12 +360,12 @@ public class PageService {
 		return pages;
 	}
 	
-	public Page readPageById(long id) {
-		return pageRepository.findById(id);
+	public Page readPageById(long id, String language) {
+		return pageRepository.findById(id, language);
 	}
 
-	public Page readPage(String code) {
-		return pageRepository.findByCode(code, LocaleContextHolder.getLocale().getLanguage());
+	public Page readPageByCode(String code, String language) {
+		return pageRepository.findByCode(code, language);
 	}
 
 	public PageTree readPageTree(String language) {

@@ -6,7 +6,6 @@ import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.domain.User;
 import org.wallride.core.repository.SettingRepository;
@@ -14,7 +13,9 @@ import org.wallride.core.repository.UserRepository;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -27,35 +28,35 @@ public class SetupService {
 	private UserRepository userRepository;
 
 	@CacheEvict(value="settings", allEntries=true)
-	public User setup(SetupRequest form, BindingResult result) {
-		settingRepository.saveAndFlush(new Setting(Setting.Key.DEFAULT_LANGUAGE, form.getDefaultLanguage()));
+	public User setup(SetupRequest request) {
+		settingRepository.saveAndFlush(new Setting(Setting.Key.DEFAULT_LANGUAGE, request.getDefaultLanguage()));
 
-		List<String> languages = new ArrayList<>();
-		languages.add(form.getDefaultLanguage());
-		for (String language : form.getLanguages()) {
+		Set<String> languages = new LinkedHashSet<>();
+		languages.add(request.getDefaultLanguage());
+		for (String language : request.getLanguages()) {
 			languages.add(language);
 		}
 		settingRepository.saveAndFlush(new Setting(Setting.Key.LANGUAGES, StringUtils.collectionToCommaDelimitedString(languages)));
 
 		for (String language : languages) {
-			settingRepository.saveAndFlush(new Setting(Setting.Key.WEBSITE_TITLE, form.getWebsiteTitle(), language));
+			settingRepository.saveAndFlush(new Setting(Setting.Key.WEBSITE_TITLE, request.getWebsiteTitle(), language));
 		}
 
-		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_URL_PREFIX, form.getMediaUrlPrefix()));
-		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_PATH, form.getMediaPath()));
+		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_URL_PREFIX, request.getMediaUrlPrefix()));
+		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_PATH, request.getMediaPath()));
 
-		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_SMTP_HOST, form.getMailSmtpHost()));
-		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_FROM, form.getMailFrom()));
+//		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_SMTP_HOST, request.getMailSmtpHost()));
+//		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_FROM, request.getMailFrom()));
 
 		User user = new User();
-		user.setLoginId(form.getLoginId());
+		user.setLoginId(request.getLoginId());
 		
 		Md5PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
-		user.setLoginPassword(passwordEncoder.encodePassword(form.getLoginPassword(), null));
+		user.setLoginPassword(passwordEncoder.encodePassword(request.getLoginPassword(), null));
 
-		user.getName().setFirstName(form.getName().getFirstName());
-		user.getName().setLastName(form.getName().getLastName());
-		user.setEmail(form.getEmail());
+		user.getName().setFirstName(request.getName().getFirstName());
+		user.getName().setLastName(request.getName().getLastName());
+		user.setEmail(request.getEmail());
 
 		LocalDateTime now = new LocalDateTime();
 		user.setCreatedAt(now);

@@ -31,10 +31,10 @@ import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
-import org.wallride.web.DefaultModelAttributeInterceptor;
-import org.wallride.web.PathVariableLocaleResolver;
-import org.wallride.web.SetupCheckInterceptor;
-import org.wallride.web.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.DefaultModelAttributeInterceptor;
+import org.wallride.web.support.PathVariableLocaleResolver;
+import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.SetupRedirectInterceptor;
 
 import javax.inject.Inject;
 import java.text.DateFormat;
@@ -47,7 +47,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @Configuration
-@ComponentScan(basePackages="org.wallride.web.admin", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
+@ComponentScan(basePackages= "org.wallride.web.controller.admin", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
 @EnableWebMvc
 public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
@@ -120,7 +120,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(defaultModelAttributeInterceptor());
-		registry.addInterceptor(setupCheckInterceptor()).addPathPatterns("/setup**");
+		registry.addInterceptor(setupRedirectInterceptor());
 	}
 
 	@Override
@@ -140,10 +140,10 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public SetupCheckInterceptor setupCheckInterceptor() {
-		SetupCheckInterceptor setupCheckInterceptor = new SetupCheckInterceptor();
-		setupCheckInterceptor.setSettings(settings);
-		return setupCheckInterceptor;
+	public SetupRedirectInterceptor setupRedirectInterceptor() {
+		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
+		setupRedirectInterceptor.setSettings(settings);
+		return setupRedirectInterceptor;
 	}
 
 	@Bean(name="adminTemplateResolver")

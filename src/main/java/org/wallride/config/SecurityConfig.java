@@ -2,6 +2,7 @@ package org.wallride.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -27,6 +28,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Inject
 	private DataSource dataSource;
 
+	@Inject
+	private Environment environment;
+
 	@Override
 	protected void registerAuthentication(AuthenticationManagerBuilder auth) throws Exception {
 		auth
@@ -45,29 +49,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.antMatcher("/_admin/**")
-				.authorizeRequests()
-					.antMatchers("/_admin/**").hasRole("USER")
-					.and()
-				.formLogin()
-					.loginPage("/_admin/login").permitAll()
-					.loginProcessingUrl("/_admin/login")
-					.defaultSuccessUrl("/_admin/")
-					.failureUrl("/_admin/login?failed")
-					.and()
-				.logout()
-					.logoutRequestMatcher(new AntPathRequestMatcher("/_admin/logout", "GET"))
-					.logoutSuccessUrl("/_admin/login")
-					.and()
-				.requiresChannel()
-					.anyRequest().requiresSecure()
-					.and()
-				.rememberMe()
-					.tokenRepository(persistentTokenRepository())
-					.and()
-				.csrf()
-					.disable();
+		http.antMatcher("/_admin/**")
+			.authorizeRequests()
+				.antMatchers("/_admin/**").hasRole("USER")
+				.and()
+			.formLogin()
+				.loginPage("/_admin/login").permitAll()
+				.loginProcessingUrl("/_admin/login")
+				.defaultSuccessUrl("/_admin/")
+				.failureUrl("/_admin/login?failed")
+				.and()
+			.logout()
+				.logoutRequestMatcher(new AntPathRequestMatcher("/_admin/logout", "GET"))
+				.logoutSuccessUrl("/_admin/login")
+				.and()
+			.requiresChannel()
+				.anyRequest().requiresSecure()
+				.and()
+			.rememberMe()
+				.tokenRepository(persistentTokenRepository())
+				.and()
+			.csrf()
+				.disable();
+		if (environment.getProperty("security.admin.force.ssl", Boolean.class, false)) {
+			http.requiresChannel()
+				.anyRequest().requiresSecure();
+		}
 	}
 
 	@Bean

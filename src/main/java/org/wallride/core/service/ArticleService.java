@@ -280,7 +280,7 @@ public class ArticleService {
 		return articleRepository.findById(id, language);
 	}
 
-	public Article readArticle(String code, String language) {
+	public Article readArticleByCode(String code, String language) {
 		return articleRepository.findByCode(code, language);
 	}
 

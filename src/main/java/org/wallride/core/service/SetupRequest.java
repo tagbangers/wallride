@@ -13,8 +13,8 @@ public class SetupRequest implements Serializable {
 	private List<String> languages;
 	private String mediaUrlPrefix;
 	private String mediaPath;
-	private String mailSmtpHost;
-	private String mailFrom;
+//	private String mailSmtpHost;
+//	private String mailFrom;
 	private String loginId;
 	private String loginPassword;
 	private PersonalName name;
@@ -40,13 +40,13 @@ public class SetupRequest implements Serializable {
 		return mediaPath;
 	}
 
-	public String getMailSmtpHost() {
-		return mailSmtpHost;
-	}
-
-	public String getMailFrom() {
-		return mailFrom;
-	}
+//	public String getMailSmtpHost() {
+//		return mailSmtpHost;
+//	}
+//
+//	public String getMailFrom() {
+//		return mailFrom;
+//	}
 
 	public String getLoginId() {
 		return loginId;
@@ -71,8 +71,8 @@ public class SetupRequest implements Serializable {
 		private List<String> languages;
 		private String mediaUrlPrefix;
 		private String mediaPath;
-		private String mailSmtpHost;
-		private String mailFrom;
+//		private String mailSmtpHost;
+//		private String mailFrom;
 		private String loginId;
 		private String loginPassword;
 		private PersonalName name;
@@ -106,15 +106,15 @@ public class SetupRequest implements Serializable {
 			return this;
 		}
 
-		public Builder mailSmtpHost(String mailSmtpHost) {
-			this.mailSmtpHost = mailSmtpHost;
-			return this;
-		}
-
-		public Builder mailFrom(String mailFrom) {
-			this.mailFrom = mailFrom;
-			return this;
-		}
+//		public Builder mailSmtpHost(String mailSmtpHost) {
+//			this.mailSmtpHost = mailSmtpHost;
+//			return this;
+//		}
+//
+//		public Builder mailFrom(String mailFrom) {
+//			this.mailFrom = mailFrom;
+//			return this;
+//		}
 
 		public Builder loginId(String loginId) {
 			this.loginId = loginId;
@@ -143,8 +143,8 @@ public class SetupRequest implements Serializable {
 			request.languages = languages;
 			request.mediaUrlPrefix = mediaUrlPrefix;
 			request.mediaPath = mediaPath;
-			request.mailSmtpHost = mailSmtpHost;
-			request.mailFrom = mailFrom;
+//			request.mailSmtpHost = mailSmtpHost;
+//			request.mailFrom = mailFrom;
 			request.loginId = loginId;
 			request.loginPassword = loginPassword;
 			request.name = name;

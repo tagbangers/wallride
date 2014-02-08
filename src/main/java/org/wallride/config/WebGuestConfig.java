@@ -36,10 +36,11 @@ import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
-import org.wallride.web.DefaultModelAttributeInterceptor;
-import org.wallride.web.MediaHttpRequestHandler;
-import org.wallride.web.PathVariableLocaleResolver;
-import org.wallride.web.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.DefaultModelAttributeInterceptor;
+import org.wallride.web.support.MediaHttpRequestHandler;
+import org.wallride.web.support.PathVariableLocaleResolver;
+import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.SetupRedirectInterceptor;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Configuration
-@ComponentScan(basePackages="org.wallride.web.guest", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
+@ComponentScan(basePackages= "org.wallride.web.controller.guest", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
 //@EnableWebMvc
 //public class WebConfig extends WebMvcConfigurerAdapter {
 public class WebGuestConfig extends WebMvcConfigurationSupport {
@@ -163,6 +164,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(defaultModelAttributeInterceptor());
+		registry.addInterceptor(setupRedirectInterceptor());
 	}
 
 	@Override
@@ -196,6 +198,13 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		defaultModelAttributeInterceptor.setCategoryService(categoryService);
 		defaultModelAttributeInterceptor.setPageService(pageService);
 		return defaultModelAttributeInterceptor;
+	}
+
+	@Bean
+	public SetupRedirectInterceptor setupRedirectInterceptor() {
+		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
+		setupRedirectInterceptor.setSettings(settings);
+		return setupRedirectInterceptor;
 	}
 
 	@Bean

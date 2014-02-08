@@ -47,14 +47,6 @@ public class MediaService {
 		return media;
 	}
 
-//	public Media[] createMedia(MultipartFile[] files) {
-//		Media[] medias = new Media[files.length];
-//		for (int i = 0; i < files.length; i++) {
-//			medias[i] = createMedia(files[i]);
-//		}
-//		return medias;
-//	}
-
 	public List<Media> readAllMedias() {
 		return mediaRepository.findAll(new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt")));
 	}

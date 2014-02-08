@@ -76,8 +76,8 @@ public class UserService {
 	@CacheEvict(value="users", allEntries=true)
 	public User updateUser(UserUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) throws ValidationException {
 		User user = userRepository.findByIdForUpdate(form.getId());
-//		user.setTitle(form.getTitle());
-//		user.setBody(form.getBody());
+//		user.setTitle(request.getTitle());
+//		user.setBody(request.getBody());
 
 		user = userRepository.saveAndFlush(user);
 		return user;
@@ -99,7 +99,7 @@ public class UserService {
 					.id(id)
 					.build();
 
-			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteRequest, "form");
+			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteRequest, "request");
 			r.setMessageCodesResolver(messageCodesResolver);
 
 			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -218,18 +218,18 @@ public class UserService {
 
 
 	@CacheEvict(value="users", allEntries=true)
-	public UserInvitation deleteUserInvitation(UserInvitationDeleteRequest form) {
-		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(form.getToken());
+	public UserInvitation deleteUserInvitation(UserInvitationDeleteRequest request) {
+		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(request.getToken());
 		userInvitationRepository.delete(invitation);
 		return invitation;
 	}
 
-//	@Cacheable(value="users", key="'id.'+#form")
-	public List<Long> searchUsers(UserSearchRequest form) {
-		if (form.isEmpty()) {
+//	@Cacheable(value="users", key="'id.'+#request")
+	public List<Long> searchUsers(UserSearchRequest request) {
+		if (request.isEmpty()) {
 			return userRepository.findId();
 		}
-		return userRepository.findByFullTextSearchTerm(form.toFullTextSearchTerm());
+		return userRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm());
 	}
 	
 //	@Cacheable(value="users", key="'list.'+#paginator")

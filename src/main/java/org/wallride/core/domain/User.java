@@ -23,7 +23,7 @@ public class User extends DomainObject<Long> {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 
-	@Column(name="login_id", length=500, unique=true)
+	@Column(name="login_id", length=100, nullable=false, unique=true)
 	@Field
 	private String loginId;
 	
