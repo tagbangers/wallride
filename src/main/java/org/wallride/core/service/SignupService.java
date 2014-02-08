@@ -8,12 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.web.admin.signup.SignupForm;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
+import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.web.HttpForbiddenException;
 
 import javax.inject.Inject;
@@ -47,7 +46,7 @@ public class SignupService {
 	}
 
 	@CacheEvict(value="users", allEntries=true)
-	public AuthorizedUser signup(SignupForm form, BindingResult errors) throws BindException {
+	public AuthorizedUser signup(SignupRequest form, BindingResult errors) throws BindException {
 		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(form.getToken());
 		boolean valid = false;
 		if (invitation != null) {

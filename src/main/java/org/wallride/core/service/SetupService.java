@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.wallride.core.web.admin.setup.SetupForm;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.domain.User;
 import org.wallride.core.repository.SettingRepository;
@@ -29,7 +28,7 @@ public class SetupService {
 	private UserRepository userRepository;
 
 	@CacheEvict(value="settings", allEntries=true)
-	public User setup(SetupForm form, BindingResult result) {
+	public User setup(SetupRequest form, BindingResult result) {
 		settingRepository.saveAndFlush(new Setting(Setting.Key.DEFAULT_LANGUAGE, form.getDefaultLanguage()));
 
 		List<String> languages = new ArrayList<>();

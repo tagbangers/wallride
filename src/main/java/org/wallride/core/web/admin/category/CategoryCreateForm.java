@@ -2,6 +2,8 @@ package org.wallride.core.web.admin.category;
 
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
+import org.wallride.core.service.CategoryCreateRequest;
+import org.wallride.core.service.CategoryUpdateRequest;
 import org.wallride.core.web.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
@@ -59,6 +61,17 @@ public class CategoryCreateForm extends DomainObjectCreateForm {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public CategoryCreateRequest buildCategoryCreateRequest() {
+		CategoryCreateRequest.Builder builder = new CategoryCreateRequest.Builder();
+		return builder
+				.parentId(parentId)
+				.code(code)
+				.name(name)
+				.description(description)
+				.language(language)
+				.build();
 	}
 
 	public static CategoryCreateForm fromDomainObject(Category category) {

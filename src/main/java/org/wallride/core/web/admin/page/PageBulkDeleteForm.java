@@ -1,5 +1,7 @@
 package org.wallride.core.web.admin.page;
 
+import org.wallride.core.service.ArticleBulkDeleteRequest;
+import org.wallride.core.service.PageBulkDeleteRequest;
 import org.wallride.core.web.DomainObjectBulkDeleteForm;
 
 import javax.validation.constraints.NotNull;
@@ -26,5 +28,13 @@ public class PageBulkDeleteForm extends DomainObjectBulkDeleteForm {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public PageBulkDeleteRequest buildPageBulkDeleteRequest() {
+		PageBulkDeleteRequest.Builder builder = new PageBulkDeleteRequest.Builder();
+		return builder
+				.ids(ids)
+				.language(language)
+				.build();
 	}
 }

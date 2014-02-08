@@ -23,12 +23,12 @@ public class CategoryService {
 	private CategoryRepository categoryRepository;
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Category createCategory(CategoryCreateRequest form, Errors errors, AuthorizedUser authorizedUser) {
+	public Category createCategory(CategoryCreateRequest request, Errors errors, AuthorizedUser authorizedUser) {
 		Category category = new Category();
 
 		Category parent = null;
-		if (form.getParentId() != null) {
-			parent = categoryRepository.findById(form.getParentId(), form.getLanguage());
+		if (request.getParentId() != null) {
+			parent = categoryRepository.findById(request.getParentId(), request.getLanguage());
 		}
 
 		int rgt = 0;
@@ -43,22 +43,22 @@ public class CategoryService {
 		}
 
 		category.setParent(parent);
-		category.setCode(form.getCode() != null ? form.getCode() : form.getName());
-		category.setName(form.getName());
-		category.setDescription(form.getDescription());
+		category.setCode(request.getCode() != null ? request.getCode() : request.getName());
+		category.setName(request.getName());
+		category.setDescription(request.getDescription());
 		category.setLft(rgt);
 		category.setRgt(rgt + 1);
-		category.setLanguage(form.getLanguage());
+		category.setLanguage(request.getLanguage());
 
 		return categoryRepository.save(category);
 	}
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Category updateCategory(CategoryUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) {
-		Category category = categoryRepository.findByIdForUpdate(form.getId(), form.getLanguage());
+	public Category updateCategory(CategoryUpdateRequest request, Errors errors, AuthorizedUser authorizedUser) {
+		Category category = categoryRepository.findByIdForUpdate(request.getId(), request.getLanguage());
 		Category parent = null;
-		if (form.getParentId() != null) {
-			parent = categoryRepository.findById(form.getParentId(), form.getLanguage());
+		if (request.getParentId() != null) {
+			parent = categoryRepository.findById(request.getParentId(), request.getLanguage());
 		}
 
 		if (!(category.getParent() == null && parent == null) && !ObjectUtils.nullSafeEquals(category.getParent(), parent)) {
@@ -81,10 +81,10 @@ public class CategoryService {
 		}
 
 		category.setParent(parent);
-		category.setCode(form.getCode() != null ? form.getCode() : form.getName());
-		category.setName(form.getName());
-		category.setDescription(form.getDescription());
-		category.setLanguage(form.getLanguage());
+		category.setCode(request.getCode() != null ? request.getCode() : request.getName());
+		category.setName(request.getName());
+		category.setDescription(request.getDescription());
+		category.setLanguage(request.getLanguage());
 
 		return categoryRepository.save(category);
 	}

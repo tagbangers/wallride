@@ -2,6 +2,8 @@ package org.wallride.core.web.admin.category;
 
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
+import org.wallride.core.service.ArticleUpdateRequest;
+import org.wallride.core.service.CategoryUpdateRequest;
 import org.wallride.core.web.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
@@ -70,6 +72,18 @@ public class CategoryEditForm extends DomainObjectEditForm {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public CategoryUpdateRequest buildCategoryUpdateRequest() {
+		CategoryUpdateRequest.Builder builder = new CategoryUpdateRequest.Builder();
+		return builder
+				.id(id)
+				.parentId(parentId)
+				.code(code)
+				.name(name)
+				.description(description)
+				.language(language)
+				.build();
 	}
 
 	public static CategoryEditForm fromDomainObject(Category category) {

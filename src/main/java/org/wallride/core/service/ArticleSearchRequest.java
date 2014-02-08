@@ -46,10 +46,6 @@ public class ArticleSearchRequest implements Serializable {
 		return true;
 	}
 
-	public boolean isAdvanced() {
-		return false;
-	}
-
 	public ArticleFullTextSearchTerm toFullTextSearchTerm() {
 		ArticleFullTextSearchTerm term = new ArticleFullTextSearchTerm();
 		BeanUtils.copyProperties(this, term);

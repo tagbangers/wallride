@@ -12,10 +12,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.service.CategoryService;
+import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.web.DomainObjectDeletedModel;
 import org.wallride.core.web.DomainObjectSavedModel;
 import org.wallride.core.web.DomainObjectUpdatedModel;
@@ -52,11 +52,6 @@ public class CategoryRestController {
 		return new CategoryIndexModel(categoryTree);
 	}
 
-//	@RequestMapping(value="/{language}/categories/{id}", method= RequestMethod.GET)
-//	public void describe() {
-//
-//	}
-
 	@RequestMapping(value="/{language}/categories", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectSavedModel save(
 			@Valid CategoryCreateForm form,
@@ -67,7 +62,7 @@ public class CategoryRestController {
 		if (result.hasErrors()) {
 			throw new BindException(result);
 		}
-		Category category = categoryService.createCategory(form, result, authorizedUser);
+		Category category = categoryService.createCategory(form.buildCategoryCreateRequest(), result, authorizedUser);
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("savedCategory", category);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
@@ -86,7 +81,7 @@ public class CategoryRestController {
 		if (result.hasErrors()) {
 			throw new BindException(result);
 		}
-		Category category = categoryService.updateCategory(form, result, authorizedUser);
+		Category category = categoryService.updateCategory(form.buildCategoryUpdateRequest(), result, authorizedUser);
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("updatedCategory", category);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);

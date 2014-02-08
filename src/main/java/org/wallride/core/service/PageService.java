@@ -60,17 +60,17 @@ public class PageService {
 
 	private static Logger logger = LoggerFactory.getLogger(PageService.class); 
 
-	public Page createPage(PageCreateRequest form, BindingResult errors, AuthorizedUser authorizedUser) throws BindException {
+	public Page createPage(PageCreateRequest request, BindingResult errors, AuthorizedUser authorizedUser) throws BindException {
 		LocalDateTime now = new LocalDateTime();
 
-		String code = (form.getCode() != null) ? form.getCode() : form.getTitle();
+		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
-			if (Post.Status.PUBLISHED.equals(form.getStatus())) {
+			if (Post.Status.PUBLISHED.equals(request.getStatus())) {
 				errors.rejectValue("code", "NotNull");
 			}
 		}
 		else {
-			Page duplicate = pageRepository.findByCode(form.getCode(), form.getLanguage());
+			Page duplicate = pageRepository.findByCode(request.getCode(), request.getLanguage());
 			if (duplicate != null) {
 				errors.rejectValue("code", "NotDuplicate");
 			}
@@ -81,7 +81,7 @@ public class PageService {
 		}
 
 		Page page = new Page();
-		Page parent = (form.getParentId() != null) ? pageRepository.findById(form.getParentId()) : null;
+		Page parent = (request.getParentId() != null) ? pageRepository.findById(request.getParentId()) : null;
 		int rgt = 0;
 		if (parent == null) {
 			rgt = pageRepository.findMaxRgt();
@@ -94,35 +94,35 @@ public class PageService {
 		}
 
 //		int depth = (parent == null) ? 1 : parent.getDepth() + 1;
-//		int sort = pageRepository.findMaxSortByDepth(depth, form.getLanguage());
+//		int sort = pageRepository.findMaxSortByDepth(depth, request.getLanguage());
 //		if (sort == 0 && parent != null) {
 //			sort = parent.getSort();
 //		}
 //		sort++;
-//		pageRepository.incrementSortBySortGreaterThanEqual(sort, form.getLanguage());
+//		pageRepository.incrementSortBySortGreaterThanEqual(sort, request.getLanguage());
 
 		page.setParent(parent);
 		page.setCode(code);
-		page.setLanguage(form.getLanguage());
+		page.setLanguage(request.getLanguage());
 
 		Media cover = null;
-		if (form.getCoverId() != null) {
-			cover = entityManager.getReference(Media.class, form.getCoverId());
+		if (request.getCoverId() != null) {
+			cover = entityManager.getReference(Media.class, request.getCoverId());
 		}
 		page.setCover(cover);
-		page.setTitle(form.getTitle());
-		page.setBody(form.getBody());
+		page.setTitle(request.getTitle());
+		page.setBody(request.getBody());
 
 		User author = entityManager.getReference(User.class, authorizedUser.getId());
 //		User author = null;
-//		if (form.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, form.getAuthorId());
+//		if (request.getAuthorId() != null) {
+//			author = entityManager.getReference(User.class, request.getAuthorId());
 //		}
 		page.setAuthor(author);
 		
-		LocalDateTime date = form.getDate();
-		Post.Status status = form.getStatus();
-		if (Post.Status.PUBLISHED.equals(form.getStatus())) {
+		LocalDateTime date = request.getDate();
+		Post.Status status = request.getStatus();
+		if (Post.Status.PUBLISHED.equals(request.getStatus())) {
 			if (date == null) {
 				date = now.withTime(0, 0, 0, 0);
 			}
@@ -138,10 +138,10 @@ public class PageService {
 //		page.setSort(sort);
 
 		List<Media> medias = new ArrayList<>();
-		if (StringUtils.hasText(form.getBody())) {
+		if (StringUtils.hasText(request.getBody())) {
 			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
-			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
+			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
 				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
 				medias.add(media);
@@ -157,18 +157,18 @@ public class PageService {
 		return pageRepository.save(page);
 	}
 
-	public Page updatePage(PageUpdateRequest form, BindingResult errors, Post.Status status, AuthorizedUser authorizedUser) throws BindException {
+	public Page updatePage(PageUpdateRequest request, BindingResult errors, Post.Status status, AuthorizedUser authorizedUser) throws BindException {
 		LocalDateTime now = new LocalDateTime();
-		Page page = pageRepository.findByIdForUpdate(form.getId());
+		Page page = pageRepository.findByIdForUpdate(request.getId());
 
-		String code = (form.getCode() != null) ? form.getCode() : form.getTitle();
+		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
 			if (Post.Status.PUBLISHED.equals(status)) {
 				errors.rejectValue("code", "NotNull");
 			}
 		}
 		else {
-			Page duplicate = pageRepository.findByCode(form.getCode(), form.getLanguage());
+			Page duplicate = pageRepository.findByCode(request.getCode(), request.getLanguage());
 			if (duplicate != null && !duplicate.equals(page)) {
 				errors.rejectValue("code", "NotDuplicate");
 			}
@@ -177,7 +177,7 @@ public class PageService {
 			throw new BindException(errors);
 		}
 
-		Page parent = (form.getParentId() != null) ? entityManager.getReference(Page.class, form.getParentId()) : null;
+		Page parent = (request.getParentId() != null) ? entityManager.getReference(Page.class, request.getParentId()) : null;
 		if (!(page.getParent() == null && parent == null) && !ObjectUtils.nullSafeEquals(page.getParent(), parent)) {
 			pageRepository.shiftLftRgt(page.getLft(), page.getRgt());
 			pageRepository.shiftRgt(page.getRgt());
@@ -199,23 +199,23 @@ public class PageService {
 
 		page.setParent(parent);
 		page.setCode(code);
-		page.setLanguage(form.getLanguage());
+		page.setLanguage(request.getLanguage());
 
 		Media cover = null;
-		if (form.getCoverId() != null) {
-			cover = entityManager.getReference(Media.class, form.getCoverId());
+		if (request.getCoverId() != null) {
+			cover = entityManager.getReference(Media.class, request.getCoverId());
 		}
 		page.setCover(cover);
-		page.setTitle(form.getTitle());
-		page.setBody(form.getBody());
+		page.setTitle(request.getTitle());
+		page.setBody(request.getBody());
 
 //		User author = null;
-//		if (form.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, form.getAuthorId());
+//		if (request.getAuthorId() != null) {
+//			author = entityManager.getReference(User.class, request.getAuthorId());
 //		}
 //		page.setAuthor(author);
 
-		LocalDateTime date = form.getDate();
+		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(status)) {
 			if (date == null) {
 				date = now.withTime(0, 0, 0, 0);
@@ -228,10 +228,10 @@ public class PageService {
 		page.setStatus(status);
 
 		List<Media> medias = new ArrayList<>();
-		if (StringUtils.hasText(form.getBody())) {
+		if (StringUtils.hasText(request.getBody())) {
 			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
-			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
+			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
 				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
 				medias.add(media);
@@ -266,8 +266,8 @@ public class PageService {
 		}
 	}
 
-	public Page deletePage(PageDeleteRequest form, BindingResult result) throws ValidationException {
-		Page page = pageRepository.findByIdForUpdate(form.getId());
+	public Page deletePage(PageDeleteRequest request, BindingResult result) throws ValidationException {
+		Page page = pageRepository.findByIdForUpdate(request.getId());
 		Page parent = page.getParent();
 		for (Page child : page.getChildren()) {
 			child.setParent(parent);
@@ -303,15 +303,15 @@ public class PageService {
 	}
 
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	public List<Page> bulkDeletePage(PageBulkDeleteRequest bulkDeleteForm, BindingResult result) {
+	public List<Page> bulkDeletePage(PageBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
 		List<Page> pages = new ArrayList<>();
-		for (long id : bulkDeleteForm.getIds()) {
-			final PageDeleteRequest deleteForm = new PageDeleteRequest();
-			deleteForm.setId(id);
-			deleteForm.setConfirmed(bulkDeleteForm.isConfirmed());
-			deleteForm.setLanguage(bulkDeleteForm.getLanguage());
-			
-			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteForm, "form");
+		for (long id : bulkDeleteRequest.getIds()) {
+			final PageDeleteRequest deleteRequest = new PageDeleteRequest.Builder()
+					.id(id)
+					.language(bulkDeleteRequest.getLanguage())
+					.build();
+
+			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteRequest, "request");
 			r.setMessageCodesResolver(messageCodesResolver);
 
 			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -320,7 +320,7 @@ public class PageService {
 			try {
 				page = transactionTemplate.execute(new TransactionCallback<Page>() {
 					public Page doInTransaction(TransactionStatus status) {
-						return deletePage(deleteForm, r);
+						return deletePage(deleteRequest, r);
 					}
 				});
 				pages.add(page);
@@ -333,13 +333,13 @@ public class PageService {
 		return pages;
 	}
 	
-	public List<Long> searchPages(PageSearchRequest form) {
-		if (form.isEmpty()) {
+	public List<Long> searchPages(PageSearchRequest request) {
+		if (request.isEmpty()) {
 			return pageRepository.findId();
 		}
-		PageFullTextSearchTerm term = form.toFullTextSearchTerm();
+		PageFullTextSearchTerm term = request.toFullTextSearchTerm();
 		term.setLanguage(LocaleContextHolder.getLocale().getLanguage());
-		return pageRepository.findByFullTextSearchTerm(form.toFullTextSearchTerm());
+		return pageRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm());
 	}
 	
 	public List<Page> readPages(Paginator<Long> paginator) {

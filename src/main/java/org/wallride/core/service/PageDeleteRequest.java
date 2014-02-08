@@ -3,28 +3,44 @@ package org.wallride.core.service;
 import org.wallride.core.web.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-public class PageDeleteRequest extends DomainObjectDeleteForm {
+public class PageDeleteRequest implements Serializable {
 
-	@NotNull
 	private Long id;
-
-	@NotNull
 	private String language;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public String getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public static class Builder  {
+
+		private Long id;
+		private String language;
+
+		public Builder() {
+		}
+
+		public Builder id(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder language(String language) {
+			this.language = language;
+			return this;
+		}
+
+		public PageDeleteRequest build() {
+			PageDeleteRequest request = new PageDeleteRequest();
+			request.id = id;
+			request.language = language;
+			return request;
+		}
 	}
 }

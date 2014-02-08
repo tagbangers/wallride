@@ -4,10 +4,8 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -20,11 +18,11 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
-import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.domain.*;
 import org.wallride.core.repository.ArticleFullTextSearchTerm;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
+import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.Paginator;
 import org.wallride.core.support.Settings;
 
@@ -91,8 +89,8 @@ public class ArticleService {
 		article.setBody(form.getBody());
 
 		User author = entityManager.getReference(User.class, authorizedUser.getId());
-//		if (form.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, form.getAuthorId());
+//		if (request.getAuthorId() != null) {
+//			author = entityManager.getReference(User.class, request.getAuthorId());
 //		}
 		article.setAuthor(author);
 
@@ -166,8 +164,8 @@ public class ArticleService {
 		article.setBody(form.getBody());
 
 //		User author = null;
-//		if (form.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, form.getAuthorId());
+//		if (request.getAuthorId() != null) {
+//			author = entityManager.getReference(User.class, request.getAuthorId());
 //		}
 //		article.setAuthor(author);
 
@@ -208,22 +206,23 @@ public class ArticleService {
 	}
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Article deleteArticle(ArticleDeleteRequest form, BindingResult result) throws BindException {
-		Article article = articleRepository.findByIdForUpdate(form.getId(), form.getLanguage());
+	public Article deleteArticle(ArticleDeleteRequest request, BindingResult result) throws BindException {
+		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
 		articleRepository.delete(article);
 		return article;
 	}
 	
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	@CacheEvict(value="articles", allEntries=true)
-	public List<Article> bulkDeleteArticle(ArticleBulkDeleteRequest bulkDeleteForm, BindingResult result) {
+	public List<Article> bulkDeleteArticle(ArticleBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
 		List<Article> articles = new ArrayList<>();
-		for (long id : bulkDeleteForm.getIds()) {
-			final ArticleDeleteRequest deleteForm = new ArticleDeleteRequest();
-			deleteForm.setId(id);
-			deleteForm.setLanguage(bulkDeleteForm.getLanguage());
-			
-			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteForm, "form");
+		for (long id : bulkDeleteRequest.getIds()) {
+			final ArticleDeleteRequest deleteRequest = new ArticleDeleteRequest.Builder()
+					.id(id)
+					.language(bulkDeleteRequest.getLanguage())
+					.build();
+
+			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteRequest, "request");
 			r.setMessageCodesResolver(messageCodesResolver);
 
 			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -233,7 +232,7 @@ public class ArticleService {
 				article = transactionTemplate.execute(new TransactionCallback<Article>() {
 					public Article doInTransaction(TransactionStatus status) {
 						try {
-							return deleteArticle(deleteForm, r);
+							return deleteArticle(deleteRequest, r);
 						}
 						catch (BindException e) {
 							throw new RuntimeException(e);
@@ -250,13 +249,13 @@ public class ArticleService {
 		return articles;
 	}
 	
-	public List<Long> searchArticles(ArticleSearchRequest form) {
-		if (form.isEmpty()) {
+	public List<Long> searchArticles(ArticleSearchRequest request) {
+		if (request.isEmpty()) {
 			return articleRepository.findId();
 		}
-		ArticleFullTextSearchTerm term = form.toFullTextSearchTerm();
+		ArticleFullTextSearchTerm term = request.toFullTextSearchTerm();
 		term.setLanguage(LocaleContextHolder.getLocale().getLanguage());
-		return articleRepository.findByFullTextSearchTerm(form.toFullTextSearchTerm());
+		return articleRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm());
 	}
 
 	public List<Article> readArticles(Paginator<Long> paginator) {

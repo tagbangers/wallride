@@ -3,6 +3,8 @@ package org.wallride.core.web.admin.page;
 import org.joda.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Post;
+import org.wallride.core.service.ArticleCreateRequest;
+import org.wallride.core.service.PageCreateRequest;
 import org.wallride.core.web.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
@@ -101,5 +103,20 @@ public class PageCreateForm extends DomainObjectCreateForm {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public PageCreateRequest buildPageCreateRequest() {
+		PageCreateRequest.Builder builder = new PageCreateRequest.Builder();
+		return builder
+				.code(code)
+				.coverId(coverId)
+				.title(title)
+				.body(body)
+				.authorId(authorId)
+				.date(date)
+				.parentId(parentId)
+				.status(status)
+				.language(language)
+				.build();
 	}
 }

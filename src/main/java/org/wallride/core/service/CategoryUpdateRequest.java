@@ -1,80 +1,92 @@
 package org.wallride.core.service;
 
-import org.springframework.beans.BeanUtils;
-import org.wallride.core.domain.Category;
-import org.wallride.core.web.DomainObjectEditForm;
-
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class CategoryUpdateRequest extends DomainObjectEditForm {
+public class CategoryUpdateRequest implements Serializable {
 
-	@NotNull
 	private Long id;
-
 	private Long parentId;
-
 	private String code;
-
-	@NotNull
 	private String name;
-
 	private String description;
-
-	@NotNull
 	private String language;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public Long getParentId() {
 		return parentId;
-	}
-
-	public void setParentId(Long parentId) {
-		this.parentId = parentId;
 	}
 
 	public String getCode() {
 		return code;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+	public static class Builder  {
 
-	public static CategoryUpdateRequest fromDomainObject(Category category) {
-		CategoryUpdateRequest form = new CategoryUpdateRequest();
-		BeanUtils.copyProperties(category, form);
-		return form;
+		private Long id;
+		private Long parentId;
+		private String code;
+		private String name;
+		private String description;
+		private String language;
+
+		public Builder() {
+		}
+
+		public Builder id(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder parentId(Long parentId) {
+			this.parentId = parentId;
+			return this;
+		}
+
+		public Builder code(String code) {
+			this.code = code;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder description(String description) {
+			this.description = description;
+			return this;
+		}
+
+		public Builder language(String language) {
+			this.language = language;
+			return this;
+		}
+
+		public CategoryUpdateRequest build() {
+			CategoryUpdateRequest request = new CategoryUpdateRequest();
+			request.id = id;
+			request.parentId = parentId;
+			request.code = code;
+			request.name = name;
+			request.description = description;
+			request.language = language;
+			return request;
+		}
 	}
 }

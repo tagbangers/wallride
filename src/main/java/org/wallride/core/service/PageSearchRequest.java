@@ -7,8 +7,10 @@ import org.wallride.core.domain.Post;
 import org.wallride.core.repository.PageFullTextSearchTerm;
 import org.wallride.core.web.DomainObjectSearchForm;
 
+import java.io.Serializable;
+
 @SuppressWarnings("serial")
-public class PageSearchRequest extends DomainObjectSearchForm {
+public class PageSearchRequest implements Serializable {
 	
 	private String keyword;
 	
@@ -23,25 +25,13 @@ public class PageSearchRequest extends DomainObjectSearchForm {
 	public String getKeyword() {
 		return keyword;
 	}
-	
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-	
+
 	public Post.Status getStatus() {
 		return status;
 	}
-	
-	public void setStatus(Post.Status status) {
-		this.status = status;
-	}
-	
+
 	public String getLanguage() {
 		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 
 	public boolean isEmpty() {
@@ -57,13 +47,42 @@ public class PageSearchRequest extends DomainObjectSearchForm {
 		return true;
 	}
 	
-	public boolean isAdvanced() {
-		return false;
-	}
-	
 	public PageFullTextSearchTerm toFullTextSearchTerm() {
 		PageFullTextSearchTerm term = new PageFullTextSearchTerm();
 		BeanUtils.copyProperties(this, term);
 		return term;
+	}
+
+	public static class Builder  {
+
+		private String keyword;
+		private Post.Status status;
+		private String language;
+
+		public Builder() {
+		}
+
+		public Builder keyword(String keyword) {
+			this.keyword = keyword;
+			return this;
+		}
+
+		public Builder status(Post.Status status) {
+			this.status = status;
+			return this;
+		}
+
+		public Builder language(String language) {
+			this.language = language;
+			return this;
+		}
+
+		public PageSearchRequest build() {
+			PageSearchRequest request = new PageSearchRequest();
+			request.keyword = keyword;
+			request.status = status;
+			request.language = language;
+			return request;
+		}
 	}
 }

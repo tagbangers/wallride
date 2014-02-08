@@ -1,69 +1,80 @@
 package org.wallride.core.service;
 
-import org.springframework.beans.BeanUtils;
-import org.wallride.core.domain.Category;
-import org.wallride.core.web.DomainObjectCreateForm;
-
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class CategoryCreateRequest extends DomainObjectCreateForm {
+public class CategoryCreateRequest implements Serializable {
 
 	private Long parentId;
-
 	private String code;
-
-	@NotNull
 	private String name;
-
 	private String description;
-
-	@NotNull
 	private String language;
 
 	public Long getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(Long parentId) {
-		this.parentId = parentId;
-	}
-
 	public String getCode() {
 		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getDescription() {
 		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public String getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+	public static class Builder  {
 
-	public static CategoryCreateRequest fromDomainObject(Category category) {
-		CategoryCreateRequest form = new CategoryCreateRequest();
-		BeanUtils.copyProperties(category, form);
-		return form;
+		private Long parentId;
+		private String code;
+		private String name;
+		private String description;
+		private String language;
+
+		public Builder() {
+		}
+
+		public Builder parentId(Long parentId) {
+			this.parentId = parentId;
+			return this;
+		}
+
+		public Builder code(String code) {
+			this.code = code;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder description(String description) {
+			this.description = description;
+			return this;
+		}
+
+		public Builder language(String language) {
+			this.language = language;
+			return this;
+		}
+
+		public CategoryCreateRequest build() {
+			CategoryCreateRequest request = new CategoryCreateRequest();
+			request.parentId = parentId;
+			request.code = code;
+			request.name = name;
+			request.description = description;
+			request.language = language;
+			return request;
+		}
 	}
 }

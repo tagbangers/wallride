@@ -56,7 +56,7 @@ public class PageBulkDeleteController {
 		
 		Collection<Page> pages = null;
 		try {
-			pages = pageService.bulkDeletePage(form, errors);
+			pages = pageService.bulkDeletePage(form.buildPageBulkDeleteRequest(), errors);
 		}
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {

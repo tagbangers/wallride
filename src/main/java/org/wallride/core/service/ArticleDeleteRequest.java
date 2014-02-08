@@ -1,7 +1,6 @@
 package org.wallride.core.service;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class ArticleDeleteRequest implements Serializable {
 
@@ -12,16 +11,8 @@ public class ArticleDeleteRequest implements Serializable {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public String getLanguage() {
 		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 
 	public static class Builder  {
