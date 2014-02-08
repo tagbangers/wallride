@@ -12,13 +12,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.admin.support.AuthorizedUser;
 import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.PageTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Setting;
-import org.wallride.core.service.CategoryTreeService;
-import org.wallride.core.service.PageTreeService;
+import org.wallride.core.service.CategoryService;
+import org.wallride.core.service.PageService;
+import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
@@ -34,13 +34,10 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 	private Settings settings;
 
 	@Inject
-	private CategoryTreeService categoryTreeService;
+	private CategoryService categoryService;
 
 	@Inject
-	private PageTreeService pageTreeService;
-
-//	@Inject
-//	private TemplateUtils templateUtils;
+	private PageService pageService;
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultModelAttributeInterceptor.class);
 
@@ -83,13 +80,13 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		mv.addObject("ADMIN_LINK", buildAdminLink());
 		mv.addObject("ADMIN_PATH", buildAdminPath(currentLanguage));
 
-		CategoryTree categoryTreeHasArticle = categoryTreeService.readCategoryTree(currentLanguage, true);
-		CategoryTree categoryTreeAll = categoryTreeService.readCategoryTree(currentLanguage);
+		CategoryTree categoryTreeHasArticle = categoryService.readCategoryTree(currentLanguage, true);
+		CategoryTree categoryTreeAll = categoryService.readCategoryTree(currentLanguage);
 		mv.addObject("CATEGORY_TREE", categoryTreeHasArticle);
 		mv.addObject("CATEGORY_TREE_ALL", categoryTreeAll);
 
-		PageTree pageTreePublished = pageTreeService.readPageTree(currentLanguage, Post.Status.PUBLISHED);
-		PageTree pageTreeAll = pageTreeService.readPageTree(currentLanguage);
+		PageTree pageTreePublished = pageService.readPageTree(currentLanguage, Post.Status.PUBLISHED);
+		PageTree pageTreeAll = pageService.readPageTree(currentLanguage);
 		mv.addObject("PAGE_TREE", pageTreePublished);
 		mv.addObject("PAGE_TREE_ALL", pageTreeAll);
 
