@@ -5,6 +5,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
+import org.wallride.core.service.ArticleUpdateRequest;
+import org.wallride.core.service.PageUpdateRequest;
 import org.wallride.core.web.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
@@ -118,6 +120,22 @@ public class PageEditForm extends DomainObjectEditForm {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public PageUpdateRequest buildPageUpdateRequest() {
+		PageUpdateRequest.Builder builder = new PageUpdateRequest.Builder();
+		return builder
+				.id(id)
+				.code(code)
+				.coverId(coverId)
+				.title(title)
+				.body(body)
+				.authorId(authorId)
+				.date(date)
+				.parentId(parentId)
+				.status(status)
+				.language(language)
+				.build();
 	}
 
 	public static PageEditForm fromDomainObject(Page page) {

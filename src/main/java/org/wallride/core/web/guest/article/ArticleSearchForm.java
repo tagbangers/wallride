@@ -6,6 +6,7 @@ import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.repository.ArticleFullTextSearchTerm;
+import org.wallride.core.service.ArticleSearchRequest;
 import org.wallride.core.web.DomainObjectSearchForm;
 
 import java.util.ArrayList;
@@ -81,10 +82,16 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 		return true;
 	}
 
-	public ArticleFullTextSearchTerm toFullTextSearchTerm() {
-		ArticleFullTextSearchTerm term = new ArticleFullTextSearchTerm();
-		BeanUtils.copyProperties(this, term);
-		return term;
+	public ArticleSearchRequest buildArticleSearchRequest() {
+		ArticleSearchRequest.Builder builder = new ArticleSearchRequest.Builder();
+		return builder
+				.keyword(keyword)
+				.dateFrom(dateFrom)
+				.dateTo(dateTo)
+				.categoryIds(categoryIds)
+				.tagIds(tagIds)
+				.language(language)
+				.build();
 	}
 
 	@Override

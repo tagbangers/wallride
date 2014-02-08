@@ -2,9 +2,10 @@ package org.wallride.core.service;
 
 import org.wallride.core.web.DomainObjectBulkDeleteForm;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class UserBulkDeleteRequest extends DomainObjectBulkDeleteForm {
+public class UserBulkDeleteRequest implements Serializable {
 
 	private List<Long> ids;
 
@@ -12,7 +13,22 @@ public class UserBulkDeleteRequest extends DomainObjectBulkDeleteForm {
 		return ids;
 	}
 
-	public void setIds(List<Long> ids) {
-		this.ids = ids;
+	public static class Builder  {
+
+		private List<Long> ids;
+
+		public Builder() {
+		}
+
+		public Builder ids(List<Long> ids) {
+			this.ids = ids;
+			return this;
+		}
+
+		public UserBulkDeleteRequest build() {
+			UserBulkDeleteRequest request = new UserBulkDeleteRequest();
+			request.ids = ids;
+			return request;
+		}
 	}
 }

@@ -37,7 +37,7 @@ public class SetupController {
 		if (result.hasErrors()) {
 			return "setup";
 		}
-		setupService.setup(form, result);
+		setupService.setup(form.buildSetupRequest(), result);
 		return "redirect:/_admin/login";
 	}
 }

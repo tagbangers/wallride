@@ -5,6 +5,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
 import org.wallride.core.repository.PageFullTextSearchTerm;
+import org.wallride.core.service.ArticleSearchRequest;
+import org.wallride.core.service.PageSearchRequest;
 import org.wallride.core.web.DomainObjectSearchForm;
 
 @SuppressWarnings("serial")
@@ -60,10 +62,13 @@ public class PageSearchForm extends DomainObjectSearchForm {
 	public boolean isAdvanced() {
 		return false;
 	}
-	
-	public PageFullTextSearchTerm toFullTextSearchTerm() {
-		PageFullTextSearchTerm term = new PageFullTextSearchTerm();
-		BeanUtils.copyProperties(this, term);
-		return term;
+
+	public PageSearchRequest buildPageSearchRequest() {
+		PageSearchRequest.Builder builder = new PageSearchRequest.Builder();
+		return builder
+				.keyword(keyword)
+				.status(status)
+				.language(language)
+				.build();
 	}
 }

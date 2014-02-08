@@ -108,7 +108,7 @@ public class PageSearchController extends DomainObjectSearchController<Page, Pag
 
 	@Override
 	protected Paginator<Long> readDomainObjects(PageSearchForm form, int perPage) {
-		List<Long> ids = pageService.searchPages(form);
+		List<Long> ids = pageService.searchPages(form.buildPageSearchRequest());
 		return new Paginator<>(ids, perPage);
 	}
 

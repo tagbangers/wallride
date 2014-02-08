@@ -34,7 +34,7 @@ public class UserInvitationCreateController {
 		if (result.hasErrors()) {
 			return "/user/invitation/index";
 		}
-		List<UserInvitation> invitations = userService.inviteUsers(form, result, authorizedUser);
+		List<UserInvitation> invitations = userService.inviteUsers(form.buildUserInvitationCreateRequest(), result, authorizedUser);
 		redirectAttributes.addFlashAttribute("savedInvitations", invitations);
 		return "redirect:/_admin/{language}/users/invitations/index";
 	}

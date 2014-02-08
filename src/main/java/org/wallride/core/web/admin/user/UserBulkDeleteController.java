@@ -56,7 +56,7 @@ public class UserBulkDeleteController {
 		
 		Collection<User> users = null;
 		try {
-			users = userService.bulkDeleteUser(form, errors);
+			users = userService.bulkDeleteUser(form.buildUserBulkDeleteRequest(), errors);
 		}
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {

@@ -52,7 +52,7 @@ public class UserEditController {
 
 		User user = null;
 		try {
-			user = userService.updateUser(form, errors, authorizedUser);
+			user = userService.updateUser(form.buildUserUpdateRequest(), errors, authorizedUser);
 		}
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {

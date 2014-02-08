@@ -3,6 +3,8 @@ package org.wallride.core.web.admin.user;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.repository.UserFullTextSearchTerm;
+import org.wallride.core.service.PageSearchRequest;
+import org.wallride.core.service.UserSearchRequest;
 import org.wallride.core.web.DomainObjectSearchForm;
 
 @SuppressWarnings("serial")
@@ -28,10 +30,11 @@ public class UserSearchForm extends DomainObjectSearchForm {
 	public boolean isAdvanced() {
 		return false;
 	}
-	
-	public UserFullTextSearchTerm toFullTextSearchTerm() {
-		UserFullTextSearchTerm term = new UserFullTextSearchTerm();
-		BeanUtils.copyProperties(this, term);
-		return term;
+
+	public UserSearchRequest buildUserSearchRequest() {
+		UserSearchRequest.Builder builder = new UserSearchRequest.Builder();
+		return builder
+				.keyword(keyword)
+				.build();
 	}
 }

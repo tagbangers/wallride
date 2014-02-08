@@ -73,7 +73,7 @@ public class PageCreateController {
 		Page page = null;
 		try {
 			form.setStatus(Post.Status.DRAFT);
-			page = pageService.createPage(form, errors, authorizedUser);
+			page = pageService.createPage(form.buildPageCreateRequest(), errors, authorizedUser);
 		}
 		catch (BindException e) {
 			if (errors.hasErrors()) {
@@ -103,7 +103,7 @@ public class PageCreateController {
 		Page page = null;
 		try {
 			form.setStatus(Post.Status.PUBLISHED);
-			page = pageService.createPage(form, errors, authorizedUser);
+			page = pageService.createPage(form.buildPageCreateRequest(), errors, authorizedUser);
 		}
 		catch (BindException e) {
 			if (errors.hasErrors()) {

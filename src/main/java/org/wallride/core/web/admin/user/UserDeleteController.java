@@ -34,7 +34,7 @@ public class UserDeleteController {
 		}
 		
 		try {
-			userService.deleteUser(form, errors);
+			userService.deleteUser(form.buildUserDeleteRequest(), errors);
 		}
 		catch (BindException e) {
 			if (errors.hasErrors()) {

@@ -34,7 +34,7 @@ public class PageDeleteController {
 		}
 		
 		try {
-			pageService.deletePage(form, errors);
+			pageService.deletePage(form.buildPageDeleteRequest(), errors);
 		}
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {

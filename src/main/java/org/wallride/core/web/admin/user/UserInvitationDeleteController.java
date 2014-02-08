@@ -29,7 +29,7 @@ public class UserInvitationDeleteController {
 			BindingResult result,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) throws MessagingException {
-		UserInvitation invitation = userService.deleteUserInvitation(form);
+		UserInvitation invitation = userService.deleteUserInvitation(form.buildUserInvitationDeleteRequest());
 		redirectAttributes.addFlashAttribute("deletedInvitation", invitation);
 		return "redirect:/_admin/{language}/users/invitations/index";
 	}

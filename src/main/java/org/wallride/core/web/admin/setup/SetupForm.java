@@ -1,6 +1,9 @@
 package org.wallride.core.web.admin.setup;
 
 import org.hibernate.validator.constraints.Email;
+import org.wallride.core.domain.PersonalName;
+import org.wallride.core.service.PageCreateRequest;
+import org.wallride.core.service.SetupRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -132,6 +135,23 @@ public class SetupForm implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public SetupRequest buildSetupRequest() {
+		SetupRequest.Builder builder = new SetupRequest.Builder();
+		return builder
+				.websiteTitle(websiteTitle)
+				.defaultLanguage(defaultLanguage)
+				.languages(languages)
+				.mediaUrlPrefix(mediaUrlPrefix)
+				.mediaPath(mediaPath)
+				.mailSmtpHost(mailSmtpHost)
+				.mailFrom(mailFrom)
+				.loginId(loginId)
+				.loginPassword(loginPassword)
+				.name(new PersonalName(name.firstName, name.lastName))
+				.email(email)
+				.build();
 	}
 
 	public static class Name {

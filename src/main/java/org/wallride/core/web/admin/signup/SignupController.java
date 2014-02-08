@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.core.service.SignupService;
 import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.service.SignupService;
 import org.wallride.core.web.HttpForbiddenException;
 
 import javax.inject.Inject;
@@ -49,7 +49,7 @@ public class SignupController {
 		}
 
 		try {
-			signupService.signup(form, errors);
+			signupService.signup(form.buildSignupRequest(), errors);
 		}
 		catch (BindException e) {
 			if (errors.hasErrors()) {

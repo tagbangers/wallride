@@ -46,7 +46,7 @@ public class ArticleIndexController {
 		if (condition == null) {
 			ArticleSearchForm form = new ArticleSearchForm() {};
 			form.setLanguage(language);
-			List<Long> ids = articleService.searchArticles(form);
+			List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 			Paginator<Long> paginator = new Paginator<>(ids, 20);
 			condition = new DomainObjectSearchCondition<ArticleSearchForm>(session, form, paginator);
 		}
@@ -75,7 +75,7 @@ public class ArticleIndexController {
 			form.setLanguage(language);
 			form.setDateFrom(new LocalDateTime(year, 1, 1, 0, 0, 0));
 			form.setDateTo(new LocalDateTime(year, 12, 31, 0, 0, 0));
-			List<Long> ids = articleService.searchArticles(form);
+			List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 			Paginator<Long> paginator = new Paginator<>(ids, 20);
 			condition = new DomainObjectSearchCondition<ArticleSearchForm>(session, form, paginator);
 		}
@@ -105,7 +105,7 @@ public class ArticleIndexController {
 			LocalDateTime date = new LocalDateTime(year, month, 1, 0, 0, 0);
 			form.setDateFrom(new LocalDateTime(year, month, 1, 0, 0, 0));
 			form.setDateTo(new LocalDateTime(year, month, date.dayOfMonth().getMaximumValue(), 23, 59, 59));
-			List<Long> ids = articleService.searchArticles(form);
+			List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 			Paginator<Long> paginator = new Paginator<>(ids, 20);
 			condition = new DomainObjectSearchCondition<ArticleSearchForm>(session, form, paginator);
 		}
@@ -135,7 +135,7 @@ public class ArticleIndexController {
 			form.setLanguage(language);
 			form.setDateFrom(new LocalDateTime(year, month, day, 0, 0, 0));
 			form.setDateTo(new LocalDateTime(year, month, day, 23, 59, 59));
-			List<Long> ids = articleService.searchArticles(form);
+			List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 			Paginator<Long> paginator = new Paginator<>(ids, 20);
 			condition = new DomainObjectSearchCondition<ArticleSearchForm>(session, form, paginator);
 		}
@@ -169,7 +169,7 @@ public class ArticleIndexController {
 			ArticleSearchForm form = new ArticleSearchForm() {};
 			form.setLanguage(language);
 			form.getCategoryIds().add(category.getId());
-			List<Long> ids = articleService.searchArticles(form);
+			List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 			Paginator<Long> paginator = new Paginator<>(ids, 20);
 			condition = new DomainObjectSearchCondition<ArticleSearchForm>(session, form, paginator);
 		}

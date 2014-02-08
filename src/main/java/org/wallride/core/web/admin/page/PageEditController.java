@@ -74,7 +74,7 @@ public class PageEditController {
 
 		Page page = null;
 		try {
-			page = pageService.updatePage(form, errors, Post.Status.DRAFT, authorizedUser);
+			page = pageService.updatePage(form.buildPageUpdateRequest(), errors, Post.Status.DRAFT, authorizedUser);
 		}
 		catch (BindException e) {
 			if (errors.hasErrors()) {
@@ -104,7 +104,7 @@ public class PageEditController {
 
 		Page page = null;
 		try {
-			page = pageService.updatePage(form, errors, Post.Status.PUBLISHED, authorizedUser);
+			page = pageService.updatePage(form.buildPageUpdateRequest(), errors, Post.Status.PUBLISHED, authorizedUser);
 		}
 		catch (BindException e) {
 			if (errors.hasErrors()) {

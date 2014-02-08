@@ -29,7 +29,7 @@ public class UserInvitationResendController {
 			BindingResult result,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) throws MessagingException {
-		UserInvitation invitation = userService.inviteAgain(form, result, authorizedUser);
+		UserInvitation invitation = userService.inviteAgain(form.buildUserInvitationResendRequest(), result, authorizedUser);
 		redirectAttributes.addFlashAttribute("resentInvitation", invitation);
 		return "redirect:/_admin/{language}/users/invitations/index";
 	}

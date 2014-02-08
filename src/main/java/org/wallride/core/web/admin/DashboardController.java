@@ -15,6 +15,7 @@ import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.Paginator;
 import org.wallride.core.support.Settings;
+import org.wallride.core.web.admin.article.ArticleSearchForm;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -62,7 +63,7 @@ public class DashboardController {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.PUBLISHED);
-		List<Long> ids = articleService.searchArticles(form);
+		List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 		Paginator<Long> paginator = new Paginator<>(ids, 10);
 		return articleService.readArticles(paginator);
 	}
@@ -71,7 +72,7 @@ public class DashboardController {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.DRAFT);
-		List<Long> ids = articleService.searchArticles(form);
+		List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
 		Paginator<Long> paginator = new Paginator<>(ids, 10);
 		return articleService.readArticles(paginator);
 	}

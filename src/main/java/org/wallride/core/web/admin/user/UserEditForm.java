@@ -3,6 +3,8 @@ package org.wallride.core.web.admin.user;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.User;
+import org.wallride.core.service.UserInvitationCreateRequest;
+import org.wallride.core.service.UserUpdateRequest;
 import org.wallride.core.web.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
@@ -70,6 +72,18 @@ public class UserEditForm extends DomainObjectEditForm {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public UserUpdateRequest buildUserUpdateRequest() {
+		UserUpdateRequest.Builder builder = new UserUpdateRequest.Builder();
+		return builder
+				.id(id)
+				.date(date)
+				.title(title)
+				.coverId(coverId)
+				.body(body)
+				.language(language)
+				.build();
 	}
 
 	public static UserEditForm fromDomainObject(User user) {

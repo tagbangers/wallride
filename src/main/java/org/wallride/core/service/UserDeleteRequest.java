@@ -3,17 +3,32 @@ package org.wallride.core.service;
 import org.wallride.core.web.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-public class UserDeleteRequest extends DomainObjectDeleteForm {
+public class UserDeleteRequest implements Serializable {
 
-	@NotNull
 	private Long id;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public static class Builder  {
+
+		private Long id;
+
+		public Builder() {
+		}
+
+		public Builder id(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public UserDeleteRequest build() {
+			UserDeleteRequest request = new UserDeleteRequest();
+			request.id = id;
+			return request;
+		}
 	}
 }

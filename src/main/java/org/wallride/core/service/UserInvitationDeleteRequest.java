@@ -1,19 +1,31 @@
 package org.wallride.core.service;
 
-import org.wallride.core.web.DomainObjectDeleteForm;
+import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
+public class UserInvitationDeleteRequest implements Serializable {
 
-public class UserInvitationDeleteRequest extends DomainObjectDeleteForm {
-
-	@NotNull
 	private String token;
 
 	public String getToken() {
 		return token;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public static class Builder  {
+
+		private String token;
+
+		public Builder() {
+		}
+
+		public Builder token(String token) {
+			this.token = token;
+			return this;
+		}
+
+		public UserInvitationDeleteRequest build() {
+			UserInvitationDeleteRequest request = new UserInvitationDeleteRequest();
+			request.token = token;
+			return request;
+		}
 	}
 }

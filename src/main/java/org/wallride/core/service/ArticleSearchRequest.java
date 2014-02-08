@@ -3,17 +3,24 @@ package org.wallride.core.service;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
 import org.wallride.core.repository.ArticleFullTextSearchTerm;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ArticleSearchRequest implements Serializable {
 
 	private String keyword;
+	private LocalDateTime dateFrom;
+	private LocalDateTime dateTo;
+	private Collection<Long> categoryIds;
+	private Collection<Long> tagIds;
 	private Post.Status status;
 	private String language;
 
@@ -23,6 +30,22 @@ public class ArticleSearchRequest implements Serializable {
 
 	public String getKeyword() {
 		return keyword;
+	}
+
+	public LocalDateTime getDateFrom() {
+		return dateFrom;
+	}
+
+	public LocalDateTime getDateTo() {
+		return dateTo;
+	}
+
+	public Collection<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public Collection<Long> getTagIds() {
+		return tagIds;
 	}
 
 	public Post.Status getStatus() {
@@ -35,6 +58,18 @@ public class ArticleSearchRequest implements Serializable {
 
 	public boolean isEmpty() {
 		if (StringUtils.hasText(getKeyword())) {
+			return false;
+		}
+		if (getDateFrom() != null) {
+			return false;
+		}
+		if (getDateTo() != null) {
+			return false;
+		}
+		if (!CollectionUtils.isEmpty(getCategoryIds())) {
+			return false;
+		}
+		if (!CollectionUtils.isEmpty(getTagIds())) {
 			return false;
 		}
 		if (getStatus() != null) {
@@ -55,6 +90,10 @@ public class ArticleSearchRequest implements Serializable {
 	public static class Builder  {
 
 		private String keyword;
+		private LocalDateTime dateFrom;
+		private LocalDateTime dateTo;
+		private Collection<Long> categoryIds;
+		private Collection<Long> tagIds;
 		private Post.Status status;
 		private String language;
 
@@ -63,6 +102,26 @@ public class ArticleSearchRequest implements Serializable {
 
 		public Builder keyword(String keyword) {
 			this.keyword = keyword;
+			return this;
+		}
+
+		public Builder dateFrom(LocalDateTime dateFrom) {
+			this.dateFrom = dateFrom;
+			return this;
+		}
+
+		public Builder dateTo(LocalDateTime dateTo) {
+			this.dateTo = dateTo;
+			return this;
+		}
+
+		public Builder categoryIds(Collection<Long> categoryIds) {
+			this.categoryIds = categoryIds;
+			return this;
+		}
+
+		public Builder tagIds(Collection<Long> tagIds) {
+			this.tagIds = tagIds;
 			return this;
 		}
 
@@ -79,6 +138,10 @@ public class ArticleSearchRequest implements Serializable {
 		public ArticleSearchRequest build() {
 			ArticleSearchRequest request = new ArticleSearchRequest();
 			request.keyword = keyword;
+			request.dateFrom = dateFrom;
+			request.dateTo = dateTo;
+			request.categoryIds = categoryIds;
+			request.tagIds = tagIds;
 			request.status = status;
 			request.language = language;
 			return request;

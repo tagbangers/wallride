@@ -1,92 +1,82 @@
 package org.wallride.core.service;
 
-import org.hibernate.validator.constraints.Email;
+import org.wallride.core.domain.PersonalName;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class SignupRequest implements Serializable {
 
-	@NotNull
 	private String token;
-
-	@NotNull
 	private String loginId;
-	
-	@NotNull
 	private String loginPassword;
-
-	@Valid
-	private Name name = new Name();
-
-	@NotNull
-	@Email
+	private PersonalName name;
 	private String email;
 
 	public String getToken() {
 		return token;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
-	}
-
 	public String getLoginId() {
 		return loginId;
-	}
-
-	public void setLoginId(String loginId) {
-		this.loginId = loginId;
 	}
 
 	public String getLoginPassword() {
 		return loginPassword;
 	}
 
-	public void setLoginPassword(String loginPassword) {
-		this.loginPassword = loginPassword;
-	}
-
-	public Name getName() {
+	public PersonalName getName() {
 		return name;
-	}
-
-	public void setName(Name name) {
-		this.name = name;
 	}
 
 	public String getEmail() {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+	public static class Builder  {
 
-	public static class Name {
+		private String token;
+		private String loginId;
+		private String loginPassword;
+		private PersonalName name;
+		private String email;
 
-		@NotNull
-		private String firstName;
-
-		@NotNull
-		private String lastName;
-
-		public String getFirstName() {
-			return firstName;
+		public Builder() {
 		}
 
-		public void setFirstName(String firstName) {
-			this.firstName = firstName;
+		public Builder token(String token) {
+			this.token = token;
+			return this;
 		}
 
-		public String getLastName() {
-			return lastName;
+		public Builder loginId(String loginId) {
+			this.loginId = loginId;
+			return this;
 		}
 
-		public void setLastName(String lastName) {
-			this.lastName = lastName;
+		public Builder loginPassword(String loginPassword) {
+			this.loginPassword = loginPassword;
+			return this;
+		}
+
+		public Builder name(PersonalName name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+
+		public SignupRequest build() {
+			SignupRequest request = new SignupRequest();
+			request.token = token;
+			request.loginId = loginId;
+			request.loginPassword = loginPassword;
+			request.name = name;
+			request.email = email;
+			return request;
 		}
 	}
 }

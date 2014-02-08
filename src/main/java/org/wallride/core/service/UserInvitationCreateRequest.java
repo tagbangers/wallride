@@ -1,29 +1,43 @@
 package org.wallride.core.service;
 
-import org.wallride.core.web.DomainObjectCreateForm;
+import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
+public class UserInvitationCreateRequest implements Serializable {
 
-public class UserInvitationCreateRequest extends DomainObjectCreateForm {
-
-	@NotNull
 	private String invitees;
-
 	private String message;
 
 	public String getInvitees() {
 		return invitees;
 	}
 
-	public void setInvitees(String invitees) {
-		this.invitees = invitees;
-	}
-
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public static class Builder  {
+
+		private String invitees;
+		private String message;
+
+		public Builder() {
+		}
+
+		public Builder invitees(String invitees) {
+			this.invitees = invitees;
+			return this;
+		}
+
+		public Builder message(String message) {
+			this.message = message;
+			return this;
+		}
+
+		public UserInvitationCreateRequest build() {
+			UserInvitationCreateRequest request = new UserInvitationCreateRequest();
+			request.invitees = invitees;
+			request.message = message;
+			return request;
+		}
 	}
 }

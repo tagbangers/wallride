@@ -1,6 +1,8 @@
 package org.wallride.core.web.admin.signup;
 
 import org.hibernate.validator.constraints.Email;
+import org.wallride.core.domain.PersonalName;
+import org.wallride.core.service.SignupRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -63,6 +65,17 @@ public class SignupForm implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public SignupRequest buildSignupRequest() {
+		SignupRequest.Builder builder = new SignupRequest.Builder();
+		return builder
+				.token(token)
+				.loginId(loginId)
+				.loginPassword(loginPassword)
+				.name(new PersonalName(name.firstName, name.lastName))
+				.email(email)
+				.build();
 	}
 
 	public static class Name {

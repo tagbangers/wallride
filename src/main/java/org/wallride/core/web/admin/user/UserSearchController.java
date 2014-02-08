@@ -87,7 +87,7 @@ public class UserSearchController extends DomainObjectSearchController<User, Use
 
 	@Override
 	protected Paginator<Long> readDomainObjects(UserSearchForm form, int perPage) {
-		List<Long> ids = userService.searchUsers(form);
+		List<Long> ids = userService.searchUsers(form.buildUserSearchRequest());
 		return new Paginator<>(ids, perPage);
 	}
 
