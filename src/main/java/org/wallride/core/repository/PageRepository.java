@@ -31,8 +31,8 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 	@Query(DEFAULT_SELECT_QUERY + "where page.id in (:ids) ")
 	List<Page> findByIdIn(@Param("ids") Collection<Long> ids);
 	
-	@Query(DEFAULT_SELECT_QUERY + "where page.id = :id ")
-	Page findById(@Param("id") Long id);
+	@Query(DEFAULT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
+	Page findById(@Param("id") Long id, @Param("language") String language);
 	
 	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language order by page.lft")
 	List<Page> findByLanguage(@Param("language") String language);

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201401240758</version>
+	<version>1.0.0.SNAPSHOT-201402090711</version>
 	<packaging>war</packaging>
 	
 	<properties>
@@ -222,16 +222,7 @@
 			<artifactId>thymeleaf-spring3</artifactId>
 			<version>${org.thymeleaf.version}</version>
 		</dependency>
-		
-		<!-- Freemarker -->
-		<!--
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.19</version>
-		</dependency>
-		-->
-		
+
 		<!-- Joda Time -->
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -399,6 +390,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

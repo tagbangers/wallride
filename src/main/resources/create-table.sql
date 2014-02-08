@@ -112,7 +112,7 @@ create table tag (
 
 create table user (
 	id bigint not null auto_increment,
-	login_id varchar(500),
+	login_id varchar(100) not null,
 	login_password varchar(500) not null,
 	name_first varchar(50) not null,
 	name_last varchar(50) not null,
