@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
-import org.wallride.domain.Article;
-import org.wallride.domain.Category;
-import org.wallride.domain.CategoryTree;
-import org.wallride.service.ArticleService;
-import org.wallride.service.CategoryService;
-import org.wallride.support.Paginator;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Category;
+import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.CategoryService;
+import org.wallride.core.support.Paginator;
 import org.wallride.web.DomainObjectSearchCondition;
 
 import javax.inject.Inject;

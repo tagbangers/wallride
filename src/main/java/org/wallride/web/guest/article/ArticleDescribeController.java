@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.domain.Article;
-import org.wallride.service.ArticleService;
+import org.wallride.core.domain.Article;
+import org.wallride.core.service.ArticleService;
 import org.wallride.web.HttpNotFoundException;
 
 import javax.inject.Inject;

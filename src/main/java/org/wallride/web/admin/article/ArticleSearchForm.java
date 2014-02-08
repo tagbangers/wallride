@@ -2,8 +2,8 @@ package org.wallride.web.admin.article;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.StringUtils;
-import org.wallride.domain.Post;
-import org.wallride.service.ArticleSearchRequest;
+import org.wallride.core.domain.Post;
+import org.wallride.core.service.ArticleSearchRequest;
 import org.wallride.web.DomainObjectSearchForm;
 
 @SuppressWarnings("serial")

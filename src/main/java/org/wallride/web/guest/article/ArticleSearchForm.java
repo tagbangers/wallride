@@ -4,7 +4,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDateTime;
 import org.springframework.util.StringUtils;
-import org.wallride.service.ArticleSearchRequest;
+import org.wallride.core.domain.Post;
+import org.wallride.core.service.ArticleSearchRequest;
 import org.wallride.web.DomainObjectSearchForm;
 
 import java.util.ArrayList;
@@ -89,6 +90,7 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 				.categoryIds(categoryIds)
 				.tagIds(tagIds)
 				.language(language)
+				.status(Post.Status.PUBLISHED)
 				.build();
 	}
 

@@ -1,6 +1,6 @@
 package org.wallride.web.admin.user;
 
-import org.wallride.service.UserInvitationCreateRequest;
+import org.wallride.core.service.UserInvitationCreateRequest;
 import org.wallride.web.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;

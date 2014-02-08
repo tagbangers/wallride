@@ -1,6 +1,6 @@
 package org.wallride.web.admin.page;
 
-import org.wallride.service.PageDeleteRequest;
+import org.wallride.core.service.PageDeleteRequest;
 import org.wallride.web.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;

@@ -3,8 +3,8 @@ package org.wallride.web;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.domain.DomainObject;
-import org.wallride.support.Paginator;
+import org.wallride.core.domain.DomainObject;
+import org.wallride.core.support.Paginator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

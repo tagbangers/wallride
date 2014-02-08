@@ -7,10 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.service.PageService;
-import org.wallride.domain.Page;
-import org.wallride.domain.Post;
-import org.wallride.support.Paginator;
+import org.wallride.core.domain.Page;
+import org.wallride.core.domain.Post;
+import org.wallride.core.service.PageService;
+import org.wallride.core.support.Paginator;
 import org.wallride.web.DomainObjectSearchCondition;
 import org.wallride.web.DomainObjectSearchController;
 

@@ -2,25 +2,25 @@ package org.wallride.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.LocaleResolver;
-import org.wallride.domain.Setting;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.support.Settings;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 import java.util.Map;
 
-@Component
 public class PathVariableLocaleResolver implements LocaleResolver {
 
-	@Inject
 	private Settings settings;
 
 	private static Logger logger = LoggerFactory.getLogger(PathVariableLocaleResolver.class);
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {

@@ -11,11 +11,11 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.service.PageService;
-import org.wallride.support.AuthorizedUser;
-import org.wallride.domain.Page;
-import org.wallride.domain.PageTree;
-import org.wallride.domain.Post;
+import org.wallride.core.domain.Page;
+import org.wallride.core.domain.PageTree;
+import org.wallride.core.domain.Post;
+import org.wallride.core.service.PageService;
+import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

@@ -6,8 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.service.UserService;
-import org.wallride.domain.User;
+import org.wallride.core.domain.User;
+import org.wallride.core.service.UserService;
 import org.wallride.web.DomainObjectDescribeController;
 
 import javax.inject.Inject;

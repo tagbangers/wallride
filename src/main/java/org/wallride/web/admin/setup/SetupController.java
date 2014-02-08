@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.service.SetupService;
+import org.wallride.core.service.SetupService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

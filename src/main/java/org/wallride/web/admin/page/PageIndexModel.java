@@ -1,6 +1,6 @@
 package org.wallride.web.admin.page;
 
-import org.wallride.domain.PageTree;
+import org.wallride.core.domain.PageTree;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

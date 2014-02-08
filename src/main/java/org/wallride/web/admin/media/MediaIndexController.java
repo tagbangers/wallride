@@ -4,9 +4,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.wallride.service.MediaService;
-import org.wallride.domain.Media;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.Media;
+import org.wallride.core.service.MediaService;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import java.util.List;

@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.service.PageService;
-import org.wallride.domain.Page;
-import org.wallride.domain.PageTree;
+import org.wallride.core.domain.Page;
+import org.wallride.core.domain.PageTree;
+import org.wallride.core.service.PageService;
 
 import javax.inject.Inject;
 

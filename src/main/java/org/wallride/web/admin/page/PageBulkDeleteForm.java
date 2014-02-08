@@ -1,6 +1,6 @@
 package org.wallride.web.admin.page;
 
-import org.wallride.service.PageBulkDeleteRequest;
+import org.wallride.core.service.PageBulkDeleteRequest;
 import org.wallride.web.DomainObjectBulkDeleteForm;
 
 import javax.validation.constraints.NotNull;

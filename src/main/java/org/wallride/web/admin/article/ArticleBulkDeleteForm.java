@@ -1,6 +1,6 @@
 package org.wallride.web.admin.article;
 
-import org.wallride.service.ArticleBulkDeleteRequest;
+import org.wallride.core.service.ArticleBulkDeleteRequest;
 import org.wallride.web.DomainObjectBulkDeleteForm;
 
 import javax.validation.constraints.NotNull;

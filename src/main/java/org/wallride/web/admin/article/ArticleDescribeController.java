@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.service.ArticleService;
-import org.wallride.domain.Article;
+import org.wallride.core.domain.Article;
+import org.wallride.core.service.ArticleService;
 import org.wallride.web.DomainObjectDescribeController;
 
 import javax.inject.Inject;

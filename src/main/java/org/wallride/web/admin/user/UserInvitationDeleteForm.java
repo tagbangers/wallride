@@ -1,6 +1,6 @@
 package org.wallride.web.admin.user;
 
-import org.wallride.service.UserInvitationDeleteRequest;
+import org.wallride.core.service.UserInvitationDeleteRequest;
 import org.wallride.web.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;

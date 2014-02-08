@@ -1,6 +1,6 @@
 package org.wallride.web;
 
-import org.wallride.domain.DomainObject;
+import org.wallride.core.domain.DomainObject;
 
 import java.io.Serializable;
 

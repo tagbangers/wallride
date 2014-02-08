@@ -2,8 +2,8 @@ package org.wallride.web.admin.user;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
-import org.wallride.domain.User;
-import org.wallride.service.UserUpdateRequest;
+import org.wallride.core.domain.User;
+import org.wallride.core.service.UserUpdateRequest;
 import org.wallride.web.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;

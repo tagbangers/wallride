@@ -1,8 +1,8 @@
 package org.wallride.web.admin.category;
 
 import org.springframework.beans.BeanUtils;
-import org.wallride.domain.Category;
-import org.wallride.service.CategoryCreateRequest;
+import org.wallride.core.domain.Category;
+import org.wallride.core.service.CategoryCreateRequest;
 import org.wallride.web.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;

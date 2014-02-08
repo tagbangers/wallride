@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.service.ArticleService;
-import org.wallride.service.CategoryService;
-import org.wallride.support.AuthorizedUser;
-import org.wallride.domain.Article;
-import org.wallride.domain.CategoryTree;
-import org.wallride.domain.Post;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Post;
+import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.CategoryService;
+import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

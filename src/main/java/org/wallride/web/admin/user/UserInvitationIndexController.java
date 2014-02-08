@@ -5,8 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.wallride.service.UserService;
-import org.wallride.domain.UserInvitation;
+import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.service.UserService;
 
 import javax.inject.Inject;
 import java.util.List;

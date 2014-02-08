@@ -1,6 +1,6 @@
 package org.wallride.web.admin.category;
 
-import org.wallride.domain.CategoryTree;
+import org.wallride.core.domain.CategoryTree;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

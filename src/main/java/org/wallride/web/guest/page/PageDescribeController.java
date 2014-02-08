@@ -5,10 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.wallride.service.PageService;
-import org.wallride.web.guest.article.ArticleIndexController;
-import org.wallride.domain.Page;
+import org.wallride.core.domain.Page;
+import org.wallride.core.service.PageService;
 import org.wallride.web.HttpNotFoundException;
+import org.wallride.web.guest.article.ArticleIndexController;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;

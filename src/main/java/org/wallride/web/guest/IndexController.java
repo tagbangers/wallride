@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.domain.Setting;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 

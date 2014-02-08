@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.wallride.service.MediaService;
-import org.wallride.domain.Media;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.Media;
+import org.wallride.core.service.MediaService;
+import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 

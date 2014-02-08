@@ -1,8 +1,8 @@
 package org.wallride.web.admin.media;
 
-import org.wallride.domain.Media;
-import org.wallride.domain.Setting;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.Media;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.support.Settings;
 
 import java.io.Serializable;
 

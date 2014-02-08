@@ -2,7 +2,7 @@ package org.wallride.web.admin.article;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.service.ArticleCreateRequest;
+import org.wallride.core.service.ArticleCreateRequest;
 import org.wallride.web.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;

@@ -1,7 +1,7 @@
 package org.wallride.web;
 
 import org.springframework.ui.Model;
-import org.wallride.domain.DomainObject;
+import org.wallride.core.domain.DomainObject;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;

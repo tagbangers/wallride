@@ -1,8 +1,8 @@
 package org.wallride.web.admin.category;
 
 import org.springframework.beans.BeanUtils;
-import org.wallride.domain.Category;
-import org.wallride.service.CategoryUpdateRequest;
+import org.wallride.core.domain.Category;
+import org.wallride.core.service.CategoryUpdateRequest;
 import org.wallride.web.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;

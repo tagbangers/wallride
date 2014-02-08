@@ -2,7 +2,7 @@ package org.wallride.web;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.support.Paginator;
+import org.wallride.core.support.Paginator;
 
 import javax.servlet.http.HttpSession;
 

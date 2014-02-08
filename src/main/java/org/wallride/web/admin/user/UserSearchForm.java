@@ -1,7 +1,7 @@
 package org.wallride.web.admin.user;
 
 import org.springframework.util.StringUtils;
-import org.wallride.service.UserSearchRequest;
+import org.wallride.core.service.UserSearchRequest;
 import org.wallride.web.DomainObjectSearchForm;
 
 @SuppressWarnings("serial")

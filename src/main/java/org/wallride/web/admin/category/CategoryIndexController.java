@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.service.CategoryService;
-import org.wallride.domain.Category;
-import org.wallride.domain.CategoryTree;
+import org.wallride.core.domain.Category;
+import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.service.CategoryService;
 
 import javax.inject.Inject;
 

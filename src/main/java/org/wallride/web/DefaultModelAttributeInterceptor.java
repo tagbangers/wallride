@@ -5,41 +5,47 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.domain.CategoryTree;
-import org.wallride.domain.PageTree;
-import org.wallride.domain.Post;
-import org.wallride.domain.Setting;
-import org.wallride.service.CategoryService;
-import org.wallride.service.PageService;
-import org.wallride.support.AuthorizedUser;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.PageTree;
+import org.wallride.core.domain.Post;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.service.CategoryService;
+import org.wallride.core.service.PageService;
+import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.Settings;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Component
 public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter {
 
-	@Inject
 	private Settings settings;
 
-	@Inject
 	private CategoryService categoryService;
 
-	@Inject
 	private PageService pageService;
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultModelAttributeInterceptor.class);
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
+
+	public void setCategoryService(CategoryService categoryService) {
+		this.categoryService = categoryService;
+	}
+
+	public void setPageService(PageService pageService) {
+		this.pageService = pageService;
+	}
 
 	@Override
 	public boolean preHandle(
@@ -74,8 +80,8 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		mv.addObject("USER", authorizedUser);
 
 		mv.addObject("WEBSITE_TITLE", settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, currentLanguage));
-		mv.addObject("WEBSITE_LINK", buildBlogLink());
-		mv.addObject("WEBSITE_PATH", buildBlogPath(currentLanguage, languages));
+		mv.addObject("WEBSITE_LINK", buildGuestLink());
+		mv.addObject("WEBSITE_PATH", buildGuestPath(currentLanguage, languages));
 
 		mv.addObject("ADMIN_LINK", buildAdminLink());
 		mv.addObject("ADMIN_PATH", buildAdminPath(currentLanguage));
@@ -92,12 +98,12 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 	}
 
-	private String buildBlogLink() {
+	private String buildGuestLink() {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
 		return builder.buildAndExpand().toUriString();
 	}
 
-	private String buildBlogPath(String currentLanguage, String[] languages) {
+	private String buildGuestPath(String currentLanguage, String[] languages) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
 		if (languages != null && languages.length > 1) {
 			builder.path("/{language}");

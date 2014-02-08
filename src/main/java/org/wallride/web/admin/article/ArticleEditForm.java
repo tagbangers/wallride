@@ -3,9 +3,9 @@ package org.wallride.web.admin.article;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.domain.Article;
-import org.wallride.domain.Category;
-import org.wallride.service.ArticleUpdateRequest;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Category;
+import org.wallride.core.service.ArticleUpdateRequest;
 import org.wallride.web.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;

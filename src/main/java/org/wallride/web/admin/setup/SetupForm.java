@@ -1,8 +1,8 @@
 package org.wallride.web.admin.setup;
 
 import org.hibernate.validator.constraints.Email;
-import org.wallride.domain.PersonalName;
-import org.wallride.service.SetupRequest;
+import org.wallride.core.domain.PersonalName;
+import org.wallride.core.service.SetupRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

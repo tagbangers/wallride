@@ -1,20 +1,20 @@
 package org.wallride.web;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import org.wallride.domain.Setting;
-import org.wallride.support.Settings;
+import org.wallride.core.domain.Setting;
+import org.wallride.core.support.Settings;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Component
 public class SetupCheckInterceptor extends HandlerInterceptorAdapter {
 
-	@Inject
 	private Settings settings;
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
 
 	@Override
 	public boolean preHandle(

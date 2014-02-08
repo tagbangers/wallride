@@ -1,6 +1,6 @@
 package org.wallride.web.admin.user;
 
-import org.wallride.service.UserBulkDeleteRequest;
+import org.wallride.core.service.UserBulkDeleteRequest;
 import org.wallride.web.DomainObjectBulkDeleteForm;
 
 import java.util.List;

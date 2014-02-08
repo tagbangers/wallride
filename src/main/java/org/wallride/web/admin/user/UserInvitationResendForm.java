@@ -1,6 +1,6 @@
 package org.wallride.web.admin.user;
 
-import org.wallride.service.UserInvitationResendRequest;
+import org.wallride.core.service.UserInvitationResendRequest;
 import org.wallride.web.DomainObjectEditForm;
 
 public class UserInvitationResendForm extends DomainObjectEditForm {

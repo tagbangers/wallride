@@ -15,9 +15,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
-import org.wallride.service.MediaService;
-import org.wallride.support.AuthorizedUser;
-import org.wallride.domain.Article;
+import org.wallride.core.domain.Article;
+import org.wallride.core.service.MediaService;
+import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.DefaultModelAttributeInterceptor;
 
 import javax.inject.Inject;
@@ -37,8 +37,8 @@ public class ArticlePreviewController {
 	private DefaultModelAttributeInterceptor defaultModelAttributeInterceptor;
 
 	@Inject
-	@Qualifier("blogTemplateEngine")
-	private SpringTemplateEngine blogTemplateEngine;
+	@Qualifier("guestTemplateEngine")
+	private SpringTemplateEngine guestTemplateEngine;
 
 	@Inject
 	private ServletContext servletContext;
@@ -74,7 +74,7 @@ public class ArticlePreviewController {
 				WebApplicationContextUtils.getWebApplicationContext(servletContext));
 		ctx.setVariable("article", article);
 
-		String html = blogTemplateEngine.process("/article/describe", ctx);
+		String html = guestTemplateEngine.process("/article/describe", ctx);
 
 		response.setContentType("text/html;charset=UTF-8");
 		response.setContentLength(html.getBytes().length);
