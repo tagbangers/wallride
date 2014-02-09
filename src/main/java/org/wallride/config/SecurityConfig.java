@@ -63,9 +63,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.logoutRequestMatcher(new AntPathRequestMatcher("/_admin/logout", "GET"))
 				.logoutSuccessUrl("/_admin/login")
 				.and()
+/*
 			.requiresChannel()
 				.anyRequest().requiresSecure()
 				.and()
+*/
 			.rememberMe()
 				.tokenRepository(persistentTokenRepository())
 				.and()
