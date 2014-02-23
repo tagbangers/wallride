@@ -34,33 +34,16 @@
 									<div id="post-cover-dropzone" class="wr-post-cover-dropzone col-sm-12" style="">
 										<p class="placeholder help-block" th:text="#{CoverImage}">Cover Image</p>
 										<div class="dragover hide"><span class="help-block">Drop files here</span></div>
-										<div class="wrap-hover">
-											<div class="message hide">
-												<span class="help-block">Drop files to replace image</span>
-											</div>
-											<div class="remove hide"><a href=""><span class="glyphicon glyphicon-remove"></span></a></div>
+										<div th:classappend="${form.coverId}? '' : 'hide'" class="image-wrap">
+											<img th:if="${form.coverId ne null}" th:src="@{${#medias.link(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+											<div class="remove"><a href="#"><span class="glyphicon glyphicon-remove"></span></a></div>
 										</div>
 										<div class="progress hide"><div class="progress-bar progress-bar-success"></div></div>
 										<input type="hidden" th:field="*{coverId}" />
-										<img th:if="${form.coverId ne null}" th:src="@{${#medias.link(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
 									</div>
 								</div>
 								<script th:inline="javascript">
 								$(function() {
-									$('#post-cover-dropzone').mouseenter(function() {
-										if($('#post-cover-dropzone input[name="coverId"]').val() != '') {
-											$('#post-cover-dropzone .message').text('Drop files here to replace image').removeClass('hide');
-											$('#post-cover-dropzone .remove').removeClass('hide');
-											$('#post-cover-dropzone .wrap-hover').addClass('has');
-										} else {
-											$('#post-cover-dropzone .message').text('Drop files here').removeClass('hide');
-											$('#post-cover-dropzone .remove').addClass('hide');
-											$('#post-cover-dropzone .wrap-hover').removeClass('has');
-										}
-									}).mouseleave(function() {
-										$('#post-cover-dropzone .wrap-hover').addClass('hide');
-									});
-
 									$('#post-cover-dropzone').fileupload({
 										url: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
 										paramName: 'file',
@@ -102,12 +85,19 @@
 										},
 										done: function(e, data) {
 											$('#post-cover-dropzone :input[name="coverId"]').val(data.result.id);
+											$('#post-cover-dropzone .progress').addClass('hide');
+											$('#post-cover-dropzone .progress-bar').css('width', '0%');
 											var img = $('<img class="wr-post-cover" />').attr('src', data.result.filelink + '?' + $.param({w: 1200, h: 500, m: 1}));
 											$('#post-cover-dropzone img').remove();
 											$('#post-cover-dropzone').append(img);
-											$('#post-cover-dropzone .progress').addClass('hide');
-											$('#post-cover-dropzone .progress-bar').css('width', '0%');
+											$('#post-cover-dropzone .image-wrap').removeClass('hide');
 										}
+									});
+									$('#post-cover-dropzone .remove').click(function(e) {
+										$('#post-cover-dropzone :input[name="coverId"]').val('');
+										$('#post-cover-dropzone .image-wrap').addClass('hide');
+										$('#post-cover-dropzone img').remove();
+										e.preventDefault();
 									});
 								});
 								</script>

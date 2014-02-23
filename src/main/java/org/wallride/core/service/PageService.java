@@ -28,7 +28,6 @@ import org.wallride.core.support.Settings;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.validation.ValidationException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -265,7 +264,7 @@ public class PageService {
 		}
 	}
 
-	public Page deletePage(PageDeleteRequest request, BindingResult result) throws ValidationException {
+	public Page deletePage(PageDeleteRequest request, BindingResult result) throws BindException {
 		Page page = pageRepository.findByIdForUpdate(request.getId());
 		Page parent = page.getParent();
 		for (Page child : page.getChildren()) {
@@ -319,12 +318,16 @@ public class PageService {
 			try {
 				page = transactionTemplate.execute(new TransactionCallback<Page>() {
 					public Page doInTransaction(TransactionStatus status) {
-						return deletePage(deleteRequest, r);
+						try {
+							return deletePage(deleteRequest, r);
+						} catch (BindException e) {
+							throw new RuntimeException(e);
+						}
 					}
 				});
 				pages.add(page);
 			}
-			catch (ValidationException e) {
+			catch (Exception e) {
 				logger.debug("Errors: {}", r);
 				result.addAllErrors(r);
 			}

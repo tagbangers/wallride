@@ -29,6 +29,10 @@
 						</div>
 					</div>
 				</div>
+				<div class="alert alert-success" th:if="${deletedPage ne null}">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<span th:text="#{DeletedPage}">Article Deleted.</span>
+				</div>
 				<div class="alert alert-success" th:if="${deletedPages ne null}">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 					<span th:text="#{DeletedPages}">Pages Deleted.</span>
