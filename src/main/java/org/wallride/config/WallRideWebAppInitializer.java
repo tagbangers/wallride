@@ -42,7 +42,7 @@ public class WallRideWebAppInitializer extends AbstractContextLoaderInitializer 
 
 	@Override
 	protected WebApplicationContext createRootApplicationContext() {
-		AnnotationConfigWebApplicationContext rootAppContext = new AnnotationConfigWebApplicationContext();
+		AnnotationConfigWebApplicationContext rootAppContext = createServletWebApplicationContext();
 		rootAppContext.register(new Class[] {
 				CoreConfig.class,
 				DataConfig.class,
