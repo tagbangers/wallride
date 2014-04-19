@@ -1,5 +1,6 @@
 package org.wallride.core.domain;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.solr.analysis.*;
 import org.hibernate.annotations.Type;
@@ -86,7 +87,7 @@ public abstract class DomainObject<ID extends Serializable> implements Serializa
 		if (this == other) return true;
 		if (other == null || !(other instanceof DomainObject)) return false;
 		DomainObject that = (DomainObject) other;
-		return (getId() == that.getId());
+		return new EqualsBuilder().append(getId(), that.getId()).isEquals();
 	}
 
 	@Override

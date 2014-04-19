@@ -7,15 +7,15 @@ import java.util.*;
 
 public class PageTree implements Serializable {
 
-	private Map<Long, Node> nodeIdMap = new LinkedHashMap<>();
+	private HashMap<Long, Node> nodeIdMap = new LinkedHashMap<>();
 
-	private Map<String, Node> nodeCodeMap = new LinkedHashMap<>();
+	private HashMap<String, Node> nodeCodeMap = new LinkedHashMap<>();
 
-	private Map<Long, Page> pageIdMap = new LinkedHashMap<>();
+	private HashMap<Long, Page> pageIdMap = new LinkedHashMap<>();
 
-	private Map<String, Page> pageCodeMap = new LinkedHashMap<>();
+	private HashMap<String, Page> pageCodeMap = new LinkedHashMap<>();
 
-	private List<Node> rootNodes = new ArrayList<>();
+	private ArrayList<Node> rootNodes = new ArrayList<>();
 
 	public PageTree(Collection<Page> pages) {
 		pages = new TreeSet<>(pages);
@@ -140,7 +140,7 @@ public class PageTree implements Serializable {
 		return pageIdMap.isEmpty();
 	}
 
-	public class Node {
+	public static class Node implements Serializable {
 
 		private Page page;
 

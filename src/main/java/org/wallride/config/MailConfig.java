@@ -9,9 +9,7 @@ import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.support.CustomThymeleafDialect;
-import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
 import java.util.HashSet;

@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class SetupForm implements Serializable {
@@ -20,7 +19,7 @@ public class SetupForm implements Serializable {
 	@NotNull
 	private String defaultLanguage;
 
-	private List<String> languages = new ArrayList<>();
+	private ArrayList<String> languages = new ArrayList<>();
 
 	@NotNull
 	private String mediaUrlPrefix = "/media/";
@@ -64,11 +63,11 @@ public class SetupForm implements Serializable {
 		this.defaultLanguage = defaultLanguage;
 	}
 
-	public List<String> getLanguages() {
+	public ArrayList<String> getLanguages() {
 		return languages;
 	}
 
-	public void setLanguages(List<String> languages) {
+	public void setLanguages(ArrayList<String> languages) {
 		this.languages = languages;
 	}
 
@@ -153,7 +152,7 @@ public class SetupForm implements Serializable {
 				.build();
 	}
 
-	public static class Name {
+	public static class Name implements Serializable {
 
 		@NotNull
 		private String firstName;

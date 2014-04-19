@@ -36,7 +36,6 @@ import org.wallride.core.domain.DomainObject;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.net.URI;
 import java.util.Properties;
 
 @Configuration

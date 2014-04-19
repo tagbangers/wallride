@@ -78,7 +78,7 @@ public class SignupForm implements Serializable {
 				.build();
 	}
 
-	public static class Name {
+	public static class Name implements Serializable {
 
 		@NotNull
 		private String firstName;

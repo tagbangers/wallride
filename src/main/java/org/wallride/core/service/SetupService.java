@@ -12,9 +12,7 @@ import org.wallride.core.repository.SettingRepository;
 import org.wallride.core.repository.UserRepository;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service

@@ -70,7 +70,7 @@ public class PostUtils {
 		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
 		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
 		params.put("code", article.getCode());
-		return builder.buildAndExpand(params).toUriString();
+		return builder.buildAndExpand(params).encode().toUriString();
 	}
 
 	private String path(UriComponentsBuilder builder, Page page, PageTree pageTree) {
@@ -98,7 +98,7 @@ public class PostUtils {
 			builder.path("/{" + key + "}");
 			params.put(key, codes.get(i));
 		}
-		return builder.buildAndExpand(params).toUriString();
+		return builder.buildAndExpand(params).encode().toUriString();
 	}
 
 	public String metaKeywords(Post post) {
