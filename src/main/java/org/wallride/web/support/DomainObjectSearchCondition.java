@@ -5,8 +5,9 @@ import org.springframework.util.StringUtils;
 import org.wallride.core.support.Paginator;
 
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
-public class DomainObjectSearchCondition<T extends DomainObjectSearchForm> {
+public class DomainObjectSearchCondition<T extends DomainObjectSearchForm> implements Serializable {
 
 	private String sessionKey;
 	

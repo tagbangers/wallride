@@ -1,7 +1,6 @@
 package org.wallride.web.support;
 
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
 import org.wallride.core.domain.Setting;

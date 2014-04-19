@@ -31,9 +31,9 @@ import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
+import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
 import org.wallride.web.support.PathVariableLocaleResolver;
-import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
 import org.wallride.web.support.SetupRedirectInterceptor;
 
 import javax.inject.Inject;

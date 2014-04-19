@@ -5,11 +5,11 @@ import java.util.*;
 
 public class CategoryTree implements Serializable {
 
-	private Map<Long, Category> categoryIdMap = new LinkedHashMap<>();
+	private HashMap<Long, Category> categoryIdMap = new LinkedHashMap<>();
 
-	private Map<String, Category> categoryCodeMap = new LinkedHashMap<>();
+	private HashMap<String, Category> categoryCodeMap = new LinkedHashMap<>();
 
-	private List<Node> rootNodes = new ArrayList<>();
+	private ArrayList<Node> rootNodes = new ArrayList<>();
 
 	public CategoryTree(Collection<Category> categories) {
 		categories = new TreeSet<>(categories);
@@ -33,7 +33,7 @@ public class CategoryTree implements Serializable {
 	}
 
 	private void createChildren(Node parent, Collection<Category> categories) {
-		List<Node> children = new ArrayList<>();
+		ArrayList<Node> children = new ArrayList<>();
 		Iterator<Category> i = categories.iterator();
 		while (i.hasNext()) {
 			Category category = i.next();
@@ -71,11 +71,11 @@ public class CategoryTree implements Serializable {
 		return categoryIdMap.isEmpty();
 	}
 
-	public class Node {
+	public static class Node implements Serializable {
 
 		private Category category;
 
-		private List<Node> children = new ArrayList<>();
+		private ArrayList<Node> children = new ArrayList<>();
 
 		private Node(Category category) {
 			this.category = category;

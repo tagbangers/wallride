@@ -2,6 +2,7 @@ package org.wallride.core.support;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -103,7 +104,7 @@ public class Paginator<E> implements Serializable {
 	 * @return ページ番号のリスト
 	 */
 	public int[] getAllNumbers() {
-		return numbers;
+		return Arrays.copyOf(numbers, numbers.length);
 	}
 
 	/**

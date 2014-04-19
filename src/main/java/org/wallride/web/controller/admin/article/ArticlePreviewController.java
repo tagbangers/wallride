@@ -76,7 +76,7 @@ public class ArticlePreviewController {
 		String html = guestTemplateEngine.process("/article/describe", ctx);
 
 		response.setContentType("text/html;charset=UTF-8");
-		response.setContentLength(html.getBytes().length);
+		response.setContentLength(html.getBytes("UTF-8").length);
 		response.getWriter().write(html);
 	}
 }

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 public class MediaHttpRequestHandler extends WebContentGenerator implements HttpRequestHandler, InitializingBean {
@@ -119,8 +120,9 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 							File copied = File.createTempFile("resized-", MediaType.parseMediaType(media.getMimeType()).getSubtype());
 							FileUtils.copyFile(temp, copied);
 							AmazonS3ResourceUtils.writeFile(temp, resized);
-							copied.delete();
-						} catch (Exception e) {
+							FileUtils.deleteQuietly(copied);
+						}
+						catch (Exception e) {
 							logger.warn("Image resize failed", e);
 						}
 					}
@@ -157,16 +159,14 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		}
 		op.addImage("-");
 
-//		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		FileOutputStream out = new FileOutputStream(file);
-		Pipe pipe = new Pipe(resource.getInputStream(), out);
+		try (FileOutputStream out = new FileOutputStream(file); InputStream in = resource.getInputStream();) {
+			Pipe pipe = new Pipe(in, out);
 
-		ConvertCmd convert = new ConvertCmd();
+			ConvertCmd convert = new ConvertCmd();
 //			convert.setSearchPath("C:\\Program Files\\ImageMagick-6.8.6-Q16");
-		convert.setInputProvider(pipe);
-		convert.setOutputConsumer(pipe);
+			convert.setInputProvider(pipe);
+			convert.setOutputConsumer(pipe);
 
-		try {
 			convert.run(op);
 			out.close();
 		}

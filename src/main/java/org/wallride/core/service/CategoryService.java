@@ -4,7 +4,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.validation.Errors;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.repository.CategoryRepository;
