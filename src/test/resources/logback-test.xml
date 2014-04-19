@@ -17,7 +17,7 @@
 	<logger name="org.hibernate.hql.internal.ast.QueryTranslatorImpl" level="ERROR" />
 	
 	<root>
-		<level value="DEBUG" />
+		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

@@ -103,14 +103,6 @@ public class DataConfig implements BatchConfigurer {
 		dataSource.setMinEvictableIdleTimeMillis(environment.getRequiredProperty("datasource.minEvictableIdleTimeMillis", Long.class));
 		dataSource.setNumTestsPerEvictionRun(environment.getRequiredProperty("datasource.numTestsPerEvictionRun", Integer.class));
 		
-		try {
-			JndiTemplate jndiTemplate = new JndiTemplate();
-			jndiTemplate.bind("dataSource", dataSource);
-		}
-		catch (NamingException e) {
-			logger.error("JNDI error.", e);
-		}
-
 		return dataSource;
 	}
 
