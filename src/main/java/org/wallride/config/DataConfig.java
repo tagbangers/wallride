@@ -31,11 +31,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import org.wallride.core.domain.DomainObject;
 
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 @Configuration
@@ -76,7 +78,7 @@ public class DataConfig implements BatchConfigurer {
 	}
 	
 	@Override
-	public PlatformTransactionManager getTransactionManager() {
+	public PlatformTransactionManager getTransactionManager() throws UnsupportedEncodingException {
 		JpaTransactionManager bean = new JpaTransactionManager();
 		bean.setEntityManagerFactory(entityManagerFactory().getObject());
 		return bean;
@@ -85,14 +87,14 @@ public class DataConfig implements BatchConfigurer {
 	// additional data-related beans
 	
 	@Bean
-	public DataSource dataSource() {
+	public DataSource dataSource() throws UnsupportedEncodingException {
 		String jdbcConnectionString = environment.getRequiredProperty("jdbc.connection.string");
 		UriComponents jdbcUriComponents = UriComponentsBuilder.fromUriString(jdbcConnectionString.substring("jdbc:".length())).build();
 
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driver"));
-		dataSource.setUsername(jdbcUriComponents.getQueryParams().getFirst("user"));
-		dataSource.setPassword(jdbcUriComponents.getQueryParams().getFirst("password"));
+		dataSource.setUsername(UriUtils.decode(jdbcUriComponents.getQueryParams().getFirst("user"), "UTF-8"));
+		dataSource.setPassword(UriUtils.decode(jdbcUriComponents.getQueryParams().getFirst("password"), "UTF-8"));
 		dataSource.setUrl(jdbcConnectionString.substring(0, jdbcConnectionString.indexOf("?")));
 
 		dataSource.setMaxActive(environment.getRequiredProperty("datasource.maxActive", Integer.class));
@@ -107,7 +109,7 @@ public class DataConfig implements BatchConfigurer {
 	}
 
 	@Bean
-	public DataSourceInitializer dataSourceInitializer() {
+	public DataSourceInitializer dataSourceInitializer() throws UnsupportedEncodingException {
 		final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
 		populator.addScript(createTableScript);
 		populator.setContinueOnError(true);
@@ -119,7 +121,7 @@ public class DataConfig implements BatchConfigurer {
 	}
 
 	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws UnsupportedEncodingException {
 		LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
 		entityManager.setDataSource(dataSource());
 		entityManager.setPackagesToScan(DomainObject.class.getPackage().getName());
