@@ -20,6 +20,8 @@ public class ArticleFullTextSearchTerm implements Serializable {
 
 	private Collection<Long> categoryIds = new ArrayList<>();
 
+	private Collection<String> categoryCodes = new ArrayList<>();
+
 	private Collection<Long> tagIds = new ArrayList<>();
 
 	private String language;
@@ -62,6 +64,14 @@ public class ArticleFullTextSearchTerm implements Serializable {
 
 	public void setCategoryIds(Collection<Long> categoryIds) {
 		this.categoryIds = categoryIds;
+	}
+
+	public Collection<String> getCategoryCodes() {
+		return categoryCodes;
+	}
+
+	public void setCategoryCodes(Collection<String> categoryCodes) {
+		this.categoryCodes = categoryCodes;
 	}
 
 	public Collection<Long> getTagIds() {

@@ -1,15 +1,18 @@
 package org.wallride.web.controller.admin.page;
 
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PageService;
-import org.wallride.core.support.Paginator;
 import org.wallride.web.support.DomainObjectSearchCondition;
 import org.wallride.web.support.DomainObjectSearchController;
 
@@ -18,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 
 @Controller
 @RequestMapping("/{language}/pages/index")
@@ -50,26 +51,24 @@ public class PageSearchController extends DomainObjectSearchController<Page, Pag
 
 	@RequestMapping(method=RequestMethod.GET)
 	public String index(
-			@RequestParam(required=false) String token,
 			Model model,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			HttpSession session)
 			throws Exception {
-		return super.requestMappingIndex(token, model, request, response, session);
+		return super.requestMappingIndex(model, request, response, session);
 	}
-	
+
 	@RequestMapping(params="page")
 	public String page(
-			@RequestParam int page, 
-			@RequestParam(required=false) String token,
+			Pageable pageable,
 			Model model,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			HttpSession session) {
-		return super.requestMappingPage(page, token, model, request, response, session);
+		return super.requestMappingPage(pageable, model, request, response, session);
 	}
-	
+
 	@RequestMapping(params="search")
 	public String search(
 			@Valid PageSearchForm form,
@@ -106,14 +105,8 @@ public class PageSearchController extends DomainObjectSearchController<Page, Pag
 	}
 
 	@Override
-	protected Paginator<Long> readDomainObjects(PageSearchForm form, int perPage) {
-		List<Long> ids = pageService.searchPages(form.buildPageSearchRequest());
-		return new Paginator<>(ids, perPage);
-	}
-
-	@Override
-	protected Collection<Page> readDomainObjects(Paginator<Long> paginator) {
-		return pageService.readPages(paginator);
+	protected org.springframework.data.domain.Page<Page> readDomainObjects(PageSearchForm form, Pageable pageable) {
+		return pageService.readPages(form.buildPageSearchRequest(), pageable);
 	}
 
 	@Override

@@ -3,18 +3,20 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201404191747</version>
+	<version>1.0.0.SNAPSHOT-201404281124</version>
 	<packaging>war</packaging>
 	
 	<properties>
-		<org.springframework.version>3.2.6.RELEASE</org.springframework.version>
-		<org.springframework.data.jpa.version>1.4.1.RELEASE</org.springframework.data.jpa.version>
-		<org.springframework.security.version>3.2.0.RC1</org.springframework.security.version>
-		<org.springframework.batch.version>2.2.1.RELEASE</org.springframework.batch.version>
-		<org.hibernate.version>4.2.2.Final</org.hibernate.version>
-		<org.hibernate-search.version>4.4.0.Final</org.hibernate-search.version>
-		<org.infinispan.version>5.3.0.Final</org.infinispan.version>
+		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
+		<org.springframework.data.jpa.version>1.5.0.RELEASE</org.springframework.data.jpa.version>
+		<org.springframework.security.version>3.2.0.RELEASE</org.springframework.security.version>
+		<org.springframework.batch.version>2.2.5.RELEASE</org.springframework.batch.version>
+		<org.hibernate.version>4.3.4.Final</org.hibernate.version>
+		<org.hibernate.search.version>4.5.0.Final</org.hibernate.search.version>
+		<org.infinispan.version>6.0.2.Final</org.infinispan.version>
 		<org.thymeleaf.version>2.1.2.RELEASE</org.thymeleaf.version>
+		<org.slf4j.version>1.7.6</org.slf4j.version>
+		<ch.qos.logback.version>1.1.1</ch.qos.logback.version>
 	</properties>
 
 	<repositories>
@@ -151,22 +153,20 @@
 		<!-- Hibernate Search -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-search</artifactId>
-			<version>${org.hibernate-search.version}</version>
+			<artifactId>hibernate-search-orm</artifactId>
+			<version>${org.hibernate.search.version}</version>
 		</dependency>
-
-		<!-- Hibernate Infinispan integration: -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-infinispan</artifactId>
-			<version>${org.hibernate.version}</version>
+			<artifactId>hibernate-search-analyzers</artifactId>
+			<version>${org.hibernate.search.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search-infinispan</artifactId>
-			<version>${org.hibernate-search.version}</version>
+			<version>${org.hibernate.search.version}</version>
 		</dependency>
-		
+
 		<!-- Infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>
@@ -187,6 +187,12 @@
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-query</artifactId>
 			<version>${org.infinispan.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>hibernate-jpa-2.0-api</artifactId>
+					<groupId>org.hibernate.javax.persistence</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.infinispan</groupId>
@@ -348,29 +354,34 @@
 			<artifactId>commons-compress</artifactId>
 			<version>1.5</version>
 		</dependency>
-		
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
+			<version>${org.slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.6.1</version>
+			<version>${org.slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>${org.slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>0.9.28</version>
+			<version>${ch.qos.logback.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>0.9.28</version>
+			<version>${ch.qos.logback.version}</version>
 		</dependency>
-		
+
 		<!-- MySQL Driver -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -400,7 +411,14 @@
 			<version>${org.springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.4</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

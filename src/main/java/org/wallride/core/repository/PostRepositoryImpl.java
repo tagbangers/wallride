@@ -7,18 +7,23 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Session;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
+import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
@@ -26,7 +31,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	private EntityManager entityManager;
 
 	@Override
-	public List<Long> findByFullTextSearchTerm(PostFullTextSearchTerm term) {
+	public org.springframework.data.domain.Page<Post> findByFullTextSearchTerm(PostFullTextSearchTerm term, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 
 		Query query = null;
@@ -54,21 +59,24 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		}
 
 		if (query == null) {
-			return new ArrayList<>();
+			return new PageImpl(new ArrayList(), pageable, 0);
 		}
 
-		javax.persistence.Query persistenceQuery = fullTextEntityManager.createFullTextQuery(query, Post.class, Page.class)
-				.setProjection("id");
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(Post.class)
+				.setFetchMode("cover", FetchMode.JOIN)
+				.setFetchMode("author", FetchMode.JOIN);
+
+		FullTextQuery persistenceQuery = fullTextEntityManager
+				.createFullTextQuery(query, Article.class, Page.class)
+				.setCriteriaQuery(criteria);
+		persistenceQuery.setFirstResult(pageable.getOffset());
+		persistenceQuery.setMaxResults(pageable.getPageSize());
+
+		int resultSize = persistenceQuery.getResultSize();
 
 		@SuppressWarnings("unchecked")
-		List<Object[]> results = persistenceQuery.getResultList();
-
-		Set<Long> ids = new LinkedHashSet<Long>();
-		for (Object[] object : results) {
-			ids.add((Long) object[0]);
-		}
-
-		return new ArrayList<>(ids);
+		List<Post> results = persistenceQuery.getResultList();
+		return new PageImpl<>(results, pageable, resultSize);
 	}
-
 }

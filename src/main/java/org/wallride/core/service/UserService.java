@@ -8,6 +8,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -26,10 +29,10 @@ import org.thymeleaf.context.Context;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.repository.UserFullTextSearchTerm;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.Paginator;
 import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
@@ -224,18 +227,14 @@ public class UserService {
 		return invitation;
 	}
 
-//	@Cacheable(value="users", key="'id.'+#request")
-	public List<Long> searchUsers(UserSearchRequest request) {
-		if (request.isEmpty()) {
-			return userRepository.findId();
-		}
-		return userRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm());
+	public Page<User> readUsers(UserSearchRequest request) {
+		Pageable pageable = new PageRequest(0, 10);
+		return readUsers(request, pageable);
 	}
-	
-//	@Cacheable(value="users", key="'list.'+#paginator")
-	public List<User> readUsers(Paginator<Long> paginator) {
-		if (paginator == null || !paginator.hasElement()) return new ArrayList<User>();
-		return readUsers(paginator.getElements());
+
+	public Page<User> readUsers(UserSearchRequest request, Pageable pageable) {
+		UserFullTextSearchTerm term = request.toFullTextSearchTerm();
+		return userRepository.findByFullTextSearchTerm(term, pageable);
 	}
 
 	private List<User> readUsers(Collection<Long> ids) {

@@ -1,15 +1,19 @@
 package org.wallride.web.controller.admin.user;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.core.domain.Post;
 import org.wallride.core.domain.User;
+import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.UserService;
-import org.wallride.core.support.Paginator;
 import org.wallride.web.support.DomainObjectSearchController;
 
 import javax.inject.Inject;
@@ -17,38 +21,43 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/{language}/users/index")
 public class UserSearchController extends DomainObjectSearchController<User, UserSearchForm> {
-	
+
 	@Inject
 	private UserService userService;
 
+	@Inject
+	private ArticleService articleService;
+
+	@ModelAttribute("articleCounts")
+	public Map<Long, Long> articleCounts(@PathVariable String language) {
+		return articleService.countArticlesByAuthorIdGrouped(Post.Status.PUBLISHED, language);
+	}
+
 	@RequestMapping(method= RequestMethod.GET)
 	public String index(
-			@RequestParam(required=false) String token,
 			Model model,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			HttpSession session)
 			throws Exception {
-		return super.requestMappingIndex(token, model, request, response, session);
+		return super.requestMappingIndex(model, request, response, session);
 	}
-	
+
 	@RequestMapping(params="page")
 	public String page(
-			@RequestParam int page,
-			@RequestParam(required=false) String token,
+			Pageable pageable,
 			Model model,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			HttpSession session) {
-		return super.requestMappingPage(page, token, model, request, response, session);
+		return super.requestMappingPage(pageable, model, request, response, session);
 	}
-	
+
 	@RequestMapping(params="search")
 	public String search(
 			@Valid UserSearchForm form,
@@ -85,13 +94,7 @@ public class UserSearchController extends DomainObjectSearchController<User, Use
 	}
 
 	@Override
-	protected Paginator<Long> readDomainObjects(UserSearchForm form, int perPage) {
-		List<Long> ids = userService.searchUsers(form.buildUserSearchRequest());
-		return new Paginator<>(ids, perPage);
-	}
-
-	@Override
-	protected Collection<User> readDomainObjects(Paginator<Long> paginator) {
-		return userService.readUsers(paginator);
+	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
+		return userService.readUsers(form.buildUserSearchRequest(), pageable);
 	}
 }

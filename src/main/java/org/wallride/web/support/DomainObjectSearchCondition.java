@@ -1,8 +1,6 @@
 package org.wallride.web.support;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.springframework.util.StringUtils;
-import org.wallride.core.support.Paginator;
+import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
@@ -10,22 +8,18 @@ import java.io.Serializable;
 public class DomainObjectSearchCondition<T extends DomainObjectSearchForm> implements Serializable {
 
 	private String sessionKey;
-	
-	private String token;
-	
 	private T form;
-	
-	private Paginator<Long> paginator;
-	
+	private Pageable pageable;
+
 	public DomainObjectSearchCondition(HttpSession session, T form) {
 		this(session, form, null);
 	}
 	
-	public DomainObjectSearchCondition(HttpSession session, T form, Paginator<Long> paginator) {
+	public DomainObjectSearchCondition(HttpSession session, T form, Pageable pageable) {
 		this.sessionKey = getSessionKey(form.getClass());
-		this.token = RandomStringUtils.randomAlphanumeric(10);
+//		this.token = RandomStringUtils.randomAlphanumeric(10);
 		this.form = form;
-		this.paginator = paginator;
+		this.pageable = pageable;
 		session.setAttribute(this.sessionKey, this);
 	}
 	
@@ -33,28 +27,20 @@ public class DomainObjectSearchCondition<T extends DomainObjectSearchForm> imple
 		return sessionKey;
 	}
 	
-	public String getToken() {
-		return token;
-	}
-	
 	public T getForm() {
 		return form;
 	}
 	
-	public Paginator<Long> getPaginator() {
-		return paginator;
+	public Pageable getPageable() {
+		return pageable;
 	}
-	
-	public static <T extends DomainObjectSearchForm> DomainObjectSearchCondition<T> resolve(HttpSession session, Class<T> clazz, String token) {
-		@SuppressWarnings("unchecked")
-		DomainObjectSearchCondition<T> condition = (DomainObjectSearchCondition<T>) session.getAttribute(getSessionKey(clazz));
-		if (condition == null || !StringUtils.hasText(token)) {
-			return null;
-		}
-		if (!token.equals(condition.getToken())) {
-			return null;
-		}
-		return condition;
+
+	public void setPageable(Pageable pageable) {
+		this.pageable = pageable;
+	}
+
+	public static <T extends DomainObjectSearchForm> DomainObjectSearchCondition<T> resolve(HttpSession session, Class<T> clazz) {
+		return (DomainObjectSearchCondition<T>) session.getAttribute(getSessionKey(clazz));
 	}
 	
 	private static String getSessionKey(Class<?> clazz) {

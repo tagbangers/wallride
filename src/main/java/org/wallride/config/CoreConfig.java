@@ -25,7 +25,7 @@ public class CoreConfig {
 	@Configuration
 	@Profile("default")
 	@PropertySource("classpath:environment-default.properties")
-	static class Product extends PropertySourcesPlaceholderConfigurer {
+	static class Default extends PropertySourcesPlaceholderConfigurer {
 	}
 
 
@@ -36,9 +36,9 @@ public class CoreConfig {
 	}
 
 //	@Configuration
-//	@Profile("test")
-//	@PropertySource("classpath:environment-test.properties")
-//	static class Test extends PropertySourcesPlaceholderConfigurer {
+//	@Profile("junit")
+//	@PropertySource("classpath:environment-junit.properties")
+//	static class Junit extends PropertySourcesPlaceholderConfigurer {
 //	}
 
 	@Bean

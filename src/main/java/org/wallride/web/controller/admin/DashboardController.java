@@ -1,5 +1,6 @@
 package org.wallride.web.controller.admin;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +13,6 @@ import org.wallride.core.domain.Setting;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
-import org.wallride.core.support.Paginator;
 import org.wallride.core.support.Settings;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
@@ -62,17 +62,15 @@ public class DashboardController {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.PUBLISHED);
-		List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
-		Paginator<Long> paginator = new Paginator<>(ids, 10);
-		return articleService.readArticles(paginator);
+		Page<Article> page = articleService.readArticles(form.buildArticleSearchRequest());
+		return page.getContent();
 	}
 
 	private List<Article> recentDraftArtciles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.DRAFT);
-		List<Long> ids = articleService.searchArticles(form.buildArticleSearchRequest());
-		Paginator<Long> paginator = new Paginator<>(ids, 10);
-		return articleService.readArticles(paginator);
+		Page<Article> page = articleService.readArticles(form.buildArticleSearchRequest());
+		return page.getContent();
 	}
 }

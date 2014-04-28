@@ -1,6 +1,9 @@
 package org.wallride.web.controller.admin.article;
 
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,17 +20,25 @@ import javax.servlet.http.HttpSession;
 @Controller
 @RequestMapping(value="/{language}/articles/describe", method=RequestMethod.GET)
 public class ArticleDescribeController extends DomainObjectDescribeController<Article, ArticleSearchForm> {
-	
+
 	@Inject
 	private ArticleService articleService;
-	
+
 	@RequestMapping
-	public String describe( 
+	public String describe(
 			@RequestParam long id,
-			@RequestParam(required=false) String token,
 			Model model,
 			HttpSession session) {
-		return super.requestMappingDescribe(id, token, model, session);
+		return super.requestMappingDescribe(id, null, model, session);
+	}
+
+	@RequestMapping(params = "pageable")
+	public String describe(
+			@RequestParam long id,
+			@PageableDefault(50) Pageable pageable,
+			Model model,
+			HttpSession session) {
+		return super.requestMappingDescribe(id, pageable, model, session);
 	}
 
 	@RequestMapping(params="part=delete-dialog")
@@ -57,5 +68,10 @@ public class ArticleDescribeController extends DomainObjectDescribeController<Ar
 	@Override
 	protected Article readDomainObject(long id) {
 		return articleService.readArticleById(id, LocaleContextHolder.getLocale().getLanguage());
+	}
+
+	@Override
+	protected Page<Article> readDomainObjects(ArticleSearchForm form, Pageable pageable) {
+		return articleService.readArticles(form.buildArticleSearchRequest(), pageable);
 	}
 }

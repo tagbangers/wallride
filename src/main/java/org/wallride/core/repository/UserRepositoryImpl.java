@@ -9,19 +9,22 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.Version;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class UserRepositoryImpl implements UserRepositoryCustom {
 	
@@ -29,7 +32,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	private EntityManager entityManager;
 	
 	@Override
-	public List<Long> findByFullTextSearchTerm(UserFullTextSearchTerm term) {
+	public Page<User> findByFullTextSearchTerm(UserFullTextSearchTerm term, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
@@ -38,7 +41,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		
 		@SuppressWarnings("rawtypes")
 		BooleanJunction<BooleanJunction> junction = qb.bool();
-		
+		junction.must(qb.all().createQuery());
+
 		if (StringUtils.hasText(term.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
@@ -64,21 +68,23 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		
 		Query searchQuery = junction.createQuery();
 		
-		Sort sort = new Sort(new SortField("id", SortField.STRING, false));
-		
-		javax.persistence.Query persistenceQuery = fullTextEntityManager
-				.createFullTextQuery(searchQuery, User.class)
-				.setProjection("id")
-				.setSort(sort);
-		@SuppressWarnings("unchecked")
-		List<Object[]> results = persistenceQuery.getResultList();
-		
-		Set<Long> ids = new LinkedHashSet<Long>();
-		for (Object[] object : results) {
-			ids.add((Long) object[0]);
-		}
-		
-		return new ArrayList<>(ids);
-	}
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(User.class);
 
+		Sort sort = new Sort(new SortField("id", SortField.STRING, false));
+
+		FullTextQuery persistenceQuery = fullTextEntityManager
+				.createFullTextQuery(searchQuery, User.class)
+				.setCriteriaQuery(criteria)
+//				.setProjection("id")
+				.setSort(sort);
+		persistenceQuery.setFirstResult(pageable.getOffset());
+		persistenceQuery.setMaxResults(pageable.getPageSize());
+
+		int resultSize = persistenceQuery.getResultSize();
+
+		@SuppressWarnings("unchecked")
+		List<User> results = persistenceQuery.getResultList();
+		return new PageImpl<>(results, pageable, resultSize);
+	}
 }
