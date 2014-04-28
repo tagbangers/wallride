@@ -20,11 +20,11 @@
 						</div>
 						<div class="pull-right">
 							<ul class="pager">
-								<li th:classappend="${prevId eq null}?'disabled'" class="previous">
-									<a th:href="${prevId ne null} ? @{__${ADMIN_PATH}__/articles/describe(id=${prevId},token=${token})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+								<li th:classappend="${previousObject eq null}?'disabled'" class="previous">
+									<a th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/articles/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
 								</li>
-								<li th:classappend="${nextId eq null}?'disabled'" class="next">
-									<a th:href="${nextId ne null} ? @{__${ADMIN_PATH}__/articles/describe(id=${nextId},token=${token})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+								<li th:classappend="${nextObject eq null}?'disabled'" class="next">
+									<a th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/articles/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
 								</li>
 							</ul>
 						</div>

@@ -12,6 +12,7 @@ import org.wallride.core.domain.Post;
 import javax.persistence.LockModeType;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Transactional
@@ -44,4 +45,18 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 
 	@Query("select count(article.id) from Article article where article.status = :status and article.language = :language ")
 	long countByStatus(@Param("status") Post.Status status, @Param("language") String language);
+
+	@Query(
+			"select new map(user.id as userId, count(article.id) as count) from Article article " +
+			"left join article.author user " +
+			"where article.status = :status and article.language = :language " +
+			"group by user.id ")
+	List<Map<String, Object>> countByAuthorIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
+
+	@Query(
+			"select new map(category.id as categoryId, count(article.id) as count) from Article article " +
+			"left join article.categories category " +
+			"where article.status = :status and article.language = :language " +
+			"group by category.id ")
+	List<Map<String, Object>> countByCategoryIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
 }

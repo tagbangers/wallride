@@ -77,7 +77,7 @@
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Articles}">Articles</span></a>
 				<ul class="nav dropdown-menu">
 					<li><a th:href="@{__${ADMIN_PATH}__/articles/create}" href="article-create.html"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New Article</span></a></li>
-					<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" href="articles.html"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Articles}">Articles</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/articles/index?search}" href="articles.html"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Articles}">Articles</span></a></li>
 					<li><a th:href="@{__${ADMIN_PATH}__/categories/index}"><span class="glyphicon glyphicon-folder-open"></span> <span th:text="#{Categories}">Categories</span></a></li>
 				</ul>
 			</li>
@@ -85,14 +85,14 @@
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> <span th:text="#{Pages}">Pages</span></a>
 				<ul class="nav dropdown-menu">
 					<li><a th:href="@{__${ADMIN_PATH}__/pages/create}"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New Page</span></a></li>
-					<li><a th:href="@{__${ADMIN_PATH}__/pages/index}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Pages}">Pages</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Pages}">Pages</span></a></li>
 				</ul>
 			</li>
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Users}">Users</span></a>
 				<ul class="nav dropdown-menu">
 					<li><a th:href="@{__${ADMIN_PATH}__/users/invitations/index}"><span class="glyphicon glyphicon-send"></span> <span th:text="#{InviteNew}">Invite New</span></a></li>
-					<li><a th:href="@{__${ADMIN_PATH}__/users/index}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Users}">Users</span></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/users/index?search}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Users}">Users</span></a></li>
 				</ul>
 			</li>
 		</ul>

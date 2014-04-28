@@ -1,6 +1,8 @@
 package org.wallride.web.controller.admin.page;
 
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,17 +19,25 @@ import javax.servlet.http.HttpSession;
 @Controller
 @RequestMapping(value="/{language}/pages/describe", method=RequestMethod.GET)
 public class PageDescribeController extends DomainObjectDescribeController<Page, PageSearchForm> {
-	
+
 	@Inject
 	private PageService pageService;
-	
+
 	@RequestMapping
-	public String describe( 
+	public String describe(
 			@RequestParam long id,
-			@RequestParam(required=false) String token,
 			Model model,
 			HttpSession session) {
-		return super.requestMappingDescribe(id, token, model, session);
+		return super.requestMappingDescribe(id, null, model, session);
+	}
+
+	@RequestMapping(params = "pageable")
+	public String describe(
+			@RequestParam long id,
+			@PageableDefault(50) Pageable pageable,
+			Model model,
+			HttpSession session) {
+		return super.requestMappingDescribe(id, pageable, model, session);
 	}
 
 	@RequestMapping(params="part=delete-dialog")
@@ -57,5 +67,10 @@ public class PageDescribeController extends DomainObjectDescribeController<Page,
 	@Override
 	protected Page readDomainObject(long id) {
 		return pageService.readPageById(id, LocaleContextHolder.getLocale().getLanguage());
+	}
+
+	@Override
+	protected org.springframework.data.domain.Page<Page> readDomainObjects(PageSearchForm form, Pageable pageable) {
+		return pageService.readPages(form.buildPageSearchRequest(), pageable);
 	}
 }

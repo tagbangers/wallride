@@ -1,8 +1,9 @@
 package org.wallride.core.repository;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.wallride.core.domain.Post;
 
 public interface PostRepositoryCustom {
-	
-	List<Long> findByFullTextSearchTerm(PostFullTextSearchTerm term);
+
+	org.springframework.data.domain.Page<Post> findByFullTextSearchTerm(PostFullTextSearchTerm term, Pageable pageable);
 }

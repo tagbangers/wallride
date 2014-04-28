@@ -5,6 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -22,7 +25,6 @@ import org.wallride.core.repository.ArticleFullTextSearchTerm;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.Paginator;
 import org.wallride.core.support.Settings;
 
 import javax.inject.Inject;
@@ -247,21 +249,18 @@ public class ArticleService {
 		}
 		return articles;
 	}
-	
-	public List<Long> searchArticles(ArticleSearchRequest request) {
-		if (request.isEmpty()) {
-			return articleRepository.findId();
-		}
-		ArticleFullTextSearchTerm term = request.toFullTextSearchTerm();
-		term.setLanguage(LocaleContextHolder.getLocale().getLanguage());
-		return articleRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm());
+
+	public Page<Article> readArticles(ArticleSearchRequest request) {
+		Pageable pageable = new PageRequest(0, 10);
+		return readArticles(request, pageable);
 	}
 
-	public List<Article> readArticles(Paginator<Long> paginator) {
-		if (paginator == null || !paginator.hasElement()) return new ArrayList<Article>();
-		return readArticles(paginator.getElements());
+	public Page<Article> readArticles(ArticleSearchRequest request, Pageable pageable) {
+		ArticleFullTextSearchTerm term = request.toFullTextSearchTerm();
+		term.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+		return articleRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm(), pageable);
 	}
-	
+
 	public List<Article> readArticles(Collection<Long> ids) {
 		Set<Article> results = new LinkedHashSet<Article>(articleRepository.findByIdIn(ids));
 		List<Article> articles = new ArrayList<>();
@@ -290,5 +289,23 @@ public class ArticleService {
 
 	public long countArticlesByStatus(Post.Status status, String language) {
 		return articleRepository.countByStatus(status, language);
+	}
+
+	public Map<Long, Long> countArticlesByAuthorIdGrouped(Post.Status status, String language) {
+		List<Map<String, Object>> results = articleRepository.countByAuthorIdGrouped(status, language);
+		Map<Long, Long> counts = new HashMap<>();
+		for (Map<String, Object> row : results) {
+			counts.put((Long) row.get("userId"), (Long) row.get("count"));
+		}
+		return counts;
+	}
+
+	public Map<Long, Long> countArticlesByCategoryIdGrouped(Post.Status status, String language) {
+		List<Map<String, Object>> results = articleRepository.countByCategoryIdGrouped(status, language);
+		Map<Long, Long> counts = new HashMap<>();
+		for (Map<String, Object> row : results) {
+			counts.put((Long) row.get("categoryId"), (Long) row.get("count"));
+		}
+		return counts;
 	}
 }
