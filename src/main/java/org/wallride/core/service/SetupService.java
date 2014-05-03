@@ -3,7 +3,6 @@ package org.wallride.core.service;
 import org.joda.time.LocalDateTime;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -49,9 +48,9 @@ public class SetupService {
 
 		User user = new User();
 		user.setLoginId(request.getLoginId());
-
-		StandardPasswordEncoder passwordEncoder = new StandardPasswordEncoder();
-		user.setLoginPassword(passwordEncoder.encode(request.getLoginPassword()));
+		
+		Md5PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
+		user.setLoginPassword(passwordEncoder.encodePassword(request.getLoginPassword(), null));
 
 		user.getName().setFirstName(request.getName().getFirstName());
 		user.getName().setLastName(request.getName().getLastName());
