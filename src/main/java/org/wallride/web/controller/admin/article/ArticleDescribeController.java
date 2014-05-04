@@ -41,13 +41,13 @@ public class ArticleDescribeController extends DomainObjectDescribeController<Ar
 		return super.requestMappingDescribe(id, pageable, model, session);
 	}
 
-	@RequestMapping(params="part=delete-dialog")
-	public String partDeleteDialog(
+	@RequestMapping(params = "part=delete-form")
+	public String partDeleteForm(
 			@PathVariable String language,
 			@RequestParam long id, Model model) {
 		Article article = articleService.readArticleById(id, language);
 		model.addAttribute("article", article);
-		return "/article/describe::#delete-dialog";
+		return "/article/describe::delete-form";
 	}
 
 	@Override

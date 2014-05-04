@@ -100,7 +100,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 				.setFetchMode("author", FetchMode.JOIN)
 				.setFetchMode("categories", FetchMode.JOIN);
 
-		Sort sort = new Sort(new SortField("date", SortField.STRING, true));
+		Sort sort = new Sort(
+				new SortField("date", SortField.STRING, true),
+				new SortField("id", SortField.LONG, true));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Article.class)

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -12,9 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
+import org.wallride.core.service.DuplicateCodeException;
+import org.wallride.core.service.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
@@ -79,20 +79,23 @@ public class ArticleEditController {
 
 		Article article = null;
 		try {
-			article = articleService.updateArticle(form.buildArticleUpdateRequest(), errors, Post.Status.DRAFT, authorizedUser);
+			article = articleService.saveArticleAsDraft(form.buildArticleUpdateRequest(), authorizedUser);
 		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				logger.debug("Errors: {}", errors);
-				return "/article/edit";
-			}
-			throw new RuntimeException(e);
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		return "redirect:/_admin/{language}/articles/edit?id={id}";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")
@@ -108,14 +111,81 @@ public class ArticleEditController {
 
 		Article article = null;
 		try {
-			article = articleService.updateArticle(form.buildArticleUpdateRequest(), errors, Post.Status.PUBLISHED, authorizedUser);
+			article = articleService.saveArticleAsPublished(form.buildArticleUpdateRequest(), authorizedUser);
 		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				logger.debug("Errors: {}", errors);
-				return "/article/edit";
-			}
-			throw new RuntimeException(e);
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/edit";
+		}
+
+		redirectAttributes.addFlashAttribute("savedArticle", article);
+		redirectAttributes.addAttribute("language", language);
+		redirectAttributes.addAttribute("id", article.getId());
+		return "redirect:/_admin/{language}/articles/describe?id={id}";
+	}
+
+	@RequestMapping(method=RequestMethod.POST, params="unpublish")
+	public String unpublish(
+			@PathVariable String language,
+			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
+			BindingResult errors,
+			AuthorizedUser authorizedUser,
+			RedirectAttributes redirectAttributes) {
+		if (errors.hasErrors()) {
+			return "/article/edit";
+		}
+
+		Article article = null;
+		try {
+			article = articleService.saveArticleAsUnpublished(form.buildArticleUpdateRequest(), authorizedUser);
+		}
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/edit";
+		}
+
+		redirectAttributes.addFlashAttribute("savedArticle", article);
+		redirectAttributes.addAttribute("language", language);
+		redirectAttributes.addAttribute("id", article.getId());
+		return "redirect:/_admin/{language}/articles/describe?id={id}";
+	}
+
+	@RequestMapping(method=RequestMethod.POST, params="update")
+	public String update(
+			@PathVariable String language,
+			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
+			BindingResult errors,
+			AuthorizedUser authorizedUser,
+			RedirectAttributes redirectAttributes) {
+		if (errors.hasErrors()) {
+			return "/article/edit";
+		}
+
+		Article article = null;
+		try {
+			article = articleService.saveArticle(form.buildArticleUpdateRequest(), authorizedUser);
+		}
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);

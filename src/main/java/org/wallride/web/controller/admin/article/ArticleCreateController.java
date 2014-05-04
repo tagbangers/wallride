@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +17,8 @@ import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
+import org.wallride.core.service.DuplicateCodeException;
+import org.wallride.core.service.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
@@ -75,20 +76,23 @@ public class ArticleCreateController {
 
 		Article article = null;
 		try {
-			article = articleService.createArticle(form.buildArticleCreateRequest(), errors, Post.Status.DRAFT, authorizedUser);
+			article = articleService.createArticle(form.buildArticleCreateRequest(), Post.Status.DRAFT, authorizedUser);
 		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				logger.debug("Errors: {}", errors);
-				return "/article/create";
-			}
-			throw new RuntimeException(e);
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/create";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		return "redirect:/_admin/{language}/articles/edit?id={id}";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")
@@ -104,14 +108,17 @@ public class ArticleCreateController {
 
 		Article article = null;
 		try {
-			article = articleService.createArticle(form.buildArticleCreateRequest(), errors, Post.Status.PUBLISHED, authorizedUser);
+			article = articleService.createArticle(form.buildArticleCreateRequest(), Post.Status.PUBLISHED, authorizedUser);
 		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				logger.debug("Errors: {}", errors);
-				return "/article/create";
-			}
-			throw new RuntimeException(e);
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/create";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);

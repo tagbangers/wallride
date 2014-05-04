@@ -1,19 +1,19 @@
 package org.wallride.core.domain;
 
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.IndexColumn;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.List;
+import java.util.SortedSet;
 
 @Entity
-@Table(name="post", uniqueConstraints=@UniqueConstraint(columnNames={"code", "language"}))
-@Inheritance(strategy= InheritanceType.JOINED)
+@Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language", "drafted_id"}))
+@Inheritance(strategy = InheritanceType.JOINED)
 @DynamicInsert
 @DynamicUpdate
 public class Post extends DomainObject<Long> {
@@ -57,6 +57,14 @@ public class Post extends DomainObject<Long> {
 	@Column(length=50, nullable=false)
 	@Field
 	private Status status;
+
+	@ManyToOne
+	private Post drafted;
+
+	@OneToMany(mappedBy = "drafted")
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	@SortNatural
+	private SortedSet<Post> drafts;
 
 	@ManyToMany
 	@JoinTable(name="post_media", joinColumns=@JoinColumn(name="post_id", referencedColumnName="id"), inverseJoinColumns=@JoinColumn(name="media_id", referencedColumnName="id"))
@@ -134,6 +142,22 @@ public class Post extends DomainObject<Long> {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public Post getDrafted() {
+		return drafted;
+	}
+
+	public void setDrafted(Post drafted) {
+		this.drafted = drafted;
+	}
+
+	public SortedSet<Post> getDrafts() {
+		return drafts;
+	}
+
+	public void setDrafts(SortedSet<Post> drafts) {
+		this.drafts = drafts;
 	}
 
 	public List<Media> getMedias() {

@@ -59,24 +59,18 @@ public class ArticleService {
 	private static Logger logger = LoggerFactory.getLogger(ArticleService.class); 
 
 	@CacheEvict(value="articles", allEntries=true)
-	public Article createArticle(ArticleCreateRequest request, BindingResult errors, Post.Status status, AuthorizedUser authorizedUser) throws BindException {
+	public Article createArticle(ArticleCreateRequest request, Post.Status status, AuthorizedUser authorizedUser) {
 		LocalDateTime now = new LocalDateTime();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
 			if (Post.Status.PUBLISHED.equals(status)) {
-				errors.rejectValue("code", "NotNull");
+				throw new EmptyCodeException();
 			}
 		}
-		else {
-			Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
-			if (duplicate != null) {
-				errors.rejectValue("code", "NotDuplicate");
-			}
-		}
-
-		if (errors.hasErrors()) {
-			throw new BindException(errors);
+		Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
+		if (duplicate != null) {
+			throw new DuplicateCodeException(request.getCode());
 		}
 
 		Article article = new Article();
@@ -89,11 +83,7 @@ public class ArticleService {
 		article.setCode(code);
 		article.setBody(request.getBody());
 
-		User author = entityManager.getReference(User.class, authorizedUser.getId());
-//		if (request.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, request.getAuthorId());
-//		}
-		article.setAuthor(author);
+		article.setAuthor(entityManager.getReference(User.class, authorizedUser.getId()));
 
 		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(status)) {
@@ -133,36 +123,87 @@ public class ArticleService {
 		return articleRepository.save(article);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
-	public Article updateArticle(ArticleUpdateRequest form, BindingResult errors, Post.Status status, AuthorizedUser authorizedUser) throws BindException {
-		LocalDateTime now = new LocalDateTime();
-		Article article = articleRepository.findByIdForUpdate(form.getId(), form.getLanguage());
-
-		String code = (form.getCode() != null) ? form.getCode() : form.getTitle();
-		if (!StringUtils.hasText(code)) {
-			if (Post.Status.PUBLISHED.equals(status)) {
-				errors.rejectValue("code", "NotNull");
-			}
+	@CacheEvict(value = "articles", allEntries = true)
+	public Article saveArticleAsDraft(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
+		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		if (!article.getStatus().equals(Post.Status.DRAFT)) {
+			ArticleCreateRequest createRequest = new ArticleCreateRequest.Builder()
+					.code(request.getCode())
+					.coverId(request.getCoverId())
+					.title(request.getTitle())
+					.body(request.getBody())
+					.authorId(request.getAuthorId())
+					.date(request.getDate())
+					.categoryIds(request.getCategoryIds())
+					.tagIds(request.getTagIds())
+					.language(request.getLanguage())
+					.build();
+			Article draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);
+			draft.setDrafted(article);
+			return articleRepository.save(draft);
 		}
 		else {
-			Article duplicate = articleRepository.findByCode(form.getCode(), form.getLanguage());
-			if (duplicate != null && !duplicate.equals(article)) {
-				errors.rejectValue("code", "NotDuplicate");
+			return saveArticle(request, authorizedUser);
+		}
+	}
+
+	@CacheEvict(value = "articles", allEntries = true)
+	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
+		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		if (article.getStatus().equals(Post.Status.DRAFT)) {
+			if (article.getDrafted() != null) {
+				articleRepository.delete((Article) article.getDrafted());
+			}
+			article.setDrafted(null);
+			article.getDrafts().clear();
+			article.setStatus(Post.Status.PUBLISHED);
+			articleRepository.save(article);
+		}
+		return saveArticle(request, authorizedUser);
+	}
+
+	@CacheEvict(value = "articles", allEntries = true)
+	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
+		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		if (!article.getStatus().equals(Post.Status.DRAFT)) {
+			article.setDrafted(null);
+			article.getDrafts().clear();
+			article.setStatus(Post.Status.DRAFT);
+			articleRepository.save(article);
+		}
+		return saveArticle(request, authorizedUser);
+	}
+
+//	@CacheEvict(value = "articles", allEntries = true)
+//	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
+//		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+//		return updateArticle(request, authorizedUser, article);
+//	}
+
+	@CacheEvict(value = "articles", allEntries = true)
+	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
+		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		LocalDateTime now = new LocalDateTime();
+
+		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		if (!StringUtils.hasText(code)) {
+			if (!Post.Status.DRAFT.equals(article.getStatus())) {
+				throw new EmptyCodeException();
 			}
 		}
-
-		if (errors.hasErrors()) {
-			throw new BindException(errors);
+		Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
+		if (duplicate != null && !duplicate.equals(article)) {
+			throw new DuplicateCodeException(request.getCode());
 		}
 
 		Media cover = null;
-		if (form.getCoverId() != null) {
-			cover = entityManager.getReference(Media.class, form.getCoverId());
+		if (request.getCoverId() != null) {
+			cover = entityManager.getReference(Media.class, request.getCoverId());
 		}
 		article.setCover(cover);
-		article.setTitle(form.getTitle());
+		article.setTitle(request.getTitle());
 		article.setCode(code);
-		article.setBody(form.getBody());
+		article.setBody(request.getBody());
 
 //		User author = null;
 //		if (request.getAuthorId() != null) {
@@ -170,29 +211,28 @@ public class ArticleService {
 //		}
 //		article.setAuthor(author);
 
-		LocalDateTime date = form.getDate();
-		if (Post.Status.PUBLISHED.equals(status)) {
+		LocalDateTime date = request.getDate();
+		if (Post.Status.PUBLISHED.equals(article.getStatus())) {
 			if (date == null) {
 				date = now.withTime(0, 0, 0, 0);
 			}
 			else if (date.isAfter(now)) {
-				status = Post.Status.SCHEDULED;
+				article.setStatus(Post.Status.SCHEDULED);
 			}
 		}
 		article.setDate(date);
-		article.setStatus(status);
-		article.setLanguage(form.getLanguage());
+		article.setLanguage(request.getLanguage());
 
 		article.getCategories().clear();
-		for (long categoryId : form.getCategoryIds()) {
+		for (long categoryId : request.getCategoryIds()) {
 			article.getCategories().add(entityManager.getReference(Category.class, categoryId));
 		}
 
 		List<Media> medias = new ArrayList<>();
-		if (StringUtils.hasText(form.getBody())) {
+		if (StringUtils.hasText(request.getBody())) {
 			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
-			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(form.getBody());
+			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
 				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
 				medias.add(media);
