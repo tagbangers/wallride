@@ -22,14 +22,18 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 			"from Article article " +
 			"left join fetch article.cover cover " +
 			"left join fetch article.author author " +
+			"left join fetch article.drafted drafted " +
 			"left join fetch article.categories category ";
 
 	@Query("select article.id from Article article order by article.date desc ")
 	List<Long> findId();
-	
+
 	@Query(DEFAULT_SELECT_QUERY + "where article.id in (:ids) ")
 	List<Article> findByIdIn(@Param("ids") Collection<Long> ids);
-	
+
+	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted order by article.id desc ")
+	List<Article> findByDrafted(@Param("drafted") Article drafted);
+
 	@Query(DEFAULT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
 	Article findById(@Param("id") Long id, @Param("language") String language);
 	
