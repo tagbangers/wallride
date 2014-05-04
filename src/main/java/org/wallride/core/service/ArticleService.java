@@ -66,13 +66,16 @@ public class ArticleService {
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
-			if (Post.Status.PUBLISHED.equals(status)) {
+			if (!status.equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
 			}
 		}
-		Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
-		if (duplicate != null) {
-			throw new DuplicateCodeException(request.getCode());
+
+		if (!status.equals(Post.Status.DRAFT)) {
+			Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
+			if (duplicate != null) {
+				throw new DuplicateCodeException(request.getCode());
+			}
 		}
 
 		Article article = new Article();

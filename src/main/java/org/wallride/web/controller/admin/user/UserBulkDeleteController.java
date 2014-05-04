@@ -40,7 +40,6 @@ public class UserBulkDeleteController {
 	public String delete(
 			@Valid @ModelAttribute("form") UserBulkDeleteForm form,
 			BindingResult errors,
-			@RequestParam(required=false) String token,
 			AuthorizedUser authorizedUser,
 			HttpServletRequest request,
 			RedirectAttributes redirectAttributes,
@@ -73,7 +72,6 @@ public class UserBulkDeleteController {
 			}
 		}
 		
-		redirectAttributes.addAttribute("token", token);
 		redirectAttributes.addFlashAttribute("deletedArticles", users);
 		redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
 		return "redirect:/_admin/user/?token={token}";

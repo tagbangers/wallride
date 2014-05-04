@@ -28,7 +28,9 @@ public abstract class DomainObjectSearchController<D extends DomainObject, F ext
 			condition = new DomainObjectSearchCondition<>(session, form, pageable);
 		}
 		if (!validateCondition(condition, request, response)) {
-			return getRedirectViewName();
+			F form = getDomainObjectSearchFormClass().newInstance();
+			Pageable pageable = new PageRequest(0, 50);
+			condition = new DomainObjectSearchCondition<>(session, form, pageable);
 		}
 		Page<D> domainObjects = readDomainObjects(condition.getForm(), condition.getPageable());
 		model.addAttribute(getModelAttributeName(), domainObjects);

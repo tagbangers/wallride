@@ -139,8 +139,41 @@
 							<div class="tools clearfix">
 								<div class="pull-left">
 									<div class="btn-group">
-										<button name="draft" class="btn btn-default" th:text="#{SaveDraft}">Save Draft</button>
+										<button id="save-draft-button" name="draft" class="btn btn-default" data-loading-text="Saving..." th:text="#{SaveDraft}">Save Draft</button>
 									</div>
+									<script>
+										$(document).ready(function() {
+											$('#save-draft-button').click(function(e) {
+												var $this = $(this);
+												$this.button('loading');
+												var $form = $this.closest('form');
+												$(':input[name="body"]', $form).val($('#main :input[name="body"]').redactor('get'));
+												var data = $form.serializeArray();
+												data.push({name: 'draft', value: 1});
+												$.ajax({
+													type: "POST",
+													url: $form.attr('action'),
+													data: data,
+													success: function() {
+														history.replaceState(null, null, './test');
+														new PNotify({
+															icon: false,
+															title: 'Saved as draft',
+															type: 'success',
+															delay: 3000,
+															buttons: {
+																sticker: false
+															}
+														});
+													},
+													complete: function() {
+														$this.button('reset');
+													}
+												});
+												return false;
+											});
+										});
+									</script>
 								</div>
 								<div class="pull-right">
 									<div class="btn-group">
@@ -150,15 +183,15 @@
 												<span class="caret"></span>
 												<span class="sr-only">Toggle Dropdown</span>
 											</button>
-											<ul id="save-menu" class="dropdown-menu" role="menu">
-												<li><a href="#" data-name="publish">Publish</a></li>
-												<li><a href="#" data-name="unpublish">Unpublish</a></li>
+											<ul id="save-menu" class="dropdown-menu pull-right" role="menu">
+												<li><a href="#" data-name="publish" th:text="#{Publish}">Publish</a></li>
+												<li><a href="#" data-name="unpublish" th:text="#{Unpublish}">Unpublish</a></li>
 											</ul>
 											<script>
 												$(document).ready(function() {
 													$('#save-menu a').click(function() {
-														$this = $(this);
-														$target = $this.closest('.btn-group').children('button:first');
+														var $this = $(this);
+														var $target = $this.closest('.btn-group').children('button:first');
 														$target.text($this.text());
 														$target.attr('name', $this.data('name'));
 													});
@@ -166,8 +199,6 @@
 											</script>
 										</th:block>
 									</div>
-
-
 								</div>
 							</div>
 							<div class="clearfix wr-tool-check">

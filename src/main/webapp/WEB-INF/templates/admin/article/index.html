@@ -149,7 +149,8 @@
 										$(this).closest('tr').removeClass('warning');
 									}
 									var checkedSomeone = false;
-									$(this).each(function(i, e) {
+									console.dir($(this));
+									$('#main .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
 										if ($(e).prop('checked')) {
 											checkedSomeone = true;
 											return;
