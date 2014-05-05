@@ -31,7 +31,7 @@ public class PageCreateForm extends DomainObjectCreateForm {
 	
 	private Long parentId;
 	
-	private Post.Status status;
+//	private Post.Status status;
 	
 	@NotNull
 	private String language;
@@ -88,13 +88,13 @@ public class PageCreateForm extends DomainObjectCreateForm {
 		this.parentId = parentId;
 	}
 	
-	public Post.Status getStatus() {
-		return status;
-	}
-	
-	public void setStatus(Post.Status status) {
-		this.status = status;
-	}
+//	public Post.Status getStatus() {
+//		return status;
+//	}
+//
+//	public void setStatus(Post.Status status) {
+//		this.status = status;
+//	}
 
 	public String getLanguage() {
 		return language;
@@ -114,7 +114,7 @@ public class PageCreateForm extends DomainObjectCreateForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
-				.status(status)
+//				.status(status)
 				.language(language)
 				.build();
 	}

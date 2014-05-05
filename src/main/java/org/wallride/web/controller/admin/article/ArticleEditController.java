@@ -49,7 +49,7 @@ public class ArticleEditController {
 	}
 
 	@ModelAttribute("categoryTree")
-	public CategoryTree categoryTree(@PathVariable String language) {
+	public CategoryTree setupCategoryTree(@PathVariable String language) {
 		return categoryService.readCategoryTree(language);
 	}
 

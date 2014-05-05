@@ -36,7 +36,7 @@ public class PageEditForm extends DomainObjectEditForm {
 
 	private Long parentId;
 	
-	private Post.Status status;
+//	private Post.Status status;
 	
 	@NotNull
 	private String language;
@@ -105,13 +105,13 @@ public class PageEditForm extends DomainObjectEditForm {
 		this.parentId = parentId;
 	}
 	
-	public Post.Status getStatus() {
-		return status;
-	}
-	
-	public void setStatus(Post.Status status) {
-		this.status = status;
-	}
+//	public Post.Status getStatus() {
+//		return status;
+//	}
+//
+//	public void setStatus(Post.Status status) {
+//		this.status = status;
+//	}
 	
 	public String getLanguage() {
 		return language;
@@ -132,7 +132,7 @@ public class PageEditForm extends DomainObjectEditForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
-				.status(status)
+//				.status(status)
 				.language(language)
 				.build();
 	}

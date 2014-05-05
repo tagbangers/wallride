@@ -65,7 +65,7 @@
 						<div class="search-result-header clearfix">
 							<div class="btn-toolbar wr-bulk-action pull-left">
 								<div class="btn-group">
-									<a th:href="@{__${ADMIN_PATH}__/pages/index(part=bulk-delete-dialog)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+									<a th:href="@{__${ADMIN_PATH}__/pages/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 								</div>
 							</div>
 							<div class="pagination-group pull-right">
@@ -104,7 +104,7 @@
 						<!-- #bulk-delete-modal -->
 						<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 							<div id="bulk-delete-dialog" class="modal-dialog">
-								<div class="modal-content">
+								<div th:fragment="bulk-delete-form" class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 										<h4 class="modal-title">Delete Pages</h4>

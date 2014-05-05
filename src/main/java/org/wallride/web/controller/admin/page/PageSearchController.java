@@ -79,9 +79,9 @@ public class PageSearchController extends DomainObjectSearchController<Page, Pag
 		return super.requestMappingSearch(form, result, model, session, redirectAttributes);
 	}
 
-	@RequestMapping(params="part=bulk-delete-dialog")
+	@RequestMapping(params="part=bulk-delete-form")
 	public String partBulkDeleteDialog() {
-		return "/page/index::#bulk-delete-dialog";
+		return "/page/index::bulk-delete-form";
 	}
 
 	@Override

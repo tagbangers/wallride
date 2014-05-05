@@ -1,6 +1,7 @@
 package org.wallride.core.service;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -126,10 +127,12 @@ public class CategoryService {
 		return category;
 	}
 
+	@Cacheable(value = "articles", key = "'category.tree.' + #language")
 	public CategoryTree readCategoryTree(String language) {
 		return readCategoryTree(language, false);
 	}
 
+	@Cacheable(value = "articles", key = "'category.tree.' + #language + '.' + #hasArticle")
 	public CategoryTree readCategoryTree(String language, boolean hasArticle) {
 		List<Category> categories = null;
 		if (!hasArticle) {

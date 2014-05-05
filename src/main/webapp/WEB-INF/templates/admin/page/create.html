@@ -15,7 +15,7 @@
 					<li class="active" th:text="#{AddNewPage}">Add new page</li>
 				</ol>
 				<form th:fragment="form(title,id)" th:action="@{__${ADMIN_PATH}__/pages/create}" th:object="${form}" action="#" method="post">
-					<input type="hidden" name="id" th:if="${id} ne null" th:value="${id}"  />
+					<input type="hidden" name="id" th:value="${page}? ${page.id} : ''"  />
 					<div class="row">
 						<div class="col-sm-9">
 							<div class="page-header clearfix">
@@ -28,6 +28,10 @@
 							<div class="alert alert-danger" th:if="${#fields.hasErrors('all')}">
 								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 								Error.
+							</div>
+							<div class="alert alert-info" th:if="${draft} ne null">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<span th:text="#{YouHaveDraft}">You have draft.</span><a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${draft.drafted.id},draft)}"><span th:text="#{CopyDraft}">Copy draft</span></a>
 							</div>
 							<fieldset>
 								<div class="form-group">
@@ -139,12 +143,68 @@
 							<div class="tools clearfix">
 								<div class="pull-left">
 									<div class="btn-group">
-										<button name="draft" class="btn btn-default" th:text="#{SaveDraft}">Save Draft</button>
+										<button id="save-draft-button" name="draft" class="btn btn-default" data-loading-text="Saving..." th:text="#{SaveDraft}">Save Draft</button>
 									</div>
+									<script th:inline="javascript">
+										$(document).ready(function() {
+											$('#save-draft-button').click(function(e) {
+												var $this = $(this);
+												$this.button('loading');
+												var $form = $this.closest('form');
+												$(':input[name="body"]', $form).val($('#main :input[name="body"]').redactor('get'));
+												var data = $form.serializeArray();
+												data.push({name: 'draft', value: 1});
+												$.ajax({
+													type: "POST",
+													url: $form.attr('action'),
+													data: data,
+													success: function(data) {
+														$form.children(':input[name="id"]').val(data.id);
+														$form.attr('action', [[@{__${ADMIN_PATH}__/pages/edit}]]);
+														var url = [[@{__${ADMIN_PATH}__/pages/edit?id=}]] + data.id;
+														history.replaceState(null, null, url);
+														new PNotify({
+															icon: false,
+															title: 'Saved as draft',
+															type: 'success',
+															delay: 3000,
+															buttons: {
+																sticker: false
+															}
+														});
+													},
+													complete: function() {
+														$this.button('reset');
+													}
+												});
+												return false;
+											});
+										});
+									</script>
 								</div>
 								<div class="pull-right">
 									<div class="btn-group">
 										<button name="publish" class="btn btn-primary" th:text="#{Publish}">Publish</button>
+										<th:block th:if="${page} ne null and ${#strings.toString(page.status)} ne 'DRAFT'">
+											<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+												<span class="caret"></span>
+												<span class="sr-only">Toggle Dropdown</span>
+											</button>
+											<ul id="save-menu" class="dropdown-menu pull-right" role="menu">
+												<li><a href="#" data-name="publish" th:text="#{Publish}">Publish</a></li>
+												<li><a href="#" data-name="unpublish" th:text="#{Unpublish}">Unpublish</a></li>
+											</ul>
+											<script>
+												$(document).ready(function() {
+													$('#save-menu a').click(function() {
+														var $this = $(this);
+														var $target = $this.closest('.btn-group').children('button:first');
+														$target.text($this.text());
+														$target.attr('name', $this.data('name'));
+													});
+												});
+											</script>
+										</th:block>
 									</div>
 								</div>
 							</div>
@@ -175,7 +235,7 @@
 								});
 							</script>
 							<fieldset>
-								<legend th:text="#{Date}">公開日</legend>
+								<legend th:text="#{Date}">Date</legend>
 								<div class="form-group row" th:classappend="${#fields.hasErrors('date')}? has-error">
 									<div class="col-sm-12">
 										<input type="text" name="date" th:value="*{date ne null ? date.toString('yyyy/MM/dd') : ''}" class="form-control" placeholder="yyyy/MM/dd"/>
@@ -184,7 +244,7 @@
 								</div>
 							</fieldset>
 							<fieldset>
-								<legend th:text="#{ParentPage}">親ページ</legend>
+								<legend th:text="#{ParentPage}">Parent Page</legend>
 								<div class="form-group">
 									<select name="parentId" class="form-control" th:field="*{parentId}" >
 										<option value="">Select Parent Page</option>

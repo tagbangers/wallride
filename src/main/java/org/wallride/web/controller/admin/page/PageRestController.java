@@ -13,6 +13,7 @@ import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.PageTree;
+import org.wallride.core.domain.Post;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectDeletedModel;
@@ -65,11 +66,11 @@ public class PageRestController {
 		if (result.hasErrors()) {
 			throw new BindException(result);
 		}
-		Page page = pageService.createPage(form.buildPageCreateRequest(), result, authorizedUser);
+		Page page = pageService.createPage(form.buildPageCreateRequest(), Post.Status.DRAFT, authorizedUser);
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("savedPage", page);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectSavedModel<Long>(page);
+		return new DomainObjectSavedModel<>(page);
 	}
 
 //	@RequestMapping(value="/{language}/pages/{id}", method=RequestMethod.POST)

@@ -43,6 +43,8 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
 
+		junction.must(qb.keyword().onField("drafted").ignoreAnalyzer().matching("_null_").createQuery());
+
 		if (StringUtils.hasText(term.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
@@ -82,7 +84,6 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Page.class)
 				.setCriteriaQuery(criteria)
-//				.setProjection("id")
 				.setSort(sort);
 		persistenceQuery.setFirstResult(pageable.getOffset());
 		persistenceQuery.setMaxResults(pageable.getPageSize());
