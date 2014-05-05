@@ -102,7 +102,7 @@ public class ArticleEditController {
 			return "redirect:/_admin/{language}/articles/edit?id={id}";
 		}
 
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft);
 		model.addAttribute("form", form);
 
 		return "/article/edit";
