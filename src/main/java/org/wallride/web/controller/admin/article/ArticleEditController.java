@@ -2,8 +2,11 @@ package org.wallride.web.controller.admin.article;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +19,8 @@ import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.DuplicateCodeException;
 import org.wallride.core.service.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -33,6 +38,9 @@ public class ArticleEditController {
 	@Inject
 	private CategoryService categoryService;
 
+	@Inject
+	private MessageSourceAccessor messageSourceAccessor;
+
 	@ModelAttribute("article")
 	public Article setupArticle(
 			@PathVariable String language,
@@ -43,6 +51,14 @@ public class ArticleEditController {
 	@ModelAttribute("categoryTree")
 	public CategoryTree categoryTree(@PathVariable String language) {
 		return categoryService.readCategoryTree(language);
+	}
+
+	@ExceptionHandler(BindException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public @ResponseBody
+	RestValidationErrorModel bindException(BindException e) {
+		logger.debug("BindException", e);
+		return RestValidationErrorModel.fromBindingResult(e.getBindingResult(), messageSourceAccessor);
 	}
 
 	@RequestMapping(method=RequestMethod.GET)
@@ -90,16 +106,16 @@ public class ArticleEditController {
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
-	public String saveAsDraft(
+	public @ResponseBody DomainObjectSavedModel saveAsDraft(
 			@PathVariable String language,
 			@Validated @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
-			AuthorizedUser authorizedUser,
-			RedirectAttributes redirectAttributes) {
+			AuthorizedUser authorizedUser)
+			throws BindException {
 		if (errors.hasErrors()) {
 			for (ObjectError error : errors.getAllErrors()) {
 				if (!"validation.NotNull".equals(error.getCode())) {
-					return "/article/edit";
+					throw new BindException(errors);
 				}
 			}
 		}
@@ -116,13 +132,10 @@ public class ArticleEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/article/edit";
+			throw new BindException(errors);
 		}
 
-		redirectAttributes.addFlashAttribute("savedArticle", article);
-		redirectAttributes.addAttribute("language", language);
-		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/edit?id={id}";
+		return new DomainObjectSavedModel<>(article);
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")

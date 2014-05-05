@@ -15,7 +15,7 @@
 					<li class="active" th:text="#{AddNewArticle}">Add new article</li>
 				</ol>
 				<form id="article-create-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
-					<input type="hidden" name="id" th:if="${article} ne null" th:value="${article.id}"  />
+					<input type="hidden" name="id" th:value="${article}? ${article.id} : ''"  />
 					<div class="row">
 						<div class="col-sm-9 wr-post-main">
 							<div class="page-header">
@@ -145,7 +145,7 @@
 									<div class="btn-group">
 										<button id="save-draft-button" name="draft" class="btn btn-default" data-loading-text="Saving..." th:text="#{SaveDraft}">Save Draft</button>
 									</div>
-									<script>
+									<script th:inline="javascript">
 										$(document).ready(function() {
 											$('#save-draft-button').click(function(e) {
 												var $this = $(this);
@@ -158,8 +158,11 @@
 													type: "POST",
 													url: $form.attr('action'),
 													data: data,
-													success: function() {
-														history.replaceState(null, null, './test');
+													success: function(data) {
+														$form.children(':input[name="id"]').val(data.id);
+														$form.attr('action', [[@{__${ADMIN_PATH}__/articles/edit}]]);
+														var url = [[@{__${ADMIN_PATH}__/articles/edit?id=}]] + data.id;
+														history.replaceState(null, null, url);
 														new PNotify({
 															icon: false,
 															title: 'Saved as draft',
