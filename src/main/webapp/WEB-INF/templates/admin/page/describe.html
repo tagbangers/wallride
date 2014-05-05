@@ -86,12 +86,12 @@
 							</ul>
 							</dd>
 						</dl>
-						<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-dialog,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
+						<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
 						<!-- #delete-modal -->
 						<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 							<div id="delete-dialog" class="modal-dialog">
 								<form th:action="@{__${ADMIN_PATH}__/pages/delete(id=${page.id})}" method="post">
-									<div class="modal-content">
+									<div th:fragment="delete-form" class="modal-content">
 										<div class="modal-header">
 											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 											<h4 class="modal-title" th:text="#{DeletePage}">ページを削除</h4>

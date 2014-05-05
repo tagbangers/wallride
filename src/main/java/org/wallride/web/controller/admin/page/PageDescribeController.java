@@ -40,13 +40,13 @@ public class PageDescribeController extends DomainObjectDescribeController<Page,
 		return super.requestMappingDescribe(id, pageable, model, session);
 	}
 
-	@RequestMapping(params="part=delete-dialog")
+	@RequestMapping(params="part=delete-form")
 	public String partDeleteDialog(
 			@PathVariable String language,
 			@RequestParam long id, Model model) {
 		Page page = pageService.readPageById(id, language);
 		model.addAttribute("page", page);
-		return "/page/describe::#delete-dialog";
+		return "/page/describe::delete-form";
 	}
 
 	@Override

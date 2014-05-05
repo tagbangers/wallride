@@ -68,9 +68,9 @@ public class UserSearchController extends DomainObjectSearchController<User, Use
 		return super.requestMappingSearch(form, result, model, session, redirectAttributes);
 	}
 
-	@RequestMapping(params="part=bulk-delete-dialog")
+	@RequestMapping(params="part=bulk-delete-form")
 	public String partBulkDeleteDialog() {
-		return "/user/index::#bulk-delete-dialog";
+		return "/user/index::bulk-delete-form";
 	}
 
 	@Override
