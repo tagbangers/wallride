@@ -110,6 +110,7 @@ public class ArticleEditController {
 			@PathVariable String language,
 			@Validated @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
+			Model model,
 			AuthorizedUser authorizedUser)
 			throws BindException {
 		if (errors.hasErrors()) {
@@ -120,9 +121,9 @@ public class ArticleEditController {
 			}
 		}
 
-		Article article = null;
+		Article article = (Article) model.asMap().get("article");
 		try {
-			article = articleService.saveArticleAsDraft(form.buildArticleUpdateRequest(), authorizedUser);
+			articleService.saveArticleAsDraft(form.buildArticleUpdateRequest(), authorizedUser);
 		}
 		catch (EmptyCodeException e) {
 			errors.rejectValue("code", "NotNull");
