@@ -96,7 +96,7 @@
 									<td th:class="'wr-post-status-' + ${page.status}" th:text="${#messages.msg('Post.Status.' + page.status)}">Status</td>
 									<td th:text="${page.title?:'(No Titled)'}" style="font-weight: bold;">事務所移転のお知らせ</td>
 									<td><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a></td>
-									<td th:text="${page.date ne null ? page.date.toString('yyyy/MM/dd (E)') : ''}">yyyy/mm/dd (E)</td>
+									<td th:text="${page.date ne null ? page.date.toString('yyyy/MM/dd (E)', #locale) : ''}">yyyy/mm/dd (E)</td>
 									<td><a th:attr="href=@{__${ADMIN_PATH}__/pages/edit(id=${page.id},token=${token})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 								</tr>
 							</tbody>
