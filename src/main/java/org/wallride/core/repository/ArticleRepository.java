@@ -31,8 +31,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Query(DEFAULT_SELECT_QUERY + "where article.id in (:ids) ")
 	List<Article> findByIdIn(@Param("ids") Collection<Long> ids);
 
-	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted order by article.id desc ")
-	List<Article> findByDrafted(@Param("drafted") Article drafted);
+//	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted order by article.id desc ")
+//	List<Article> findByDrafted(@Param("drafted") Article drafted);
 
 	@Query(DEFAULT_SELECT_QUERY + "where regexp(article.code, :regex) = 1 and article.language = :language ")
 	List<Article> findByCodeRegex(@Param("regex") String regex, @Param("language") String language);
@@ -47,7 +47,10 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Query(DEFAULT_SELECT_QUERY + "where article.code = :code and article.language = :language ")
 	Article findByCode(@Param("code") String code, @Param("language") String language);
 
-	@Query("select count(article.id) from Article article where article.language = :language ")
+	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted and article.id = (select max(article.id) from article where article.drafted = :drafted) ")
+	Article findDraft(@Param("drafted") Article drafted);
+
+	@Query("select count(article.id) from Article article where article.language = :language and article.drafted is null ")
 	long count(@Param("language") String language);
 
 	@Query("select count(article.id) from Article article where article.status = :status and article.language = :language and article.drafted is null ")

@@ -34,7 +34,7 @@ public class ArticleEditController {
 	private CategoryService categoryService;
 
 	@ModelAttribute("article")
-	public Article article(
+	public Article setupArticle(
 			@PathVariable String language,
 			@RequestParam long id) {
 		return articleService.readArticleById(id, language);
@@ -59,11 +59,38 @@ public class ArticleEditController {
 
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
 		model.addAttribute("form", form);
+
+		Article draft = articleService.readDraftById(id);
+		model.addAttribute("draft", draft);
+
+		return "/article/edit";
+	}
+
+	@RequestMapping(method=RequestMethod.GET, params="draft")
+	public String editDraft(
+			@PathVariable String language,
+			@RequestParam long id,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		Article article = (Article) model.asMap().get("article");
+		if (!language.equals(article.getLanguage())) {
+			redirectAttributes.addAttribute("language", language);
+			return "redirect:/_admin/{language}/articles/index";
+		}
+
+		Article draft = articleService.readDraftById(id);
+		if (draft != null) {
+			article = draft;
+		}
+
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
+		model.addAttribute("form", form);
+
 		return "/article/edit";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
-	public String draft(
+	public String saveAsDraft(
 			@PathVariable String language,
 			@Validated @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
@@ -99,7 +126,7 @@ public class ArticleEditController {
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")
-	public String publish(
+	public String saveAsPublished(
 			@PathVariable String language,
 			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
@@ -131,7 +158,7 @@ public class ArticleEditController {
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="unpublish")
-	public String unpublish(
+	public String saveAsUnpublished(
 			@PathVariable String language,
 			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,

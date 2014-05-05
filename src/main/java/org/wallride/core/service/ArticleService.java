@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -31,7 +30,6 @@ import org.wallride.core.support.Settings;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.lang.invoke.CallSite;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -141,8 +139,8 @@ public class ArticleService {
 	public Article saveArticleAsDraft(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			List<Article> drafts = articleRepository.findByDrafted(article);
-			if (CollectionUtils.isEmpty(drafts)) {
+			Article draft = articleRepository.findDraft(article);
+			if (draft == null) {
 				ArticleCreateRequest createRequest = new ArticleCreateRequest.Builder()
 						.code(request.getCode())
 						.coverId(request.getCoverId())
@@ -154,12 +152,11 @@ public class ArticleService {
 						.tagIds(request.getTagIds())
 						.language(request.getLanguage())
 						.build();
-				Article draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);
+				draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);
 				draft.setDrafted(article);
 				return articleRepository.save(draft);
 			}
 			else {
-				Article draft = drafts.get(0);
 				ArticleUpdateRequest updateRequest = new ArticleUpdateRequest.Builder()
 						.id(draft.getId())
 						.code(request.getCode())
@@ -358,6 +355,10 @@ public class ArticleService {
 
 	public Article readArticleByCode(String code, String language) {
 		return articleRepository.findByCode(code, language);
+	}
+
+	public Article readDraftById(long id) {
+		return articleRepository.findDraft(entityManager.getReference(Article.class, id));
 	}
 
 	public long countArticles(String language) {
