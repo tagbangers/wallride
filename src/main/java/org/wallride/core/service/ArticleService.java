@@ -79,13 +79,22 @@ public class ArticleService {
 		}
 
 		Article article = new Article();
+
+		if (!status.equals(Post.Status.DRAFT)) {
+			article.setCode(code);
+			article.setDraftedCode(null);
+		}
+		else {
+			article.setCode(null);
+			article.setDraftedCode(code);
+		}
+
 		Media cover = null;
 		if (request.getCoverId() != null) {
 			cover = entityManager.getReference(Media.class, request.getCoverId());
 		}
 		article.setCover(cover);
 		article.setTitle(request.getTitle());
-		article.setCode(code);
 		article.setBody(request.getBody());
 
 		article.setAuthor(entityManager.getReference(User.class, authorizedUser.getId()));
@@ -198,12 +207,6 @@ public class ArticleService {
 		return saveArticle(request, authorizedUser);
 	}
 
-//	@CacheEvict(value = "articles", allEntries = true)
-//	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-//		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-//		return updateArticle(request, authorizedUser, article);
-//	}
-
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
@@ -211,13 +214,24 @@ public class ArticleService {
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
-			if (!Post.Status.DRAFT.equals(article.getStatus())) {
+			if (!article.getStatus().equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
 			}
 		}
-		Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
-		if (duplicate != null && !duplicate.equals(article)) {
-			throw new DuplicateCodeException(request.getCode());
+		if (!article.getStatus().equals(Post.Status.DRAFT)) {
+			Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
+			if (duplicate != null && !duplicate.equals(article)) {
+				throw new DuplicateCodeException(request.getCode());
+			}
+		}
+
+		if (!article.getStatus().equals(Post.Status.DRAFT)) {
+			article.setCode(code);
+			article.setDraftedCode(null);
+		}
+		else {
+			article.setCode(null);
+			article.setDraftedCode(code);
 		}
 
 		Media cover = null;
@@ -226,7 +240,6 @@ public class ArticleService {
 		}
 		article.setCover(cover);
 		article.setTitle(request.getTitle());
-		article.setCode(code);
 		article.setBody(request.getBody());
 
 //		User author = null;

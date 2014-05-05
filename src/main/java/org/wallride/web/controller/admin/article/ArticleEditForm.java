@@ -5,6 +5,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Category;
+import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleUpdateRequest;
 import org.wallride.web.support.DomainObjectEditForm;
 
@@ -141,6 +142,9 @@ public class ArticleEditForm extends DomainObjectEditForm {
 	public static ArticleEditForm fromDomainObject(Article article) {
 		ArticleEditForm form = new ArticleEditForm();
 		BeanUtils.copyProperties(article, form);
+		if (article.getStatus().equals(Post.Status.DRAFT)) {
+			form.setCode(article.getDraftedCode());
+		}
 		form.setCoverId(article.getCover() != null ? article.getCover().getId() : null);
 		for (Category category : article.getCategories()) {
 			form.getCategoryIds().add(category.getId());

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.SortedSet;
 
 @Entity
-@Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language", "drafted_id"}))
+@Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
 @Inheritance(strategy = InheritanceType.JOINED)
 @DynamicInsert
 @DynamicUpdate
@@ -60,6 +60,9 @@ public class Post extends DomainObject<Long> {
 
 	@ManyToOne
 	private Post drafted;
+
+	@Column(name = "drafted_code", length = 200)
+	private String draftedCode;
 
 	@OneToMany(mappedBy = "drafted")
 	@LazyCollection(LazyCollectionOption.EXTRA)
@@ -150,6 +153,14 @@ public class Post extends DomainObject<Long> {
 
 	public void setDrafted(Post drafted) {
 		this.drafted = drafted;
+	}
+
+	public String getDraftedCode() {
+		return draftedCode;
+	}
+
+	public void setDraftedCode(String draftedCode) {
+		this.draftedCode = draftedCode;
 	}
 
 	public SortedSet<Post> getDrafts() {

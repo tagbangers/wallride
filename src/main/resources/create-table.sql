@@ -76,6 +76,7 @@ create table post (
 	author_id bigint,
 	status varchar(50) not null,
 	drafted_id bigint,
+	drafted_code varchar(200),
 	created_at datetime not null,
 	created_by varchar(100),
 	updated_at datetime not null,
@@ -209,7 +210,7 @@ alter table page
 	references post (id);
 
 alter table post
-	add constraint UK_9awc6gvqyqbkh45ta3dq3vti  unique (code, language, drafted_id);
+	add constraint UK_9awc6gvqyqbkh45ta3dq3vti  unique (code, language);
 
 alter table post
 	add index FK_ik65bluepv8oxdfvgbj5qdcsj (author_id),

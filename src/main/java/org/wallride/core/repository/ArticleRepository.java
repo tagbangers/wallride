@@ -34,6 +34,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted order by article.id desc ")
 	List<Article> findByDrafted(@Param("drafted") Article drafted);
 
+	@Query(DEFAULT_SELECT_QUERY + "where regexp(article.code, :regex) = 1 and article.language = :language ")
+	List<Article> findByCodeRegex(@Param("regex") String regex, @Param("language") String language);
+
 	@Query(DEFAULT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
 	Article findById(@Param("id") Long id, @Param("language") String language);
 	

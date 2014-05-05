@@ -1,7 +1,6 @@
 package org.wallride.config;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
@@ -22,7 +21,6 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.jndi.JndiTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
@@ -35,7 +33,6 @@ import org.springframework.web.util.UriUtils;
 import org.wallride.core.domain.DomainObject;
 
 import javax.inject.Inject;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
@@ -131,7 +128,7 @@ public class DataConfig implements BatchConfigurer {
 		entityManager.setJpaVendorAdapter(vendorAdapter);
 		
 		Properties properties = new Properties();
-		properties.put("hibernate.dialect", MySQL5InnoDBDialect.class.getCanonicalName());
+		properties.put("hibernate.dialect", ExtendedMySQL5InnoDBDialect.class.getCanonicalName());
 		properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
 		properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
 
