@@ -251,62 +251,62 @@
 							</fieldset>
 						</div>
 					</div>
-				</form>
-				<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content"></div>
+					<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content"></div>
+						</div>
 					</div>
-				</div>
-				<script th:inline="javascript">
-					$(function() {
-						$('#main').on('click', '#save-category', function(e) {
-							e.preventDefault();
-							var self = $(this);
-							self.button('loading');
-							var checked = [];
-							$('input[name="categoryIds"]:checked', '#article-create-form').each(function(i, element) {
-								checked.push($(element).val());
-							});
-							var form = self.closest('form');
-							var data = {
-								parentId: $(':input[name="parentId"]', form).val(),
-								code: $(':input[name="code"]', form).val(),
-								name: $(':input[name="name"]', form).val(),
-								description: $(':input[name="description"]', form).val()
-							};
-							$.ajax({
-								url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
-								type: 'post',
-								data: data,
-								success: function(savedCategory) {
-									checked.push(savedCategory.id.toString());
-									$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
-										data = $(data);
-										$(':input[name="categoryIds"]', data).each(function(i, element) {
-											if ($.inArray($(element).val(), checked) != -1) {
-												$(element).prop('checked', true);
-											}
+					<script th:inline="javascript">
+						$(function() {
+							$('#main').on('click', '#save-category', function(e) {
+								e.preventDefault();
+								var self = $(this);
+								self.button('loading');
+								var checked = [];
+								$('input[name="categoryIds"]:checked', '#article-create-form').each(function(i, element) {
+									checked.push($(element).val());
+								});
+								var form = self.closest('form');
+								var data = {
+									parentId: $(':input[name="parentId"]', form).val(),
+									code: $(':input[name="code"]', form).val(),
+									name: $(':input[name="name"]', form).val(),
+									description: $(':input[name="description"]', form).val()
+								};
+								$.ajax({
+									url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+									type: 'post',
+									data: data,
+									success: function(savedCategory) {
+										checked.push(savedCategory.id.toString());
+										$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
+											data = $(data);
+											$(':input[name="categoryIds"]', data).each(function(i, element) {
+												if ($.inArray($(element).val(), checked) != -1) {
+													$(element).prop('checked', true);
+												}
+											});
+											$('#category-fieldset').html(data);
 										});
-										$('#category-fieldset').html(data);
-									});
-									self.closest('.modal').modal('hide');
-								},
-								error: function(jqXHR) {
-									$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-										var field = $(':input[name="' + field + '"]', form);
-										$(field).closest('.form-group').addClass('has-error');
-									});
-								},
-								complete: function() {
-									$(self).button('reset');
-								}
+										self.closest('.modal').modal('hide');
+									},
+									error: function(jqXHR) {
+										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+											var field = $(':input[name="' + field + '"]', form);
+											$(field).closest('.form-group').addClass('has-error');
+										});
+									},
+									complete: function() {
+										$(self).button('reset');
+									}
+								});
+							});
+							$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
+								$(this).removeData('bs.modal');
 							});
 						});
-						$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
-							$(this).removeData('bs.modal');
-						});
-					});
-				</script>
+					</script>
+				</form>
 			</div>
 		</div>
 		<footer>
