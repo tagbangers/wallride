@@ -90,11 +90,13 @@ public class PageEditController {
 		}
 
 		Page draft = pageService.readDraftById(id);
-		if (draft != null) {
-			page = draft;
+		if (draft == null) {
+			redirectAttributes.addAttribute("language", language);
+			redirectAttributes.addAttribute("id", id);
+			return "redirect:/_admin/{language}/pages/edit?id={id}";
 		}
 
-		PageEditForm form = PageEditForm.fromDomainObject(page);
+		PageEditForm form = PageEditForm.fromDomainObject(draft);
 		model.addAttribute("form", form);
 
 		return "/page/edit";

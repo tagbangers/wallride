@@ -34,10 +34,10 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 	@Query(DEFAULT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
 	Page findById(@Param("id") Long id, @Param("language") String language);
 	
-	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language order by page.lft")
+	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language and page.drafted is null order by page.lft")
 	List<Page> findByLanguage(@Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language and page.status = :status order by page.lft")
+	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language and page.status = :status and page.drafted is null order by page.lft")
 	List<Page> findByLanguageAndStatus(@Param("language") String language, @Param("status") Post.Status status);
 
 	@Query(DEFAULT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
@@ -50,10 +50,10 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 	@Query(DEFAULT_SELECT_QUERY + "where page.drafted = :drafted and page.id = (select max(page.id) from page where page.drafted = :drafted) ")
 	Page findDraft(@Param("drafted") Page drafted);
 
-	@Query("select count(page.id) from Page page where page.language = :language ")
+	@Query("select count(page.id) from Page page where page.language = :language and page.drafted is null ")
 	long count(@Param("language") String language);
 
-	@Query("select count(page.id) from Page page where page.status = :status and page.language = :language ")
+	@Query("select count(page.id) from Page page where page.status = :status and page.language = :language and page.drafted is null ")
 	long countByStatus(@Param("status") Post.Status status, @Param("language") String language);
 
 	@Query("select coalesce(max(rgt), 0) from Page ")
