@@ -300,7 +300,14 @@
 			<artifactId>im4java</artifactId>
 			<version>1.4.0</version>
 		</dependency>
-		
+
+		<!-- RSS -->
+		<dependency>
+			<groupId>rome</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.0</version>
+		</dependency>
+
 		<!-- Commons -->
 		<dependency>
 			<groupId>commons-dbcp</groupId>

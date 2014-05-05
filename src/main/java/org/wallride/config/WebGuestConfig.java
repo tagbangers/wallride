@@ -20,12 +20,14 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.springframework.web.util.UrlPathHelper;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -38,10 +40,7 @@ import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
 import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
-import org.wallride.web.support.DefaultModelAttributeInterceptor;
-import org.wallride.web.support.MediaHttpRequestHandler;
-import org.wallride.web.support.PathVariableLocaleResolver;
-import org.wallride.web.support.SetupRedirectInterceptor;
+import org.wallride.web.support.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -234,10 +233,17 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	public ViewResolver viewResolver() {
+	public BeanNameViewResolver beanNameViewResolver() {
+		BeanNameViewResolver viewResolver = new BeanNameViewResolver();
+		viewResolver.setOrder(1);
+		return viewResolver;
+	}
+
+	@Bean
+	public ThymeleafViewResolver thymeleafViewResolver() {
 		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
 		viewResolver.setTemplateEngine(templateEngine());
-		viewResolver.setOrder(1);
+		viewResolver.setOrder(2);
 		viewResolver.setViewNames(new String[] { "*" });
 		viewResolver.setCache(false);
 		viewResolver.setCharacterEncoding("UTF-8");
@@ -255,5 +261,19 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
 		pathVariableLocaleResolver.setSettings(settings);
 		return pathVariableLocaleResolver;
+	}
+
+	@Bean(name = "atomFeedView")
+	public View atomFeedView() {
+		AtomFeedView view = new AtomFeedView();
+		view.setSettings(settings);
+		return view;
+	}
+
+	@Bean(name = "rssFeedView")
+	public View rssFeedView() {
+		RssFeedView view = new RssFeedView();
+		view.setSettings(settings);
+		return view;
 	}
 }
