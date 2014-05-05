@@ -3,9 +3,11 @@ package org.wallride.core.domain;
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.List;
@@ -59,12 +61,13 @@ public class Post extends DomainObject<Long> {
 	private Status status;
 
 	@ManyToOne
+	@IndexedEmbedded(depth = 1, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private Post drafted;
 
 	@Column(name = "drafted_code", length = 200)
 	private String draftedCode;
 
-	@OneToMany(mappedBy = "drafted")
+	@OneToMany(mappedBy = "drafted", cascade = CascadeType.REMOVE)
 	@LazyCollection(LazyCollectionOption.EXTRA)
 	@SortNatural
 	private SortedSet<Post> drafts;

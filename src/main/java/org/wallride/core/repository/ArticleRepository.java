@@ -50,7 +50,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Query("select count(article.id) from Article article where article.language = :language ")
 	long count(@Param("language") String language);
 
-	@Query("select count(article.id) from Article article where article.status = :status and article.language = :language ")
+	@Query("select count(article.id) from Article article where article.status = :status and article.language = :language and article.drafted is null ")
 	long countByStatus(@Param("status") Post.Status status, @Param("language") String language);
 
 	@Query(

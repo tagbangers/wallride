@@ -12,6 +12,8 @@ import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
@@ -44,6 +46,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		@SuppressWarnings("rawtypes")
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
+
+		junction.must(qb.keyword().onField("drafted").ignoreAnalyzer().matching("_null_").createQuery());
 
 		if (StringUtils.hasText(term.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
@@ -107,7 +111,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Article.class)
 				.setCriteriaQuery(criteria)
-//				.setProjection("id")
 				.setSort(sort);
 		persistenceQuery.setFirstResult(pageable.getOffset());
 		persistenceQuery.setMaxResults(pageable.getPageSize());
