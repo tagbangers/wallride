@@ -58,26 +58,28 @@
 									</div>
 								</div>
 							</div>
-							<table class="table table-hover list">
-								<thead>
-									<tr>
-										<th class="wr-tr-checkbox"><input type="checkbox" /></th>
-										<th th:text="#{Name}">名前</th>
-										<th th:text="#{LoginId}">ログインID</th>
-										<th th:text="#{Email}">メールアドレス</th>
-										<th th:text="#{Posts}" class="text-right">投稿記事数</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr th:each="user : ${users}" th:attr="data-href=@{__${ADMIN_PATH}__/users/describe(id=${user.id})}" class="clickable">
-										<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${user.id}" /></td>
-										<td th:text="${user.name}"></td>
-										<td th:text="${user.loginId}"></td>
-										<td th:text="${user.email}"></td>
-										<td th:text="${user.articleCount}" class="text-right"></td>
-									</tr>
-								</tbody>
-							</table>
+							<div class="table-responsive">
+								<table class="table table-hover list">
+									<thead>
+										<tr>
+											<th class="wr-tr-checkbox"><input type="checkbox" /></th>
+											<th th:text="#{Name}">名前</th>
+											<th th:text="#{LoginId}">ログインID</th>
+											<th th:text="#{Email}">メールアドレス</th>
+											<th th:text="#{Posts}" class="text-right">投稿記事数</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="user : ${users}" th:attr="data-href=@{__${ADMIN_PATH}__/users/describe(id=${user.id})}" class="clickable">
+											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${user.id}" /></td>
+											<td th:text="${user.name}"></td>
+											<td th:text="${user.loginId}"></td>
+											<td th:text="${user.email}"></td>
+											<td th:text="${user.articleCount}" class="text-right"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 							<!-- #bulk-delete-modal -->
 							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 								<div id="bulk-delete-dialog" class="modal-dialog">
