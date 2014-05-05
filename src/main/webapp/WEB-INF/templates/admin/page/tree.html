@@ -36,7 +36,7 @@
 				</div>
 				<div class="clearfix">
 					<div class="pull-left">
-						<a th:href="@{__${ADMIN_PATH}__/pages/tree?part=page-create-dialog}" data-toggle="modal" data-target="#page-create-modal" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New</span></a>
+						<a th:href="@{__${ADMIN_PATH}__/pages/tree?part=page-create-form}" data-toggle="modal" data-target="#page-create-modal" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New</span></a>
 					</div>
 					<div class="pull-right">
 						<button id="update-page-sort" type="submit" class="btn btn-primary" data-loading-text="saving..." disabled="true" th:if="!${pageTree.empty}" th:text="#{SaveOrder}">Save Order</button>
@@ -70,13 +70,13 @@
 							<div class="wr-tree-options pull-left">
 								<span class="wr-tree-option disclose"><span class="glyphicon glyphicon-chevron-right"></span></span>
 								<span class="wr-tree-option title" th:text="${node.page.title}"></span>
-								<span class="wr-tree-option" th:text="${'/' + node.page.code}">/cate1</span>
+								<span class="wr-tree-option" th:if="${node.page.code}" th:text="${'/' + node.page.code}">/cate1</span>
 								<span class="wr-tree-option small" style="margin-left: 10px;" th:classappend="'wr-post-status-' + ${node.page.status}">● <span th:text="#{Post.Status. + ${node.page.status}}"></span></span>
 							</div>
 							<div class="wr-tree-options pull-right">
 								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/edit(id=${node.page.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
-								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-create-dialog,parentId=${node.page.id})}" data-toggle="modal" data-target="#page-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
-								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-delete-dialog,id=${node.page.id})}" data-toggle="modal" data-target="#page-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
+								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-create-form,parentId=${node.page.id})}" data-toggle="modal" data-target="#page-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
+								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-delete-form,id=${node.page.id})}" data-toggle="modal" data-target="#page-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
 							</div>
 							<script>
 								$(function() {
@@ -93,7 +93,7 @@
 				<div id="page-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 					<div id="page-create-dialog" class="modal-dialog">
 						<form>
-							<div class="modal-content">
+							<div th:fragment="page-create-form" class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 									<h4 class="modal-title" th:text="#{AddNewPage}">Add New Page</h4>
@@ -160,7 +160,7 @@
 				<div id="page-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 					<div id="page-delete-dialog" class="modal-dialog">
 						<form>
-							<div class="modal-content">
+							<div th:fragment="page-delete-form" class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 									<h4 class="modal-title" th:text="#{DeletePage}">Delete Page</h4>

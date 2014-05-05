@@ -31,26 +31,26 @@ public class CategoryIndexController {
 		return "/category/index";
 	}
 
-	@RequestMapping(params="part=category-create-dialog")
-	public String partCategoryCreateDialog(@PathVariable String language, @RequestParam(required=false) Long parentId, Model model) {
+	@RequestMapping(params="part=category-create-form")
+	public String partCategoryCreateForm(@PathVariable String language, @RequestParam(required = false) Long parentId, Model model) {
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);
 		model.addAttribute("parentId", parentId);
 		model.addAttribute("categoryTree", categoryTree);
-		return "/category/index::#category-create-dialog";
+		return "/category/index::category-create-form";
 	}
 
-	@RequestMapping(params="part=category-edit-dialog")
-	public String partCategoryEditDialog(@PathVariable String language, @RequestParam long id, Model model) {
+	@RequestMapping(params="part=category-edit-form")
+	public String partCategoryEditForm(@PathVariable String language, @RequestParam long id, Model model) {
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);
 		Category category = categoryTree.getCategoryById(id);
 		model.addAttribute("categoryTree", categoryTree);
 		model.addAttribute("category", category);
-		return "/category/index::#category-edit-dialog";
+		return "/category/index::category-edit-form";
 	}
 
-	@RequestMapping(params="part=category-delete-dialog")
-	public String partCategoryDeleteDialog(@RequestParam long id, Model model) {
+	@RequestMapping(params="part=category-delete-form")
+	public String partCategoryDeleteForm(@RequestParam long id, Model model) {
 		model.addAttribute("targetId", id);
-		return "/category/index::#category-delete-dialog";
+		return "/category/index::category-delete-form";
 	}
 }

@@ -16,7 +16,7 @@ public class PageUpdateRequest implements Serializable {
 	private Long authorId;
 	private LocalDateTime date;
 	private Long parentId;
-	private Post.Status status;
+//	private Post.Status status;
 	private String language;
 
 	public Long getId() {
@@ -51,9 +51,9 @@ public class PageUpdateRequest implements Serializable {
 		return parentId;
 	}
 
-	public Post.Status getStatus() {
-		return status;
-	}
+//	public Post.Status getStatus() {
+//		return status;
+//	}
 
 	public String getLanguage() {
 		return language;
@@ -135,7 +135,7 @@ public class PageUpdateRequest implements Serializable {
 			request.authorId = authorId;
 			request.date = date;
 			request.parentId = parentId;
-			request.status = status;
+//			request.status = status;
 			request.language = language;
 			return request;
 		}

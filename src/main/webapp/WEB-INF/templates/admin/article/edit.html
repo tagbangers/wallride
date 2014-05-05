@@ -12,7 +12,7 @@
 				<ol class="breadcrumb">
 					<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">Dashboard</a></li>
 					<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" th:text="#{Articles}">Articles</a></li>
-					<li><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${form.id})}" th:text="${form.title}"></a></li>
+					<li><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${form.id})}" th:text="${article.title?:'(No Titled)'}"></a></li>
 					<li class="active" th:text="#{EditArticle}">Edit Article</li>
 				</ol>
 				<form th:include="article/create::form(title=#{EditArticle},article=${article})" th:action="@{__${ADMIN_PATH}__/articles/edit}" th:object="${form}" action="#" method="post">

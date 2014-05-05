@@ -14,7 +14,7 @@
 						<div class="pull-left">
 							<ol class="breadcrumb">
 								<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">Dashboard</a></li>
-								<li><a th:href="@{__${ADMIN_PATH}__/articles/index(token=${token})}" th:text="#{Articles}">Articles</a></li>
+								<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" th:text="#{Articles}">Articles</a></li>
 								<li class="active" th:if="${article ne null}" th:text="${article.title}?:'(No Titled)'"></li>
 							</ol>
 						</div>
@@ -84,12 +84,12 @@
 							</ul>
 							</dd>
 						</dl>
-						<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-dialog,id=${article.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>
+						<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-form,id=${article.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>
 						<!-- #delete-modal -->
 						<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 							<div id="delete-dialog" class="modal-dialog">
-								<form th:action="@{__${ADMIN_PATH}__/articles/delete(id=${article.id})}" method="post">
-									<div class="modal-content">
+								<div class="modal-content">
+									<form th:fragment="delete-form" th:action="@{__${ADMIN_PATH}__/articles/delete(id=${article.id})}" method="post">
 										<div class="modal-header">
 											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 											<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Article</h4>
@@ -101,8 +101,8 @@
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
 											<button class="btn btn-primary" th:text="#{Delete}">Delete</button>
 										</div>
-									</div>
-								</form>
+									</form>
+								</div>
 							</div>
 						</div>
 						<!--/#delete-modal -->

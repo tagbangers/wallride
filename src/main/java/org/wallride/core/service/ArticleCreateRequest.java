@@ -1,6 +1,7 @@
 package org.wallride.core.service;
 
 import org.joda.time.LocalDateTime;
+import org.wallride.core.domain.Post;
 
 import java.io.Serializable;
 import java.util.HashSet;

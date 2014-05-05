@@ -31,26 +31,26 @@ public class PageTreeController {
 		return "/page/tree";
 	}
 
-	@RequestMapping(params="part=page-create-dialog")
+	@RequestMapping(params="part=page-create-form")
 	public String partPageCreateDialog(@PathVariable String language, @RequestParam(required=false) Long parentId, Model model) {
 		PageTree pageTree = pageService.readPageTree(language);
 		model.addAttribute("parentId", parentId);
 		model.addAttribute("pageTree", pageTree);
-		return "/page/tree::#page-create-dialog";
+		return "/page/tree::page-create-form";
 	}
 
-	@RequestMapping(params="part=page-edit-dialog")
+	@RequestMapping(params="part=page-edit-form")
 	public String partPageEditDialog(@PathVariable String language, @RequestParam long id, Model model) {
 		PageTree pageTree = pageService.readPageTree(language);
 		Page page = pageTree.getPageById(id);
 		model.addAttribute("pageTree", pageTree);
 		model.addAttribute("page", page);
-		return "/page/tree::#page-edit-dialog";
+		return "/page/tree::page-edit-form";
 	}
 
-	@RequestMapping(params="part=page-delete-dialog")
+	@RequestMapping(params="part=page-delete-form")
 	public String partPageDeleteDialog(@RequestParam long id, Model model) {
 		model.addAttribute("targetId", id);
-		return "/page/tree::#page-delete-dialog";
+		return "/page/tree::page-delete-form";
 	}
 }

@@ -15,7 +15,7 @@
 					<li class="active" th:text="#{AddNewArticle}">Add new article</li>
 				</ol>
 				<form id="article-create-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
-					<input type="hidden" name="id" th:if="${article} ne null" th:value="${article.id}"  />
+					<input type="hidden" name="id" th:value="${article}? ${article.id} : ''"  />
 					<div class="row">
 						<div class="col-sm-9 wr-post-main">
 							<div class="page-header">
@@ -28,6 +28,10 @@
 							<div class="alert alert-danger" th:if="${#fields.hasErrors('all')}">
 								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 								<span th:text="#{Error}">Error</span>
+							</div>
+							<div class="alert alert-info" th:if="${draft} ne null">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<span th:text="#{YouHaveDraft}">You have draft.</span><a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${draft.drafted.id},draft)}"><span th:text="#{CopyDraft}">Copy draft</span></a>
 							</div>
 							<fieldset>
 								<div class="form-group">
@@ -127,7 +131,8 @@
 												imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
 												imageGetJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
 												toolbarFixed: true,
-												toolbarFixedBox: true
+												toolbarFixedBox: true,
+												plugins: ['fontcolor', 'fontsize', 'fullscreen']
 											});
 										});
 									</script>
@@ -138,12 +143,68 @@
 							<div class="tools clearfix">
 								<div class="pull-left">
 									<div class="btn-group">
-										<button name="draft" class="btn btn-default" th:text="#{SaveDraft}">Save Draft</button>
+										<button id="save-draft-button" name="draft" class="btn btn-default" data-loading-text="Saving..." th:text="#{SaveDraft}">Save Draft</button>
 									</div>
+									<script th:inline="javascript">
+										$(document).ready(function() {
+											$('#save-draft-button').click(function(e) {
+												var $this = $(this);
+												$this.button('loading');
+												var $form = $this.closest('form');
+												$(':input[name="body"]', $form).val($('#main :input[name="body"]').redactor('get'));
+												var data = $form.serializeArray();
+												data.push({name: 'draft', value: 1});
+												$.ajax({
+													type: "POST",
+													url: $form.attr('action'),
+													data: data,
+													success: function(data) {
+														$form.children(':input[name="id"]').val(data.id);
+														$form.attr('action', [[@{__${ADMIN_PATH}__/articles/edit}]]);
+														var url = [[@{__${ADMIN_PATH}__/articles/edit?id=}]] + data.id;
+														history.replaceState(null, null, url);
+														new PNotify({
+															icon: false,
+															title: 'Saved as draft',
+															type: 'success',
+															delay: 3000,
+															buttons: {
+																sticker: false
+															}
+														});
+													},
+													complete: function() {
+														$this.button('reset');
+													}
+												});
+												return false;
+											});
+										});
+									</script>
 								</div>
 								<div class="pull-right">
 									<div class="btn-group">
 										<button name="publish" class="btn btn-primary" th:text="#{Publish}">Publish</button>
+										<th:block th:if="${article} ne null and ${#strings.toString(article.status)} ne 'DRAFT'">
+											<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+												<span class="caret"></span>
+												<span class="sr-only">Toggle Dropdown</span>
+											</button>
+											<ul id="save-menu" class="dropdown-menu pull-right" role="menu">
+												<li><a href="#" data-name="publish" th:text="#{Publish}">Publish</a></li>
+												<li><a href="#" data-name="unpublish" th:text="#{Unpublish}">Unpublish</a></li>
+											</ul>
+											<script>
+												$(document).ready(function() {
+													$('#save-menu a').click(function() {
+														var $this = $(this);
+														var $target = $this.closest('.btn-group').children('button:first');
+														$target.text($this.text());
+														$target.attr('name', $this.data('name'));
+													});
+												});
+											</script>
+										</th:block>
 									</div>
 								</div>
 							</div>
@@ -192,63 +253,67 @@
 											<ul th:unless="${#lists.isEmpty(node.children)}" th:include="article/create::category-index(${node.children})" class="list-unstyled"></ul>
 										</li>
 									</ul>
-									<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-dialog}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
+									<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
 								</section>
 							</fieldset>
 						</div>
 					</div>
-				</form>
-				<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
-				<script th:inline="javascript">
-					$(function() {
-						$('#main').on('click', '#save-category', function(e) {
-							e.preventDefault();
-							var self = $(this);
-							self.button('loading');
-							var checked = [];
-							$('input[name="categoryIds"]:checked', '#article-create-form').each(function(i, element) {
-								checked.push($(element).val());
-							});
-							var form = self.closest('form');
-							var data = {
-								parentId: $(':input[name="parentId"]', form).val(),
-								code: $(':input[name="code"]', form).val(),
-								name: $(':input[name="name"]', form).val(),
-								description: $(':input[name="description"]', form).val()
-							};
-							$.ajax({
-								url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
-								type: 'post',
-								data: data,
-								success: function(savedCategory) {
-									checked.push(savedCategory.id.toString());
-									$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
-										data = $(data);
-										$(':input[name="categoryIds"]', data).each(function(i, element) {
-											if ($.inArray($(element).val(), checked) != -1) {
-												$(element).prop('checked', true);
-											}
+					<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content"></div>
+						</div>
+					</div>
+					<script th:inline="javascript">
+						$(function() {
+							$('#main').on('click', '#save-category', function(e) {
+								e.preventDefault();
+								var self = $(this);
+								self.button('loading');
+								var checked = [];
+								$('input[name="categoryIds"]:checked', '#article-create-form').each(function(i, element) {
+									checked.push($(element).val());
+								});
+								var form = self.closest('form');
+								var data = {
+									parentId: $(':input[name="parentId"]', form).val(),
+									code: $(':input[name="code"]', form).val(),
+									name: $(':input[name="name"]', form).val(),
+									description: $(':input[name="description"]', form).val()
+								};
+								$.ajax({
+									url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+									type: 'post',
+									data: data,
+									success: function(savedCategory) {
+										checked.push(savedCategory.id.toString());
+										$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
+											data = $(data);
+											$(':input[name="categoryIds"]', data).each(function(i, element) {
+												if ($.inArray($(element).val(), checked) != -1) {
+													$(element).prop('checked', true);
+												}
+											});
+											$('#category-fieldset').html(data);
 										});
-										$('#category-fieldset').html(data);
-									});
-									self.closest('.modal').modal('hide');
-								},
-								error: function(jqXHR) {
-									$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-										var field = $(':input[name="' + field + '"]', form);
-										$(field).closest('.form-group').addClass('has-error');
-									});
-								},
-								complete: function() {
-									$(self).button('reset');
-								}
+										self.closest('.modal').modal('hide');
+									},
+									error: function(jqXHR) {
+										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+											var field = $(':input[name="' + field + '"]', form);
+											$(field).closest('.form-group').addClass('has-error');
+										});
+									},
+									complete: function() {
+										$(self).button('reset');
+									}
+								});
+							});
+							$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
+								$(this).removeData('bs.modal');
 							});
 						});
-						$('#main').on('hidden.bs.modal', '#category-create-modal', function() {
-							$(this).removeData('bs.modal');
-						});
-					});
-				</script>
+					</script>
+				</form>
 			</div>
 		</div>
 		<footer>

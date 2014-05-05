@@ -3,16 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201405031825</version>
+	<version>1.0.0.SNAPSHOT-201405060235</version>
 	<packaging>war</packaging>
 	
 	<properties>
-		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
-		<org.springframework.data.jpa.version>1.5.0.RELEASE</org.springframework.data.jpa.version>
-		<org.springframework.security.version>3.2.0.RELEASE</org.springframework.security.version>
+		<org.springframework.version>4.0.4.RELEASE</org.springframework.version>
+		<org.springframework.data.jpa.version>1.5.2.RELEASE</org.springframework.data.jpa.version>
+		<org.springframework.security.version>3.2.3.RELEASE</org.springframework.security.version>
 		<org.springframework.batch.version>2.2.5.RELEASE</org.springframework.batch.version>
-		<org.hibernate.version>4.3.4.Final</org.hibernate.version>
-		<org.hibernate.search.version>4.5.0.Final</org.hibernate.search.version>
+		<org.hibernate.version>4.3.5.Final</org.hibernate.version>
+		<org.hibernate.search.version>4.5.1.Final</org.hibernate.search.version>
 		<org.infinispan.version>6.0.2.Final</org.infinispan.version>
 		<org.thymeleaf.version>2.1.2.RELEASE</org.thymeleaf.version>
 		<org.slf4j.version>1.7.6</org.slf4j.version>
@@ -240,7 +240,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.thymeleaf</groupId>
-			<artifactId>thymeleaf-spring3</artifactId>
+			<artifactId>thymeleaf-spring4</artifactId>
 			<version>${org.thymeleaf.version}</version>
 		</dependency>
 
@@ -300,7 +300,14 @@
 			<artifactId>im4java</artifactId>
 			<version>1.4.0</version>
 		</dependency>
-		
+
+		<!-- RSS -->
+		<dependency>
+			<groupId>rome</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.0</version>
+		</dependency>
+
 		<!-- Commons -->
 		<dependency>
 			<groupId>commons-dbcp</groupId>

@@ -2,23 +2,26 @@ package org.wallride.web.controller.admin.article;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
+import org.wallride.core.service.DuplicateCodeException;
+import org.wallride.core.service.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -36,6 +39,9 @@ public class ArticleCreateController {
 	@Inject
 	private CategoryService categoryService;
 
+	@Inject
+	private MessageSourceAccessor messageSourceAccessor;
+
 	@ModelAttribute("form")
 	public ArticleCreateForm articleCreateForm() {
 		return new ArticleCreateForm();
@@ -45,7 +51,14 @@ public class ArticleCreateController {
 	public CategoryTree categoryTree(@PathVariable String language) {
 		return categoryService.readCategoryTree(language);
 	}
-	
+
+	@ExceptionHandler(BindException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public @ResponseBody RestValidationErrorModel bindException(BindException e) {
+		logger.debug("BindException", e);
+		return RestValidationErrorModel.fromBindingResult(e.getBindingResult(), messageSourceAccessor);
+	}
+
 	@RequestMapping(method=RequestMethod.GET)
 	public String create() {
 		return "/article/create";
@@ -59,40 +72,40 @@ public class ArticleCreateController {
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
-	public String draft(
+	public @ResponseBody DomainObjectSavedModel saveAsDraft(
 			@PathVariable String language,
 			@Validated @ModelAttribute("form") ArticleCreateForm form,
 			BindingResult errors,
-			AuthorizedUser authorizedUser,
-			RedirectAttributes redirectAttributes) {
+			AuthorizedUser authorizedUser)
+			throws BindException {
 		if (errors.hasErrors()) {
 			for (ObjectError error : errors.getAllErrors()) {
 				if (!"validation.NotNull".equals(error.getCode())) {
-					return "/article/create";
+					throw new BindException(errors);
 				}
 			}
 		}
 
 		Article article = null;
 		try {
-			article = articleService.createArticle(form.buildArticleCreateRequest(), errors, Post.Status.DRAFT, authorizedUser);
+			article = articleService.createArticle(form.buildArticleCreateRequest(), Post.Status.DRAFT, authorizedUser);
 		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				logger.debug("Errors: {}", errors);
-				return "/article/create";
-			}
-			throw new RuntimeException(e);
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			throw new BindException(errors);
 		}
 
-		redirectAttributes.addFlashAttribute("savedArticle", article);
-		redirectAttributes.addAttribute("language", language);
-		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		return new DomainObjectSavedModel<>(article);
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="publish")
-	public String publish(
+	public String saveAsPublished(
 			@PathVariable String language,
 			@Validated({Default.class, ArticleCreateForm.GroupPublish.class}) @ModelAttribute("form") ArticleCreateForm form,
 			BindingResult errors,
@@ -104,14 +117,17 @@ public class ArticleCreateController {
 
 		Article article = null;
 		try {
-			article = articleService.createArticle(form.buildArticleCreateRequest(), errors, Post.Status.PUBLISHED, authorizedUser);
+			article = articleService.createArticle(form.buildArticleCreateRequest(), Post.Status.PUBLISHED, authorizedUser);
 		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				logger.debug("Errors: {}", errors);
-				return "/article/create";
-			}
-			throw new RuntimeException(e);
+		catch (EmptyCodeException e) {
+			errors.rejectValue("code", "NotNull");
+		}
+		catch (DuplicateCodeException e) {
+			errors.rejectValue("code", "NotDuplicate");
+		}
+		if (errors.hasErrors()) {
+			logger.debug("Errors: {}", errors);
+			return "/article/create";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);

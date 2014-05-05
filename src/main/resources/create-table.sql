@@ -75,6 +75,8 @@ create table post (
 	date datetime,
 	author_id bigint,
 	status varchar(50) not null,
+	drafted_id bigint,
+	drafted_code varchar(200),
 	created_at datetime not null,
 	created_by varchar(100),
 	updated_at datetime not null,
@@ -208,7 +210,7 @@ alter table page
 	references post (id);
 
 alter table post
-	add constraint UK_6khu2naokwmhyfq3lt8t8eehn unique (code, language);
+	add constraint UK_9awc6gvqyqbkh45ta3dq3vti  unique (code, language);
 
 alter table post
 	add index FK_ik65bluepv8oxdfvgbj5qdcsj (author_id),
@@ -221,6 +223,11 @@ alter table post
 	add constraint FK_lew3sxka65cx9ichkheda3m4p
 	foreign key (cover_id)
 	references media (id);
+
+alter table post
+	add constraint FK_i0a3aj3cfl77hk6skuemp2aya
+	foreign key (drafted_id)
+	references post (id);
 
 alter table post_media
 	add index FK_cbh3kwx9ocobb3y3jn93nth0o (media_id),

@@ -27,7 +27,7 @@
 				<div class="page-header clearfix">
 					<div class="row">
 						<div class="col-sm-2">
-							<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-dialog}" data-toggle="modal" data-target="#category-create-modal" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New</span></a>
+							<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New</span></a>
 						</div>
 						<div class="col-sm-10">
 							<div class="pull-right">
@@ -68,9 +68,9 @@
 							</div>
 							<div class="wr-tree-options pull-right">
 								<span class="badge wr-tree-option" th:text="${node.category.articleCount}">16</span>
-								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-edit-dialog,id=${node.category.id})}" data-toggle="modal" data-target="#category-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
-								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-create-dialog,parentId=${node.category.id})}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
-								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-delete-dialog,id=${node.category.id})}" data-toggle="modal" data-target="#category-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
+								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-edit-form,id=${node.category.id})}" data-toggle="modal" data-target="#category-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
+								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-create-form,parentId=${node.category.id})}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
+								<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-delete-form,id=${node.category.id})}" data-toggle="modal" data-target="#category-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
 							</div>
 						</div>
 						<ul th:unless="${#lists.isEmpty(node.children)}" th:include="category/index::category(${node.children})"></ul>
@@ -79,8 +79,8 @@
 				<!-- #category-create-modal -->
 				<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 					<div id="category-create-dialog" class="modal-dialog">
-						<form>
-							<div class="modal-content">
+						<div class="modal-content">
+							<form th:fragment="category-create-form">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 									<h4 class="modal-title" th:text="#{AddNewCategory}">Add New Category</h4>
@@ -107,8 +107,8 @@
 									<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
 									<button class="btn btn-primary" id="save-category" th:text="#{Save}">Save</button>
 								</div>
-							</div>
-						</form>
+							</form>
+						</div>
 					</div>
 				</div>
 				<!--/#category-create-modal -->
@@ -148,9 +148,9 @@
 				</script>
 				<!-- #category-edit-modal -->
 				<div id="category-edit-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-					<div id="category-edit-dialog" class="modal-dialog" th:if="${category}">
-						<form>
-							<div class="modal-content">
+					<div id="category-edit-dialog" class="modal-dialog">
+						<div class="modal-content">
+							<form th:fragment="category-edit-form" th:if="${category}">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 									<h4 class="modal-title" th:text="#{EditCategory}">Edit Category</h4>
@@ -177,8 +177,8 @@
 									<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
 									<button id="update-category" class="btn btn-primary" th:text="#{Save}" th:attr="data-id=${category.id}">Save</button>
 								</div>
-							</div>
-						</form>
+							</form>
+						</div>
 					</div>
 				</div>
 				<!--/#category-edit-modal -->
@@ -222,8 +222,8 @@
 				<!-- #category-delete-modal -->
 				<div id="category-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 					<div id="category-delete-dialog" class="modal-dialog">
-						<form>
-							<div class="modal-content">
+						<div class="modal-content">
+							<form th:fragment="category-delete-form">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 									<h4 class="modal-title">Delete Category</h4>
@@ -235,8 +235,8 @@
 									<button class="btn btn-default">Cancel</button>
 									<button id="delete-category" class="btn btn-primary" th:attr="data-id=${targetId}">Delete</button>
 								</div>
-							</div>
-						</form>
+							</form>
+						</div>
 					</div>
 				</div>
 				<!--/#category-delete-modal -->

@@ -51,11 +51,10 @@
 				</section>
 				<section class="search-result">
 					<form method="post">
-						<input type="hidden" name="token" th:value="${token}" />
 						<div class="search-result-header clearfix">
 							<div class="btn-toolbar wr-bulk-action pull-left">
 								<div class="btn-group">
-									<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-dialog)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+									<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 								</div>
 							</div>
 							<div class="pagination-group pull-right">
@@ -69,34 +68,36 @@
 								</div>
 							</div>
 						</div>
-						<table class="table table-hover">
-							<thead>
-								<tr>
-									<th class="wr-tr-checkbox" style="width:40px"><input type="checkbox" /></th>
-									<th th:text="#{Status}">Status</th>
-									<th th:text="#{Title}">Title</th>
-									<th th:text="#{Categories}">Categories</th>
-									<th th:text="#{Author}">Author</th>
-									<th th:text="#{Date}">Date</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
-									<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${article.id}" /></td>
-									<td th:class="'wr-post-status-' + ${article.status}" th:text="${#messages.msg('Post.Status.' + article.status)}">Status</td>
-									<td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
-									<td th:text="${#strings.setJoin(article.categories, '&nbsp;|&nbsp;')}"></td>
-									<td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
-									<td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E)') : ''}">2013/10/24</td>
-									<td><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
-								</tr>
-							</tbody>
-						</table>
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th class="wr-tr-checkbox" style="width:40px"><input type="checkbox" /></th>
+										<th th:text="#{Status}">Status</th>
+										<th th:text="#{Title}">Title</th>
+										<th th:text="#{Categories}">Categories</th>
+										<th th:text="#{Author}">Author</th>
+										<th th:text="#{Date}">Date</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
+										<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${article.id}" /></td>
+										<td th:class="'wr-post-status-' + ${article.status}" th:text="${#messages.msg('Post.Status.' + article.status)}">Status</td>
+										<td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
+										<td th:text="${#strings.setJoin(article.categories, '&nbsp;|&nbsp;')}"></td>
+										<td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
+										<td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E)', #locale) : ''}">2013/10/24</td>
+										<td><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 						<!-- #bulk-delete-modal -->
 						<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 							<div id="bulk-delete-dialog" class="modal-dialog">
-								<div class="modal-content">
+								<div th:fragment="bulk-delete-form" class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 										<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
@@ -150,7 +151,8 @@
 										$(this).closest('tr').removeClass('warning');
 									}
 									var checkedSomeone = false;
-									$(this).each(function(i, e) {
+									console.dir($(this));
+									$('#main .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
 										if ($(e).prop('checked')) {
 											checkedSomeone = true;
 											return;
