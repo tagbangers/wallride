@@ -24,6 +24,7 @@ import org.wallride.core.domain.*;
 import org.wallride.core.repository.ArticleFullTextSearchTerm;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
+import org.wallride.core.repository.PostRepository;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.Settings;
 
@@ -37,7 +38,7 @@ import java.util.regex.Pattern;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class ArticleService {
-	
+
 	@Inject
 	private ArticleRepository articleRepository;
 
@@ -180,27 +181,20 @@ public class ArticleService {
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-		if (article.getStatus().equals(Post.Status.DRAFT)) {
-			if (article.getDrafted() != null) {
-				articleRepository.delete((Article) article.getDrafted());
-			}
-			article.setDrafted(null);
-			article.getDrafts().clear();
-			article.setStatus(Post.Status.PUBLISHED);
-			articleRepository.save(article);
-		}
+		article.setDrafted(null);
+		article.setStatus(Post.Status.PUBLISHED);
+		articleRepository.save(article);
+		articleRepository.deleteByDrafted(article);
 		return saveArticle(request, authorizedUser);
 	}
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			article.setDrafted(null);
-			article.getDrafts().clear();
-			article.setStatus(Post.Status.DRAFT);
-			articleRepository.save(article);
-		}
+		article.setDrafted(null);
+		article.setStatus(Post.Status.DRAFT);
+		articleRepository.save(article);
+		articleRepository.deleteByDrafted(article);
 		return saveArticle(request, authorizedUser);
 	}
 

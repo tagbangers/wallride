@@ -2,6 +2,7 @@ package org.wallride.core.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -69,4 +70,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 			"where article.status = :status and article.language = :language " +
 			"group by category.id ")
 	List<Map<String, Object>> countByCategoryIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
+
+	@Modifying
+	@Query("delete from Article article where article.drafted = :drafted ")
+	void deleteByDrafted(@Param("drafted") Article dradted);
 }

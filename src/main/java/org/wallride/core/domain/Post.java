@@ -67,7 +67,7 @@ public class Post extends DomainObject<Long> {
 	@Column(name = "drafted_code", length = 200)
 	private String draftedCode;
 
-	@OneToMany(mappedBy = "drafted", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "drafted", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
 	@SortNatural
 	private SortedSet<Post> drafts;
