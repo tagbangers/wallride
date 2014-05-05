@@ -31,7 +31,7 @@
 							</div>
 							<div class="alert alert-info" th:if="${draft} ne null">
 								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-								<span>編集中の下書きがあります。<a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${draft.drafted.id},draft)}">下書きを反映する</a></span>
+								<span th:text="#{YouHaveDraft}">編集中の下書きがあります。<a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${draft.drafted.id},draft)}"><span th:text="#{CopyDraft}">下書きを反映する</span></a></span>
 							</div>
 							<fieldset>
 								<div class="form-group">

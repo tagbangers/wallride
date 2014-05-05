@@ -33,8 +33,40 @@
 		<script th:src="@{/_admin/resources/js/common.js}"></script>
 	</head>
 	<body>
-		<header th:fragment="header" id="header" class="navbar navbar-inverse navbar-static-top">
-			<div class="container">
+		<header th:fragment="header" id="header" class="navbar">
+			<div class="wr-navbar-global container-fluid">
+				<div class="navbar-header">
+					<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+						<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+					</button>
+					<p class="navbar-brand">WallRide</p>
+				</div>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-left">
+						<li class="dropdown">
+							<a href="#" role="button" class="add-menu dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add New</span></a>
+							<ul class="dropdown-menu" role="menu" aria-labelledby="add-menu">
+								<li role="presentation"><a role="menuitem" tabindex="-1" th:href="@{__${ADMIN_PATH}__/articles/create}" th:text="#{AddNewArticle}">New Article</a></li>
+								<li role="presentation"><a role="menuitem" tabindex="-1" th:href="@{__${ADMIN_PATH}__/pages/create}" th:text="#{AddNewPage}">New Page</a></li>
+							</ul>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown wr-account">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<img th:src="@{${USER.getGravatarUrl(30)}}" src="../../resources/admin/img/tb-logo.png" class="wr-account-picture"/>
+								&nbsp;&nbsp;<span th:text="${USER.name}"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${USER.id})}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Profile}">プロフィール</span></a></li>
+								<li><a th:href="@{/_admin/logout}"><span class="glyphicon glyphicon-off"></span> <span th:text="#{LogOut}">ログアウト</span></a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="wr-navbar-blog container-fluid">
 				<div class="navbar-header">
 					<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse">
 						<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
@@ -42,44 +74,27 @@
 					<a href="../" class="navbar-brand" th:text="${WEBSITE_TITLE}">WallRide</a>
 				</div>
 				<!-- Collect the nav links, forms, and other content for toggling -->
-				<div class="collapse navbar-collapse navbar-ex1-collapse">
+				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<li><a th:href="@{${WEBSITE_LINK}}" href="#" target="_blank" style="font-size:15px;"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${WEBSITE_LINK}">公開画面</span></a></li>
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle wr-current-language" data-toggle="dropdown" th:text="${#messages.msg('Language.' + #locale.language)}"> <b class="caret"></b></a>
+							<a href="#" class="dropdown-toggle wr-current-language" data-toggle="dropdown"><span th:text="${#messages.msg('Language.' + #locale.language)}"></span> <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li class="disabled"><a href="#">Languages</a></li>
-								<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${#messages.msg('Language.' + key)}">English</a></li>
+								<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}"><span th:text="${#messages.msg('Language.' + key)}">English</span> </a></li>
 							</ul>
 						</li>
 					</ul>
 				</div>
 			</div>
 		</header>
-		<div>
-			<div th:fragment="sidebar" id="sidebar">
-				<div class="accordion-group">
-					<div class="accordion-heading account">
-						<a href="#collapseZero" class="wr-account accordion-toggle collapsed" data-toggle="collapse" data-parent="#sidebar">
-							<img th:src="@{${USER.getGravatarUrl(300)}}" src="../../resources/admin/img/tb-logo.png" class="wr-account-picture img-thumbnail"/>
-							<span class="wr-account-name" th:text="${USER.name}"></span>
-						</a>
-					</div>
-					<div id="collapseZero" class="accordion-body collapse">
-						<div class="accordion-inner">
-							<ul class="nav">
-								<li><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${USER.id})}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Profile}">プロフィール</span></a></li>
-								<li><a th:href="@{/_admin/logout}"><span class="glyphicon glyphicon-off"></span> <span th:text="#{LogOut}">ログアウト</span></a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-
-				<ul class="nav nav-stacked">
+		<div th:fragment="sidebar" id="wr-blog-menu">
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav navbar-left">
 					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Articles}">Articles</span></a>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Articles}">Articles</span> <b class="caret"></b></a>
 						<ul class="nav dropdown-menu">
 							<li><a th:href="@{__${ADMIN_PATH}__/articles/create}" href="article-create.html"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New Article</span></a></li>
 							<li><a th:href="@{__${ADMIN_PATH}__/articles/index?search}" href="articles.html"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Articles}">Articles</span></a></li>
@@ -87,68 +102,70 @@
 						</ul>
 					</li>
 					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> <span th:text="#{Pages}">Pages</span></a>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-book"></span> <span th:text="#{Pages}">Pages</span> <b class="caret"></b></a>
 						<ul class="nav dropdown-menu">
 							<li><a th:href="@{__${ADMIN_PATH}__/pages/create}"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New Page</span></a></li>
 							<li><a th:href="@{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Pages}">Pages</span></a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Users}">Users</span></a>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Users}">Users</span> <b class="caret"></b></a>
 						<ul class="nav dropdown-menu">
 							<li><a th:href="@{__${ADMIN_PATH}__/users/invitations/index}"><span class="glyphicon glyphicon-send"></span> <span th:text="#{InviteNew}">Invite New</span></a></li>
 							<li><a th:href="@{__${ADMIN_PATH}__/users/index?search}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Users}">Users</span></a></li>
 						</ul>
 					</li>
 				</ul>
-				<script>
-					$(function() {
-						$('#sidebar').on('click', '[data-toggle=collapse]', function(e) {
-							var $this = $(this);
-							var $target = $this.next();
-							var $parent = $('#sidebar');
-							$parent.find('.nav.in').collapse('hide');
-							$target.collapse('toggle');
-						});
-					});
-				</script>
+				<ul class="nav navbar-nav navbar-right">
+				</ul>
 			</div>
-			<div id="main">
-				<div class="page-header clearfix">
-					<h1>Dashboard</h1>
+			<script>
+				$(function() {
+					$('#sidebar').on('click', '[data-toggle=collapse]', function(e) {
+						var $this = $(this);
+						var $target = $this.next();
+						var $parent = $('#sidebar');
+						$parent.find('.nav.in').collapse('hide');
+						$target.collapse('toggle');
+					});
+				});
+			</script>
+		</div>
+		<div id="main">
+			<div class="page-header clearfix">
+				<h1>Dashboard</h1>
+			</div>
+			<div class="row wr-dashboard">
+				<div class="col-sm-2">
+					<h2>Content</h2>
+					<table class="table">
+						<tr>
+							<th th:text="${articleCount}">11</th>
+							<td>Posts</td>
+						</tr>
+						<tr>
+							<th th:text="${pageCount}">11</th>
+							<td>Pages</td>
+						</tr>
+						<tr>
+							<th th:text="${categoryCount}">11</th>
+							<td>Categories</td>
+						</tr>
+					</table>
 				</div>
-				<div class="row wr-dashboard">
-					<div class="col-sm-2">
-						<h2>Content</h2>
-						<table class="table">
-							<tr>
-								<th th:text="${articleCount}">11</th>
-								<td>Posts</td>
-							</tr>
-							<tr>
-								<th th:text="${pageCount}">11</th>
-								<td>Pages</td>
-							</tr>
-							<tr>
-								<th th:text="${categoryCount}">11</th>
-								<td>Categories</td>
-							</tr>
-						</table>
-					</div>
-					<div class="col-sm-5">
-						<h2>New Posts</h2>
-						<dl th:each="article : ${recentPublishedArticles}" class="list-inline">
-							<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}">Title</a></dt>
-							<dd th:text="${article.date.toString('yyyy/MM/dd')}">yyyy/MM/dd</dd>
-						</dl>
-					</div>
-					<div class="col-sm-5">
-						<h2>Drafts</h2>
-						<dl th:each="article : ${recentDraftArticles}" class="list-inline">
-							<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}?:'(No Titled)'">Title</a></dt>
-							<dd th:text="${article.updatedAt.toString('yyyy/MM/dd HH:mm') + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
-						</dl>
-					</div>
+				<div class="col-sm-5">
+					<h2>New Posts</h2>
+					<dl th:each="article : ${recentPublishedArticles}" class="list-inline">
+						<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}">Title</a></dt>
+						<dd th:text="${article.date.toString('yyyy/MM/dd')}">yyyy/MM/dd</dd>
+					</dl>
+				</div>
+				<div class="col-sm-5">
+					<h2>Drafts</h2>
+					<dl th:each="article : ${recentDraftArticles}" class="list-inline">
+						<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}?:'(No Titled)'">Title</a></dt>
+						<dd th:text="${article.updatedAt.toString('yyyy/MM/dd HH:mm') + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
+					</dl>
 				</div>
 			</div>
 		</div>
