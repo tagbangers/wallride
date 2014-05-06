@@ -49,6 +49,7 @@ public class WallRideWebAppInitializer extends AbstractContextLoaderInitializer 
 				MailConfig.class,
 				CacheConfig.class,
 				SecurityConfig.class,
+				ScheduleConfig.class,
 		});
 		return rootAppContext;
 	}
