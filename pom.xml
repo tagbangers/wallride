@@ -136,7 +136,7 @@
 			<artifactId>spring-batch-core</artifactId>
 			<version>${org.springframework.batch.version}</version>
 		</dependency>
-		
+
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
