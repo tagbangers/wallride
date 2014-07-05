@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div th:replace="layout::sidebar"></div>
+			<div id="main">
+				<ol class="breadcrumb">
+					<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">Dashboard</a></li>
+					<li class="active" th:text="#{System}">System</li>
+				</ol>
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="page-header clearfix">
+							<h1 th:text="#{System}">System</h1>
+						</div>
+						<div class="table-responsive">
+							<table class="table">
+								<colgroup>
+									<col class="col-sm-3" />
+									<col class="col-sm-9" />
+								</colgroup>
+								<tbody>
+									<tr>
+										<th>Spring Profile</th>
+										<td th:text="${system['spring.profiles.active']}">default</td>
+									</tr>
+									<tr>
+										<th>Java Version</th>
+										<td th:text="${system['java.version']}">1.7.0</td>
+									</tr>
+									<tr>
+										<th>Java Vendor</th>
+										<td th:text="${system['java.vendor']}">Oracle Corporation</td>
+									</tr>
+									<tr>
+										<th>User Timezone</th>
+										<td th:text="${system['user.timezone']}">User Timezone</td>
+									</tr>
+									<tr>
+										<th>User Locale</th>
+										<td><span th:text="${system['user.language']}">en</span>_<span th:text="${system['user.country']}">US</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>
