@@ -21,29 +21,26 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
-import org.springframework.web.util.UrlPathHelper;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
 import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
@@ -52,8 +49,6 @@ import java.util.*;
 
 @Configuration
 @ComponentScan(basePackages= "org.wallride.web.controller.guest", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
-//@EnableWebMvc
-//public class WebConfig extends WebMvcConfigurerAdapter {
 public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Inject
@@ -84,34 +79,10 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
 		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
 
-		UrlPathHelper customUrlPathHelper = new UrlPathHelper() {
-			@Override
-			public String getLookupPathForRequest(HttpServletRequest request) {
-				String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
-				if (defaultLanguage != null) {
-					String[] languages = StringUtils.commaDelimitedListToStringArray(settings.readSettingAsString(Setting.Key.LANGUAGES));
-//					String[] languages = StringUtils.split(settingService.readSettingAsString(Setting.Key.LANGUAGES), ",");
-					String path = super.getLookupPathForRequest(request);
-					boolean languagePath = false;
-					for (String language : languages) {
-						if (path.startsWith("/" + language + "/")) {
-							languagePath = true;
-							break;
-						}
-					}
-					if (!languagePath) {
-						path = "/" + defaultLanguage + path;
-					}
-					return path;
-				}
-				else {
-					return super.getLookupPathForRequest(request);
-				}
-			}
-		};
-		handlerMapping.setUrlPathHelper(customUrlPathHelper);
+		handlerMapping.setUrlPathHelper(new LanguageUrlPathHelper(settings));
+		handlerMapping.setDefaultHandler(new PageDescribeController(pageService, settings));
 
-		handlerMapping.setOrder(0);
+		handlerMapping.setOrder(Integer.MAX_VALUE);
 		handlerMapping.setInterceptors(getInterceptors());
 		handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager());
 		return handlerMapping;
@@ -183,14 +154,27 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		mediaHttpRequestHandler.setSettings(settings);
 		mediaHttpRequestHandler.setCacheSeconds(86400);
 
-		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<String, HttpRequestHandler>();
+		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
 		urlMap.put("/media/{key}", mediaHttpRequestHandler);
 
 		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
-		handlerMapping.setOrder(Integer.MAX_VALUE -1);
+		handlerMapping.setOrder(0);
 		handlerMapping.setUrlMap(urlMap);
 		return handlerMapping;
 	}
+
+//	@Bean
+//	public SimpleUrlHandlerMapping pageUrlHandlerMapping() {
+//		PageHttpRequestHandler pageHttpRequestHandler = new PageHttpRequestHandler();
+//
+//		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
+//		urlMap.put("/{language}/{code}", pageHttpRequestHandler);
+//
+//		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
+//		handlerMapping.setOrder(2);
+//		handlerMapping.setUrlMap(urlMap);
+//		return handlerMapping;
+//	}
 
 	@Bean
 	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {

@@ -78,7 +78,7 @@
 					<ul class="nav navbar-nav navbar-left">
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li><a th:href="@{${WEBSITE_LINK}}" href="#" target="_blank" style="font-size:15px;"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${WEBSITE_LINK}">公開画面</span></a></li>
+						<li><a th:href="@{${WEBSITE_LINK}}" href="#" target="_blank" style="font-size:15px;"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${WEBSITE_LINK}">http://www.wallride.org</span></a></li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle wr-current-language" data-toggle="dropdown"><span th:text="${#messages.msg('Language.' + #locale.language)}"></span> <b class="caret"></b></a>
 							<ul class="dropdown-menu">
@@ -115,6 +115,7 @@
 							<li><a th:href="@{__${ADMIN_PATH}__/users/index?search}"><span class="glyphicon glyphicon-list"></span> <span th:text="#{Users}">Users</span></a></li>
 						</ul>
 					</li>
+					<li><a th:href="@{__${ADMIN_PATH}__/system/index}"><span class="glyphicon glyphicon-cog"></span> <span th:text="#{System}">System</span></a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 				</ul>

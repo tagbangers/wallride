@@ -140,6 +140,11 @@ public class PageEditForm extends DomainObjectEditForm {
 	public static PageEditForm fromDomainObject(Page page) {
 		PageEditForm form = new PageEditForm();
 		BeanUtils.copyProperties(page, form);
+
+		if (page.getStatus().equals(Post.Status.DRAFT)) {
+			form.setCode(page.getDraftedCode());
+		}
+
 		form.setCoverId(page.getCover() != null ? page.getCover().getId() : null);
 		form.setParentId(page.getParent() != null ? page.getParent().getId() : null);
 		return form;

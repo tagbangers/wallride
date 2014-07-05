@@ -33,22 +33,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		// @formatter:off
 		auth
 			.userDetailsService(authorizedStaffDetailsService())
 			.passwordEncoder(new StandardPasswordEncoder());
+		// @formatter:on
 	}
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
+		// @formatter:off
 		web
 			.ignoring()
 				.antMatchers("/_admin/resources/**")
 				.antMatchers("/_admin/setup**")
 				.antMatchers("/_admin/signup**");
+		// @formatter:on
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		// @formatter:off
 		http.antMatcher("/_admin/**")
 			.authorizeRequests()
 				.antMatchers("/_admin/**").hasRole("USER")
@@ -74,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			http.requiresChannel()
 				.anyRequest().requiresSecure();
 		}
+		// @formatter:on
 	}
 
 	@Bean

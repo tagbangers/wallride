@@ -14,28 +14,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//@Component
 public class PostUtils {
-
-//	@Inject
-//	private SettingService settingService;
-//
-//	@Inject
-//	private DefaultModelAttributeService defaultModelAttributeService;
-//
-//	@Inject
-//	private Environment environment;
 
 	private IProcessingContext processingContext;
 
 	private Settings settings;
 
-//	private Environment environment;
-
 	public PostUtils(IProcessingContext processingContext, Settings settings) {
 		this.processingContext = processingContext;
 		this.settings = settings;
-//		this.environment = environment;
 	}
 
 	public String link(Article article) {
@@ -43,9 +30,9 @@ public class PostUtils {
 		return path(builder, article);
 	}
 
-	public String link(Page page, PageTree pageTree) {
+	public String link(Page page) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, page, pageTree);
+		return path(builder, page);
 	}
 
 	public String path(Article article) {
@@ -53,9 +40,9 @@ public class PostUtils {
 		return path(builder, article);
 	}
 
-	public String path(Page page, PageTree pageTree) {
+	public String path(Page page) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, page, pageTree);
+		return path(builder, page);
 	}
 
 	private String path(UriComponentsBuilder builder, Article article) {
@@ -73,7 +60,7 @@ public class PostUtils {
 		return builder.buildAndExpand(params).encode().toUriString();
 	}
 
-	private String path(UriComponentsBuilder builder, Page page, PageTree pageTree) {
+	private String path(UriComponentsBuilder builder, Page page) {
 		Map<String, Object> params = new HashMap<>();
 		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
 		if (languages != null && languages.length > 1) {
@@ -81,7 +68,7 @@ public class PostUtils {
 			params.put("language", processingContext.getContext().getLocale().getLanguage());
 		}
 
-		pageTree = (PageTree) processingContext.getContext().getVariables().get("PAGE_TREE_ALL");
+		PageTree pageTree = (PageTree) processingContext.getContext().getVariables().get("PAGE_TREE_ALL");
 //		PageTree pageTree = defaultModelAttributeService.readPageTree(LocaleContextHolder.getLocale().getLanguage());
 		List<String> codes = new LinkedList<>();
 		Page parent = page.getParent();
@@ -130,7 +117,7 @@ public class PostUtils {
 	}
 
 	public String ogUrl(Page page, PageTree pageTree) {
-		return link(page, pageTree);
+		return link(page);
 	}
 
 	public String ogImage(Post post) {

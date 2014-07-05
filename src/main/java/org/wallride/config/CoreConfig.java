@@ -10,12 +10,14 @@ import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
 
 import javax.inject.Inject;
 
 @Configuration
+@EnableAsync
 @ComponentScan(basePackages="org.wallride.core", excludeFilters={ @Filter(Configuration.class)} )
 public class CoreConfig {
 

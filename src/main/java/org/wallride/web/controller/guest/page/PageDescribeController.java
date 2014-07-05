@@ -1,44 +1,53 @@
 package org.wallride.web.controller.guest.page;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
+import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.AbstractController;
+import org.springframework.web.util.UrlPathHelper;
 import org.wallride.core.domain.Page;
 import org.wallride.core.service.PageService;
-import org.wallride.web.controller.guest.article.ArticleIndexController;
+import org.wallride.core.support.Settings;
 import org.wallride.web.support.HttpNotFoundException;
+import org.wallride.web.support.LanguageUrlPathHelper;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/{language}/{code}")
-public class PageDescribeController {
+public class PageDescribeController extends AbstractController {
 
-	@Inject
+	private static final String PATH_PATTERN = "/{language}/{code}";
+
 	private PageService pageService;
+	private UrlPathHelper urlPathHelper;
 
-	@Inject
-	private ArticleIndexController articleIndexController;
+	public PageDescribeController(PageService pageService, Settings settings) {
+		this.pageService = pageService;
+		this.urlPathHelper = new LanguageUrlPathHelper(settings);
+	}
 
-	@RequestMapping
-	public String describe(
-			@PathVariable String code,
-			@PathVariable String language,
-			HttpSession session,
-			Model model) {
-		if (code.matches("[0-9]{4}")) {
-			return articleIndexController.year(language, Integer.parseInt(code), new PageRequest(0, 10), model);
+	@Override
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String path = urlPathHelper.getLookupPathForRequest(request);
+
+		PathMatcher pathMatcher = new AntPathMatcher();
+		if (!pathMatcher.match(PATH_PATTERN, path)) {
+			throw new HttpNotFoundException();
 		}
 
-		Page page = pageService.readPageByCode(code, language);
+		Map<String, String> variables = pathMatcher.extractUriTemplateVariables(PATH_PATTERN, path);
+		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, variables);
+
+		Page page = pageService.readPageByCode(variables.get("code"), variables.get("language"));
 		if (page == null) {
 			throw new HttpNotFoundException();
 		}
 
-		model.addAttribute("page", page);
-		return "/page/describe";
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("/page/describe");
+		modelAndView.addObject("page", page);
+		return modelAndView;
 	}
 }

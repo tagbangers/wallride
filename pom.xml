@@ -3,18 +3,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201405060235</version>
+	<version>1.0.0.SNAPSHOT-201407060358</version>
 	<packaging>war</packaging>
 	
 	<properties>
-		<org.springframework.version>4.0.4.RELEASE</org.springframework.version>
-		<org.springframework.data.jpa.version>1.5.2.RELEASE</org.springframework.data.jpa.version>
-		<org.springframework.security.version>3.2.3.RELEASE</org.springframework.security.version>
-		<org.springframework.batch.version>2.2.5.RELEASE</org.springframework.batch.version>
+		<org.springframework.version>4.0.5.RELEASE</org.springframework.version>
+		<org.springframework.data.jpa.version>1.6.1.RELEASE</org.springframework.data.jpa.version>
+		<org.springframework.security.version>3.2.4.RELEASE</org.springframework.security.version>
+		<org.springframework.batch.version>3.0.0.RELEASE</org.springframework.batch.version>
 		<org.hibernate.version>4.3.5.Final</org.hibernate.version>
 		<org.hibernate.search.version>4.5.1.Final</org.hibernate.search.version>
 		<org.infinispan.version>6.0.2.Final</org.infinispan.version>
-		<org.thymeleaf.version>2.1.2.RELEASE</org.thymeleaf.version>
+		<org.thymeleaf.version>2.1.3.RELEASE</org.thymeleaf.version>
 		<org.slf4j.version>1.7.6</org.slf4j.version>
 		<ch.qos.logback.version>1.1.1</ch.qos.logback.version>
 	</properties>
@@ -136,7 +136,7 @@
 			<artifactId>spring-batch-core</artifactId>
 			<version>${org.springframework.batch.version}</version>
 		</dependency>
-		
+
 		<!-- Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
