@@ -71,8 +71,8 @@ public class CoreConfig {
 	@Bean
 	@Lazy
 	public AmazonS3Client amazonS3Client() {
-		final String accessKey = environment.getRequiredProperty("amazon.accesskey");
-		final String secretKey = environment.getRequiredProperty("amazon.secretkey");
+		final String accessKey = environment.getRequiredProperty("aws.accessKey");
+		final String secretKey = environment.getRequiredProperty("aws.secretKey");
 		ClientConfiguration configuration = new ClientConfiguration();
 		configuration.setMaxConnections(1000);
 		return new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey), configuration);
