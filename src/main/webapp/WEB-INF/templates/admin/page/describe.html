@@ -75,15 +75,28 @@
 							</div>
 						</div>
 						<dl>
-							<dt th:text="#{Date}">公開日</dt>
+							<dt th:text="#{Date}">Date</dt>
 							<dd th:if="${page.date ne null}" th:text="${page.date.toString('yyyy/MM/dd')}"></dd>
 						</dl>
 						<dl>
-							<dt th:text="#{ParentPage}">親ページ</dt>
+							<dt th:text="#{ParentPage}">Parent Page</dt>
 							<dd>
 							<ul class="list-unstyled">
 								<li th:if="${page.parent ne null}" th:text="${page.parent.title}">Category Name</li>
 							</ul>
+							</dd>
+						</dl>
+						<dl>
+							<dt th:text="#{Seo}">SEO</dt>
+							<dd>
+								<dl>
+									<dt th:text="#{SeoTitle}">Title</dt>
+									<dd th:text="${page.seo}? ${page.seo.title}"></dd>
+									<dt th:text="#{SeoDescription}">Description</dt>
+									<dd th:text="${page.seo}? ${page.seo.description}"></dd>
+									<dt th:text="#{SeoKeywords}">Keywords</dt>
+									<dd th:text="${page.seo}? ${page.seo.keywords}"></dd>
+								</dl>
 							</dd>
 						</dl>
 						<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>

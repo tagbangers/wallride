@@ -1,5 +1,6 @@
 package org.wallride.core.service;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +22,11 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
-import org.wallride.core.repository.ArticleFullTextSearchTerm;
-import org.wallride.core.repository.ArticleRepository;
-import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.repository.PostRepository;
+import org.wallride.core.repository.*;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.Settings;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,18 +38,16 @@ import java.util.regex.Pattern;
 @Transactional(rollbackFor=Exception.class)
 public class ArticleService {
 
-	@Inject
+	@Resource
 	private ArticleRepository articleRepository;
-
-	@Inject
+	@Resource
+	private TagRepository tagRepository;
+	@Resource
 	private MediaRepository mediaRepository;
-	
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
-	
 	@Inject
 	private PlatformTransactionManager transactionManager;
-
 	@Inject
 	private Settings settings;
 
@@ -116,6 +113,33 @@ public class ArticleService {
 			article.getCategories().add(entityManager.getReference(Category.class, categoryId));
 		}
 
+		article.getTags().clear();
+		String[] tags = org.apache.commons.lang.StringUtils.splitByWholeSeparator(request.getTags(), ",");
+		if (!ArrayUtils.isEmpty(tags)) {
+			String language = LocaleContextHolder.getLocale().getLanguage();
+			for (String tagName : tags) {
+				if (tagName.startsWith("_new_")) {
+					Tag newTag = new Tag();
+					newTag.setName(org.apache.commons.lang.StringUtils.removeStart(tagName, "_new_"));
+					newTag.setLanguage(language);
+					tagRepository.save(newTag);
+					article.getTags().add(newTag);
+				}
+				else {
+					Tag tag = tagRepository.findById(Long.parseLong(tagName), language);
+					if (tag != null) {
+						article.getTags().add(tag);
+					}
+				}
+			}
+		}
+
+		Seo seo = new Seo();
+		seo.setTitle(request.getSeoTitle());
+		seo.setDescription(request.getSeoDescription());
+		seo.setKeywords(request.getSeoKeywords());
+		article.setSeo(seo);
+
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
 			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
@@ -150,7 +174,10 @@ public class ArticleService {
 						.authorId(request.getAuthorId())
 						.date(request.getDate())
 						.categoryIds(request.getCategoryIds())
-						.tagIds(request.getTagIds())
+						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
 						.language(request.getLanguage())
 						.build();
 				draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -167,7 +194,10 @@ public class ArticleService {
 						.authorId(request.getAuthorId())
 						.date(request.getDate())
 						.categoryIds(request.getCategoryIds())
-						.tagIds(request.getTagIds())
+						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
 						.language(request.getLanguage())
 						.build();
 				return saveArticle(updateRequest, authorizedUser);
@@ -255,6 +285,33 @@ public class ArticleService {
 		for (long categoryId : request.getCategoryIds()) {
 			article.getCategories().add(entityManager.getReference(Category.class, categoryId));
 		}
+
+		article.getTags().clear();
+		String[] tags = org.apache.commons.lang.StringUtils.splitByWholeSeparator(request.getTags(), ",");
+		if (!ArrayUtils.isEmpty(tags)) {
+			String language = LocaleContextHolder.getLocale().getLanguage();
+			for (String tagName : tags) {
+				if (tagName.startsWith("_new_")) {
+					Tag newTag = new Tag();
+					newTag.setName(org.apache.commons.lang.StringUtils.removeStart(tagName, "_new_"));
+					newTag.setLanguage(language);
+					tagRepository.save(newTag);
+					article.getTags().add(newTag);
+				}
+				else {
+					Tag tag = tagRepository.findById(Long.parseLong(tagName), language);
+					if (tag != null) {
+						article.getTags().add(tag);
+					}
+				}
+			}
+		}
+
+		Seo seo = new Seo();
+		seo.setTitle(request.getSeoTitle());
+		seo.setDescription(request.getSeoDescription());
+		seo.setKeywords(request.getSeoKeywords());
+		article.setSeo(seo);
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {

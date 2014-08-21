@@ -28,6 +28,7 @@ import org.wallride.core.repository.PageRepository;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.Settings;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,18 +40,15 @@ import java.util.regex.Pattern;
 @Transactional(rollbackFor=Exception.class)
 public class PageService {
 	
-	@Inject
+	@Resource
 	private PageRepository pageRepository;
-
-	@Inject
+	@Resource
 	private MediaRepository mediaRepository;
-	
+
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
-	
 	@Inject
 	private PlatformTransactionManager transactionManager;
-
 	@Inject
 	private Settings settings;
 
@@ -124,6 +122,12 @@ public class PageService {
 		page.setDate(date);
 		page.setStatus(status);
 		page.setLanguage(request.getLanguage());
+
+		Seo seo = new Seo();
+		seo.setTitle(request.getSeoTitle());
+		seo.setDescription(request.getSeoDescription());
+		seo.setKeywords(request.getSeoKeywords());
+		page.setSeo(seo);
 
 		page.setLft(rgt);
 		page.setRgt(rgt + 1);
@@ -282,6 +286,12 @@ public class PageService {
 		}
 		page.setDate(date);
 		page.setLanguage(request.getLanguage());
+
+		Seo seo = new Seo();
+		seo.setTitle(request.getSeoTitle());
+		seo.setDescription(request.getSeoDescription());
+		seo.setKeywords(request.getSeoKeywords());
+		page.setSeo(seo);
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {

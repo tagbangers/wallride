@@ -61,7 +61,7 @@
 							</div>
 							<div class="btn-toolbar pull-right" role="toolbar">
 								<div class="btn-group">
-									<a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
+									<a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}" type="button" class="btn btn-info" th:text="#{Edit}">Edit</a>
 <!--									<a class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></a>
 									<ul class="dropdown-menu pull-right" role="menu">
 										<li class="disabled"><a href="#">記事をコピー</a></li>
@@ -73,15 +73,36 @@
 							</div>
 						</div>
 						<dl>
-							<dt th:text="#{Date}">公開日</dt>
+							<dt th:text="#{Date}">Date</dt>
 							<dd th:if="${article.date ne null}" th:text="${article.date.toString('yyyy/MM/dd')}"></dd>
 						</dl>
 						<dl>
-							<dt th:text="#{Categories}">カテゴリ</dt>
+							<dt th:text="#{Categories}">Categories</dt>
 							<dd>
 							<ul class="list-unstyled">
 								<li th:each="category : ${article.categories}" th:text="${category.name}">Category Name</li>
 							</ul>
+							</dd>
+						</dl>
+						<dl>
+							<dt th:text="#{Tags}">Tags</dt>
+							<dd>
+								<ul class="list-unstyled list-inline list-inline-tag">
+									<li th:each="tag : ${article.tags}"><span class="label label-default" th:text="${tag.name}"></span></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl>
+							<dt th:text="#{Seo}">SEO</dt>
+							<dd>
+								<dl>
+									<dt th:text="#{SeoTitle}">Title</dt>
+									<dd th:text="${article.seo}? ${article.seo.title}"></dd>
+									<dt th:text="#{SeoDescription}">Description</dt>
+									<dd th:text="${article.seo}? ${article.seo.description}"></dd>
+									<dt th:text="#{SeoKeywords}">Keywords</dt>
+									<dd th:text="${article.seo}? ${article.seo.keywords}"></dd>
+								</dl>
 							</dd>
 						</dl>
 						<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-form,id=${article.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>

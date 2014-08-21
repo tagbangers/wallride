@@ -2,24 +2,29 @@ package org.wallride.core.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name="tag")
+@Table(name = "tag")
 @DynamicInsert
 @DynamicUpdate
+@Indexed
 @SuppressWarnings("serial")
 public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(name="name", length=500, nullable=false)
+	@Column(name = "name", length = 500, nullable = false)
+	@Field
 	private String name;
 
-	@Column(length=3, nullable=false)
+	@Column(length = 3, nullable = false)
+	@Field
 	private String language;
 
 	@Override

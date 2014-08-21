@@ -30,9 +30,13 @@ public class PageCreateForm extends DomainObjectCreateForm {
 	private LocalDateTime date;
 	
 	private Long parentId;
-	
+
+	private String seoTitle;
+	private String seoDescription;
+	private String seoKeywords;
+
 //	private Post.Status status;
-	
+
 	@NotNull
 	private String language;
 
@@ -87,8 +91,32 @@ public class PageCreateForm extends DomainObjectCreateForm {
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
-	
-//	public Post.Status getStatus() {
+
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public void setSeoTitle(String seoTitle) {
+		this.seoTitle = seoTitle;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public void setSeoDescription(String seoDescription) {
+		this.seoDescription = seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
+	}
+
+	public void setSeoKeywords(String seoKeywords) {
+		this.seoKeywords = seoKeywords;
+	}
+
+	//	public Post.Status getStatus() {
 //		return status;
 //	}
 //
@@ -114,6 +142,9 @@ public class PageCreateForm extends DomainObjectCreateForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.seoTitle(seoTitle)
+				.seoDescription(seoDescription)
+				.seoKeywords(seoKeywords)
 //				.status(status)
 				.language(language)
 				.build();

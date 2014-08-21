@@ -252,6 +252,21 @@
 									</select>
 								</div>
 							</fieldset>
+							<fieldset id="seo-fieldset">
+								<legend th:text="#{Seo}">SEO</legend>
+								<div class="form-group" th:classappend="${#fields.hasErrors('seoTitle')}? has-error">
+									<input type="text" th:field="*{seoTitle}" class="form-control" th:placeholder="#{SeoTitle}" />
+									<span th:if="${#fields.hasErrors('seoTitle')}" class="help-block" th:text="${#fields.errors('seoTitle')}" />
+								</div>
+								<div class="form-group" th:classappend="${#fields.hasErrors('seoDescription')}? has-error">
+									<textarea th:field="*{seoDescription}" class="form-control" th:placeholder="#{SeoDescription}" style="min-height: 100px"></textarea>
+									<span th:if="${#fields.hasErrors('seoDescription')}" class="help-block" th:text="${#fields.errors('seoDescription')}" />
+								</div>
+								<div class="form-group" th:classappend="${#fields.hasErrors('seoKeywords')}? has-error">
+									<textarea th:field="*{seoKeywords}" class="form-control" th:placeholder="#{SeoKeywords}"></textarea>
+									<span th:if="${#fields.hasErrors('seoKeywords')}" class="help-block" th:text="${#fields.errors('seoKeywords')}" />
+								</div>
+							</fieldset>
 						</div>
 					</div>
 				</form>
