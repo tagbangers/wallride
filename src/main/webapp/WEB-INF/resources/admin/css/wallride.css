@@ -474,6 +474,11 @@ legend {
 .panel.category li.checkbox:first-child {
 	margin-top: 0;
 }
+.label-default {
+	background-color: #F5F2F2;
+	border: 1px solid #b3b3b3;
+	color: #525252;
+}
 .label-publish {
 	background-color: #E47875;
 }

@@ -75,7 +75,7 @@
 											<td th:text="${user.name}"></td>
 											<td th:text="${user.loginId}"></td>
 											<td th:text="${user.email}"></td>
-											<td th:text="${user.articleCount}" class="text-right"></td>
+											<td th:text="${articleCounts.get(user.id)}?:0" class="text-right"></td>
 										</tr>
 									</tbody>
 								</table>

@@ -72,6 +72,13 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 			"group by category.id ")
 	List<Map<String, Object>> countByCategoryIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
 
+	@Query(
+			"select new map(tag.id as tagId, count(article.id) as count) from Article article " +
+			"left join article.tags tag " +
+			"where article.status = :status and article.language = :language " +
+			"group by tag.id ")
+	List<Map<String, Object>> countByTagIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
+
 	@Modifying
 	@Query("delete from Article article where article.drafted = :drafted ")
 	void deleteByDrafted(@Param("drafted") Article dradted);

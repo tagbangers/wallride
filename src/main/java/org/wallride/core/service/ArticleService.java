@@ -437,4 +437,13 @@ public class ArticleService {
 		}
 		return counts;
 	}
+
+	public Map<Long, Long> countArticlesByTagIdGrouped(Post.Status status, String language) {
+		List<Map<String, Object>> results = articleRepository.countByTagIdGrouped(status, language);
+		Map<Long, Long> counts = new HashMap<>();
+		for (Map<String, Object> row : results) {
+			counts.put((Long) row.get("tagId"), (Long) row.get("count"));
+		}
+		return counts;
+	}
 }
