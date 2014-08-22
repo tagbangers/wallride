@@ -1,12 +1,16 @@
 package org.wallride.core.domain;
 
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Formula;
+import org.apache.commons.lang.builder.CompareToBuilder;
+import org.hibernate.annotations.*;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Entity
 @Table(name = "tag")
@@ -27,6 +31,14 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 	@Column(length = 3, nullable = false)
 	@Field
 	private String language;
+
+	@ManyToMany
+	@JoinTable(
+			name = "article_tag",
+			joinColumns = {@JoinColumn(name = "tag_id")},
+			inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"))
+	@SortNatural
+	private SortedSet<Article> articles = new TreeSet<>();
 
 	@Formula("(" +
 			"select count(distinct article.id) from article article " +
@@ -61,8 +73,21 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 		this.language = language;
 	}
 
+	public SortedSet<Article> getArticles() {
+		return articles;
+	}
+
+	public void setArticles(SortedSet<Article> articles) {
+		this.articles = articles;
+	}
+
 	public int getArticleCount() {
 		return articleCount;
+	}
+
+	@Field(analyze = Analyze.NO)
+	public String getSortKey() {
+		return getName();
 	}
 
 	@Override
@@ -72,6 +97,9 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 
 	@Override
 	public int compareTo(Tag tag) {
-		return (int) (tag.getId() - getId());
+		return new CompareToBuilder()
+				.append(getName(), tag.getName())
+				.append(getId(), tag.getId())
+				.toComparison();
 	}
 }

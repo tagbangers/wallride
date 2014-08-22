@@ -96,6 +96,12 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 			}
 		}
 
+		if (!CollectionUtils.isEmpty(term.getTagIds())) {
+			for (long tagId : term.getTagIds()) {
+				junction.must(qb.keyword().onField("tags.id").matching(tagId).createQuery());
+			}
+		}
+
 		Query searchQuery = junction.createQuery();
 		
 		Session session = (Session) entityManager.getDelegate();

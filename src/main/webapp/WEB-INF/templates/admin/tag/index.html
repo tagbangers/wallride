@@ -19,9 +19,17 @@
 						<li><a th:href="@{__${ADMIN_PATH}__/tags/index?part=tag-create-form}" data-toggle="modal" data-target="#tag-create-modal" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewTag}">Add New Tag</span></a></li>
 					</ul>
 				</div>
+				<div class="alert alert-success" th:if="${savedTag ne null}">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<span th:text="#{SavedTag}">Tag saved.</span>
+				</div>
+				<div class="alert alert-success" th:if="${deletedTags ne null}">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<span th:text="#{DeletedTags}">Tags Deleted.</span>
+				</div>
 				<section class="search-condition">
 					<div class="search-condition-quick clearfix">
-						<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/articles/index}" th:object="${form}">
+						<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
 							<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
 							<div class="form-group pull-right" style="width: 300px;">
 								<div class="input-group simple-search pull-right">
@@ -37,16 +45,16 @@
 						<div class="search-result-header clearfix">
 							<div class="btn-toolbar wr-bulk-action pull-left">
 								<div class="btn-group">
-									<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+									<a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 								</div>
 							</div>
 							<div class="pagination-group pull-right">
 								<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
 								<div class="pull-right">
 									<ul class="pagination paginateon-sm">
-										<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
+										<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
 										<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
-										<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
+										<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
 									</ul>
 								</div>
 							</div>
@@ -85,7 +93,7 @@
 									</div>
 									<div class="modal-footer">
 										<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-										<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+										<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
 									</div>
 								</div>
 							</div>

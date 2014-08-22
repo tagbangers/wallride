@@ -53,7 +53,7 @@ public class TagRestController {
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("savedTag", savedTag);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectSavedModel<Long>(savedTag);
+		return new DomainObjectSavedModel<>(savedTag);
 	}
 
 	@RequestMapping(value="/{language}/tags/{id}", method=RequestMethod.POST)
@@ -68,10 +68,10 @@ public class TagRestController {
 		if (result.hasErrors()) {
 			throw new BindException(result);
 		}
-		Tag updatedTag = tagService.updateTag(form.buildTagUpdateRequest(), authorizedUser);
+		Tag savedTag = tagService.updateTag(form.buildTagUpdateRequest(), authorizedUser);
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
-		flashMap.put("updatedTag", updatedTag);
+		flashMap.put("savedTag", savedTag);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectUpdatedModel<Long>(updatedTag);
+		return new DomainObjectUpdatedModel<>(savedTag);
 	}
 }

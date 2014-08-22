@@ -36,6 +36,9 @@
 				</div>
 				<p th:utext="${#posts.body(article)}"></p>
 				<time></time>
+				<ul th:if="${article.tags}" class="list-inline">
+					<li th:each="tag : ${article.tags}"><a th:href="@{__${WEBSITE_PATH}__/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
+				</ul>
 			</article>
 		</div>
 		<div th:replace="layout::footer" id="footer"></div>

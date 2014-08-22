@@ -11,6 +11,7 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
@@ -75,7 +76,7 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(Tag.class);
 
-		Sort sort = new Sort(new SortField("id", SortField.STRING, true));
+		Sort sort = new Sort(new SortField("sortKey", SortField.STRING));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Tag.class)
