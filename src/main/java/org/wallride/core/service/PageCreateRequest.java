@@ -15,7 +15,10 @@ public class PageCreateRequest implements Serializable {
 	private Long authorId;
 	private LocalDateTime date;
 	private Long parentId;
-//	private Post.Status status;
+	private String seoTitle;
+	private String seoDescription;
+	private String seoKeywords;
+	//	private Post.Status status;
 	private String language;
 
 	public String getCode() {
@@ -46,7 +49,19 @@ public class PageCreateRequest implements Serializable {
 		return parentId;
 	}
 
-//	public Post.Status getStatus() {
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
+	}
+
+	//	public Post.Status getStatus() {
 //		return status;
 //	}
 
@@ -63,7 +78,9 @@ public class PageCreateRequest implements Serializable {
 		private Long authorId;
 		private LocalDateTime date;
 		private Long parentId;
-		private Post.Status status;
+		private String seoTitle;
+		private String seoDescription;
+		private String seoKeywords;
 		private String language;
 
 		public Builder() {
@@ -104,8 +121,18 @@ public class PageCreateRequest implements Serializable {
 			return this;
 		}
 
-		public Builder status(Post.Status status) {
-			this.status = status;
+		public Builder seoTitle(String seoTitle) {
+			this.seoTitle = seoTitle;
+			return this;
+		}
+
+		public Builder seoDescription(String seoDescription) {
+			this.seoDescription = seoDescription;
+			return this;
+		}
+
+		public Builder seoKeywords(String seoKeywords) {
+			this.seoKeywords = seoKeywords;
 			return this;
 		}
 
@@ -123,6 +150,9 @@ public class PageCreateRequest implements Serializable {
 			request.authorId = authorId;
 			request.date = date;
 			request.parentId = parentId;
+			request.seoTitle = seoTitle;
+			request.seoDescription = seoDescription;
+			request.seoKeywords = seoKeywords;
 //			request.status = status;
 			request.language = language;
 			return request;

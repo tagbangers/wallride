@@ -256,6 +256,79 @@
 									<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
 								</section>
 							</fieldset>
+							<fieldset>
+								<legend th:text="#{Tags}">Tags</legend>
+								<div class="form-group row" th:classappend="${#fields.hasErrors('tags')}? has-error">
+									<div class="col-sm-12">
+										<input id="tags-field" type="text" th:field="*{tags}" style="width: 100%" placeholder=""/>
+									</div>
+									<span class="help-block" th:each="err : ${#fields.errors('tags')}"  th:text="${err}" />
+								</div>
+							</fieldset>
+							<script th:inline="javascript">
+								/*<![CDATA[*/
+								$(function() {
+									$('#tags-field').select2({
+										minimumInputLength: 1,
+										multiple: true,
+										createSearchChoice:function(term, data) {
+											if ($(data).filter(function() {
+												return this.text.localeCompare(term)===0;
+											}).length===0) {
+												return {id: "_new_" + term, text:term};
+											}
+										},
+										ajax: {
+											url:  /*[[@{__${ADMIN_PATH}__/tags/select}]]*/ '#',
+											dataType: 'json',
+											data: function (term, page) {
+												return {
+													keyword: term
+												};
+											},
+											results: function (data, page) {
+												return {results: data};
+											}
+										},
+										initSelection: function(element, callback) {
+											var data = [];
+											$(element.val().split(',')).each(function() {
+												var id = this;
+												if (id !== "") {
+													if (this.match(/^_new_/)) {
+														data.push({id: id, text: id.replace('_new_', '')});
+													} else {
+														var url = /*[[@{__${ADMIN_PATH}__/tags/select/}]]*/ '#';
+														url += id;
+														$.ajax(url,  {
+															async: false,
+															dataType: "json"
+														}).done(function(response) { data.push(response); });
+													}
+												}
+											});
+											element.val('');
+											callback(data);
+										}
+									});
+								});
+								/*]]>*/
+							</script>
+							<fieldset id="seo-fieldset">
+								<legend th:text="#{Seo}">SEO</legend>
+								<div class="form-group" th:classappend="${#fields.hasErrors('seoTitle')}? has-error">
+									<input type="text" th:field="*{seoTitle}" class="form-control" th:placeholder="#{SeoTitle}" />
+									<span th:if="${#fields.hasErrors('seoTitle')}" class="help-block" th:text="${#fields.errors('seoTitle')}" />
+								</div>
+								<div class="form-group" th:classappend="${#fields.hasErrors('seoDescription')}? has-error">
+									<textarea th:field="*{seoDescription}" class="form-control" th:placeholder="#{SeoDescription}" style="min-height: 100px"></textarea>
+									<span th:if="${#fields.hasErrors('seoDescription')}" class="help-block" th:text="${#fields.errors('seoDescription')}" />
+								</div>
+								<div class="form-group" th:classappend="${#fields.hasErrors('seoKeywords')}? has-error">
+									<textarea th:field="*{seoKeywords}" class="form-control" th:placeholder="#{SeoKeywords}"></textarea>
+									<span th:if="${#fields.hasErrors('seoKeywords')}" class="help-block" th:text="${#fields.errors('seoKeywords')}" />
+								</div>
+							</fieldset>
 						</div>
 					</div>
 					<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">

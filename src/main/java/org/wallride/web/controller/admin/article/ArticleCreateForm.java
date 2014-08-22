@@ -32,7 +32,11 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 
 	private Set<Long> categoryIds = new HashSet<>();
 
-	private Set<Long> tagIds = new HashSet<>();
+	private String tags;
+
+	private String seoTitle;
+	private String seoDescription;
+	private String seoKeywords;
 
 	@NotNull
 	private String language;
@@ -93,12 +97,36 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 		this.categoryIds = categoryIds;
 	}
 
-	public Set<Long> getTagIds() {
-		return tagIds;
+	public String getTags() {
+		return tags;
 	}
 
-	public void setTagIds(Set<Long> tagIds) {
-		this.tagIds = tagIds;
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public void setSeoTitle(String seoTitle) {
+		this.seoTitle = seoTitle;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public void setSeoDescription(String seoDescription) {
+		this.seoDescription = seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
+	}
+
+	public void setSeoKeywords(String seoKeywords) {
+		this.seoKeywords = seoKeywords;
 	}
 
 	public String getLanguage() {
@@ -119,7 +147,10 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 				.authorId(authorId)
 				.date(date)
 				.categoryIds(categoryIds)
-				.tagIds(tagIds)
+				.tags(tags)
+				.seoTitle(seoTitle)
+				.seoDescription(seoDescription)
+				.seoKeywords(seoKeywords)
 				.language(language)
 				.build();
 	}

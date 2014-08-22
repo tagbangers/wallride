@@ -1,16 +1,20 @@
 package org.wallride.web.controller.admin.article;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Post;
+import org.wallride.core.domain.Tag;
 import org.wallride.core.service.ArticleUpdateRequest;
 import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("serial")
@@ -38,7 +42,11 @@ public class ArticleEditForm extends DomainObjectEditForm {
 
 	private Set<Long> categoryIds = new HashSet<>();
 
-	private Set<Long> tagIds = new HashSet<>();
+	private String tags;
+
+	private String seoTitle;
+	private String seoDescription;
+	private String seoKeywords;
 
 	@NotNull
 	private String language;
@@ -107,12 +115,36 @@ public class ArticleEditForm extends DomainObjectEditForm {
 		this.categoryIds = categoryIds;
 	}
 
-	public Set<Long> getTagIds() {
-		return tagIds;
+	public String getTags() {
+		return tags;
 	}
 
-	public void setTagIds(Set<Long> tagIds) {
-		this.tagIds = tagIds;
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public void setSeoTitle(String seoTitle) {
+		this.seoTitle = seoTitle;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public void setSeoDescription(String seoDescription) {
+		this.seoDescription = seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
+	}
+
+	public void setSeoKeywords(String seoKeywords) {
+		this.seoKeywords = seoKeywords;
 	}
 
 	public String getLanguage() {
@@ -134,7 +166,10 @@ public class ArticleEditForm extends DomainObjectEditForm {
 				.authorId(authorId)
 				.date(date)
 				.categoryIds(categoryIds)
-				.tagIds(tagIds)
+				.tags(tags)
+				.seoTitle(seoTitle)
+				.seoDescription(seoDescription)
+				.seoKeywords(seoKeywords)
 				.language(language)
 				.build();
 	}
@@ -150,6 +185,18 @@ public class ArticleEditForm extends DomainObjectEditForm {
 		form.setCoverId(article.getCover() != null ? article.getCover().getId() : null);
 		for (Category category : article.getCategories()) {
 			form.getCategoryIds().add(category.getId());
+		}
+
+		List<Long> tagIds = new ArrayList<>();
+		for (Tag tag : article.getTags()) {
+			tagIds.add(tag.getId());
+		}
+		form.setTags(StringUtils.join(tagIds, ","));
+
+		if (article.getSeo() != null) {
+			form.setSeoTitle(article.getSeo().getTitle());
+			form.setSeoDescription(article.getSeo().getDescription());
+			form.setSeoKeywords(article.getSeo().getKeywords());
 		}
 		return form;
 	}

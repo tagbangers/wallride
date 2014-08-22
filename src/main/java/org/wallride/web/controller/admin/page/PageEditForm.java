@@ -35,7 +35,11 @@ public class PageEditForm extends DomainObjectEditForm {
 	private LocalDateTime date;
 
 	private Long parentId;
-	
+
+	private String seoTitle;
+	private String seoDescription;
+	private String seoKeywords;
+
 //	private Post.Status status;
 	
 	@NotNull
@@ -104,8 +108,32 @@ public class PageEditForm extends DomainObjectEditForm {
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
-	
-//	public Post.Status getStatus() {
+
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public void setSeoTitle(String seoTitle) {
+		this.seoTitle = seoTitle;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public void setSeoDescription(String seoDescription) {
+		this.seoDescription = seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
+	}
+
+	public void setSeoKeywords(String seoKeywords) {
+		this.seoKeywords = seoKeywords;
+	}
+
+	//	public Post.Status getStatus() {
 //		return status;
 //	}
 //
@@ -132,6 +160,9 @@ public class PageEditForm extends DomainObjectEditForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.seoTitle(seoTitle)
+				.seoDescription(seoDescription)
+				.seoKeywords(seoKeywords)
 //				.status(status)
 				.language(language)
 				.build();
@@ -147,6 +178,12 @@ public class PageEditForm extends DomainObjectEditForm {
 
 		form.setCoverId(page.getCover() != null ? page.getCover().getId() : null);
 		form.setParentId(page.getParent() != null ? page.getParent().getId() : null);
+
+		if (page.getSeo() != null) {
+			form.setSeoTitle(page.getSeo().getTitle());
+			form.setSeoDescription(page.getSeo().getDescription());
+			form.setSeoKeywords(page.getSeo().getKeywords());
+		}
 		return form;
 	}
 }

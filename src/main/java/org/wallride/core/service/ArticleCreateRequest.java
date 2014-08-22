@@ -16,7 +16,10 @@ public class ArticleCreateRequest implements Serializable {
 	private Long authorId;
 	private LocalDateTime date;
 	private Set<Long> categoryIds = new HashSet<>();
-	private Set<Long> tagIds = new HashSet<>();
+	private String tags;
+	private String seoTitle;
+	private String seoDescription;
+	private String seoKeywords;
 	private String language;
 
 	public String getCode() {
@@ -47,8 +50,20 @@ public class ArticleCreateRequest implements Serializable {
 		return categoryIds;
 	}
 
-	public Set<Long> getTagIds() {
-		return tagIds;
+	public String getTags() {
+		return tags;
+	}
+
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
 	}
 
 	public String getLanguage() {
@@ -64,7 +79,10 @@ public class ArticleCreateRequest implements Serializable {
 		private Long authorId;
 		private LocalDateTime date;
 		private Set<Long> categoryIds = new HashSet<>();
-		private Set<Long> tagIds = new HashSet<>();
+		private String tags;
+		private String seoTitle;
+		private String seoDescription;
+		private String seoKeywords;
 		private String language;
 
 		public Builder() {
@@ -105,8 +123,23 @@ public class ArticleCreateRequest implements Serializable {
 			return this;
 		}
 
-		public Builder tagIds(Set<Long> tagIds) {
-			this.tagIds = tagIds;
+		public Builder tags(String tags) {
+			this.tags = tags;
+			return this;
+		}
+
+		public Builder seoTitle(String seoTitle) {
+			this.seoTitle = seoTitle;
+			return this;
+		}
+
+		public Builder seoDescription(String seoDescription) {
+			this.seoDescription = seoDescription;
+			return this;
+		}
+
+		public Builder seoKeywords(String seoKeywords) {
+			this.seoKeywords = seoKeywords;
 			return this;
 		}
 
@@ -124,7 +157,10 @@ public class ArticleCreateRequest implements Serializable {
 			request.authorId = authorId;
 			request.date = date;
 			request.categoryIds = categoryIds;
-			request.tagIds = tagIds;
+			request.tags = tags;
+			request.seoTitle = seoTitle;
+			request.seoDescription = seoDescription;
+			request.seoKeywords = seoKeywords;
 			request.language = language;
 			return request;
 		}
