@@ -10,11 +10,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.TagService;
 import org.wallride.core.support.Pagination;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/{language}/tags/index")
@@ -25,10 +28,17 @@ public class TagSearchController {
 
 	@Inject
 	private TagService tagService;
+	@Inject
+	private ArticleService articleService;
 
 	@ModelAttribute(FORM_MODEL_KEY)
 	public TagSearchForm setupTagSearchForm() {
 		return new TagSearchForm();
+	}
+
+	@ModelAttribute("articleCounts")
+	public Map<Long, Long> articleCounts(@PathVariable String language) {
+		return articleService.countArticlesByTagIdGrouped(Post.Status.PUBLISHED, language);
 	}
 
 	@RequestMapping

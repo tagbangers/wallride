@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Post;
+import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/{language}/categories/index")
@@ -18,10 +21,17 @@ public class CategoryIndexController {
 
 	@Inject
 	private CategoryService categoryService;
+	@Inject
+	private ArticleService articleService;
 
 	@ModelAttribute("form")
 	public CategoryCreateForm categoryCreateForm() {
 		return new CategoryCreateForm();
+	}
+
+	@ModelAttribute("articleCounts")
+	public Map<Long, Long> articleCounts(@PathVariable String language) {
+		return articleService.countArticlesByCategoryIdGrouped(Post.Status.PUBLISHED, language);
 	}
 
 	@RequestMapping

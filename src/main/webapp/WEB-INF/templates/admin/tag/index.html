@@ -73,7 +73,7 @@
 									<tr th:each="tag : ${tags}">
 										<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${tag.id}" /></td>
 										<td th:text="${tag.name}"></td>
-										<td class="text-right"><span class="badge wr-tree-option" th:text="${tag.articleCount}">16</span></td>
+										<td class="text-right"><span class="badge wr-tree-option" th:text="${articleCounts.get(tag.id)}?:0">16</span></td>
 										<td class="text-center"><a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-edit-form,id=${tag.id})}" data-toggle="modal" data-target="#tag-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 									</tr>
 								</tbody>

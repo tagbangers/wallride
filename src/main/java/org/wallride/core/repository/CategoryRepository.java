@@ -31,7 +31,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 	@Query(DEFAULT_SELECT_QUERY + "where category.language = :language order by category.lft")
 	List<Category> findByLanguage(@Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where category.language = :language and category.articleCount > 0 order by category.lft")
+	@Query(
+			DEFAULT_SELECT_QUERY +
+			"where category.language = :language " +
+			"and category.id in (select category.id from Article article inner join article.categories category where article.status = 'PUBLISHED') " +
+			"order by category.lft")
 	List<Category> findByLanguageAndHasArticle(@Param("language") String language);
 
 	@Query(DEFAULT_SELECT_QUERY + "where category.id = :id and category.language = :language ")

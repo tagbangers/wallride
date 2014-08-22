@@ -41,13 +41,13 @@ public class User extends DomainObject<Long> {
 	@Column(length=500, nullable=false)
 	private String email;
 
-	@Formula("(" +
-			"select count(distinct article.id) from user " +
-			"inner join post post on post.author_id = user.id " +
-			"inner join article article on article.id = post.id " +
-			"where post.author_id = id " +
-			"and post.status = 'PUBLISHED')")
-	private int articleCount;
+//	@Formula("(" +
+//			"select count(distinct article.id) from user " +
+//			"inner join post post on post.author_id = user.id " +
+//			"inner join article article on article.id = post.id " +
+//			"where post.author_id = id " +
+//			"and post.status = 'PUBLISHED')")
+//	private int articleCount;
 
 	@Override
 	public Long getId() {
@@ -90,9 +90,9 @@ public class User extends DomainObject<Long> {
 		this.email = email;
 	}
 
-	public int getArticleCount() {
-		return articleCount;
-	}
+//	public int getArticleCount() {
+//		return articleCount;
+//	}
 
 	public String getGravatarUrl(int size) throws UnsupportedEncodingException {
 		String hash = DigestUtils.md5DigestAsHex(getEmail().getBytes("CP1252"));
