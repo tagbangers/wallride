@@ -47,6 +47,10 @@ public class Post extends DomainObject<Long> {
 	@Field
 	private String body;
 
+	@Embedded
+	@IndexedEmbedded
+	private Seo seo = new Seo();
+
 	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
 	@Field
 	@FieldBridge(impl=LocalDateTimeBridge.class)
@@ -124,6 +128,14 @@ public class Post extends DomainObject<Long> {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public Seo getSeo() {
+		return seo;
+	}
+
+	public void setSeo(Seo seo) {
+		this.seo = seo;
 	}
 
 	public LocalDateTime getDate() {

@@ -89,7 +89,7 @@ public class PostUtils {
 	}
 
 	public String metaKeywords(Post post) {
-		return null; //TODO
+		return post.getSeo() != null ? post.getSeo().getKeywords(): null;
 	}
 
 	public String metaAuthor(Post post) {
@@ -97,7 +97,7 @@ public class PostUtils {
 	}
 
 	public String metaDescription(Post post) {
-		return null; //TODO
+		return post.getSeo() != null ? post.getSeo().getDescription(): null;
 	}
 
 	public String ogSiteName(Post post) {
@@ -125,6 +125,9 @@ public class PostUtils {
 	}
 
 	public String title(Post post) {
+		if (post.getSeo() != null && post.getSeo().getTitle() != null) {
+			return post.getSeo().getTitle();
+		}
 		return String.format("%s | %s",
 				post.getTitle(),
 				settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage()));
