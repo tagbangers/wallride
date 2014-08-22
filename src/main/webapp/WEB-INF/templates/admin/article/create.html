@@ -275,7 +275,7 @@
 											if ($(data).filter(function() {
 												return this.text.localeCompare(term)===0;
 											}).length===0) {
-												return {id: "_new_" + term, text:term};
+												return {id: term, text:term};
 											}
 										},
 										ajax: {
@@ -295,16 +295,7 @@
 											$(element.val().split(',')).each(function() {
 												var id = this;
 												if (id !== "") {
-													if (this.match(/^_new_/)) {
-														data.push({id: id, text: id.replace('_new_', '')});
-													} else {
-														var url = /*[[@{__${ADMIN_PATH}__/tags/select/}]]*/ '#';
-														url += id;
-														$.ajax(url,  {
-															async: false,
-															dataType: "json"
-														}).done(function(response) { data.push(response); });
-													}
+													data.push({id: id, text: id});
 												}
 											});
 											element.val('');

@@ -35,6 +35,10 @@ public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCu
 	@Query(DEFAULT_SELECT_QUERY + "where tag.name = :name and tag.language = :language ")
 	Tag findByName(@Param("name") String name, @Param("language") String language);
 
+	@Query(DEFAULT_SELECT_QUERY + "where tag.name = :name and tag.language = :language ")
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	Tag findByNameForUpdate(@Param("name") String name, @Param("language") String language);
+
 	@Query("select count(tag.id) from Tag tag where tag.language = :language ")
 	long count(@Param("language") String language);
 }

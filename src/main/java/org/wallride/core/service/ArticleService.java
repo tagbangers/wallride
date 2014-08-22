@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -114,23 +115,21 @@ public class ArticleService {
 		}
 
 		article.getTags().clear();
-		String[] tags = org.apache.commons.lang.StringUtils.splitByWholeSeparator(request.getTags(), ",");
-		if (!ArrayUtils.isEmpty(tags)) {
-			String language = LocaleContextHolder.getLocale().getLanguage();
-			for (String tagName : tags) {
-				if (tagName.startsWith("_new_")) {
-					Tag newTag = new Tag();
-					newTag.setName(org.apache.commons.lang.StringUtils.removeStart(tagName, "_new_"));
-					newTag.setLanguage(language);
-					tagRepository.save(newTag);
-					article.getTags().add(newTag);
+		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
+		if (!CollectionUtils.isEmpty(tagNames)) {
+			for (String tagName : tagNames) {
+				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				if (tag == null) {
+					tag = new Tag();
+					tag.setName(tagName);
+					tag.setLanguage(request.getLanguage());
+					article.setCreatedAt(now);
+					article.setCreatedBy(authorizedUser.toString());
+					article.setUpdatedAt(now);
+					article.setUpdatedBy(authorizedUser.toString());
+					tag = tagRepository.saveAndFlush(tag);
 				}
-				else {
-					Tag tag = tagRepository.findById(Long.parseLong(tagName), language);
-					if (tag != null) {
-						article.getTags().add(tag);
-					}
-				}
+				article.getTags().add(tag);
 			}
 		}
 
@@ -287,23 +286,21 @@ public class ArticleService {
 		}
 
 		article.getTags().clear();
-		String[] tags = org.apache.commons.lang.StringUtils.splitByWholeSeparator(request.getTags(), ",");
-		if (!ArrayUtils.isEmpty(tags)) {
-			String language = LocaleContextHolder.getLocale().getLanguage();
-			for (String tagName : tags) {
-				if (tagName.startsWith("_new_")) {
-					Tag newTag = new Tag();
-					newTag.setName(org.apache.commons.lang.StringUtils.removeStart(tagName, "_new_"));
-					newTag.setLanguage(language);
-					tagRepository.save(newTag);
-					article.getTags().add(newTag);
+		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
+		if (!CollectionUtils.isEmpty(tagNames)) {
+			for (String tagName : tagNames) {
+				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				if (tag == null) {
+					tag = new Tag();
+					tag.setName(tagName);
+					tag.setLanguage(request.getLanguage());
+					article.setCreatedAt(now);
+					article.setCreatedBy(authorizedUser.toString());
+					article.setUpdatedAt(now);
+					article.setUpdatedBy(authorizedUser.toString());
+					tag = tagRepository.saveAndFlush(tag);
 				}
-				else {
-					Tag tag = tagRepository.findById(Long.parseLong(tagName), language);
-					if (tag != null) {
-						article.getTags().add(tag);
-					}
-				}
+				article.getTags().add(tag);
 			}
 		}
 

@@ -517,9 +517,14 @@ legend {
 .pager {
 	margin: 4px 0;
 }
-#main .page-header  .list-inline > li > h1 {
+#main .page-header .list-inline > li > h1 {
 	margin-top: 5px;
 }
+#main .list-inline.list-inline-tag > li {
+	padding-left: 0;
+	margin-bottom: 3px;
+}
+
 /***** dropdown *****/
 .dropdown-submenu{position:relative;}
 .dropdown-submenu>.dropdown-menu{top:0;left:100%;margin-top:-6px;margin-left:-1px;-webkit-border-radius:0 6px 6px 6px;-moz-border-radius:0 6px 6px 6px;border-radius:0 6px 6px 6px;}

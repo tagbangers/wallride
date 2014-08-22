@@ -4,7 +4,6 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +19,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Tag;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
@@ -46,6 +43,11 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag createTag(TagCreateRequest request, AuthorizedUser authorizedUser) {
+		Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
+		if (duplicate != null) {
+			throw new DuplicateNameException(request.getName());
+		}
+
 		Tag tag = new Tag();
 		LocalDateTime now = LocalDateTime.now();
 
@@ -63,6 +65,13 @@ public class TagService {
 	public Tag updateTag(TagUpdateRequest request, AuthorizedUser authorizedUser) {
 		Tag tag = tagRepository.findByIdForUpdate(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
+
+		if (!ObjectUtils.nullSafeEquals(tag.getName(), request.getName())) {
+			Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
+			if (duplicate != null) {
+				throw new DuplicateNameException(request.getName());
+			}
+		}
 
 		tag.setName(request.getName());
 		tag.setLanguage(request.getLanguage());

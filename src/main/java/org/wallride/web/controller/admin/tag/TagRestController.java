@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.service.DuplicateNameException;
 import org.wallride.core.service.TagService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
@@ -42,14 +43,22 @@ public class TagRestController {
 	@RequestMapping(value="/{language}/tags", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectSavedModel save(
 			@Valid TagCreateForm form,
-			BindingResult result,
+			BindingResult errors,
 			AuthorizedUser authorizedUser,
 			HttpServletRequest request,
 			HttpServletResponse response) throws BindException {
-		if (result.hasErrors()) {
-			throw new BindException(result);
+		if (errors.hasErrors()) {
+			throw new BindException(errors);
 		}
-		Tag savedTag = tagService.createTag(form.buildTagCreateRequest(), authorizedUser);
+
+		Tag savedTag;
+		try {
+			savedTag = tagService.createTag(form.buildTagCreateRequest(), authorizedUser);
+		} catch (DuplicateNameException e) {
+			errors.rejectValue("name", "NotDuplicate");
+			throw new BindException(errors);
+		}
+
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("savedTag", savedTag);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
@@ -59,16 +68,24 @@ public class TagRestController {
 	@RequestMapping(value="/{language}/tags/{id}", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectUpdatedModel update(
 			@Valid TagEditForm form,
-			BindingResult result,
+			BindingResult errors,
 			@PathVariable long id,
 			AuthorizedUser authorizedUser,
 			HttpServletRequest request,
 			HttpServletResponse response) throws BindException {
 		form.setId(id);
-		if (result.hasErrors()) {
-			throw new BindException(result);
+		if (errors.hasErrors()) {
+			throw new BindException(errors);
 		}
-		Tag savedTag = tagService.updateTag(form.buildTagUpdateRequest(), authorizedUser);
+
+		Tag savedTag;
+		try {
+			savedTag = tagService.updateTag(form.buildTagUpdateRequest(), authorizedUser);
+		} catch (DuplicateNameException e) {
+			errors.rejectValue("name", "NotDuplicate");
+			throw new BindException(errors);
+		}
+
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("savedTag", savedTag);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);

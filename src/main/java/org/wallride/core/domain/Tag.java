@@ -13,7 +13,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "tag", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "language"}))
 @DynamicInsert
 @DynamicUpdate
 @Indexed
@@ -24,7 +24,7 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(name = "name", length = 500, nullable = false)
+	@Column(name = "name", length = 200, nullable = false)
 	@Field
 	private String name;
 
