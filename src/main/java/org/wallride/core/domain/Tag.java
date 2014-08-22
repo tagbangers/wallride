@@ -2,6 +2,7 @@ package org.wallride.core.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Formula;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -27,6 +28,14 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 	@Field
 	private String language;
 
+	@Formula("(" +
+			"select count(distinct article.id) from article article " +
+			"inner join post post on article.id = post.id " +
+			"inner join article_tag tag on article.id = tag.article_id " +
+			"where tag.tag_id = id " +
+			"and post.status = 'PUBLISHED') ")
+	private int articleCount;
+
 	@Override
 	public Long getId() {
 		return id;
@@ -50,6 +59,10 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public int getArticleCount() {
+		return articleCount;
 	}
 
 	@Override

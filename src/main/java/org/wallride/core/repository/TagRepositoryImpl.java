@@ -66,6 +66,10 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
 			junction.must(query);
 		}
 
+		if (StringUtils.hasText(request.getLanguage())) {
+			junction.must(qb.keyword().onField("language").matching(request.getLanguage()).createQuery());
+		}
+
 		Query searchQuery = junction.createQuery();
 		
 		Session session = (Session) entityManager.getDelegate();
