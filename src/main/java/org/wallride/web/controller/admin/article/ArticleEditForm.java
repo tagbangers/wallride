@@ -187,11 +187,11 @@ public class ArticleEditForm extends DomainObjectEditForm {
 			form.getCategoryIds().add(category.getId());
 		}
 
-		List<Long> tagIds = new ArrayList<>();
+		List<String> tagNames = new ArrayList<>();
 		for (Tag tag : article.getTags()) {
-			tagIds.add(tag.getId());
+			tagNames.add(tag.getName());
 		}
-		form.setTags(StringUtils.join(tagIds, ","));
+		form.setTags(StringUtils.join(tagNames, ","));
 
 		if (article.getSeo() != null) {
 			form.setSeoTitle(article.getSeo().getTitle());

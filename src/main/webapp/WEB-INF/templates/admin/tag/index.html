@@ -53,7 +53,7 @@
 								<div class="pull-right">
 									<ul class="pagination paginateon-sm">
 										<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
-										<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
+										<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
 										<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
 									</ul>
 								</div>
@@ -197,6 +197,8 @@
 											$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
 												var field = $(':input[name="' + field + '"]', form);
 												$(field).closest('.form-group').addClass('has-error');
+												$(field).closest('.form-group').find('.help-block.has-error').remove();
+												$(field).after($('<span class="help-block has-error" />').text(message));
 											});
 											$(self).button('reset');
 										}
@@ -254,6 +256,8 @@
 											$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
 												var field = $(':input[name="' + field + '"]', form);
 												$(field).closest('.form-group').addClass('has-error');
+												$(field).closest('.form-group').find('.help-block.has-error').remove();
+												$(field).after($('<span class="help-block has-error" />').text(message));
 											});
 											$(self).button('reset');
 										}

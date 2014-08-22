@@ -107,7 +107,7 @@ create table setting (
 create table tag (
 	id bigint not null auto_increment,
 	language varchar(3) not null,
-	name varchar(500) not null,
+	name varchar(200) not null,
 	created_at datetime not null,
 	created_by varchar(100),
 	updated_at datetime not null,
@@ -181,6 +181,9 @@ alter table category
 	add constraint FK_81thrbnb8c08gua7tvqj7xdqk
 	foreign key (parent_id)
 	references category (id);
+
+alter table tag
+	add constraint UK_96k5ovyyuo8hgewc0h2f0g9et unique (name, language);
 
 alter table navigation_item
 	add index FK_e986fb2rhw2a7a2m2col2f1fg (parent_id),

@@ -32,7 +32,7 @@ public class TagSelectController {
 		List<DomainObjectSelectModel> results = new ArrayList<>();
 		if (tags.hasContent()) {
 			for (Tag tag : tags) {
-				DomainObjectSelectModel model = new DomainObjectSelectModel(tag);
+				DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getName(), tag.getName());
 				results.add(model);
 			}
 		}
@@ -50,7 +50,7 @@ public class TagSelectController {
 			return null;
 		}
 
-		DomainObjectSelectModel model = new DomainObjectSelectModel(tag);
+		DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getName(), tag.getName());
 		return model;
 	}
 }

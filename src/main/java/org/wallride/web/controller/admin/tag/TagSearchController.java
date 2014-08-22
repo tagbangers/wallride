@@ -48,7 +48,7 @@ public class TagSearchController {
 			BindingResult errors,
 			@PageableDefault(50) Pageable pageable,
 			Model model) {
-		Page<Tag> tags = tagService.readTags(form.buildTagSearchRequest());
+		Page<Tag> tags = tagService.readTags(form.buildTagSearchRequest(), pageable);
 		model.addAttribute("tags", tags);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(tags));
