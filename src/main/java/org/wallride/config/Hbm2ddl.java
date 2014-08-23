@@ -34,6 +34,5 @@ public class Hbm2ddl {
 		new SchemaExport(configuration)
 				.setDelimiter(";")
 				.create(true, false);
-		System.out.println(System.getProperty("test2"));
 	}
 }

@@ -4,6 +4,8 @@ import org.joda.time.LocalDateTime;
 import org.wallride.core.domain.Post;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class PageUpdateRequest implements Serializable {
@@ -16,6 +18,7 @@ public class PageUpdateRequest implements Serializable {
 	private Long authorId;
 	private LocalDateTime date;
 	private Long parentId;
+	private Set<Long> relatedPostIds = new HashSet<>();
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
@@ -54,6 +57,10 @@ public class PageUpdateRequest implements Serializable {
 		return parentId;
 	}
 
+	public Set<Long> getRelatedPostIds() {
+		return relatedPostIds;
+	}
+
 	public String getSeoTitle() {
 		return seoTitle;
 	}
@@ -84,6 +91,7 @@ public class PageUpdateRequest implements Serializable {
 		private Long authorId;
 		private LocalDateTime date;
 		private Long parentId;
+		private Set<Long> relatedPostIds = new HashSet<>();
 		private String seoTitle;
 		private String seoDescription;
 		private String seoKeywords;
@@ -132,6 +140,11 @@ public class PageUpdateRequest implements Serializable {
 			return this;
 		}
 
+		public Builder relatedPostIds(Set<Long> relatedPostIds) {
+			this.relatedPostIds = relatedPostIds;
+			return this;
+		}
+
 		public Builder seoTitle(String seoTitle) {
 			this.seoTitle = seoTitle;
 			return this;
@@ -162,6 +175,7 @@ public class PageUpdateRequest implements Serializable {
 			request.authorId = authorId;
 			request.date = date;
 			request.parentId = parentId;
+			request.relatedPostIds = relatedPostIds;
 			request.seoTitle = seoTitle;
 			request.seoDescription = seoDescription;
 			request.seoKeywords = seoKeywords;

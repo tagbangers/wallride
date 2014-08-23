@@ -6,11 +6,13 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.joda.time.LocalDateTime;
 
-import javax.persistence.*;
 import javax.persistence.CascadeType;
+import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 @Entity
@@ -77,8 +79,15 @@ public class Post extends DomainObject<Long> {
 	private SortedSet<Post> drafts;
 
 	@ManyToMany
+	@JoinTable(
+			name="post_related_post",
+			joinColumns = { @JoinColumn(name="post_id")},
+			inverseJoinColumns = { @JoinColumn(name="related_id") })
+	private Set<Post> relatedPosts = new HashSet<>();
+
+	@ManyToMany
 	@JoinTable(name="post_media", joinColumns=@JoinColumn(name="post_id", referencedColumnName="id"), inverseJoinColumns=@JoinColumn(name="media_id", referencedColumnName="id"))
-	@IndexColumn(name="`index`")
+	@OrderColumn(name="`index`")
 	private List<Media> medias;
 
 	@Override
@@ -188,6 +197,14 @@ public class Post extends DomainObject<Long> {
 
 	public List<Media> getMedias() {
 		return medias;
+	}
+
+	public Set<Post> getRelatedPosts() {
+		return relatedPosts;
+	}
+
+	public void setRelatedPosts(Set<Post> relatedPosts) {
+		this.relatedPosts = relatedPosts;
 	}
 
 	public void setMedias(List<Media> medias) {

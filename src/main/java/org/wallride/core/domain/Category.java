@@ -1,12 +1,11 @@
 package org.wallride.core.domain;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.search.annotations.Field;
 
-import javax.persistence.CascadeType;
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -63,7 +62,7 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 			name="article_category",
 			joinColumns={@JoinColumn(name="category_id")},
 			inverseJoinColumns=@JoinColumn(name="article_id", referencedColumnName="id"))
-	@Sort(type= SortType.NATURAL)
+	@SortNatural
 	private SortedSet<Article> articles = new TreeSet<>();
 
 //	@Formula("(" +

@@ -93,6 +93,14 @@
 							</dd>
 						</dl>
 						<dl>
+							<dt>Related Posts</dt>
+							<dd>
+								<ul class="list-unstyled list-inline list-inline-tag">
+									<li th:each="relatedPost : ${article.relatedPosts}"><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${relatedPost.id})}" th:text="${relatedPost.title}" target="_blank"></a></li>
+								</ul>
+							</dd>
+						</dl>
+						<dl>
 							<dt th:text="#{Seo}">SEO</dt>
 							<dd>
 								<dl>

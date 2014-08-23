@@ -123,6 +123,13 @@ public class PageService {
 		page.setStatus(status);
 		page.setLanguage(request.getLanguage());
 
+		page.getRelatedPosts().clear();
+		Set<Post> relatedPosts = new HashSet<>();
+		for (long relatedId : request.getRelatedPostIds()) {
+			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
+		}
+		page.setRelatedPosts(relatedPosts);
+
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());
 		seo.setDescription(request.getSeoDescription());
@@ -286,6 +293,13 @@ public class PageService {
 		}
 		page.setDate(date);
 		page.setLanguage(request.getLanguage());
+
+		page.getRelatedPosts().clear();
+		Set<Post> relatedPosts = new HashSet<>();
+		for (long relatedId : request.getRelatedPostIds()) {
+			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
+		}
+		page.setRelatedPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());
