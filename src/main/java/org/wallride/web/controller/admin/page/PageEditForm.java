@@ -9,6 +9,8 @@ import org.wallride.core.service.PageUpdateRequest;
 import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class PageEditForm extends DomainObjectEditForm {
@@ -35,6 +37,7 @@ public class PageEditForm extends DomainObjectEditForm {
 	private LocalDateTime date;
 
 	private Long parentId;
+	private Set<Long> relatedPostIds = new HashSet<>();
 
 	private String seoTitle;
 	private String seoDescription;
@@ -109,6 +112,14 @@ public class PageEditForm extends DomainObjectEditForm {
 		this.parentId = parentId;
 	}
 
+	public Set<Long> getRelatedPostIds() {
+		return relatedPostIds;
+	}
+
+	public void setRelatedPostIds(Set<Long> relatedPostIds) {
+		this.relatedPostIds = relatedPostIds;
+	}
+
 	public String getSeoTitle() {
 		return seoTitle;
 	}
@@ -160,6 +171,7 @@ public class PageEditForm extends DomainObjectEditForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
@@ -178,6 +190,10 @@ public class PageEditForm extends DomainObjectEditForm {
 
 		form.setCoverId(page.getCover() != null ? page.getCover().getId() : null);
 		form.setParentId(page.getParent() != null ? page.getParent().getId() : null);
+
+		for (Post post : page.getRelatedPosts()) {
+			form.getRelatedPostIds().add(post.getId());
+		}
 
 		if (page.getSeo() != null) {
 			form.setSeoTitle(page.getSeo().getTitle());

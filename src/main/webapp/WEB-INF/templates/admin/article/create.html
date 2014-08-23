@@ -306,7 +306,7 @@
 								/*]]>*/
 							</script>
 							<fieldset>
-								<legend>Related Posts</legend>
+								<legend th:text="#{RelatedPosts}">Related Posts</legend>
 								<div class="form-group row" th:classappend="${#fields.hasErrors('relatedPostIds')}? has-error">
 									<div class="col-sm-12">
 										<input id="related-posts-fieldset" type="text" th:field="*{relatedPostIds}" style="width: 100%" placeholder=""/>

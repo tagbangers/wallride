@@ -252,6 +252,53 @@
 									</select>
 								</div>
 							</fieldset>
+							<fieldset>
+								<legend th:text="#{RelatedPosts}">Related Posts</legend>
+								<div class="form-group row" th:classappend="${#fields.hasErrors('relatedPostIds')}? has-error">
+									<div class="col-sm-12">
+										<input id="related-posts-fieldset" type="text" th:field="*{relatedPostIds}" style="width: 100%" placeholder=""/>
+									</div>
+									<span th:if="${#fields.hasErrors('relatedPostIds')}" class="help-block" th:text="${#fields.errors('relatedPostIds')}" />
+								</div>
+							</fieldset>
+							<script th:inline="javascript">
+								/*<![CDATA[*/
+								$(function() {
+									$('#related-posts-fieldset').select2({
+										minimumInputLength: 1,
+										multiple: true,
+										ajax: {
+											url:  /*[[@{__${ADMIN_PATH}__/posts/select}]]*/ '#',
+											dataType: 'json',
+											data: function (term, page) {
+												return {
+													keyword: term
+												};
+											},
+											results: function (data, page) {
+												return {results: data};
+											}
+										},
+										initSelection: function(element, callback) {
+											var data = [];
+											$(element.val().split(',')).each(function() {
+												var id = this;
+												if (id !== "") {
+													var url = /*[[@{__${ADMIN_PATH}__/posts/select}]]*/ '#';
+													$.ajax(url + "/" + id,  {
+														async: false,
+														dataType: "json",
+														data: { id: id }
+													}).done(function(response) { data.push(response); });
+												}
+											});
+											element.val('');
+											callback(data);
+										}
+									});
+								});
+								/*]]>*/
+							</script>
 							<fieldset id="seo-fieldset">
 								<legend th:text="#{Seo}">SEO</legend>
 								<div class="form-group" th:classappend="${#fields.hasErrors('seoTitle')}? has-error">
