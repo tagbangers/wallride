@@ -16,7 +16,7 @@ import java.util.List;
 @Analyzer(definition="synonyms")
 @Indexed
 @SuppressWarnings("serial")
-public class Page extends Post implements Comparable<Page>{
+public class Page extends Post implements Comparable<Page> {
 
 	@Column(name="lft", nullable=false)
 	@Field

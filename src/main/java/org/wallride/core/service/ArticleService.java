@@ -1,6 +1,5 @@
 package org.wallride.core.service;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,10 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
-import org.wallride.core.repository.*;
+import org.wallride.core.repository.ArticleFullTextSearchTerm;
+import org.wallride.core.repository.ArticleRepository;
+import org.wallride.core.repository.MediaRepository;
+import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.Settings;
 
@@ -132,6 +134,13 @@ public class ArticleService {
 				article.getTags().add(tag);
 			}
 		}
+
+		article.getRelatedPosts().clear();
+		Set<Post> relatedPosts = new HashSet<>();
+		for (long relatedId : request.getRelatedPostIds()) {
+			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
+		}
+		article.setRelatedPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());
@@ -303,6 +312,13 @@ public class ArticleService {
 				article.getTags().add(tag);
 			}
 		}
+
+		article.getRelatedPosts().clear();
+		Set<Post> relatedPosts = new HashSet<>();
+		for (long relatedId : request.getRelatedPostIds()) {
+			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
+		}
+		article.setRelatedPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());

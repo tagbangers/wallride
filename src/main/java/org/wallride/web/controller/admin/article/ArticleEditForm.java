@@ -41,8 +41,8 @@ public class ArticleEditForm extends DomainObjectEditForm {
 	private LocalDateTime date;
 
 	private Set<Long> categoryIds = new HashSet<>();
-
 	private String tags;
+	private Set<Long> relatedPostIds = new HashSet<>();
 
 	private String seoTitle;
 	private String seoDescription;
@@ -123,6 +123,14 @@ public class ArticleEditForm extends DomainObjectEditForm {
 		this.tags = tags;
 	}
 
+	public Set<Long> getRelatedPostIds() {
+		return relatedPostIds;
+	}
+
+	public void setRelatedPostIds(Set<Long> relatedPostIds) {
+		this.relatedPostIds = relatedPostIds;
+	}
+
 	public String getSeoTitle() {
 		return seoTitle;
 	}
@@ -167,6 +175,7 @@ public class ArticleEditForm extends DomainObjectEditForm {
 				.date(date)
 				.categoryIds(categoryIds)
 				.tags(tags)
+				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
@@ -183,6 +192,7 @@ public class ArticleEditForm extends DomainObjectEditForm {
 		}
 
 		form.setCoverId(article.getCover() != null ? article.getCover().getId() : null);
+
 		for (Category category : article.getCategories()) {
 			form.getCategoryIds().add(category.getId());
 		}
@@ -192,6 +202,10 @@ public class ArticleEditForm extends DomainObjectEditForm {
 			tagNames.add(tag.getName());
 		}
 		form.setTags(StringUtils.join(tagNames, ","));
+
+		for (Post post : article.getRelatedPosts()) {
+			form.getRelatedPostIds().add(post.getId());
+		}
 
 		if (article.getSeo() != null) {
 			form.setSeoTitle(article.getSeo().getTitle());

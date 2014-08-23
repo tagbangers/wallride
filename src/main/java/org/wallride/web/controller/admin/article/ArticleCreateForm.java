@@ -31,8 +31,8 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 	private LocalDateTime date;
 
 	private Set<Long> categoryIds = new HashSet<>();
-
 	private String tags;
+	private Set<Long> relatedPostIds = new HashSet<>();
 
 	private String seoTitle;
 	private String seoDescription;
@@ -105,6 +105,14 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 		this.tags = tags;
 	}
 
+	public Set<Long> getRelatedPostIds() {
+		return relatedPostIds;
+	}
+
+	public void setRelatedPostIds(Set<Long> relatedPostIds) {
+		this.relatedPostIds = relatedPostIds;
+	}
+
 	public String getSeoTitle() {
 		return seoTitle;
 	}
@@ -148,6 +156,7 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 				.date(date)
 				.categoryIds(categoryIds)
 				.tags(tags)
+				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)

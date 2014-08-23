@@ -7,6 +7,8 @@ import org.wallride.core.service.PageCreateRequest;
 import org.wallride.web.support.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class PageCreateForm extends DomainObjectCreateForm {
@@ -30,6 +32,7 @@ public class PageCreateForm extends DomainObjectCreateForm {
 	private LocalDateTime date;
 	
 	private Long parentId;
+	private Set<Long> relatedPostIds = new HashSet<>();
 
 	private String seoTitle;
 	private String seoDescription;
@@ -83,13 +86,25 @@ public class PageCreateForm extends DomainObjectCreateForm {
 	public LocalDateTime getDate() {
 		return date;
 	}
-	
+
+	public void setDate(LocalDateTime date) {
+		this.date = date;
+	}
+
 	public Long getParentId() {
 		return parentId;
 	}
 	
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
+	}
+
+	public Set<Long> getRelatedPostIds() {
+		return relatedPostIds;
+	}
+
+	public void setRelatedPostIds(Set<Long> relatedPostIds) {
+		this.relatedPostIds = relatedPostIds;
 	}
 
 	public String getSeoTitle() {
@@ -142,6 +157,7 @@ public class PageCreateForm extends DomainObjectCreateForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)

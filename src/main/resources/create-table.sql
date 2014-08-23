@@ -94,6 +94,12 @@ create table post_media (
 	primary key (post_id, `index`)
 ) ENGINE=InnoDB;
 
+create table post_related_post (
+	post_id bigint not null,
+	related_id bigint not null,
+	primary key (post_id, related_id)
+) ENGINE=InnoDB;
+
 create table setting (
 	`key` varchar(100) not null,
 	value varchar(500) not null,
@@ -244,6 +250,16 @@ alter table post_media
 alter table post_media
 	add index FK_rmb5w9waqw5fpy31j42wjirt3 (post_id),
 	add constraint FK_rmb5w9waqw5fpy31j42wjirt3
+	foreign key (post_id)
+	references post (id);
+
+alter table post_related_post
+	add constraint FK_4yoix0vojg6k29dujxt66dlm1
+	foreign key (related_id)
+	references post (id);
+
+alter table post_related_post
+	add constraint FK_9h3eog304whtvhs23f3lmd5ow
 	foreign key (post_id)
 	references post (id);
 
