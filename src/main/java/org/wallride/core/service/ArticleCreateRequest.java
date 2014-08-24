@@ -1,7 +1,6 @@
 package org.wallride.core.service;
 
 import org.joda.time.LocalDateTime;
-import org.wallride.core.domain.Post;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -17,6 +16,7 @@ public class ArticleCreateRequest implements Serializable {
 	private LocalDateTime date;
 	private Set<Long> categoryIds = new HashSet<>();
 	private String tags;
+	private Set<Long> relatedPostIds = new HashSet<>();
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
@@ -54,6 +54,10 @@ public class ArticleCreateRequest implements Serializable {
 		return tags;
 	}
 
+	public Set<Long> getRelatedPostIds() {
+		return relatedPostIds;
+	}
+
 	public String getSeoTitle() {
 		return seoTitle;
 	}
@@ -80,6 +84,7 @@ public class ArticleCreateRequest implements Serializable {
 		private LocalDateTime date;
 		private Set<Long> categoryIds = new HashSet<>();
 		private String tags;
+		private Set<Long> relatedPostIds = new HashSet<>();
 		private String seoTitle;
 		private String seoDescription;
 		private String seoKeywords;
@@ -128,6 +133,11 @@ public class ArticleCreateRequest implements Serializable {
 			return this;
 		}
 
+		public Builder relatedPostIds(Set<Long> relatedPostIds) {
+			this.relatedPostIds = relatedPostIds;
+			return this;
+		}
+
 		public Builder seoTitle(String seoTitle) {
 			this.seoTitle = seoTitle;
 			return this;
@@ -158,6 +168,7 @@ public class ArticleCreateRequest implements Serializable {
 			request.date = date;
 			request.categoryIds = categoryIds;
 			request.tags = tags;
+			request.relatedPostIds = relatedPostIds;
 			request.seoTitle = seoTitle;
 			request.seoDescription = seoDescription;
 			request.seoKeywords = seoKeywords;

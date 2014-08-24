@@ -2,8 +2,7 @@ package org.wallride.core.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -27,7 +26,7 @@ public class Article extends Post implements Comparable<Article> {
 			name="article_category",
 			joinColumns={@JoinColumn(name="article_id")},
 			inverseJoinColumns=@JoinColumn(name="category_id", referencedColumnName="id"))
-	@Sort(type=SortType.NATURAL)
+	@SortNatural
 	@IndexedEmbedded
 	private SortedSet<Category> categories = new TreeSet<>();
 
@@ -36,7 +35,7 @@ public class Article extends Post implements Comparable<Article> {
 			name="article_tag",
 			joinColumns={@JoinColumn(name="article_id")},
 			inverseJoinColumns=@JoinColumn(name="tag_id", referencedColumnName="id"))
-	@Sort(type=SortType.NATURAL)
+	@SortNatural
 	@IndexedEmbedded
 	private SortedSet<Tag> tags = new TreeSet<>();
 
@@ -55,7 +54,7 @@ public class Article extends Post implements Comparable<Article> {
 	public void setTags(SortedSet<Tag> tags) {
 		this.tags = tags;
 	}
-	
+
 	public int compareTo(Article article) {
 		if (getDate() != null && article.getDate() == null) return 1;
 		if (getDate() == null && article.getDate() != null) return -1;
