@@ -7,52 +7,46 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<div th:replace="layout::sidebar"></div>
-			<div id="main">
-				<div class="row">
-					<div class="col-sm-12">
-						<div class="pull-left">
-							<ol class="breadcrumb">
-								<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">ダッシュボード</a></li>
-								<li><a th:href="@{__${ADMIN_PATH}__/users/index}" th:text="#{AllUsers}">ユーザ一覧</a></li>
-								<li class="active" th:text="${user.name}"></li>
-							</ol>
+			<div id="wr-page-header">
+				<div class="page-header container-fluid">
+					<div class="pull-left">
+						<h1 th:text="${user.name}">Name</h1>
+					</div>
+					<div class="pull-right">
+						<div class="btn-group">
+							<div th:classappend="${previousObject eq null}?'disabled'" class="previous">
+								<a class="btn btn-default" th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+							</div>
 						</div>
-						<div class="pull-right">
-							<ul class="pager">
-								<li th:classappend="${previousObject eq null}?'disabled'" class="previous">
-									<a th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
-								</li>
-								<li th:classappend="${nextObject eq null}?'disabled'" class="next">
-									<a th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
-								</li>
-							</ul>
+						<div class="btn-group">
+							<div th:classappend="${nextObject eq null}?'disabled'" class="next">
+								<a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-sm-9 describe">
-						<div class="page-header">
-							<h1 th:text="${user.name}">Name</h1>
-						</div>
-						<table class="table">
-							<tr>
-								<th th:text="#{LoginId}">ログインID</th>
-								<td th:text="${user.loginId}">ログインID</td>
-							</tr>
-							<tr>
-								<th th:text="#{Email}">メールアドレス</th>
-								<td th:text="${user.email}">メールアドレス</td>
-							</tr>
-							<tr>
-								<th th:text="#{Posts}">投稿記事数</th>
-								<td th:text="${articleCounts.get(user.id)}?:0">投稿記事数</td>
-							</tr>
-						</table>
-					</div>
-					<div class="col-sm-3">
-						<div class="thumbnail">
-							<img th:src="${user.getGravatarUrl(170)}" src="http://placehold.it/170/eeeeee/ffffff" />
+			</div>
+			<div id="wr-page-content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-sm-12 describe">
+							<div style="margin-bottom: 15px">
+								<img style="width:150px; border-radius: 50%" th:src="${user.getGravatarUrl(170)}" src="http://placehold.it/170/eeeeee/ffffff" />
+							</div>
+							<table class="table">
+								<tr>
+									<th th:text="#{LoginId}">ログインID</th>
+									<td th:text="${user.loginId}">ログインID</td>
+								</tr>
+								<tr>
+									<th th:text="#{Email}">メールアドレス</th>
+									<td th:text="${user.email}">メールアドレス</td>
+								</tr>
+								<tr>
+									<th th:text="#{Posts}">投稿記事数</th>
+									<td th:text="${articleCounts.get(user.id)}?:0">投稿記事数</td>
+								</tr>
+							</table>
 						</div>
 					</div>
 				</div>
