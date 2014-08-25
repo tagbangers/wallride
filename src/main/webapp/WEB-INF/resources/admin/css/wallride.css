@@ -155,27 +155,13 @@ pre {
 #wr-page-header .back {
 	margin-right: 15px;
 }
-#wr-page-header .pager {
-	margin: 0;
-}
-#wr-page-header .pager .disabled>a, .pager .disabled>a:hover, .pager .disabled>a:focus, .pager .disabled>span {
-	color: #999;
+.disabled>a,
+.disabled>a:hover,
+.disabled>a:focus,
+.disabled>span {
+	color: #C5C5C5;
 	cursor: not-allowed;
 	background-color: transparent;
-}
-.pager li>a, .pager li>span {
-	padding: 0 15px 0 0;
-	border-radius:0;
-	border:transparent;
-	background-color: transparent;
-	line-height: 35px;
-}
-.pager li>a {
-	color: #726868;
-}
-.pager li>a:hover, .pager li>a:focus {
-	background-color: transparent;
-	color: #819FAA;
 }
 @media (max-width: 768px) {
 	#wr-blog-nav {
@@ -185,7 +171,6 @@ pre {
 		margin-left: 0;
 	}
 }
-
 
 /*** search ***/
 #wr-page-content .search-condition {
@@ -201,7 +186,7 @@ pre {
 	width:250px;
 }
 #wr-page-content .search-condition .status-condition {
-	margin-left: 30px;
+	margin-left: 15px;
 }
 #wr-page-content .search-result .search-result-header {
 	margin-bottom: 15px;
@@ -216,9 +201,10 @@ pre {
 #wr-page-content .search-result .condition-group {
 	padding: 9px 9px 9px 0;
 }
-
+#wr-page-content .wr-tool-panel dl.wr-tags dd {
+	margin-left: 5px;
+}
 /***** button *****/
-
 .btn-primary {
 	background-color: #E25656;
 	border-color: #DDDDDD;

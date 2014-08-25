@@ -11,6 +11,9 @@
 				<div class="page-header container-fluid">
 					<div class="row">
 						<div class="col-sm-9">
+							<div class="pull-left back">
+								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/articles/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+							</div>
 							<div class="pull-left">
 								<h1 th:text="${article.title}?:'(No Titled)'">(No Titled)</h1>
 							</div>
@@ -76,7 +79,7 @@
 								</ul>
 								</dd>
 							</dl>
-							<dl>
+							<dl class="wr-tags">
 								<dt th:text="#{Tags}">Tags</dt>
 								<dd>
 									<ul class="list-unstyled list-inline list-inline-tag">
@@ -90,7 +93,7 @@
 									<ul class="list-unstyled">
 										<li th:each="relatedPost : ${article.relatedPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
 									</ul>
-									</dd>
+								</dd>
 							</dl>
 							<dl>
 								<dt th:text="#{Seo}">SEO</dt>

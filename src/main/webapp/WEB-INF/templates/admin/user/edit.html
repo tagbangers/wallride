@@ -14,56 +14,55 @@
 			</div>
 			<div id="wr-page-content">
 				<div class="container-fluid">
-					<div class="row">
-						<form class="form-horizontal" method="post">
-							<div class="col-sm-9">
-								<fieldset>
-									<div class="form-group">
-										<label class="col-sm-2 control-label" th:text="#{Name}">名前</label>
-										<div class="col-sm-5">
-											<input type="text" class="form-control" th:attr="placeholder=#{FirstName}" />
-										</div>
-										<div class="col-sm-5">
-											<input type="text" class="form-control" th:attr="placeholder=#{LastName}" />
-										</div>
-									</div>
-								</fieldset>
-								<fieldset>
-									<div class="form-group">
-										<label class="col-sm-2 control-label" th:text="#{Email}">メールアドレス</label>
-										<div class="col-sm-10">
-											<input type="text" name="path" class="form-control" th:attr="placeholder=#{Email}" placeholder="メールアドレス" />
-										</div>
-									</div>
-								</fieldset>
-								<fieldset>
-									<div class="form-group">
-										<label class="col-sm-2 control-label" th:text="#{Languages}">言語</label>
-										<div class="col-sm-10">
-											<select class="form-control">
-												<option value="日本語">日本語</option>
-												<option value="日本語">日本語</option>
-												<option value="日本語">日本語</option>
-												<option value="日本語">日本語</option>
-											</select>
-										</div>
-									</div>
-								</fieldset>
-							</div>
-							<div class="col-sm-3">
-								<fieldset style="margin-top: 0; margin-bottom: 1em;">
-									<div class="btn-toolbar pull-right" role="toolbar">
-										<div class="btn-group">
-											<button name="_step.save" class="btn btn-primary ok" th:text="#{Save}">保存</button>
-										</div>
-									</div>
-								</fieldset>
-								<div class="thumbnail">
-									<img src="http://placehold.it/170/eeeeee/ffffff"/>
+					<form class="form-horizontal" method="post">
+						<fieldset>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" th:text="#{Thumbnail}">サムネイル</label>
+								<div class="col-sm-10">
+									<a href="https://gravatar.com" target="_blank">Register Gravatar</a>
 								</div>
 							</div>
-						</form>
-					</div>
+						</fieldset>
+						<fieldset>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" th:text="#{Name}">名前</label>
+								<div class="col-sm-5">
+									<input type="text" class="form-control" th:attr="placeholder=#{FirstName}" />
+								</div>
+								<div class="col-sm-5">
+									<input type="text" class="form-control" th:attr="placeholder=#{LastName}" />
+								</div>
+							</div>
+						</fieldset>
+						<fieldset>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" th:text="#{Email}">メールアドレス</label>
+								<div class="col-sm-10">
+									<input type="text" name="path" class="form-control" th:attr="placeholder=#{Email}" placeholder="メールアドレス" />
+								</div>
+							</div>
+						</fieldset>
+						<!--<fieldset>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" th:text="#{Languages}">言語</label>
+								<div class="col-sm-10">
+									<select class="form-control">
+										<option value="日本語">日本語</option>
+										<option value="日本語">日本語</option>
+										<option value="日本語">日本語</option>
+										<option value="日本語">日本語</option>
+									</select>
+								</div>
+							</div>
+						</fieldset>-->
+						<fieldset>
+							<div>
+								<div class="btn-group">
+									<button name="_step.save" class="btn btn-primary ok" th:text="#{Save}">保存</button>
+								</div>
+							</div>
+						</fieldset>
+					</form>
 				</div>
 			</div>
 		</div>

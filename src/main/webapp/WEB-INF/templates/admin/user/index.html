@@ -107,25 +107,25 @@
 										var confirmed = $(this);
 										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
 									});
-									$('#main .search-result').on('click', '[data-href]', function(e) {
+									$('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
 										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')){
 											window.location = $(e.target).closest('tr').data('href');
 										};
 									});
-									$('#main .search-result').on('click', '[data-action]', function(e) {
+									$('#wr-page-content .search-result').on('click', '[data-action]', function(e) {
 										var form = $(this).closest('form');
 										form.attr('action', $(this).data('action'));
 										form.submit();
 										e.preventDefault();
 									});
-									$('#main .search-result td.wr-tr-checkbox').shiftcheckbox({
+									$('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
 										checkboxSelector: ':checkbox',
 										selectAll: '.search-result th.wr-tr-checkbox'
 									});
-									$('#main .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
+									$('#wr-page-content .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
 										e.stopPropagation();
 									});
-									$('#main .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
+									$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
 										var checked = $(this).prop('checked');
 										if (checked) {
 											$(this).closest('tr').addClass('warning');
@@ -134,17 +134,17 @@
 											$(this).closest('tr').removeClass('warning');
 										}
 										var checkedSomeone = false;
-										$('#main .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
+										$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
 											if ($(e).prop('checked')) {
 												checkedSomeone = true;
 												return;
 											}
 										});
 										if (checkedSomeone) {
-											$('#main .search-result .wr-bulk-action .btn').removeClass('disabled');
+											$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
 										}
 										else {
-											$('#main .search-result .wr-bulk-action .btn').addClass('disabled');
+											$('#wr-page-content .search-result .wr-bulk-action .btn').addClass('disabled');
 										}
 									});
 								});

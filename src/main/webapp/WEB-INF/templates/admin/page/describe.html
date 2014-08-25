@@ -11,6 +11,9 @@
 				<div class="page-header container-fluid">
 					<div class="row">
 						<div class="col-sm-9">
+							<div class="pull-left back">
+								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+							</div>
 							<div class="pull-left">
 								<h1 th:text="${page.title?:'(No Titled)'}">Page Title</h1>
 							</div>

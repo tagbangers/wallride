@@ -23,6 +23,9 @@
 								<a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
 							</div>
 						</div>
+						<div class="btn-group">
+							<a th:href="@{__${ADMIN_PATH}__/users/edit(id=${user.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
+						</div>
 					</div>
 				</div>
 			</div>
