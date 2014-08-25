@@ -7,37 +7,34 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<div th:replace="layout::sidebar"></div>
-			<div id="main">
-				<ol class="breadcrumb">
-					<li><a th:href="@{__${ADMIN_PATH}__/}" th:text="#{Dashboard}">ダッシュボード</a></li>
-					<li class="active" th:text="#{AllUsers}">ユーザ一覧</li>
-				</ol>
-				<div class="page-header clearfix">
-					<ul class="list-inline">
-						<li><h1 th:text="#{Users}">Users</h1></li>
-						<li><a th:href="@{__${ADMIN_PATH}__/users/invitations/index}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{InviteNew}">ユーザーを招待</span></a></li>
-					</ul>
-				</div>
-				<section class="search-condition">
-					<div class="search-condition-quick clearfix">
-						<form class="form-inline" method="post" th:action="@{__${ADMIN_PATH}__/users/index}" th:object="${form}">
-							<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
-							<input type="hidden" />
-							<div class="form-group pull-left">
-								<ul class="list-inline" style="line-height: 30px;">
-									<li><a th:text="#{All}">すべて</a> <span class="total" >(0)</span></li>
-								</ul>
-							</div>
-							<div class="form-group pull-right" style="width: 300px;">
-								<div class="input-group simple-search pull-right">
-									<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-									<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
-								</div>
-							</div>
-						</form>
+			<div id="wr-page-header">
+				<div class="page-header container-fluid">
+					<div class="pull-left">
+						<h1 th:text="#{Users}">Users</h1>
 					</div>
-				</section>
+					<div class="pull-right">
+						<a th:href="@{__${ADMIN_PATH}__/users/invitations/index}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{InviteNew}">ユーザーを招待</span></a>
+					</div>
+				</div>
+			</div>
+			<div id="wr-page-content">
+				<div class="container-fluid">
+					<section class="search-condition">
+						<div class="search-condition-simple clearfix">
+							<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/users/index}" th:object="${form}">
+								<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
+								<div class="form-group pull-left">
+									<div class="input-group keyword-search">
+										<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
+										<span class="input-group-btn">
+											<button class="btn btn-default" type="submit" name="search"><span class="glyphicon glyphicon-search"></span>
+											</button>
+										</span>
+									</div>
+								</div>
+							</form>
+						</div>
+					</section>
 					<section class="search-result">
 						<form method="post">
 							<input type="hidden" name="token" th:value="${token}" />
@@ -110,25 +107,25 @@
 										var confirmed = $(this);
 										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
 									});
-									$('#main .search-result').on('click', '[data-href]', function(e) {
+									$('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
 										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')){
 											window.location = $(e.target).closest('tr').data('href');
 										};
 									});
-									$('#main .search-result').on('click', '[data-action]', function(e) {
+									$('#wr-page-content .search-result').on('click', '[data-action]', function(e) {
 										var form = $(this).closest('form');
 										form.attr('action', $(this).data('action'));
 										form.submit();
 										e.preventDefault();
 									});
-									$('#main .search-result td.wr-tr-checkbox').shiftcheckbox({
+									$('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
 										checkboxSelector: ':checkbox',
 										selectAll: '.search-result th.wr-tr-checkbox'
 									});
-									$('#main .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
+									$('#wr-page-content .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
 										e.stopPropagation();
 									});
-									$('#main .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
+									$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
 										var checked = $(this).prop('checked');
 										if (checked) {
 											$(this).closest('tr').addClass('warning');
@@ -137,17 +134,17 @@
 											$(this).closest('tr').removeClass('warning');
 										}
 										var checkedSomeone = false;
-										$('#main .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
+										$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
 											if ($(e).prop('checked')) {
 												checkedSomeone = true;
 												return;
 											}
 										});
 										if (checkedSomeone) {
-											$('#main .search-result .wr-bulk-action .btn').removeClass('disabled');
+											$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
 										}
 										else {
-											$('#main .search-result .wr-bulk-action .btn').addClass('disabled');
+											$('#wr-page-content .search-result .wr-bulk-action .btn').addClass('disabled');
 										}
 									});
 								});
@@ -157,6 +154,7 @@
 					</section>
 				</div>
 			</div>
+		</div>
 		<footer>
 		</footer>
 	</body>

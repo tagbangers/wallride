@@ -7,59 +7,29 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<div th:replace="layout::sidebar"></div>
-			<div id="main">
-				<div class="row">
-					<div class="col-sm-12">
-						<div class="pull-left">
-							<ol class="breadcrumb">
-								<li><a th:href="@{__${ADMIN_PATH}__/}">Dashboard</a></li>
-								<li><a th:href="@{__${ADMIN_PATH}__/pages/index}">Pages</a></li>
-								<li class="active" th:text="${page.title?:'(No Titled)'}"></li>
-							</ol>
-						</div>
-						<div class="pull-right">
-							<ul class="pager">
-								<li th:classappend="${previousObject eq null}?'disabled'" class="previous">
-									<a th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/pages/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
-								</li>
-								<li th:classappend="${nextObject eq null}?'disabled'" class="next">
-									<a th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/pages/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-9 wr-describe-main">
-						<div class="alert alert-success" th:if="${savedPage ne null}">
-							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-							<span th:text="#{SavedPage}">Page saved.</span>
-						</div>
-						<div class="page-header clearfix">
-							<img th:if="${page.cover ne null}" th:src="@{${#medias.link(page.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
-							<h1 th:text="${page.title?:'(No Titled)'}">Page Title</h1>
-						</div>
-						<div class="clearfix">
-							<p th:utext="${#posts.body(page)}"></p>
-						</div>
-						<hr/>
-						<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a>
-					</div>
-					<div class="col-sm-3 wr-tool-panel">
-						<div class="tools clearfix">
-							<div class="pull-left">
-								<div class="status">
-									<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
-									<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
-									<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-									<a th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
-										<span class="glyphicon glyphicon-globe"></span>
-										<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-									</a>
-								</div>
+			<div id="wr-page-header">
+				<div class="page-header container-fluid">
+					<div class="row">
+						<div class="col-sm-9">
+							<div class="pull-left back">
+								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
 							</div>
-							<div class="btn-toolbar pull-right" role="toolbar">
+							<div class="pull-left">
+								<h1 th:text="${page.title?:'(No Titled)'}">Page Title</h1>
+							</div>
+						</div>
+						<div class="col-sm-3">
+							<div class="pull-right">
+								<div class="btn-group">
+									<div th:classappend="${previousObject eq null}?'disabled'" class="previous">
+										<a class="btn btn-default" th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/pages/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+									</div>
+								</div>
+								<div class="btn-group">
+									<div th:classappend="${nextObject eq null}?'disabled'" class="next">
+										<a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/pages/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+									</div>
+								</div>
 								<div class="btn-group">
 									<a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${page.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
 <!--
@@ -74,74 +44,109 @@
 								</div>
 							</div>
 						</div>
-						<dl>
-							<dt th:text="#{Date}">Date</dt>
-							<dd th:if="${page.date ne null}" th:text="${page.date.toString('yyyy/MM/dd')}"></dd>
-						</dl>
-						<dl>
-							<dt th:text="#{ParentPage}">Parent Page</dt>
-							<dd>
-							<ul class="list-unstyled">
-								<li th:if="${page.parent ne null}" th:text="${page.parent.title}">Category Name</li>
-							</ul>
-							</dd>
-						</dl>
-						<dl>
-							<dt th:text="#{RelatedPosts}">Related Posts</dt>
-							<dd>
-								<ul class="list-unstyled">
-									<li th:each="relatedPost : ${page.relatedPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
-								</ul>
-							</dd>
-						</dl>
-						<dl>
-							<dt th:text="#{Seo}">SEO</dt>
-							<dd>
-								<dl>
-									<dt th:text="#{SeoTitle}">Title</dt>
-									<dd th:text="${page.seo}? ${page.seo.title}"></dd>
-									<dt th:text="#{SeoDescription}">Description</dt>
-									<dd th:text="${page.seo}? ${page.seo.description}"></dd>
-									<dt th:text="#{SeoKeywords}">Keywords</dt>
-									<dd th:text="${page.seo}? ${page.seo.keywords}"></dd>
-								</dl>
-							</dd>
-						</dl>
-						<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
-						<!-- #delete-modal -->
-						<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-							<div id="delete-dialog" class="modal-dialog">
-								<form th:action="@{__${ADMIN_PATH}__/pages/delete(id=${page.id})}" method="post">
-									<div th:fragment="delete-form" class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-											<h4 class="modal-title" th:text="#{DeletePage}">ページを削除</h4>
-										</div>
-										<div class="modal-body">
-											<p th:text="#{MakeSureDelete}">本当に削除しますか？</p>
-										</div>
-										<div class="modal-footer">
-											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">キャンセル</button>
-											<button class="btn btn-primary" th:text="#{Delete}">削除</button>
-										</div>
-									</div>
-								</form>
-							</div>
-						</div>
-						<!--/#delete-modal -->
-						<script th:inline="javascript">
-							// <![CDATA[
-							$(function() {
-								$('#delete-modal').on('hidden.bs.modal', function() {
-									$(this).removeData('bs.modal');
-								});
-							});
-							// ]]>
-						</script>
 					</div>
 				</div>
-				<div class="alert alert-warning" th:unless="${page ne null}">
-					<strong>Not Found.</strong> May be deleted.
+			</div>
+			<div id="wr-page-content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-sm-9 wr-describe-main">
+							<div class="alert alert-success" th:if="${savedPage ne null}">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<span th:text="#{SavedPage}">Page saved.</span>
+							</div>
+							<div th:if="${page.cover ne null}">
+								<img th:src="@{${#medias.link(page.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+							</div>
+							<div class="clearfix">
+								<p th:utext="${#posts.body(page)}"></p>
+							</div>
+							<hr/>
+							<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a>
+						</div>
+						<div class="col-sm-3 wr-tool-panel">
+							<div class="tools clearfix">
+								<div class="pull-left">
+									<div class="status">
+										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
+										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
+										<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+										<a th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
+											<span class="glyphicon glyphicon-globe"></span>
+											<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+										</a>
+									</div>
+								</div>
+							</div>
+							<dl>
+								<dt th:text="#{Date}">Date</dt>
+								<dd th:if="${page.date ne null}" th:text="${page.date.toString('yyyy/MM/dd')}"></dd>
+							</dl>
+							<dl>
+								<dt th:text="#{ParentPage}">Parent Page</dt>
+								<dd>
+								<ul class="list-unstyled">
+									<li th:if="${page.parent ne null}" th:text="${page.parent.title}">Category Name</li>
+								</ul>
+								</dd>
+							</dl>
+							<dl>
+								<dt th:text="#{RelatedPosts}">Related Posts</dt>
+								<dd>
+									<ul class="list-unstyled">
+										<li th:each="relatedPost : ${page.relatedPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
+									</ul>
+								</dd>
+							</dl>
+							<dl>
+								<dt th:text="#{Seo}">SEO</dt>
+								<dd>
+									<dl>
+										<dt th:text="#{SeoTitle}">Title</dt>
+										<dd th:text="${page.seo}? ${page.seo.title}"></dd>
+										<dt th:text="#{SeoDescription}">Description</dt>
+										<dd th:text="${page.seo}? ${page.seo.description}"></dd>
+										<dt th:text="#{SeoKeywords}">Keywords</dt>
+										<dd th:text="${page.seo}? ${page.seo.keywords}"></dd>
+									</dl>
+								</dd>
+							</dl>
+							<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
+							<!-- #delete-modal -->
+							<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="delete-dialog" class="modal-dialog">
+									<form th:action="@{__${ADMIN_PATH}__/pages/delete(id=${page.id})}" method="post">
+										<div th:fragment="delete-form" class="modal-content">
+											<div class="modal-header">
+												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+												<h4 class="modal-title" th:text="#{DeletePage}">ページを削除</h4>
+											</div>
+											<div class="modal-body">
+												<p th:text="#{MakeSureDelete}">本当に削除しますか？</p>
+											</div>
+											<div class="modal-footer">
+												<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">キャンセル</button>
+												<button class="btn btn-primary" th:text="#{Delete}">削除</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+							<!--/#delete-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function() {
+									$('#delete-modal').on('hidden.bs.modal', function() {
+										$(this).removeData('bs.modal');
+									});
+								});
+								// ]]>
+							</script>
+						</div>
+					</div>
+					<div class="alert alert-warning" th:unless="${page ne null}">
+						<strong>Not Found.</strong> May be deleted.
+					</div>
 				</div>
 			</div>
 		</div>
