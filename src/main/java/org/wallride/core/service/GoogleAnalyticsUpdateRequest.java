@@ -4,19 +4,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class GoogleAnalyticsUpdateRequest {
 
-	private long blodId;
+	private long blogId;
 	private String trackingId;
 	private String profileId;
 	private Integer customDimensionIndex;
 	private String serviceAccountId;
 	private MultipartFile serviceAccountP12File;
 
-	public long getBlodId() {
-		return blodId;
+	public long getBlogId() {
+		return blogId;
 	}
 
-	public void setBlodId(long blodId) {
-		this.blodId = blodId;
+	public void setBlogId(long blogId) {
+		this.blogId = blogId;
 	}
 
 	public String getTrackingId() {

@@ -89,6 +89,10 @@ public class PostService {
 
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
+		if (googleAnalytics == null) {
+			logger.warn("Configuration of Google Analytics can not be found");
+			return;
+		}
 
 		try {
 			PrivateKey privateKey = SecurityUtils.loadPrivateKeyFromKeyStore(

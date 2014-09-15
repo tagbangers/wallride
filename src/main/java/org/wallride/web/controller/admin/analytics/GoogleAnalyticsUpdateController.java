@@ -61,7 +61,7 @@ public class GoogleAnalyticsUpdateController {
 		}
 
 		GoogleAnalyticsUpdateRequest request = new GoogleAnalyticsUpdateRequest();
-		request.setBlodId(Blog.DEFAULT_ID);
+		request.setBlogId(Blog.DEFAULT_ID);
 		request.setTrackingId(form.getTrackingId());
 		request.setProfileId(form.getProfileId());
 		request.setCustomDimensionIndex(form.getCustomDimensionIndex());
@@ -78,6 +78,6 @@ public class GoogleAnalyticsUpdateController {
 
 		redirectAttributes.getFlashAttributes().clear();
 		redirectAttributes.addFlashAttribute("updatedGoogleAnalytics", updatedGoogleAnalytics);
-		return "redirect:/_admin/{language}/analytics/analytics";
+		return "redirect:/_admin/{language}/analytics";
 	}
 }

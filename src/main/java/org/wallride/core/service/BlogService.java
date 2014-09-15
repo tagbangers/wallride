@@ -22,14 +22,10 @@ import org.wallride.core.repository.BlogRepository;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -93,11 +89,20 @@ public class BlogService {
 		googleAnalytics.setServiceAccountP12FileName(request.getServiceAccountP12File().getOriginalFilename());
 		googleAnalytics.setServiceAccountP12FileContent(p12);
 
-		Blog blog = blogRepository.findByIdForUpdate(request.getBlodId());
+		Blog blog = blogRepository.findByIdForUpdate(request.getBlogId());
 		blog.setGoogleAnalytics(googleAnalytics);
 
 		blog = blogRepository.saveAndFlush(blog);
 		return blog.getGoogleAnalytics();
+	}
+
+	@CacheEvict(value = "blogs", allEntries = true)
+	public GoogleAnalytics deleteGoogleAnalytics(long blogId) {
+		Blog blog = blogRepository.findByIdForUpdate(blogId);
+		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
+		blog.setGoogleAnalytics(null);
+		blogRepository.saveAndFlush(blog);
+		return googleAnalytics;
 	}
 
 	@Cacheable(value = "blogs")
