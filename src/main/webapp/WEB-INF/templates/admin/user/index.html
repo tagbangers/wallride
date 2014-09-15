@@ -86,12 +86,12 @@
 											<h4 class="modal-title">Delete Articles</h4>
 										</div>
 										<div class="modal-body">
-											<p th:text="#{MakeSureDelete}">本当に削除しますか？</p>
+											<p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
 											<label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
 										</div>
 										<div class="modal-footer">
-											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">キャンセル</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/bulk-delete}" disabled="true" th:text="#{Delete}">削除</button>
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
 										</div>
 									</div>
 								</div>

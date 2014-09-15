@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201408311546</version>
+	<version>1.0.0.SNAPSHOT-201409160404</version>
 	<packaging>war</packaging>
 	
 	<properties>
@@ -293,7 +293,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
+		<!-- Google -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-analytics</artifactId>
+			<version>v3-rev100-1.19.0</version>
+		</dependency>
+
 		<!-- im4java -->
 		<dependency>
 			<groupId>org.im4java</groupId>
@@ -408,7 +415,6 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.0.1</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- Test -->

@@ -32,14 +32,15 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.wallride.core.repository.MediaRepository;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
-import org.wallride.core.support.Settings;
 import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.Normalizer;
@@ -58,16 +59,13 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	private CustomThymeleafDialect customThymeleafDialect;
 
 	@Inject
+	private BlogService blogService;
+
+	@Inject
 	private CategoryService categoryService;
 
 	@Inject
 	private PageService pageService;
-
-	@Inject
-	private MediaRepository mediaRepository;
-
-	@Inject
-	private Settings settings;
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -75,12 +73,15 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Inject
 	private Environment environment;
 
+	@Resource
+	private MediaRepository mediaRepository;
+
 	@Override
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
 		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
 
-		handlerMapping.setUrlPathHelper(new LanguageUrlPathHelper(settings));
-		handlerMapping.setDefaultHandler(new PageDescribeController(pageService, settings));
+		handlerMapping.setUrlPathHelper(new LanguageUrlPathHelper(blogService));
+		handlerMapping.setDefaultHandler(new PageDescribeController(blogService, pageService));
 
 		handlerMapping.setOrder(Integer.MAX_VALUE);
 		handlerMapping.setInterceptors(getInterceptors());
@@ -149,9 +150,9 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
 		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
+		mediaHttpRequestHandler.setBlogService(blogService);
 		mediaHttpRequestHandler.setMediaRepository(mediaRepository);
 		mediaHttpRequestHandler.setResourceLoader(resourceLoader);
-		mediaHttpRequestHandler.setSettings(settings);
 		mediaHttpRequestHandler.setCacheSeconds(86400);
 
 		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
@@ -179,7 +180,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
 		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
-		defaultModelAttributeInterceptor.setSettings(settings);
+		defaultModelAttributeInterceptor.setBlogService(blogService);
 		defaultModelAttributeInterceptor.setCategoryService(categoryService);
 		defaultModelAttributeInterceptor.setPageService(pageService);
 		return defaultModelAttributeInterceptor;
@@ -188,7 +189,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public SetupRedirectInterceptor setupRedirectInterceptor() {
 		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
-		setupRedirectInterceptor.setSettings(settings);
+		setupRedirectInterceptor.setBlogService(blogService);
 		return setupRedirectInterceptor;
 	}
 
@@ -243,21 +244,21 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public LocaleResolver localeResolver() {
 		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
-		pathVariableLocaleResolver.setSettings(settings);
+		pathVariableLocaleResolver.setBlogService(blogService);
 		return pathVariableLocaleResolver;
 	}
 
 	@Bean(name = "atomFeedView")
 	public View atomFeedView() {
 		AtomFeedView view = new AtomFeedView();
-		view.setSettings(settings);
+		view.setBlogService(blogService);
 		return view;
 	}
 
 	@Bean(name = "rssFeedView")
 	public View rssFeedView() {
 		RssFeedView view = new RssFeedView();
-		view.setSettings(settings);
+		view.setBlogService(blogService);
 		return view;
 	}
 }

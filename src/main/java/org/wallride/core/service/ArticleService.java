@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
 public class ArticleService {
 
 	@Resource
+	private BlogService blogService;
+	@Resource
 	private ArticleRepository articleRepository;
 	@Resource
 	private TagRepository tagRepository;
@@ -150,7 +152,8 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String mediaUrlPrefix = blog.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -328,7 +331,8 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-			String mediaUrlPrefix = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX);
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String mediaUrlPrefix = blog.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {

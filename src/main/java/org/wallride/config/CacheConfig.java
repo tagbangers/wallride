@@ -42,7 +42,7 @@ public class CacheConfig {
 	private static Logger logger = LoggerFactory.getLogger(CacheConfig.class);
 
 	@Bean
-	public CacheManager cacheManager() throws Exception {
+	public SpringEmbeddedCacheManagerFactoryBean cacheManagerFactoryBean() throws Exception {
 		// JGroups settings
 		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");
 		if ("jgroups-ec2.xml".equals(jgroupsConfigurationFile)) {
@@ -60,17 +60,18 @@ public class CacheConfig {
 
 		ConfigurationBuilderHolder holder = new ConfigurationBuilderHolder();
 
-//		GlobalConfigurationBuilder globalBuilder = new GlobalConfigurationBuilder();
 		GlobalConfigurationBuilder globalBuilder = holder.getGlobalConfigurationBuilder();
+		// @formatter:off
 		globalBuilder
-				.globalJmxStatistics()
+			.globalJmxStatistics()
 				.enable()
 //				.cacheManagerName("HibernateSearch")
 				.allowDuplicateDomains(true)
-				.transport()
+			.transport()
 				.defaultTransport()
 //				.clusterName("wallride-cluster")
 				.addProperty("configurationFile", jgroupsConfigurationFile);
+		// @formatter:on
 
 		Properties props = new Properties();
 		props.put("hibernate.search.default.directory_provider", "infinispan");
@@ -81,8 +82,9 @@ public class CacheConfig {
 
 		JdbcStringBasedStoreConfigurationBuilder jdbcBuilder = new JdbcStringBasedStoreConfigurationBuilder(defaultBuilder.persistence());
 //		JdbcStringBasedCacheStoreConfigurationBuilder jdbcBuilder = new JdbcStringBasedCacheStoreConfigurationBuilder(defaultBuilder.loaders());
+		// @formatter:off
 		jdbcBuilder
-				.key2StringMapper(LuceneKey2StringMapper.class)
+			.key2StringMapper(LuceneKey2StringMapper.class)
 				.table()
 				.tableNamePrefix("ispn_string_table")
 				.idColumnName("id_column")
@@ -93,45 +95,47 @@ public class CacheConfig {
 				.timestampColumnType("bigint")
 				.dropOnExit(false)
 				.createOnStart(true)
-				.async()
+			.async()
 				.enable()
 				.flushLockTimeout(15000)
 				.threadPoolSize(10)
-				.fetchPersistentState(true)
-				.ignoreModifications(false)
-				.purgeOnStartup(false)
-//				.dataSource().jndiUrl("dataSource");
-				.connectionFactory(InfinispanDataSourceConnectionFactoryConfigurationBuilder.class).dataSource(dataSource);
+			.fetchPersistentState(true)
+			.ignoreModifications(false)
+			.purgeOnStartup(false)
+//			.dataSource().jndiUrl("dataSource");
+			.connectionFactory(InfinispanDataSourceConnectionFactoryConfigurationBuilder.class).dataSource(dataSource);
+		// @formatter:on
 
+		// @formatter:off
 		defaultBuilder
-				.locking()
+			.locking()
 				.lockAcquisitionTimeout(300000)
 				.writeSkewCheck(false)
 				.concurrencyLevel(500)
 				.useLockStriping(false)
-				.clustering()
+			.clustering()
 				.cacheMode(CacheMode.DIST_SYNC)
-				.stateTransfer()
+			.stateTransfer()
 				.timeout(960000)
 				.fetchInMemoryState(true)
-				.sync()
-				.replTimeout(480000)
+			.sync()
+			.replTimeout(480000)
 				.jmxStatistics()
 				.enable()
-				.eviction()
+			.eviction()
 				.maxEntries(-1)
 				.strategy(EvictionStrategy.NONE)
 				.expiration()
-				.maxIdle(-1)
-				.reaperEnabled(false)
-				.indexing()
+					.maxIdle(-1)
+					.reaperEnabled(false)
+			.indexing()
 				.enable()
 				.indexLocalOnly(false)
 				.withProperties(props)
-				.persistence()
-				.addStore(jdbcBuilder)
-				.preload(true)
-				.shared(true);
+			.persistence()
+			.addStore(jdbcBuilder)
+			.preload(true)
+			.shared(true);
 //			.loaders()
 //				.preload(true)
 //				.passivation(false)
@@ -139,6 +143,7 @@ public class CacheConfig {
 //				.addStore(jdbcBuilder);
 //				.preload(true)
 //				.shared(true);
+		// @formatter:on
 
 //		ConfigurationBuilder luceneBuilder = new ConfigurationBuilder();
 //		luceneBuilder
@@ -156,15 +161,19 @@ public class CacheConfig {
 //		holder.getNamedConfigurationBuilders().put("LuceneIndexesLocking", luceneBuilder);
 
 		ConfigurationBuilder cacheBuilder = new ConfigurationBuilder();
+		// @formatter:off
 		cacheBuilder
-				.clustering()
+			.clustering()
 				.cacheMode(CacheMode.INVALIDATION_SYNC)
 				.indexing()
 				.enabled(false);
 //			.persistence()
 //				.clearStores();
+		// @formatter:on
 
+		holder.getNamedConfigurationBuilders().put("blogs", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("settings", cacheBuilder);
+		holder.getNamedConfigurationBuilders().put("popularPosts", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("articles", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("categories", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("pages", cacheBuilder);
@@ -172,60 +181,6 @@ public class CacheConfig {
 		holder.getNamedConfigurationBuilders().put("banners", cacheBuilder);
 
 //		holder.getNamedConfigurationBuilders().put("resources", cacheBuilder);
-
-//		namedBuilder
-//			.indexing()
-//				.enable()
-//				.indexLocalOnly(false)
-//				.withProperties(props)
-//			.persistence()
-//				.addStore(jdbcBuilder)
-//				.preload(true)
-//				.shared(true)
-//			.clustering()
-//				.cacheMode(CacheMode.DIST_SYNC)
-//			.jmxStatistics()
-//				.enable();
-//
-//		holder.getNamedConfigurationBuilders().put("LuceneIndexesMetadata", namedBuilder);
-//		holder.getNamedConfigurationBuilders().put("LuceneIndexesData", namedBuilder);
-//		holder.getNamedConfigurationBuilders().put("LuceneIndexesLocking", namedBuilder);
-
-
-//		Properties props = new Properties();
-//		props.put("hibernate.search.default.directory_provider", "infinispan");
-//		props.put("hibernate.search.default.indexmanager", InfinispanIndexManager.class.getCanonicalName());
-
-//		ConfigurationBuilder cacheBuilder = new ConfigurationBuilder();
-//		ConfigurationBuilder namedBuilder = new ConfigurationBuilder();
-//		JdbcStringBasedStoreConfigurationBuilder jdbcBuilder = new JdbcStringBasedStoreConfigurationBuilder(namedBuilder.persistence());
-//		jdbcBuilder
-//			.key2StringMapper(LuceneKey2StringMapper.class)
-//			.table()
-//			.tableNamePrefix("ispn_string_table")
-//			.idColumnName("id_column")
-//			.idColumnType("varchar(255)")
-//			.dataColumnName("data_column")
-//			.dataColumnType("longblob")
-//			.timestampColumnName("timestamp_column")
-//			.timestampColumnType("bigint")
-//			.dropOnExit(false)
-//			.createOnStart(true)
-//			.dataSource().jndiUrl("dataSource");
-//		namedBuilder
-//			.indexing()
-//			.enable()
-//			.indexLocalOnly(false)
-//			.withProperties(props)
-//			.persistence()
-//				.addStore(jdbcBuilder)
-//			.clustering()
-//				.cacheMode(CacheMode.DIST_SYNC);
-//
-//		holder.getNamedConfigurationBuilders().put("LuceneIndexesMetadata", namedBuilder);
-//		holder.getNamedConfigurationBuilders().put("LuceneIndexesData", namedBuilder);
-//		holder.getNamedConfigurationBuilders().put("LuceneIndexesLocking", namedBuilder);
-
 
 //		final EmbeddedCacheManager embeddedCacheManager = new DefaultCacheManager(globalBuilder.build(), cacheBuilder.build());
 		final EmbeddedCacheManager embeddedCacheManager = new DefaultCacheManager(holder, true);
@@ -238,9 +193,6 @@ public class CacheConfig {
 				return embeddedCacheManager;
 			}
 		};
-		factory.afterPropertiesSet();
-		CacheManager cacheManager = factory.getObject();
-
-		return cacheManager;
+		return factory;
 	}
 }

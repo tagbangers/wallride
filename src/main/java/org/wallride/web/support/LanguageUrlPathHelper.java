@@ -1,30 +1,29 @@
 package org.wallride.web.support;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.Setting;
-import org.wallride.core.support.Settings;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.BlogLanguage;
+import org.wallride.core.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 
 public class LanguageUrlPathHelper extends UrlPathHelper {
 
-	private Settings settings;
+	private BlogService blogService;
 
-	public LanguageUrlPathHelper(Settings settings) {
-		this.settings = settings;
+	public LanguageUrlPathHelper(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	@Override
 	public String getLookupPathForRequest(HttpServletRequest request) {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String defaultLanguage = blog.getDefaultLanguage();
 		if (defaultLanguage != null) {
-			String[] languages = StringUtils.commaDelimitedListToStringArray(settings.readSettingAsString(Setting.Key.LANGUAGES));
-//			String[] languages = StringUtils.split(settingService.readSettingAsString(Setting.Key.LANGUAGES), ",");
 			String path = super.getLookupPathForRequest(request);
 			boolean languagePath = false;
-			for (String language : languages) {
-				if (path.startsWith("/" + language + "/")) {
+			for (BlogLanguage blogLanguage : blog.getLanguages()) {
+				if (path.startsWith("/" + blogLanguage.getLanguage() + "/")) {
 					languagePath = true;
 					break;
 				}
