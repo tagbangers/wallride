@@ -19,7 +19,7 @@
 							<form th:action="@{__${ADMIN_PATH}__/analytics/edit}" th:object="${form}" method="post" class="form-horizontal" enctype="multipart/form-data">
 								<div class="alert alert-danger" th:if="${#fields.hasErrors('all')}">
 									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-									<span>Input is incorrect</span>
+									<span th:text="#{Error}">There was a problem with your submission.</span>
 									<ul th:if="${#fields.hasErrors('global')}">
 										<li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
 									</ul>

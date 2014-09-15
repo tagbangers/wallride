@@ -109,6 +109,7 @@ create table post (
 	date datetime,
 	author_id bigint,
 	status varchar(50) not null,
+	views bigint not null,
 	drafted_id bigint,
 	drafted_code varchar(200),
 	created_at datetime not null,
