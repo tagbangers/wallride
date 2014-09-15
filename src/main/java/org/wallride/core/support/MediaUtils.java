@@ -1,17 +1,15 @@
 package org.wallride.core.support;
 
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
-import org.wallride.core.domain.Setting;
+import org.wallride.core.service.BlogService;
 
-//@Component
 public class MediaUtils {
 
-//	private Environment environment;
+	private BlogService blogService;
 
-	private Settings settings;
-
-	public MediaUtils(Settings settings) {
-		this.settings = settings;
+	public MediaUtils(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	public String link(Media media) {
@@ -19,6 +17,7 @@ public class MediaUtils {
 	}
 
 	public String link(String id) {
-		return settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX) + id;
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		return blog.getMediaUrlPrefix() + id;
 	}
 }

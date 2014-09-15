@@ -3,8 +3,8 @@ package org.wallride.web.controller.guest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Setting;
-import org.wallride.core.support.Settings;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.service.BlogService;
 
 import javax.inject.Inject;
 
@@ -13,11 +13,12 @@ import javax.inject.Inject;
 public class IndexController {
 
 	@Inject
-	private Settings settings;
+	private BlogService blogService;
 
 	@RequestMapping
 	public String index(RedirectAttributes redirectAttributes) {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String defaultLanguage = blog.getDefaultLanguage();
 		redirectAttributes.addAttribute("language", defaultLanguage);
 		return "redirect:/{language}/";
 	}

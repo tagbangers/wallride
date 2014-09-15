@@ -9,7 +9,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.feed.AbstractRssFeedView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Setting;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.support.PostUtils;
 import org.wallride.core.support.Settings;
 
@@ -20,10 +22,10 @@ import java.util.*;
 
 public class RssFeedView extends AbstractRssFeedView {
 	
-	private Settings settings;
+	private BlogService blogService;
 
-	public void setSettings(Settings settings) {
-		this.settings = settings;
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	@Override
@@ -31,8 +33,11 @@ public class RssFeedView extends AbstractRssFeedView {
 			Map<String, Object> model, 
 			Channel feed, 
 			HttpServletRequest request) {
-		feed.setTitle(settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage()));
-		feed.setDescription(settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage()));
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String language = LocaleContextHolder.getLocale().getLanguage();
+
+		feed.setTitle(blog.getTitle(language));
+		feed.setDescription(blog.getTitle(language));
 
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
 		feed.setLink(builder.buildAndExpand().toUriString());
@@ -64,8 +69,9 @@ public class RssFeedView extends AbstractRssFeedView {
 	private String link(Article article) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = settings.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
-		if (languages != null && languages.length > 1) {
+
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		if (blog.getLanguages().size() > 1) {
 			builder.path("/{language}");
 			params.put("language", LocaleContextHolder.getLocale().getLanguage());
 		}

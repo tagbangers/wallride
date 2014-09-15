@@ -18,4 +18,9 @@ public class ScheduleConfig {
 	public void publishPost() {
 		postService.publishScheduledPosts();
 	}
+
+	@Scheduled(cron="0 0 3 * * *")
+	public void syncGoogleAnalytics() {
+		postService.syncGoogleAnalytics();
+	}
 }

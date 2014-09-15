@@ -1,5 +1,6 @@
 package org.wallride.web.controller.admin.media;
 
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.support.Settings;
@@ -12,9 +13,9 @@ public class MediaCreatedModel implements Serializable {
 
 	private String filelink;
 
-	public MediaCreatedModel(Media media, Settings settings) {
+	public MediaCreatedModel(Media media, Blog blog) {
 		this.id = media.getId();
-		this.filelink = settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX) + media.getId();
+		this.filelink = blog.getMediaUrlPrefix() + media.getId();
 	}
 
 	public String getId() {

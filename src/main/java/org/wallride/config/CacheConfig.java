@@ -171,7 +171,9 @@ public class CacheConfig {
 //				.clearStores();
 		// @formatter:on
 
+		holder.getNamedConfigurationBuilders().put("blogs", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("settings", cacheBuilder);
+		holder.getNamedConfigurationBuilders().put("popularPosts", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("articles", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("categories", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("pages", cacheBuilder);

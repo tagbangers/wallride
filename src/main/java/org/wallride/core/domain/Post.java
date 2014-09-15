@@ -66,6 +66,9 @@ public class Post extends DomainObject<Long> {
 	@Field
 	private Status status;
 
+	@Column(nullable = false)
+	private long views;
+
 	@ManyToOne
 	@IndexedEmbedded(depth = 1, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private Post drafted;
@@ -169,6 +172,14 @@ public class Post extends DomainObject<Long> {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public long getViews() {
+		return views;
+	}
+
+	public void setViews(long views) {
+		this.views = views;
 	}
 
 	public Post getDrafted() {

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.MediaRepository;
@@ -21,13 +22,13 @@ import java.util.List;
 public class MediaService {
 
 	@Inject
-	private MediaRepository mediaRepository;
+	private BlogService blogService;
 
 	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Inject
-	private Settings settings;
+	@javax.annotation.Resource
+	private MediaRepository mediaRepository;
 
 	public Media createMedia(MultipartFile file) {
 		Media media = new Media();
@@ -35,8 +36,9 @@ public class MediaService {
 		media.setOriginalName(file.getOriginalFilename());
 		media = mediaRepository.saveAndFlush(media);
 
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		try {
-			Resource prefix = resourceLoader.getResource(settings.readSettingAsString(Setting.Key.MEDIA_PATH));
+			Resource prefix = resourceLoader.getResource(blog.getMediaPath());
 			Resource resource = prefix.createRelative(media.getId());
 			AmazonS3ResourceUtils.writeMultipartFile(file, resource);
 		}

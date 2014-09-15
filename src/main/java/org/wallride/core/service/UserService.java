@@ -26,15 +26,15 @@ import org.springframework.validation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.wallride.core.domain.Setting;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserFullTextSearchTerm;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.Settings;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -47,13 +47,7 @@ import java.util.*;
 public class UserService {
 
 	@Inject
-	private Settings settings;
-
-	@Inject
-	private UserRepository userRepository;
-
-	@Inject
-	private UserInvitationRepository userInvitationRepository;
+	private BlogService blogService;
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
@@ -73,6 +67,11 @@ public class UserService {
 
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
+
+	@Resource
+	private UserRepository userRepository;
+	@Resource
+	private UserInvitationRepository userInvitationRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -149,8 +148,9 @@ public class UserService {
 			invitations.add(invitation);
 		}
 
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		for (UserInvitation invitation : invitations) {
-			String websiteTitle = settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
+			String websiteTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
 			String signupLink = ServletUriComponentsBuilder.fromCurrentContextPath()
 					.path("/_admin/signup")
 					.queryParam("token", invitation.getToken())
@@ -190,7 +190,8 @@ public class UserService {
 		invitation.setUpdatedBy(authorizedUser.toString());
 		invitation = userInvitationRepository.saveAndFlush(invitation);
 
-		String websiteTitle = settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage());
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String websiteTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
 		String signupLink = ServletUriComponentsBuilder.fromCurrentContextPath()
 				.path("/_admin/signup")
 				.queryParam("token", invitation.getToken())

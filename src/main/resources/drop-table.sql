@@ -3,6 +3,8 @@ SET foreign_key_checks = 0;
 drop table if exists article;
 drop table if exists article_category;
 drop table if exists article_tag;
+drop table if exists blog;
+drop table if exists blog_language;
 drop table if exists category;
 drop table if exists media;
 drop table if exists navigation_item;

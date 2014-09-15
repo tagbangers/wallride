@@ -14,27 +14,27 @@ public class Settings {
 	@Inject
 	private SettingRepository settingRepository;
 
-	@Cacheable("settings")
-	public String readSettingAsString(Setting.Key key) {
-		Setting setting = settingRepository.findByKey(key.name());
-		return (setting != null) ? setting.getValue() : null;
-	}
-
-	@Cacheable("settings")
-	public String readSettingAsString(Setting.Key key, String language) {
-		Setting setting = settingRepository.findByKey(key.name() + "_" + language);
-		return (setting != null) ? setting.getValue() : null;
-	}
-
-	@Cacheable("settings")
-	public String[] readSettingAsStringArray(Setting.Key key, String delimiter) {
-		Setting setting = settingRepository.findByKey(key.name());
-		return (setting != null) ? StringUtils.delimitedListToStringArray(setting.getValue(), delimiter) : null;
-	}
-
-	@Cacheable("settings")
-	public String[] readSettingAsStringArray(Setting.Key key, String delimiter, String language) {
-		Setting setting = settingRepository.findByKey(key.name() + "_" + language);
-		return (setting != null) ? StringUtils.delimitedListToStringArray(setting.getValue(), delimiter) : null;
-	}
+//	@Cacheable("settings")
+//	public String readSettingAsString(Setting.Key key) {
+//		Setting setting = settingRepository.findByKey(key.name());
+//		return (setting != null) ? setting.getValue() : null;
+//	}
+//
+//	@Cacheable("settings")
+//	public String readSettingAsString(Setting.Key key, String language) {
+//		Setting setting = settingRepository.findByKey(key.name() + "_" + language);
+//		return (setting != null) ? setting.getValue() : null;
+//	}
+//
+//	@Cacheable("settings")
+//	public String[] readSettingAsStringArray(Setting.Key key, String delimiter) {
+//		Setting setting = settingRepository.findByKey(key.name());
+//		return (setting != null) ? StringUtils.delimitedListToStringArray(setting.getValue(), delimiter) : null;
+//	}
+//
+//	@Cacheable("settings")
+//	public String[] readSettingAsStringArray(Setting.Key key, String delimiter, String language) {
+//		Setting setting = settingRepository.findByKey(key.name() + "_" + language);
+//		return (setting != null) ? StringUtils.delimitedListToStringArray(setting.getValue(), delimiter) : null;
+//	}
 }
