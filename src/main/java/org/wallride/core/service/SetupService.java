@@ -6,45 +6,32 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.domain.User;
+import org.wallride.core.repository.BlogRepository;
 import org.wallride.core.repository.SettingRepository;
 import org.wallride.core.repository.UserRepository;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
+@Transactional(rollbackFor = Exception.class)
 public class SetupService {
-	
-	@Inject
-	private SettingRepository settingRepository;
-	
-	@Inject
+
+	@Resource
 	private UserRepository userRepository;
+	@Resource
+	private BlogRepository blogRepository;
 
-	@CacheEvict(value="settings", allEntries=true)
+	@CacheEvict(value = {"users", "blogs"}, allEntries = true)
 	public User setup(SetupRequest request) {
-		settingRepository.saveAndFlush(new Setting(Setting.Key.DEFAULT_LANGUAGE, request.getDefaultLanguage()));
-
-		Set<String> languages = new LinkedHashSet<>();
-		languages.add(request.getDefaultLanguage());
-		for (String language : request.getLanguages()) {
-			languages.add(language);
-		}
-		settingRepository.saveAndFlush(new Setting(Setting.Key.LANGUAGES, StringUtils.collectionToCommaDelimitedString(languages)));
-
-		for (String language : languages) {
-			settingRepository.saveAndFlush(new Setting(Setting.Key.WEBSITE_TITLE, request.getWebsiteTitle(), language));
-		}
-
-		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_URL_PREFIX, request.getMediaUrlPrefix()));
-		settingRepository.saveAndFlush(new Setting(Setting.Key.MEDIA_PATH, request.getMediaPath()));
-
-//		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_SMTP_HOST, request.getMailSmtpHost()));
-//		settingRepository.saveAndFlush(new Setting(Setting.Key.MAIL_FROM, request.getMailFrom()));
+		LocalDateTime now = new LocalDateTime();
 
 		User user = new User();
 		user.setLoginId(request.getLoginId());
@@ -56,11 +43,49 @@ public class SetupService {
 		user.getName().setLastName(request.getName().getLastName());
 		user.setEmail(request.getEmail());
 
-		LocalDateTime now = new LocalDateTime();
 		user.setCreatedAt(now);
 		user.setUpdatedAt(now);
-		
+
 		user = userRepository.saveAndFlush(user);
+
+		Blog blog = new Blog();
+		blog.setCode("default");
+		blog.setDefaultLanguage(request.getDefaultLanguage());
+		blog.setMediaUrlPrefix(request.getMediaUrlPrefix());
+		blog.setMediaPath(request.getMediaPath());
+		blog.setCreatedAt(now);
+		blog.setCreatedBy(user.toString());
+		blog.setUpdatedAt(now);
+		blog.setUpdatedBy(user.toString());
+
+		BlogLanguage defaultLanguage = new BlogLanguage();
+		defaultLanguage.setBlog(blog);
+		defaultLanguage.setLanguage(request.getDefaultLanguage());
+		defaultLanguage.setTitle(request.getWebsiteTitle());
+		defaultLanguage.setCreatedAt(now);
+		defaultLanguage.setCreatedBy(user.toString());
+		defaultLanguage.setUpdatedAt(now);
+		defaultLanguage.setUpdatedBy(user.toString());
+
+		Set<BlogLanguage> blogLanguages = new HashSet<>();
+		blogLanguages.add(defaultLanguage);
+
+		for (String language : request.getLanguages()) {
+			BlogLanguage blogLanguage = new BlogLanguage();
+			blogLanguage.setBlog(blog);
+			blogLanguage.setLanguage(language);
+			blogLanguage.setTitle(request.getWebsiteTitle());
+			blogLanguage.setCreatedAt(now);
+			blogLanguage.setCreatedBy(user.toString());
+			blogLanguage.setUpdatedAt(now);
+			blogLanguage.setUpdatedBy(user.toString());
+
+			blogLanguages.add(blogLanguage);
+		}
+		blog.setLanguages(blogLanguages);
+
+		blogRepository.saveAndFlush(blog);
+
 		return user;
 	}
 }

@@ -7,8 +7,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UrlPathHelper;
 import org.wallride.core.domain.Page;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.PageService;
-import org.wallride.core.support.Settings;
 import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.LanguageUrlPathHelper;
 
@@ -20,12 +20,14 @@ public class PageDescribeController extends AbstractController {
 
 	private static final String PATH_PATTERN = "/{language}/{code}";
 
+	private BlogService blogService;
 	private PageService pageService;
 	private UrlPathHelper urlPathHelper;
 
-	public PageDescribeController(PageService pageService, Settings settings) {
+	public PageDescribeController(BlogService blogService, PageService pageService) {
+		this.blogService = blogService;
 		this.pageService = pageService;
-		this.urlPathHelper = new LanguageUrlPathHelper(settings);
+		this.urlPathHelper = new LanguageUrlPathHelper(blogService);
 	}
 
 	@Override

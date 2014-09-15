@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.LocaleResolver;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Setting;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.support.Settings;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,34 +17,33 @@ import java.util.Map;
 
 public class PathVariableLocaleResolver implements LocaleResolver {
 
-	private Settings settings;
+	private BlogService blogService;
 
 	private static Logger logger = LoggerFactory.getLogger(PathVariableLocaleResolver.class);
 
-	public void setSettings(Settings settings) {
-		this.settings = settings;
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		String currentLanguage = (String) pathVariables.get("language");
 		if (currentLanguage == null) {
-			currentLanguage = defaultLanguage;
+			currentLanguage = blog.getDefaultLanguage();
 		}
 		else {
-			String[] languages = settings.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
 			boolean correct = false;
-			for (String language : languages) {
-				if (language.equals(currentLanguage)) {
+			for (BlogLanguage blogLanguage : blog.getLanguages()) {
+				if (blogLanguage.getLanguage().equals(currentLanguage)) {
 					correct = true;
 					break;
 				}
 			}
 			if (!correct) {
-				currentLanguage = defaultLanguage;
+				currentLanguage = blog.getDefaultLanguage();
 			}
 		}
 

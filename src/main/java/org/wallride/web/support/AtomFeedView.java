@@ -5,34 +5,36 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.feed.atom.Link;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.feed.AbstractAtomFeedView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Setting;
-import org.wallride.core.support.Settings;
+import org.wallride.core.service.BlogService;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 public class AtomFeedView extends AbstractAtomFeedView {
 
-	private Settings settings;
+	private BlogService blogService;
 
-	public void setSettings(Settings settings) {
-		this.settings = settings;
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	protected void buildFeedMetadata(
 			Map<String, Object> model,
 			Feed feed, 
 			HttpServletRequest request) {
-		feed.setTitle(settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage()));
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String language = LocaleContextHolder.getLocale().getLanguage();
+
+		feed.setTitle(blog.getTitle(language));
 		Content info = new Content();
-		info.setValue(settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, LocaleContextHolder.getLocale().getLanguage()));
+		info.setValue(blog.getTitle(language));
 		feed.setInfo(info);
 
 		ArrayList<Link> links = new ArrayList<>();
@@ -74,8 +76,9 @@ public class AtomFeedView extends AbstractAtomFeedView {
 	private String link(Article article) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = settings.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
-		if (languages != null && languages.length > 1) {
+
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		if (blog.getLanguages().size() > 1) {
 			builder.path("/{language}");
 			params.put("language", LocaleContextHolder.getLocale().getLanguage());
 		}

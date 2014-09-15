@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
-import org.wallride.core.support.Settings;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
 import javax.inject.Inject;
@@ -23,20 +23,18 @@ import java.util.List;
 public class DashboardController {
 	
 	@Inject
-	private Settings settings;
-
+	private BlogService blogService;
 	@Inject
 	private ArticleService articleService;
-
 	@Inject
 	private PageService pageService;
-
 	@Inject
 	private CategoryService categoryService;
 	
 	@RequestMapping({"/","/dashboard"})
 	public String dashboard(RedirectAttributes redirectAttributes) {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String defaultLanguage = blog.getDefaultLanguage();
 		redirectAttributes.addAttribute("language", defaultLanguage);
 		return "redirect:/_admin/{language}/";
 	}

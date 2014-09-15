@@ -15,6 +15,35 @@ create table article_tag (
 	primary key (article_id, tag_id)
 ) ENGINE=InnoDB;
 
+create table blog (
+	id bigint not null auto_increment,
+	code varchar(200) not null,
+	default_language varchar(3) not null,
+	ga_tracking_id varchar(100),
+	ga_custom_dimension_index integer,
+	ga_service_account_id varchar(300),
+	ga_service_account_p12_key longblob,
+	media_url_prefix varchar(300) not null,
+	media_path varchar(300) not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (id)
+) ENGINE=InnoDB;
+
+create table blog_language (
+	id bigint not null auto_increment,
+	blog_id bigint not null,
+	language varchar(3) not null,
+	title longtext not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (id)
+) ENGINE=InnoDB;
+
 create table category (
 	id bigint not null auto_increment,
 	code varchar(200) not null,
@@ -149,89 +178,90 @@ create table user_invitation (
 	primary key (token)
 ) ENGINE=InnoDB;
 
+alter table blog
+	add constraint UK_398ypeix0usuwxip7hl30tl95  unique (code);
+
+alter table blog_language
+	add constraint UK_ad19h6nvek9854379mxcaj721  unique (blog_id, language);
+
+alter table category
+	add constraint UK_86l62kycx6uuh2dbgymn8i065  unique (code, language);
+
+alter table post
+	add constraint UK_6khu2naokwmhyfq3lt8t8eehn  unique (code, language);
+
+alter table tag
+	add constraint UK_96k5ovyyuo8hgewc0h2f0g9et  unique (name, language);
+
+alter table user
+	add constraint UK_6ntlp6n5ltjg6hhxl66jj5u0l  unique (login_id);
+
 alter table article
-	add index FK_3mlcrjv9clnvarg3o8fysvnkx (id),
 	add constraint FK_3mlcrjv9clnvarg3o8fysvnkx
 	foreign key (id)
 	references post (id);
 
 alter table article_category
-	add index FK_48nv4hxwx3mte5gferj9wlj46 (article_id),
 	add constraint FK_48nv4hxwx3mte5gferj9wlj46
 	foreign key (article_id)
 	references article (id);
 
 alter table article_category
-	add index FK_aaq7a2c3e34qghxyh34ao8r6p (category_id),
 	add constraint FK_aaq7a2c3e34qghxyh34ao8r6p
 	foreign key (category_id)
 	references category (id);
 
 alter table article_tag
-	add index FK_pkndl0ud6fkak73gdkls858a5 (tag_id),
-	add constraint FK_pkndl0ud6fkak73gdkls858a5
-	foreign key (tag_id)
-	references tag (id);
-
-alter table article_tag
-	add index FK_5ao70rbptu4cd93wbu7o38y1y (article_id),
 	add constraint FK_5ao70rbptu4cd93wbu7o38y1y
 	foreign key (article_id)
 	references article (id);
 
-alter table category
-	add constraint UK_86l62kycx6uuh2dbgymn8i065 unique (code, language);
+alter table article_tag
+	add constraint FK_pkndl0ud6fkak73gdkls858a5
+	foreign key (tag_id)
+	references tag (id);
+
+alter table blog_language
+	add constraint FK_gvt8qnfjl6qwbb3am853c70ul
+	foreign key (blog_id)
+	references blog (id);
 
 alter table category
-	add index FK_81thrbnb8c08gua7tvqj7xdqk (parent_id),
 	add constraint FK_81thrbnb8c08gua7tvqj7xdqk
 	foreign key (parent_id)
 	references category (id);
 
-alter table tag
-	add constraint UK_96k5ovyyuo8hgewc0h2f0g9et unique (name, language);
-
 alter table navigation_item
-	add index FK_e986fb2rhw2a7a2m2col2f1fg (parent_id),
 	add constraint FK_e986fb2rhw2a7a2m2col2f1fg
 	foreign key (parent_id)
 	references navigation_item (id);
 
 alter table navigation_item
-	add index FK_qie2cbixacp4xccixia3mjd99 (category_id),
 	add constraint FK_qie2cbixacp4xccixia3mjd99
 	foreign key (category_id)
 	references category (id);
 
 alter table navigation_item
-	add index FK_gqekdbas3sbmx3u4peurmkxl0 (page_id),
 	add constraint FK_gqekdbas3sbmx3u4peurmkxl0
 	foreign key (page_id)
 	references page (id);
 
 alter table page
-	add index FK_e9x1tbh3hitjnkmigkv8pl24w (parent_id),
 	add constraint FK_e9x1tbh3hitjnkmigkv8pl24w
 	foreign key (parent_id)
 	references page (id);
 
 alter table page
-	add index FK_88lc5ox4n3kvd7vc10nvx8nn6 (id),
 	add constraint FK_88lc5ox4n3kvd7vc10nvx8nn6
 	foreign key (id)
 	references post (id);
 
 alter table post
-	add constraint UK_9awc6gvqyqbkh45ta3dq3vti  unique (code, language);
-
-alter table post
-	add index FK_ik65bluepv8oxdfvgbj5qdcsj (author_id),
 	add constraint FK_ik65bluepv8oxdfvgbj5qdcsj
 	foreign key (author_id)
 	references user (id);
 
 alter table post
-	add index FK_lew3sxka65cx9ichkheda3m4p (cover_id),
 	add constraint FK_lew3sxka65cx9ichkheda3m4p
 	foreign key (cover_id)
 	references media (id);
@@ -242,13 +272,11 @@ alter table post
 	references post (id);
 
 alter table post_media
-	add index FK_cbh3kwx9ocobb3y3jn93nth0o (media_id),
 	add constraint FK_cbh3kwx9ocobb3y3jn93nth0o
 	foreign key (media_id)
 	references media (id);
 
 alter table post_media
-	add index FK_rmb5w9waqw5fpy31j42wjirt3 (post_id),
 	add constraint FK_rmb5w9waqw5fpy31j42wjirt3
 	foreign key (post_id)
 	references post (id);
@@ -262,9 +290,6 @@ alter table post_related_post
 	add constraint FK_9h3eog304whtvhs23f3lmd5ow
 	foreign key (post_id)
 	references post (id);
-
-alter table user
-	add constraint UK_6ntlp6n5ltjg6hhxl66jj5u0l unique (login_id);
 
 create table persistent_logins (
 	username varchar(64) not null,

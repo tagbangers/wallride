@@ -9,6 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.core.domain.*;
+import org.wallride.core.service.BlogService;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -17,12 +18,11 @@ import java.util.regex.Pattern;
 public class PostUtils {
 
 	private IProcessingContext processingContext;
+	private BlogService blogService;
 
-	private Settings settings;
-
-	public PostUtils(IProcessingContext processingContext, Settings settings) {
+	public PostUtils(IProcessingContext processingContext, BlogService blogService) {
 		this.processingContext = processingContext;
-		this.settings = settings;
+		this.blogService = blogService;
 	}
 
 	public String link(Article article) {
@@ -101,7 +101,8 @@ public class PostUtils {
 	}
 
 	public String ogSiteName(Post post) {
-		return settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage());
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		return blog.getTitle(processingContext.getContext().getLocale().getLanguage());
 	}
 
 	public String ogTitle(Post post) {
@@ -128,20 +129,23 @@ public class PostUtils {
 		if (post.getSeo() != null && post.getSeo().getTitle() != null) {
 			return post.getSeo().getTitle();
 		}
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		return String.format("%s | %s",
 				post.getTitle(),
-				settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, processingContext.getContext().getLocale().getLanguage()));
+				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
 	}
 
 	public String body(Post post) {
 		if (!StringUtils.hasText(post.getBody())) {
 			return null;
 		}
+
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		Document document = Jsoup.parse(post.getBody());
 		Elements elements = document.select("img");
 		for (Element element : elements) {
 			String src = element.attr("src");
-			if (src.startsWith(settings.readSettingAsString(Setting.Key.MEDIA_URL_PREFIX))) {
+			if (src.startsWith(blog.getMediaUrlPrefix())) {
 				String style = element.attr("style");
 				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
 				Matcher matcher = pattern.matcher(element.attr("style"));

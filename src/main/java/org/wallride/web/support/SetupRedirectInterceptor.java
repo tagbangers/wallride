@@ -1,10 +1,9 @@
 package org.wallride.web.support;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.Setting;
-import org.wallride.core.support.Settings;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,16 +12,16 @@ public class SetupRedirectInterceptor extends HandlerInterceptorAdapter {
 
     private static final String SETUP_PATH = "/_admin/setup";
 
-	private Settings settings;
+	private BlogService blogService;
 
-	public void setSettings(Settings settings) {
-		this.settings = settings;
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
-		if (StringUtils.hasText(defaultLanguage)) {
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		if (blog != null) {
             return true;
         }
 

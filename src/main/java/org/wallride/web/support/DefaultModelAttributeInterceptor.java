@@ -11,32 +11,29 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.PageTree;
-import org.wallride.core.domain.Post;
-import org.wallride.core.domain.Setting;
+import org.wallride.core.domain.*;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.Settings;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter {
 
-	private Settings settings;
-
+	private BlogService blogService;
 	private CategoryService categoryService;
-
 	private PageService pageService;
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultModelAttributeInterceptor.class);
 
-	public void setSettings(Settings settings) {
-		this.settings = settings;
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
 	}
 
 	public void setCategoryService(CategoryService categoryService) {
@@ -58,7 +55,12 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		if (mv.getView() instanceof RedirectView) return;
 		if (mv.getViewName().startsWith("redirect:")) return;
 
-		String[] languages = settings.readSettingAsStringArray(Setting.Key.LANGUAGES, ",");
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		List<String> languages = new ArrayList<>();
+		for (BlogLanguage blogLanguage : blog.getLanguages()) {
+			languages.add(blogLanguage.getLanguage());
+		}
+
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
 
 		mv.addObject("LANGUAGES", languages);
@@ -71,7 +73,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		}
 		mv.addObject("USER", authorizedUser);
 
-		mv.addObject("WEBSITE_TITLE", settings.readSettingAsString(Setting.Key.WEBSITE_TITLE, currentLanguage));
+		mv.addObject("WEBSITE_TITLE", blog.getTitle(currentLanguage));
 		mv.addObject("WEBSITE_LINK", buildGuestLink());
 		mv.addObject("WEBSITE_PATH", buildGuestPath(currentLanguage, languages));
 
@@ -95,9 +97,9 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		return builder.buildAndExpand().toUriString();
 	}
 
-	private String buildGuestPath(String currentLanguage, String[] languages) {
+	private String buildGuestPath(String currentLanguage, List<String> languages) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		if (languages != null && languages.length > 1) {
+		if (languages.size() > 1) {
 			builder.path("/{language}");
 		}
 		return builder.buildAndExpand(currentLanguage).toUriString();
@@ -116,7 +118,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		return builder.buildAndExpand(currentLanguage).toUriString();
 	}
 
-	private Map<String, String> buildLanguageLinks(String currentLanguage, String[] languages, HttpServletRequest request) {
+	private Map<String, String> buildLanguageLinks(String currentLanguage, List<String> languages, HttpServletRequest request) {
 		UrlPathHelper pathHelper = new UrlPathHelper();
 		Map<String, String> languageLinks = new LinkedHashMap<>();
 		String path = pathHelper.getPathWithinServletMapping(request);

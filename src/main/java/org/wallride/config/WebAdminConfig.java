@@ -28,6 +28,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
@@ -57,6 +58,9 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 	@Inject
 	private CustomThymeleafDialect customThymeleafDialect;
+
+	@Inject
+	private BlogService blogService;
 
 	@Inject
 	private CategoryService categoryService;
@@ -135,7 +139,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
 		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
-		defaultModelAttributeInterceptor.setSettings(settings);
+		defaultModelAttributeInterceptor.setBlogService(blogService);
 		defaultModelAttributeInterceptor.setCategoryService(categoryService);
 		defaultModelAttributeInterceptor.setPageService(pageService);
 		return defaultModelAttributeInterceptor;
@@ -144,7 +148,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public SetupRedirectInterceptor setupRedirectInterceptor() {
 		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
-		setupRedirectInterceptor.setSettings(settings);
+		setupRedirectInterceptor.setBlogService(blogService);
 		return setupRedirectInterceptor;
 	}
 
@@ -219,7 +223,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	@Bean
 	public LocaleResolver localeResolver() {
 		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
-		pathVariableLocaleResolver.setSettings(settings);
+		pathVariableLocaleResolver.setBlogService(blogService);
 		return pathVariableLocaleResolver;
 	}
 }

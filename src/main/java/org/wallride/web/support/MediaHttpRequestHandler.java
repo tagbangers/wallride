@@ -18,9 +18,11 @@ import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
 import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.MediaRepository;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.support.AmazonS3ResourceUtils;
 import org.wallride.core.support.Settings;
 
@@ -35,13 +37,16 @@ import java.util.Map;
 
 public class MediaHttpRequestHandler extends WebContentGenerator implements HttpRequestHandler, InitializingBean {
 
-	private MediaRepository mediaRepository;
+	private BlogService blogService;
 
+	private MediaRepository mediaRepository;
 	private ResourceLoader resourceLoader;
 
-	private Settings settings;
-
 	private static Logger logger = LoggerFactory.getLogger(MediaHttpRequestHandler.class);
+
+	public void setBlogService(BlogService blogService) {
+		this.blogService = blogService;
+	}
 
 	public void setMediaRepository(MediaRepository mediaRepository) {
 		this.mediaRepository = mediaRepository;
@@ -49,10 +54,6 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
-	}
-
-	public void setSettings(Settings settings) {
-		this.settings = settings;
 	}
 
 	@Override
@@ -99,7 +100,8 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 //	}
 
 	private Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException {
-		final Resource prefix = resourceLoader.getResource(settings.readSettingAsString(Setting.Key.MEDIA_PATH));
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
 		final Resource resource = prefix.createRelative(media.getId());
 		if (!resource.exists()) {
 			return null;

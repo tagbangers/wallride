@@ -1,15 +1,14 @@
 package org.wallride.web.controller.admin.setup;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Setting;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.SetupService;
-import org.wallride.core.support.Settings;
 import org.wallride.web.support.HttpForbiddenException;
 
 import javax.inject.Inject;
@@ -21,10 +20,9 @@ public class SetupController {
 	
 	@Inject
 	private SetupService setupService;
-
 	@Inject
-	private Settings settings;
-	
+	private BlogService blogService;
+
 	@ModelAttribute("form")
 	public SetupForm setupForm() {
 		return new SetupForm();
@@ -32,8 +30,8 @@ public class SetupController {
 	
 	@RequestMapping(method=RequestMethod.GET)
 	public String setup() {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
-		if (StringUtils.hasText(defaultLanguage)) {
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		if (blog != null) {
 			throw new HttpForbiddenException();
 		}
 		return "/setup";
@@ -44,8 +42,8 @@ public class SetupController {
 			@Valid @ModelAttribute("form") SetupForm form,
 			BindingResult result,
 			RedirectAttributes redirectAttributes) {
-		String defaultLanguage = settings.readSettingAsString(Setting.Key.DEFAULT_LANGUAGE);
-		if (StringUtils.hasText(defaultLanguage)) {
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		if (blog != null) {
 			throw new HttpForbiddenException();
 		}
 		if (result.hasErrors()) {
