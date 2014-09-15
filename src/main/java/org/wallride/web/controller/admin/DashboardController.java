@@ -1,5 +1,6 @@
 package org.wallride.web.controller.admin;
 
+import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,10 +11,7 @@ import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.PageService;
+import org.wallride.core.service.*;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
 import javax.inject.Inject;
@@ -24,6 +22,8 @@ public class DashboardController {
 	
 	@Inject
 	private BlogService blogService;
+	@Inject
+	private PostService postService;
 	@Inject
 	private ArticleService articleService;
 	@Inject
@@ -50,10 +50,16 @@ public class DashboardController {
 		model.addAttribute("articleCount", articleCount);
 		model.addAttribute("pageCount", pageCount);
 		model.addAttribute("categoryCount", categoryCount);
+		model.addAttribute("popularPosts", popularPosts(language));
 		model.addAttribute("recentPublishedArticles", recentPublishedArticles(language));
-		model.addAttribute("recentDraftArticles", recentDraftArtciles(language));
+		model.addAttribute("recentDraftArticles", recentDraftArticles(language));
 
 		return "/dashboard";
+	}
+
+	private List<Post> popularPosts(String language) {
+		postService.readPopularPosts(LocalDate.now().minusWeeks(2), language, 10);
+		return postService.readPopularPosts(LocalDate.now().minusWeeks(1), language, 10);
 	}
 
 	private List<Article> recentPublishedArticles(String language) {
@@ -64,7 +70,7 @@ public class DashboardController {
 		return page.getContent();
 	}
 
-	private List<Article> recentDraftArtciles(String language) {
+	private List<Article> recentDraftArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.DRAFT);

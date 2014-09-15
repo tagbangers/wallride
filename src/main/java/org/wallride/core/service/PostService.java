@@ -14,6 +14,7 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -165,6 +167,59 @@ public class PostService {
 
 	public Page<Post> readPosts(SearchPostRequest request, Pageable pageable) {
 		return postRepository.search(request, pageable);
+	}
+
+	@Cacheable(value = "popularPosts")
+	public List<Post> readPopularPosts(LocalDate from, String language, int maxResults) {
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
+		if (googleAnalytics == null) {
+			logger.warn("Configuration of Google Analytics can not be found");
+			return new ArrayList<>();
+		}
+
+		try {
+			PrivateKey privateKey = SecurityUtils.loadPrivateKeyFromKeyStore(
+					SecurityUtils.getPkcs12KeyStore(), new ByteArrayInputStream(blog.getGoogleAnalytics().getServiceAccountP12FileContent()),
+					"notasecret", "privatekey", "notasecret");
+
+			HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+			JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+
+			Set<String> scopes = new HashSet<>();
+			scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
+
+			GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+					.setJsonFactory(jsonFactory)
+					.setServiceAccountId(googleAnalytics.getServiceAccountId())
+					.setServiceAccountScopes(scopes)
+					.setServiceAccountPrivateKey(privateKey)
+					.build();
+
+			Analytics analytics = new Analytics.Builder(httpTransport, jsonFactory, credential)
+					.setApplicationName("WallRide")
+					.build();
+
+			int startIndex = 1;
+			final GaData gaData = analytics.data().ga()
+					.get(googleAnalytics.getProfileId(), from.toString("yyyy-MM-dd"), LocalDate.now().toString("yyyy-MM-dd"), "ga:pageviews")
+					.setDimensions(String.format("ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
+					.setSort(String.format("-ga:pageviews,-ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
+					.setStartIndex(startIndex)
+					.setMaxResults(maxResults)
+					.execute();
+
+			List<Long> postIds = new ArrayList<>();
+			for (List row : gaData.getRows()) {
+				postIds.add(Long.parseLong((String) row.get(0)));
+			}
+
+			return postRepository.findByIdIn(postIds, language);
+		} catch (GeneralSecurityException e) {
+			throw new GoogleAnalyticsException(e);
+		} catch (IOException e) {
+			throw new GoogleAnalyticsException(e);
+		}
 	}
 
 	public Post readPostById(long id, String language) {
