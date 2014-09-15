@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
+		<title>WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div id="wr-page-header">
+				<div class="page-header container-fluid clearfix">
+					<div class="pull-left">
+						<h1 th:text="#{GoogleAnalytics}">Google Analytics</h1>
+					</div>
+					<div class="pull-right">
+						<div class="btn-group">
+							<a th:href="@{__${ADMIN_PATH}__/analytics/edit}" class="btn btn-default">Edit</a>
+							<button type="button" class="btn btn-default">Delete</button>
+						</div>
+						<div class="btn-group">
+							<button type="button" class="btn btn-primary">Sync</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="wr-page-content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-sm-12">
+							<table class="table">
+								<colgroup>
+									<col class="col-sm-3" />
+									<col class="col-sm-9" />
+								</colgroup>
+								<tbody>
+									<tr>
+										<th th:text="#{GoogleAnalyticsTrackingID}">Tracking ID</th>
+										<td th:text="${googleAnalytics.trackingId}"></td>
+									</tr>
+									<tr>
+										<th th:text="#{GoogleAnalyticsProfileID}">Profile ID</th>
+										<td th:text="${googleAnalytics.profileId}"></td>
+									</tr>
+									<tr>
+										<th th:text="#{GoogleAnalyticsCustomDimensionIndex}">Custom Dimension Index</th>
+										<td th:text="${googleAnalytics.customDimensionIndex}"></td>
+									</tr>
+									<tr>
+										<th th:text="#{GoogleAnalyticsServiceAccountID}">Service Account ID</th>
+										<td th:text="${googleAnalytics.serviceAccountId}"></td>
+									</tr>
+									<tr>
+										<th th:text="#{GoogleAnalyticsServiceAccountP12File}">Service Account P12 File</th>
+										<td th:text="${googleAnalytics.serviceAccountP12FileName}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>

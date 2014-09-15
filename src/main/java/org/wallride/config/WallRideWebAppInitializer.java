@@ -10,6 +10,7 @@ import org.springframework.web.context.AbstractContextLoaderInitializer;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.wallride.core.support.AmazonS3Resource;
 import org.wallride.core.support.AmazonS3ResourceLoader;
@@ -33,6 +34,10 @@ public class WallRideWebAppInitializer extends AbstractContextLoaderInitializer 
 		characterEncodingFilter.setForceEncoding(true);
 		FilterRegistration.Dynamic characterEncoding = servletContext.addFilter("characterEncodingFilter", characterEncodingFilter);
 		characterEncoding.addMappingForUrlPatterns(dispatcherTypes, true, "/*");
+
+		HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
+		FilterRegistration.Dynamic hiddenHttpMethod = servletContext.addFilter("hiddenHttpMethodFilter", hiddenHttpMethodFilter);
+		hiddenHttpMethod.addMappingForUrlPatterns(dispatcherTypes, true, "/*");
 
 		registerAdminServlet(servletContext);
 		registerGuestServlet(servletContext);

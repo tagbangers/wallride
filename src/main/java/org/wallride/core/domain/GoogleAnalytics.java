@@ -14,6 +14,10 @@ public class GoogleAnalytics implements Serializable {
 	@Field
 	private String trackingId;
 
+	@Column(name = "ga_profile_id", length = 100)
+	@Field
+	private String profileId;
+
 	@Column(name = "ga_custom_dimension_index")
 	@Field
 	private int customDimensionIndex;
@@ -22,9 +26,13 @@ public class GoogleAnalytics implements Serializable {
 	@Field
 	private String serviceAccountId;
 
+	@Column(name = "ga_service_account_p12_file_name", length = 300)
+	@Field
+	private String serviceAccountP12FileName;
+
 	@Lob
-	@Column(name = "ga_service_account_p12_key")
-	private byte[] serviceAccountP12Key;
+	@Column(name = "ga_service_account_p12_file_content")
+	private byte[] serviceAccountP12FileContent;
 
 	public String getTrackingId() {
 		return trackingId;
@@ -32,6 +40,14 @@ public class GoogleAnalytics implements Serializable {
 
 	public void setTrackingId(String trackingId) {
 		this.trackingId = trackingId;
+	}
+
+	public String getProfileId() {
+		return profileId;
+	}
+
+	public void setProfileId(String profileId) {
+		this.profileId = profileId;
 	}
 
 	public int getCustomDimensionIndex() {
@@ -50,11 +66,19 @@ public class GoogleAnalytics implements Serializable {
 		this.serviceAccountId = serviceAccountId;
 	}
 
-	public byte[] getServiceAccountP12Key() {
-		return serviceAccountP12Key;
+	public String getServiceAccountP12FileName() {
+		return serviceAccountP12FileName;
 	}
 
-	public void setServiceAccountP12Key(byte[] serviceAccountP12Key) {
-		this.serviceAccountP12Key = serviceAccountP12Key;
+	public void setServiceAccountP12FileName(String serviceAccountP12FileName) {
+		this.serviceAccountP12FileName = serviceAccountP12FileName;
+	}
+
+	public byte[] getServiceAccountP12FileContent() {
+		return serviceAccountP12FileContent;
+	}
+
+	public void setServiceAccountP12FileContent(byte[] serviceAccountP12Key) {
+		this.serviceAccountP12FileContent = serviceAccountP12Key;
 	}
 }
