@@ -58,7 +58,6 @@ public class DashboardController {
 	}
 
 	private List<Post> popularPosts(String language) {
-		postService.readPopularPosts(LocalDate.now().minusWeeks(2), language, 10);
 		return postService.readPopularPosts(LocalDate.now().minusWeeks(1), language, 10);
 	}
 
