@@ -63,7 +63,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
 
-		mv.addObject("LANGUAGES", languages);
+		mv.addObject("LANGUAGES", languages.toArray(new String[languages.size()]));
 		mv.addObject("LANGUAGE_LINKS", buildLanguageLinks(currentLanguage, languages, request));
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
