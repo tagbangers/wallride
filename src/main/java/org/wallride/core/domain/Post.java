@@ -3,6 +3,7 @@ package org.wallride.core.domain;
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.joda.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ import java.util.SortedSet;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DynamicInsert
 @DynamicUpdate
+@Indexed
 public class Post extends DomainObject<Long> {
 
 	public enum Status {
