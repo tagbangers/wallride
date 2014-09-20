@@ -19,7 +19,10 @@ import java.util.List;
 
 @Controller
 public class DashboardController {
-	
+
+	private static final int POPULAR_POSTS_DAYS = 7;
+	private static final int POPULAR_POSTS_COUNT = 10;
+
 	@Inject
 	private BlogService blogService;
 	@Inject
@@ -58,7 +61,7 @@ public class DashboardController {
 	}
 
 	private List<Post> popularPosts(String language) {
-		return postService.readPopularPosts(LocalDate.now().minusWeeks(1), language, 10);
+		return postService.readPopularPosts(LocalDate.now().minusDays(POPULAR_POSTS_DAYS), language, POPULAR_POSTS_COUNT);
 	}
 
 	private List<Article> recentPublishedArticles(String language) {

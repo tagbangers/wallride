@@ -86,9 +86,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		}
 
 		if (!CollectionUtils.isEmpty(request.getPostIds())) {
+			BooleanJunction<BooleanJunction> bool = qb.bool();
 			for (long postId : request.getPostIds()) {
-				junction.must(qb.keyword().onField("id").matching(postId).createQuery());
+				bool.should(qb.keyword().onField("id").matching(postId).createQuery());
 			}
+			junction.must(bool.createQuery());
 		}
 
 		Query searchQuery = junction.createQuery();
