@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 public class SearchPostRequest {
 
+	private Collection<Long> postIds = new ArrayList<>();
 	private Post.Status status = Post.Status.PUBLISHED;
 	private String keyword;
 	private LocalDateTime dateFrom;
@@ -19,6 +20,24 @@ public class SearchPostRequest {
 
 	public SearchPostRequest(String language) {
 		this.language = language;
+	}
+
+	public Collection<Long> getPostIds() {
+		return postIds;
+	}
+
+	public void setPostIds(Collection<Long> postIds) {
+		this.postIds = postIds;
+	}
+
+	public SearchPostRequest withPostIds(Long... postIds) {
+		if (getPostIds() == null) {
+			setPostIds(new ArrayList<Long>(postIds.length));
+		}
+		for (Long value : postIds) {
+			getPostIds().add(value);
+		}
+		return this;
 	}
 
 	public Post.Status getStatus() {

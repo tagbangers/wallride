@@ -24,7 +24,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
@@ -36,11 +35,8 @@ import org.wallride.core.repository.PostRepository;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
-import javax.transaction.TransactionManager;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
@@ -214,7 +210,27 @@ public class PostService {
 				postIds.add(Long.parseLong((String) row.get(0)));
 			}
 
-			return postRepository.findByIdIn(postIds, language);
+			SearchPostRequest searchPostRequest = new SearchPostRequest(language);
+			searchPostRequest.setPostIds(postIds);
+			searchPostRequest.setStatus(Post.Status.PUBLISHED);
+			Page<Post> page = postRepository.search(searchPostRequest, new PageRequest(0, postIds.size()));
+			List<Post> posts = new ArrayList<>(page.getContent());
+			List<Post> results = new ArrayList<>(posts.size());
+			for (long postId : postIds) {
+				Post match = null;
+				for (Post post : posts) {
+					if (postId == post.getId()) {
+						match = post;
+						break;
+					}
+				}
+				if (match != null) {
+					results.add(match);
+					posts.remove(match);
+				}
+			}
+
+			return results;
 		} catch (GeneralSecurityException e) {
 			throw new GoogleAnalyticsException(e);
 		} catch (IOException e) {
