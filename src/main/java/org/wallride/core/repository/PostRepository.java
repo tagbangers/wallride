@@ -25,9 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 	@Query("select post.id from Post post order by post.date desc ")
 	List<Long> findId();
 	
-	@Query(DEFAULT_SELECT_QUERY + "where post.id in (:ids) and post.language = :language ")
-	List<Post> findByIdIn(@Param("ids") Collection<Long> ids, @Param("language") String language);
-
 	@Query(DEFAULT_SELECT_QUERY + "where post.status = :status and post.date <= :date ")
 	List<Post> findByStatusAndDateLessThanEqual(@Param("status") Post.Status status, @Param("date") LocalDateTime date);
 
