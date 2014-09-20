@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201409160404</version>
+	<version>1.0.0.SNAPSHOT-201409210628</version>
 	<packaging>war</packaging>
 	
 	<properties>
