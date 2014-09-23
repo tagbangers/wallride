@@ -18,7 +18,7 @@ public class LanguageUrlPathHelper extends UrlPathHelper {
 	@Override
 	public String getLookupPathForRequest(HttpServletRequest request) {
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-		String defaultLanguage = blog.getDefaultLanguage();
+		String defaultLanguage = (blog != null) ? blog.getDefaultLanguage() : null;
 		if (defaultLanguage != null) {
 			String path = super.getLookupPathForRequest(request);
 			boolean languagePath = false;
