@@ -1,6 +1,6 @@
 package org.wallride.config;
 
-import org.apache.commons.io.IOUtils;
+import com.amazonaws.internal.EC2MetadataClient;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
@@ -14,19 +14,14 @@ import org.infinispan.query.indexmanager.InfinispanIndexManager;
 import org.infinispan.spring.provider.SpringEmbeddedCacheManagerFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
 import java.util.Properties;
 
 @Configuration
@@ -46,13 +41,11 @@ public class CacheConfig {
 		// JGroups settings
 		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");
 		if ("jgroups-ec2.xml".equals(jgroupsConfigurationFile)) {
-			Process process = Runtime.getRuntime().exec("GET http://instance-data/latest/meta-data/local-ipv4");
-			List<String> results = IOUtils.readLines(process.getInputStream());
-			if (!CollectionUtils.isEmpty(results)) {
-				String ipaddress = results.get(0);
-				logger.info("jgroups.bind_addr -> {}", ipaddress);
-				System.setProperty("jgroups.bind_addr", ipaddress);
-			}
+			EC2MetadataClient metadataClient = new EC2MetadataClient();
+			String ipaddress = metadataClient.readResource("/latest/meta-data/local-ipv4");
+			logger.info("jgroups.bind_addr -> {}", ipaddress);
+			System.setProperty("jgroups.bind_addr", ipaddress);
+
 			System.setProperty("jgroups.s3.access_key", environment.getRequiredProperty("aws.accessKey"));
 			System.setProperty("jgroups.s3.secret_access_key", environment.getRequiredProperty("aws.secretKey"));
 			System.setProperty("jgroups.s3.bucket",  environment.getRequiredProperty("jgroups.s3.bucket"));
