@@ -57,8 +57,10 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		List<String> languages = new ArrayList<>();
-		for (BlogLanguage blogLanguage : blog.getLanguages()) {
-			languages.add(blogLanguage.getLanguage());
+		if (blog != null) {
+			for (BlogLanguage blogLanguage : blog.getLanguages()) {
+				languages.add(blogLanguage.getLanguage());
+			}
 		}
 
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
