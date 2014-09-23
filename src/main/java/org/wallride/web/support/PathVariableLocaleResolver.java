@@ -28,22 +28,25 @@ public class PathVariableLocaleResolver implements LocaleResolver {
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String defaultLanguage = (blog != null) ? blog.getDefaultLanguage() : null;
 
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		String currentLanguage = (String) pathVariables.get("language");
 		if (currentLanguage == null) {
-			currentLanguage = blog.getDefaultLanguage();
+			currentLanguage = defaultLanguage;
 		}
 		else {
 			boolean correct = false;
-			for (BlogLanguage blogLanguage : blog.getLanguages()) {
-				if (blogLanguage.getLanguage().equals(currentLanguage)) {
-					correct = true;
-					break;
+			if (blog != null) {
+				for (BlogLanguage blogLanguage : blog.getLanguages()) {
+					if (blogLanguage.getLanguage().equals(currentLanguage)) {
+						correct = true;
+						break;
+					}
 				}
 			}
 			if (!correct) {
-				currentLanguage = blog.getDefaultLanguage();
+				currentLanguage = defaultLanguage;
 			}
 		}
 
