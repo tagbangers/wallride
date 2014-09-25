@@ -128,6 +128,21 @@ public class PageTree implements Serializable {
 		return pageIdMap.values();
 	}
 
+	public List<Page> getSiblingPagesByCode(String code) {
+		Page page = getPageByCode(code);
+		List<Page> siblings = new ArrayList<>();
+		if (page.getParent() == null) {
+			return siblings;
+		}
+		Node node = getNodeByCode(page.getParent().getCode());
+		for (Node child : node.getChildren()) {
+			if (!page.equals(child.getPage())) {
+				siblings.add(child.getPage());
+			}
+		}
+		return siblings;
+	}
+
 	public Page getPageById(long id) {
 		return pageIdMap.get(id);
 	}
