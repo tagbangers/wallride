@@ -155,6 +155,14 @@ public class PageTree implements Serializable {
 		return pageCodeMap.get(code);
 	}
 
+	public boolean isParentPage(Page target, Page page) {
+		List<Page> parents = getParentPagesByCode(page.getCode());
+		if (CollectionUtils.isEmpty(parents)) {
+			return false;
+		}
+		return parents.contains(target);
+	}
+
 	public boolean isEmpty() {
 		return pageIdMap.isEmpty();
 	}
