@@ -129,6 +129,10 @@ public class PageTree implements Serializable {
 	}
 
 	public List<Page> getSiblingPagesByCode(String code) {
+		return getSiblingPagesByCode(code, false);
+	}
+
+	public List<Page> getSiblingPagesByCode(String code, boolean includeSelf) {
 		Page page = getPageByCode(code);
 		List<Page> siblings = new ArrayList<>();
 		if (page.getParent() == null) {
@@ -136,7 +140,9 @@ public class PageTree implements Serializable {
 		}
 		Node node = getNodeByCode(page.getParent().getCode());
 		for (Node child : node.getChildren()) {
-			siblings.add(child.getPage());
+			if (includeSelf || !page.equals(child.getPage())) {
+				siblings.add(child.getPage());
+			}
 		}
 		return siblings;
 	}
