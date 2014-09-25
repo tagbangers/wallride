@@ -75,7 +75,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		}
 		mv.addObject("USER", authorizedUser);
 
-		mv.addObject("WEBSITE_TITLE", blog.getTitle(currentLanguage));
+		mv.addObject("WEBSITE_TITLE", blog != null ? blog.getTitle(currentLanguage) : null);
 		mv.addObject("WEBSITE_LINK", buildGuestLink());
 		mv.addObject("WEBSITE_PATH", buildGuestPath(currentLanguage, languages));
 
