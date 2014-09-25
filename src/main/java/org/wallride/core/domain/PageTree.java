@@ -136,9 +136,7 @@ public class PageTree implements Serializable {
 		}
 		Node node = getNodeByCode(page.getParent().getCode());
 		for (Node child : node.getChildren()) {
-			if (!page.equals(child.getPage())) {
-				siblings.add(child.getPage());
-			}
+			siblings.add(child.getPage());
 		}
 		return siblings;
 	}
