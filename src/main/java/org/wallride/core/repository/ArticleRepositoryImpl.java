@@ -108,8 +108,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		Criteria criteria = session.createCriteria(Article.class)
 				.setFetchMode("cover", FetchMode.JOIN)
 				.setFetchMode("author", FetchMode.JOIN)
-				.setFetchMode("categories", FetchMode.JOIN)
-				.setFetchMode("tags", FetchMode.JOIN);
+				.setFetchMode("categories", FetchMode.JOIN);
+//				.setFetchMode("tags", FetchMode.JOIN);
 
 		Sort sort = new Sort(
 				new SortField("date", SortField.STRING, true),

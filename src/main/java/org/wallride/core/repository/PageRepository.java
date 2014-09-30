@@ -17,8 +17,15 @@ import java.util.List;
 @Repository
 @Transactional
 public interface PageRepository extends JpaRepository<Page, Long>, PageRepositoryCustom {
-	
-	static final String DEFAULT_SELECT_QUERY = 
+
+	static final String DEFAULT_LIST_SELECT_QUERY =
+			"from Page page " +
+			"left join fetch page.cover cover "+
+			"left join fetch page.author author " +
+			"left join fetch page.parent parent " +
+			"left join fetch page.children children ";
+
+	static final String DEFAULT_OBJECT_SELECT_QUERY =
 			"from Page page " + 
 			"left join fetch page.cover cover "+
 			"left join fetch page.author author " +
@@ -29,26 +36,26 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 	@Query("select page.id from Page page order by page.id")
 	List<Long> findId();
 	
-	@Query(DEFAULT_SELECT_QUERY + "where page.id in (:ids) ")
+	@Query(DEFAULT_LIST_SELECT_QUERY + "where page.id in (:ids) ")
 	List<Page> findByIdIn(@Param("ids") Collection<Long> ids);
 	
-	@Query(DEFAULT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
-	Page findById(@Param("id") Long id, @Param("language") String language);
-	
-	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language and page.drafted is null order by page.lft")
+	@Query(DEFAULT_LIST_SELECT_QUERY + "where page.language = :language and page.drafted is null order by page.lft")
 	List<Page> findByLanguage(@Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where page.language = :language and page.status = :status and page.drafted is null order by page.lft")
+	@Query(DEFAULT_LIST_SELECT_QUERY + "where page.language = :language and page.status = :status and page.drafted is null order by page.lft")
 	List<Page> findByLanguageAndStatus(@Param("language") String language, @Param("status") Post.Status status);
 
-	@Query(DEFAULT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
+	Page findById(@Param("id") Long id, @Param("language") String language);
+
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	Page findByIdForUpdate(@Param("id")Long id, @Param("language") String language);
 	
-	@Query(DEFAULT_SELECT_QUERY + "where page.code = :code and page.language = :language ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.code = :code and page.language = :language ")
 	Page findByCode(@Param("code") String code, @Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where page.drafted = :drafted and page.id = (select max(page.id) from page where page.drafted = :drafted) ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.drafted = :drafted and page.id = (select max(page.id) from page where page.drafted = :drafted) ")
 	Page findDraft(@Param("drafted") Page drafted);
 
 	@Query("select count(page.id) from Page page where page.language = :language and page.drafted is null ")

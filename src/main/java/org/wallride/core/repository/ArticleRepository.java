@@ -18,8 +18,15 @@ import java.util.Map;
 @Repository
 @Transactional
 public interface ArticleRepository extends JpaRepository<Article, Long>, ArticleRepositoryCustom {
-	
-	static final String DEFAULT_SELECT_QUERY = 
+
+	static final String DEFAULT_LIST_SELECT_QUERY =
+			"from Article article " +
+			"left join fetch article.cover cover " +
+			"left join fetch article.author author " +
+			"left join fetch article.drafted drafted " +
+			"left join fetch article.categories category ";
+
+	static final String DEFAULT_OBJECT_SELECT_QUERY =
 			"from Article article " +
 			"left join fetch article.cover cover " +
 			"left join fetch article.author author " +
@@ -31,26 +38,26 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Query("select article.id from Article article order by article.date desc ")
 	List<Long> findId();
 
-	@Query(DEFAULT_SELECT_QUERY + "where article.id in (:ids) ")
+	@Query(DEFAULT_LIST_SELECT_QUERY + "where article.id in (:ids) ")
 	List<Article> findByIdIn(@Param("ids") Collection<Long> ids);
 
 //	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted order by article.id desc ")
 //	List<Article> findByDrafted(@Param("drafted") Article drafted);
 
-	@Query(DEFAULT_SELECT_QUERY + "where regexp(article.code, :regex) = 1 and article.language = :language ")
+	@Query(DEFAULT_LIST_SELECT_QUERY + "where regexp(article.code, :regex) = 1 and article.language = :language ")
 	List<Article> findByCodeRegex(@Param("regex") String regex, @Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
 	Article findById(@Param("id") Long id, @Param("language") String language);
 	
-	@Query(DEFAULT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	Article findByIdForUpdate(@Param("id") Long id, @Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where article.code = :code and article.language = :language ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.code = :code and article.language = :language ")
 	Article findByCode(@Param("code") String code, @Param("language") String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted and article.id = (select max(article.id) from article where article.drafted = :drafted) ")
+	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.drafted = :drafted and article.id = (select max(article.id) from article where article.drafted = :drafted) ")
 	Article findDraft(@Param("drafted") Article drafted);
 
 	@Query("select count(article.id) from Article article where article.language = :language and article.drafted is null ")
