@@ -7,7 +7,7 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form th:include="page/create::form(title=#{EditPage},id=${form.id})" th:action="@{__${ADMIN_PATH}__/pages/edit}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:include="page/create::form(title=#{EditPage},id=${form.id})" th:action="@{__${ADMIN_PATH}__/pages/edit}" th:object="${form}" action="#" method="post">
 			</form>
 		</div>
 		<footer>
