@@ -7,7 +7,7 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form th:include="article/create::form(title=#{EditArticle},article=${article})" th:action="@{__${ADMIN_PATH}__/articles/edit}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:include="article/create::form(title=#{EditArticle},article=${article})" th:action="@{__${ADMIN_PATH}__/articles/edit}" th:object="${form}" action="#" method="post">
 			</form>
 		</div>
 		<footer>

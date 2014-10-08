@@ -57,8 +57,10 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		List<String> languages = new ArrayList<>();
-		for (BlogLanguage blogLanguage : blog.getLanguages()) {
-			languages.add(blogLanguage.getLanguage());
+		if (blog != null) {
+			for (BlogLanguage blogLanguage : blog.getLanguages()) {
+				languages.add(blogLanguage.getLanguage());
+			}
 		}
 
 		String currentLanguage = LocaleContextHolder.getLocale().getLanguage();
@@ -73,7 +75,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		}
 		mv.addObject("USER", authorizedUser);
 
-		mv.addObject("WEBSITE_TITLE", blog.getTitle(currentLanguage));
+		mv.addObject("WEBSITE_TITLE", blog != null ? blog.getTitle(currentLanguage) : null);
 		mv.addObject("WEBSITE_LINK", buildGuestLink());
 		mv.addObject("WEBSITE_PATH", buildGuestPath(currentLanguage, languages));
 

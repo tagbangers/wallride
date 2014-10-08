@@ -7,7 +7,7 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form th:fragment="form(title,id)" th:action="@{__${ADMIN_PATH}__/pages/create}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:fragment="form(title,id)" th:action="@{__${ADMIN_PATH}__/pages/create}" th:object="${form}" action="#" method="post">
 				<input type="hidden" name="id" th:value="${page}? ${page.id} : ''"  />
 				<div id="wr-page-header">
 					<div class="page-header container-fluid">
@@ -60,7 +60,7 @@
 													history.replaceState(null, null, url);
 													new PNotify({
 														icon: false,
-														title: 'Saved as draft',
+														title: /*[[#{SavedAsDraft}]]*/ 'Saved as draft',
 														type: 'success',
 														delay: 3000,
 														buttons: {
@@ -212,6 +212,7 @@
 											$(function() {
 												$('#wr-page-content :input[name="body"]').redactor({
 													minHeight: 300,
+													convertDivs: false,
 													convertImageLinks: true,
 													convertVideoLinks: true,
 													imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
@@ -320,6 +321,18 @@
 						</div>
 					</div>
 				</div>
+				<script th:inline="javascript">
+					$(function() {
+						var lastValue = $('#wr-post-form :input[name!="id"]').serialize();
+						setInterval(function() {
+							var currentValue = $('#wr-post-form :input[name!="id"]').serialize();
+							if (lastValue != currentValue) {
+								$('#save-draft-button').trigger('click');
+							}
+							lastValue = currentValue;
+						}, 30000);
+					});
+				</script>
 			</form>
 		</div>
 		<footer>

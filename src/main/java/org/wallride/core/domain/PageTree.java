@@ -128,12 +128,39 @@ public class PageTree implements Serializable {
 		return pageIdMap.values();
 	}
 
+	public List<Page> getSiblingPagesByCode(String code) {
+		return getSiblingPagesByCode(code, false);
+	}
+
+	public List<Page> getSiblingPagesByCode(String code, boolean includeSelf) {
+		Page page = getPageByCode(code);
+		List<Page> siblings = new ArrayList<>();
+		if (page.getParent() == null) {
+			return siblings;
+		}
+		Node node = getNodeByCode(page.getParent().getCode());
+		for (Node child : node.getChildren()) {
+			if (includeSelf || !page.equals(child.getPage())) {
+				siblings.add(child.getPage());
+			}
+		}
+		return siblings;
+	}
+
 	public Page getPageById(long id) {
 		return pageIdMap.get(id);
 	}
 
 	public Page getPageByCode(String code) {
 		return pageCodeMap.get(code);
+	}
+
+	public boolean isParentPage(Page target, Page page) {
+		List<Page> parents = getParentPagesByCode(page.getCode());
+		if (CollectionUtils.isEmpty(parents)) {
+			return false;
+		}
+		return parents.contains(target);
 	}
 
 	public boolean isEmpty() {

@@ -7,7 +7,7 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form id="article-create-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
 				<input type="hidden" name="id" th:value="${article}? ${article.id} : ''"  />
 				<div id="wr-page-header">
 					<div class="page-header container-fluid">
@@ -58,7 +58,7 @@
 													history.replaceState(null, null, url);
 													new PNotify({
 														icon: false,
-														title: 'Saved as draft',
+														title: /*[[#{SavedAsDraft}]]*/ 'Saved as draft',
 														type: 'success',
 														delay: 3000,
 														buttons: {
@@ -210,6 +210,7 @@
 											$(function() {
 												$('#wr-page-content :input[name="body"]').redactor({
 													minHeight: 300,
+													convertDivs: false,
 													convertImageLinks: true,
 													convertVideoLinks: true,
 													imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
@@ -317,7 +318,7 @@
 											var self = $(this);
 											self.button('loading');
 											var checked = [];
-											$('input[name="categoryIds"]:checked', '#article-create-form').each(function(i, element) {
+											$('input[name="categoryIds"]:checked', '#wr-post-form').each(function(i, element) {
 												checked.push($(element).val());
 											});
 											var form = self.closest('form');
@@ -424,6 +425,18 @@
 						</div>
 					</div>
 				</div>
+				<script th:inline="javascript">
+					$(function() {
+						var lastValue = $('#wr-post-form :input[name!="id"]').serialize();
+						setInterval(function() {
+							var currentValue = $('#wr-post-form :input[name!="id"]').serialize();
+							if (lastValue != currentValue) {
+								$('#save-draft-button').trigger('click');
+							}
+							lastValue = currentValue;
+						}, 30000);
+					});
+				</script>
 			</form>
 		</div>
 		<footer>
