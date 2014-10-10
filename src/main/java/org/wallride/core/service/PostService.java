@@ -205,28 +205,30 @@ public class PostService {
 					.setMaxResults(maxResults)
 					.execute();
 
+			List<Post> results = new ArrayList<>();
 			List<Long> postIds = new ArrayList<>();
-			for (List row : gaData.getRows()) {
-				postIds.add(Long.parseLong((String) row.get(0)));
-			}
-
-			SearchPostRequest searchPostRequest = new SearchPostRequest(language);
-			searchPostRequest.setPostIds(postIds);
-			searchPostRequest.setStatus(Post.Status.PUBLISHED);
-			Page<Post> page = postRepository.search(searchPostRequest, new PageRequest(0, postIds.size()));
-			List<Post> posts = new ArrayList<>(page.getContent());
-			List<Post> results = new ArrayList<>(posts.size());
-			for (long postId : postIds) {
-				Post match = null;
-				for (Post post : posts) {
-					if (postId == post.getId()) {
-						match = post;
-						break;
-					}
+			if (!CollectionUtils.isEmpty(gaData.getRows())) {
+				for (List row : gaData.getRows()) {
+					postIds.add(Long.parseLong((String) row.get(0)));
 				}
-				if (match != null) {
-					results.add(match);
-					posts.remove(match);
+
+				SearchPostRequest searchPostRequest = new SearchPostRequest(language);
+				searchPostRequest.setPostIds(postIds);
+				searchPostRequest.setStatus(Post.Status.PUBLISHED);
+				Page<Post> page = postRepository.search(searchPostRequest, new PageRequest(0, postIds.size()));
+				List<Post> posts = new ArrayList<>(page.getContent());
+				for (long postId : postIds) {
+					Post match = null;
+					for (Post post : posts) {
+						if (postId == post.getId()) {
+							match = post;
+							break;
+						}
+					}
+					if (match != null) {
+						results.add(match);
+						posts.remove(match);
+					}
 				}
 			}
 
