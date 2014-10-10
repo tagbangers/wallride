@@ -190,7 +190,8 @@ public class PostUtils {
 	}
 
 	public String summary(Post post, int length) {
-		String summary = post.getBody();
+		Document document = Jsoup.parse(post.getBody());
+		String summary = document.text();
 		if (!StringUtils.hasText(summary)) {
 			return summary;
 		}
