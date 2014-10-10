@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.core.domain.*;
@@ -27,25 +28,45 @@ public class PostUtils {
 
 	public String link(Article article) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, article);
+		return path(builder, article, true);
+	}
+
+	public String link(Article article, boolean encode) {
+		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+		return path(builder, article, encode);
 	}
 
 	public String link(Page page) {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, page);
+		return path(builder, page, true);
+	}
+
+	public String link(Page page, boolean encode) {
+		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+		return path(builder, page, encode);
 	}
 
 	public String path(Article article) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, article);
+		return path(builder, article, true);
+	}
+
+	public String path(Article article, boolean encode) {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
+		return path(builder, article, encode);
 	}
 
 	public String path(Page page) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, page);
+		return path(builder, page, true);
 	}
 
-	private String path(UriComponentsBuilder builder, Article article) {
+	public String path(Page page, boolean encode) {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
+		return path(builder, page, encode);
+	}
+
+	private String path(UriComponentsBuilder builder, Article article, boolean encode) {
 		Map<String, Object> params = new HashMap<>();
 		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
 		if (languages != null && languages.length > 1) {
@@ -57,10 +78,15 @@ public class PostUtils {
 		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
 		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
 		params.put("code", article.getCode());
-		return builder.buildAndExpand(params).encode().toUriString();
+
+		UriComponents components = builder.buildAndExpand(params);
+		if (encode) {
+			components = components.encode();
+		}
+		return components.toUriString();
 	}
 
-	private String path(UriComponentsBuilder builder, Page page) {
+	private String path(UriComponentsBuilder builder, Page page, boolean encode) {
 		Map<String, Object> params = new HashMap<>();
 		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
 		if (languages != null && languages.length > 1) {
@@ -85,7 +111,12 @@ public class PostUtils {
 			builder.path("/{" + key + "}");
 			params.put(key, codes.get(i));
 		}
-		return builder.buildAndExpand(params).encode().toUriString();
+
+		UriComponents components = builder.buildAndExpand(params);
+		if (encode) {
+			components = components.encode();
+		}
+		return components.toUriString();
 	}
 
 	public String metaKeywords(Post post) {
@@ -117,7 +148,7 @@ public class PostUtils {
 		return link(article);
 	}
 
-	public String ogUrl(Page page, PageTree pageTree) {
+	public String ogUrl(Page page) {
 		return link(page);
 	}
 
@@ -159,7 +190,8 @@ public class PostUtils {
 	}
 
 	public String summary(Post post, int length) {
-		String summary = post.getBody();
+		Document document = Jsoup.parse(post.getBody());
+		String summary = document.text();
 		if (!StringUtils.hasText(summary)) {
 			return summary;
 		}

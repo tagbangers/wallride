@@ -118,7 +118,7 @@
 					<!--/#page-create-modal -->
 					<script th:inline="javascript">
 						$(function() {
-							$('#main').on('click', '#save-page', function(e) {
+							$('#wr-page-content').on('click', '#save-page', function(e) {
 								e.preventDefault();
 								var self = this;
 								$(self).button('loading');
@@ -145,7 +145,7 @@
 									}
 								});
 							});
-							$('#main').on('hidden.bs.modal', '#page-create-modal', function() {
+							$('#wr-page-content').on('hidden.bs.modal', '#page-create-modal', function() {
 								$(this).removeData('bs.modal');
 							});
 						});
@@ -189,14 +189,14 @@
 								expandOnHover: 700
 	//							startCollapsed: true
 							});
-							$('#main').on('sortupdate', '#page-tree', function() {
+							$('#wr-page-content').on('sortupdate', '#page-tree', function() {
 								$('#update-page-sort').prop('disabled', false);
 								$('button', $(this)).prop('disabled', true);
 							});
 							$('.disclose').on('click', function() {
 								$(this).closest('li').toggleClass('mjs-nestedSortable-collapsed').toggleClass('mjs-nestedSortable-expanded');
 							})
-							$('#main').on('click', '#delete-page', function(e) {
+							$('#wr-page-content').on('click', '#delete-page', function(e) {
 								e.preventDefault();
 								var self = $(this);
 								self.button('loading');

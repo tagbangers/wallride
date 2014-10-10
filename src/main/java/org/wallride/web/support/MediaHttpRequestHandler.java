@@ -107,36 +107,24 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 			return null;
 		}
 
+		Resource resized = resource;
 		boolean doResize = (width > 0 || height > 0);
 		if (doResize && "image".equals(MediaType.parseMediaType(media.getMimeType()).getType())) {
-			final Resource resized = prefix.createRelative(String.format("%s.resized/%dx%d-%d", media.getId(), width, height, mode.ordinal()));
+			resized = prefix.createRelative(String.format("%s.resized/%dx%d-%d",
+					media.getId(),
+					width, height, mode.ordinal()));
 			if (!resized.exists() || resource.lastModified() > resized.lastModified()) {
-//			if (!resized.exists()) {
-				final File temp = File.createTempFile("resized-", MediaType.parseMediaType(media.getMimeType()).getSubtype());
+				File temp = File.createTempFile(
+						getClass().getCanonicalName() + ".resized-",
+						"." + MediaType.parseMediaType(media.getMimeType()).getSubtype());
 				temp.deleteOnExit();
 				resizeImage(resource, temp, width, height, mode);
-				Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						try {
-							File copied = File.createTempFile("resized-", MediaType.parseMediaType(media.getMimeType()).getSubtype());
-							FileUtils.copyFile(temp, copied);
-							AmazonS3ResourceUtils.writeFile(temp, resized);
-							FileUtils.deleteQuietly(copied);
-						}
-						catch (Exception e) {
-							logger.warn("Image resize failed", e);
-						}
-					}
-				};
-				new Thread(runnable).start();
-				return new FileSystemResource(temp);
+
+				AmazonS3ResourceUtils.writeFile(temp, resized);
+				FileUtils.deleteQuietly(temp);
 			}
-			return resized;
 		}
-		else {
-			return resource;
-		}
+		return resized;
 	}
 
 	private void resizeImage(Resource resource, File file, int width, int height, Media.ResizeMode mode) throws IOException {
