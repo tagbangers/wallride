@@ -13,7 +13,7 @@ import org.wallride.web.support.HttpNotFoundException;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/{language}/{year}/{month}/{day}/{code}")
+@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}/{code:.+}")
 public class ArticleDescribeController {
 
 	@Inject
