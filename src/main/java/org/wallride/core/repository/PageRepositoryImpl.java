@@ -69,7 +69,11 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 		if (StringUtils.hasText(term.getLanguage())) {
 			junction.must(qb.keyword().onField("language").matching(term.getLanguage()).createQuery());
 		}
-		
+
+		if (term.getStatus() != null) {
+			junction.must(qb.keyword().onField("status").matching(term.getStatus()).createQuery());
+		}
+
 		Query searchQuery = junction.createQuery();
 		
 		Session session = (Session) entityManager.getDelegate();
