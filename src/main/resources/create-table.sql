@@ -155,13 +155,12 @@ create table tag (
 
 create table user (
 	id bigint not null auto_increment,
-	code varchar(200) not null,
 	login_id varchar(100) not null,
 	login_password varchar(500) not null,
 	name_first varchar(50) not null,
 	name_last varchar(50) not null,
 	nickname varchar(500),
-	email varchar(500) not null,
+	email varchar(200) not null,
 	description longtext,
 	created_at datetime not null,
 	created_by varchar(100),
@@ -200,10 +199,10 @@ alter table tag
 	add constraint UK_96k5ovyyuo8hgewc0h2f0g9et  unique (name, language);
 
 alter table user
-  add constraint UK_h1vneshxbwkd1ailk02vdy2qu  unique (code);
+	add constraint UK_6ntlp6n5ltjg6hhxl66jj5u0l  unique (login_id);
 
 alter table user
-	add constraint UK_6ntlp6n5ltjg6hhxl66jj5u0l  unique (login_id);
+	add constraint UK_h1vneshxbwkd1ailk02vdy2qu  unique (email);
 
 alter table article
 	add constraint FK_3mlcrjv9clnvarg3o8fysvnkx

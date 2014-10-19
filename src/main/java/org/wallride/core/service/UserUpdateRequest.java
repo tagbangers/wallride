@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class UserUpdateRequest implements Serializable {
 
 	private Long id;
-	private String code;
+	private String loginId;
 	private PersonalName name;
 	private String nickname;
 	private String email;
@@ -18,8 +18,8 @@ public class UserUpdateRequest implements Serializable {
 		return id;
 	}
 
-	public String getCode() {
-		return code;
+	public String getLoginId() {
+		return loginId;
 	}
 
 	public PersonalName getName() {
@@ -41,7 +41,7 @@ public class UserUpdateRequest implements Serializable {
 	public static class Builder  {
 
 		private Long id;
-		private String code;
+		private String loginId;
 		private PersonalName name;
 		private String nickname;
 		private String email;
@@ -55,8 +55,8 @@ public class UserUpdateRequest implements Serializable {
 			return this;
 		}
 
-		public Builder code(String code) {
-			this.code = code;
+		public Builder loginId(String loginId) {
+			this.loginId = loginId;
 			return this;
 		}
 
@@ -83,7 +83,7 @@ public class UserUpdateRequest implements Serializable {
 		public UserUpdateRequest build() {
 			UserUpdateRequest request = new UserUpdateRequest();
 			request.id = id;
-			request.code = code;
+			request.loginId = loginId;
 			request.name = name;
 			request.nickname = nickname;
 			request.email = email;

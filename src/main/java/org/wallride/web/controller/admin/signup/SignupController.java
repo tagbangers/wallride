@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.service.DuplicateEmailException;
+import org.wallride.core.service.DuplicateLoginIdException;
 import org.wallride.core.service.SignupService;
 import org.wallride.web.support.HttpForbiddenException;
 
@@ -48,13 +50,13 @@ public class SignupController {
 		}
 
 		try {
-			signupService.signup(form.buildSignupRequest(), errors);
-		}
-		catch (BindException e) {
-			if (errors.hasErrors()) {
-				return "/signup/signup";
-			}
-			throw new RuntimeException(e);
+			signupService.signup(form.buildSignupRequest());
+		} catch (DuplicateLoginIdException e) {
+			errors.rejectValue("loginId", "NotDuplicate");
+			return "/signup/signup";
+		} catch (DuplicateEmailException e) {
+			errors.rejectValue("email", "NotDuplicate");
+			return "/signup/signup";
 		}
 
 		return "redirect:/_admin/login";

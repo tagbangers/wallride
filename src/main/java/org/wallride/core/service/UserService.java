@@ -82,7 +82,6 @@ public class UserService {
 		user.setNickname(form.getNickname());
 		user.setEmail(form.getEmail());
 		user.setDescription(form.getDescription());
-		user.setCode(form.getCode());
 
 		user = userRepository.saveAndFlush(user);
 		return user;
@@ -260,12 +259,12 @@ public class UserService {
 		return userRepository.findOne(id);
 	}
 
+	public User readUserByLoginId(String loginId) {
+		return userRepository.findByLoginId(loginId);
+	}
+
 //	@Cacheable(value="users", key="'invitations.list'")
 	public List<UserInvitation> readUserInvitations() {
 		return userInvitationRepository.findAll(new Sort(Sort.Direction.DESC, "createdAt"));
-	}
-
-	public User readUserByCode(String code) {
-		return userRepository.findByCode(code);
 	}
 }

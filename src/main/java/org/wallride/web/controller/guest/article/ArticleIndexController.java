@@ -171,14 +171,14 @@ public class ArticleIndexController {
 		return "/article/index";
 	}
 
-	@RequestMapping("/{language}/author/{code}")
+	@RequestMapping("/{language}/author/{loginId}")
 	public String author(
 			@PathVariable String language,
-			@PathVariable String code,
+			@PathVariable String loginId,
 			@PageableDefault(10) Pageable pageable,
 			HttpServletRequest request,
 			Model model) {
-		User author = userService.readUserByCode(code);
+		User author = userService.readUserByLoginId(loginId);
 		if (author == null) {
 			throw new HttpNotFoundException();
 		}
