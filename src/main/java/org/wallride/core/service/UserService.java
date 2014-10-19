@@ -78,8 +78,11 @@ public class UserService {
 	@CacheEvict(value="users", allEntries=true)
 	public User updateUser(UserUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) throws ValidationException {
 		User user = userRepository.findByIdForUpdate(form.getId());
-//		user.setTitle(request.getTitle());
-//		user.setBody(request.getBody());
+		user.setName(form.getName());
+		user.setNickname(form.getNickname());
+		user.setEmail(form.getEmail());
+		user.setDescription(form.getDescription());
+		user.setCode(form.getCode());
 
 		user = userRepository.saveAndFlush(user);
 		return user;
@@ -260,5 +263,9 @@ public class UserService {
 //	@Cacheable(value="users", key="'invitations.list'")
 	public List<UserInvitation> readUserInvitations() {
 		return userInvitationRepository.findAll(new Sort(Sort.Direction.DESC, "createdAt"));
+	}
+
+	public User readUserByCode(String code) {
+		return userRepository.findByCode(code);
 	}
 }

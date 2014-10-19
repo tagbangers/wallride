@@ -16,3 +16,22 @@ a {
 a:hover, a:focus {
 	color: #B2CDE4;
 }
+
+table {
+	border: 1px solid #ccc;
+	width: 100%;
+	margin: 20px 0;
+}
+table th, table td {
+	border: 1px solid #ccc;
+	padding: 10px;
+}
+table th {
+	width: 30%;
+}
+body {
+	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}
+h1, h2, h3, h4, h5 {
+	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}

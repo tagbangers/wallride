@@ -1,6 +1,6 @@
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
+import org.wallride.core.domain.PersonalName;
 
 import java.io.Serializable;
 
@@ -8,44 +8,44 @@ import java.io.Serializable;
 public class UserUpdateRequest implements Serializable {
 
 	private Long id;
-	private LocalDateTime date;
-	private String title;
-	private Long coverId;
-	private String body;
-	private String language;
+	private String code;
+	private PersonalName name;
+	private String nickname;
+	private String email;
+	private String description;
 
 	public Long getId() {
 		return id;
 	}
 
-	public LocalDateTime getDate() {
-		return date;
+	public String getCode() {
+		return code;
 	}
 
-	public String getTitle() {
-		return title;
+	public PersonalName getName() {
+		return name;
 	}
 
-	public Long getCoverId() {
-		return coverId;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public String getBody() {
-		return body;
+	public String getEmail() {
+		return email;
 	}
 
-	public String getLanguage() {
-		return language;
+	public String getDescription() {
+		return description;
 	}
 
 	public static class Builder  {
 
 		private Long id;
-		private LocalDateTime date;
-		private String title;
-		private Long coverId;
-		private String body;
-		private String language;
+		private String code;
+		private PersonalName name;
+		private String nickname;
+		private String email;
+		private String description;
 
 		public Builder() {
 		}
@@ -55,39 +55,39 @@ public class UserUpdateRequest implements Serializable {
 			return this;
 		}
 
-		public Builder date(LocalDateTime date) {
-			this.date = date;
+		public Builder code(String code) {
+			this.code = code;
 			return this;
 		}
 
-		public Builder title(String title) {
-			this.title = title;
+		public Builder name(PersonalName name) {
+			this.name = name;
 			return this;
 		}
 
-		public Builder coverId(Long coverId) {
-			this.coverId = coverId;
+		public Builder nickname(String nickname) {
+			this.nickname = nickname;
 			return this;
 		}
 
-		public Builder body(String body) {
-			this.body = body;
+		public Builder email(String email) {
+			this.email = email;
 			return this;
 		}
 
-		public Builder language(String language) {
-			this.language = language;
+		public Builder description(String description) {
+			this.description = description;
 			return this;
 		}
 
 		public UserUpdateRequest build() {
 			UserUpdateRequest request = new UserUpdateRequest();
 			request.id = id;
-			request.date = date;
-			request.title = title;
-			request.coverId = coverId;
-			request.body = body;
-			request.language = language;
+			request.code = code;
+			request.name = name;
+			request.nickname = nickname;
+			request.email = email;
+			request.description = description;
 			return request;
 		}
 	}

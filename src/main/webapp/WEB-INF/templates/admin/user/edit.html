@@ -14,7 +14,8 @@
 			</div>
 			<div id="wr-page-content">
 				<div class="container-fluid">
-					<form class="form-horizontal" method="post">
+					<form class="form-horizontal" method="post" th:object="${form}" th:action="@{__${ADMIN_PATH}__/users/edit}">
+						<input type="hidden" th:field="*{id}"  />
 						<fieldset>
 							<div class="form-group">
 								<label class="col-sm-2 control-label" th:text="#{Thumbnail}">サムネイル</label>
@@ -24,13 +25,35 @@
 							</div>
 						</fieldset>
 						<fieldset>
-							<div class="form-group">
+							<div class="form-group" th:classappend="${#fields.hasErrors('code')}? has-error">
+								<label class="col-sm-2 control-label" th:text="#{URLPath}">URL</label>
+								<div class="col-sm-10">
+									<div class="input-group">
+										<div class="input-group-addon" th:text="@{__${WEBSITE_LINK}__/author/}">http://</div>
+										<input type="text" th:field="*{code}" class="form-control" />
+									</div>
+								</div>
+							</div>
+						</fieldset>
+						<fieldset>
+							<div class="form-group" th:classappend="${#fields.hasErrors('name.*')}? has-error">
 								<label class="col-sm-2 control-label" th:text="#{Name}">名前</label>
 								<div class="col-sm-5">
-									<input type="text" class="form-control" th:attr="placeholder=#{FirstName}" />
+									<input type="text" th:field="*{name.firstName}" class="form-control" th:attr="placeholder=#{FirstName}" />
+									<span class="help-block" th:each="err : ${#fields.errors('name.firstName')}" th:text="${err}" />
 								</div>
 								<div class="col-sm-5">
-									<input type="text" class="form-control" th:attr="placeholder=#{LastName}" />
+									<input type="text" th:field="*{name.lastName}" class="form-control" th:attr="placeholder=#{LastName}" />
+									<span class="help-block" th:each="err : ${#fields.errors('name.lastName')}" th:text="${err}" />
+								</div>
+							</div>
+						</fieldset>
+						<fieldset>
+							<div class="form-group" th:classappend="${#fields.hasErrors('nickname')}? has-error">
+								<label class="col-sm-2 control-label" th:text="#{Nickname}">Nickname</label>
+								<div class="col-sm-5">
+									<input type="text" th:field="*{nickname}" placeholder="Nickname" th:attr="placeholder=#{Nickname}" class="form-control" />
+									<span class="help-block" th:each="err : ${#fields.errors('nickname')}" th:text="${err}" />
 								</div>
 							</div>
 						</fieldset>
@@ -38,7 +61,17 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label" th:text="#{Email}">メールアドレス</label>
 								<div class="col-sm-10">
-									<input type="text" name="path" class="form-control" th:attr="placeholder=#{Email}" placeholder="メールアドレス" />
+									<input type="text" th:field="*{email}"  name="path" class="form-control" th:attr="placeholder=#{Email}" placeholder="メールアドレス" />
+									<span class="help-block" th:each="err : ${#fields.errors('email')}" th:text="${err}" />
+								</div>
+							</div>
+						</fieldset>
+						<fieldset>
+							<div class="form-group" th:classappend="${#fields.hasErrors('description')}? has-error">
+								<label class="col-sm-2 control-label" th:text="#{Profile}">Profile</label>
+								<div class="col-sm-10">
+									<textarea type="text" th:field="*{description}" class="form-control" style="min-height: 150px" th:attr="placeholder=#{Profile}"></textarea>
+									<span class="help-block" th:each="err : ${#fields.errors('description')}" th:text="${err}" />
 								</div>
 							</div>
 						</fieldset>

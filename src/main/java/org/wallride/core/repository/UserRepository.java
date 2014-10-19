@@ -23,13 +23,16 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
 	@Query("select user.id from User user order by user.id")
 	List<Long> findId();
-	
+
 	@Query(DEFAULT_SELECT_QUERY + "where user.id in (:ids) ")
 	List<User> findByIdIn(@Param("ids") Collection<Long> ids);
 	
 	@Query(DEFAULT_SELECT_QUERY + "where user.id = :id ")
 	User findById(@Param("id") Long id);
-	
+
+	@Query(DEFAULT_SELECT_QUERY + "where user.code = :code ")
+	User findByCode(@Param("code") String code);
+
 	@Query(DEFAULT_SELECT_QUERY + "where user.id = :id ")
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	User findByIdForUpdate(@Param("id")Long id);

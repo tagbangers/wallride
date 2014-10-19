@@ -4,10 +4,9 @@
 		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" th:content="${#posts.metaDescription(page)}" />
-		<meta name="keywords" th:content="${#posts.metaKeywords(page)}" />
+		<meta name="description" content="" />
 		<meta name="author" content="" />
-		<title th:text="${#posts.title(page)}">Title</title>
+		<title th:text="${WEBSITE_TITLE}">Title</title>
 		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
 		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
 		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/atom.xml}" />
@@ -29,23 +28,31 @@
 	<body>
 		<div id="wrap">
 			<div th:replace="layout::nav"></div>
-			<img th:if="${page.cover ne null}" th:src="@{${#medias.link(page.cover)}(w=1200,h=300,m=1)}" class="post-cover" />
 			<div class="container">
 				<div class="row">
-					<article class="col-md-12">
-						<div class="page-header">
-							<h1 th:text="${page.title}"></h1>
+					<div class="col-md-9">
+						<div>
+							<h2 th:text="${author}"></h2>
+							<pre th:utext="${author.description}"></pre>
 						</div>
-						<p th:utext="${#posts.body(page)}"></p>
-						<time></time>
-					</article>
-					<!--
+						<article th:each="article : ${articles}" class="wr-post-summary row">
+							<div class="col-sm-2">
+								<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=120,h=120,m=1)}" class="wr-post-cover" />
+							</div>
+							<div class="col-sm-10">
+								<h1 class="wr-post-title"><a th:href="@{__${WEBSITE_PATH}__/__${article.date.toString('yyyy/MM/dd')}__/__${article.code}__}" th:text="${article.title}?:'No Titled'" href="#"></a></h1>
+								<time th:text="${article.date.toString('yyyy/MM/dd')}"></time>
+							</div>
+						</article>
+					</div>
 					<div class="col-md-3">
-						<div class="list-group" th:if="${!#lists.isEmpty(page.children)}" style="margin-top: 40px;">
-							<a th:each="page : ${page.children}" th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:text="${page.title}" class="list-group-item">Link</a>
+						<div class="list-group" th:if="${category eq null}">
+							<a th:each="node : ${CATEGORY_TREE.rootNodes}" th:href="@{__${WEBSITE_PATH}__/category/__${node.category.code}__}" th:text="${node.category.name}" class="list-group-item">Link</a>
+						</div>
+						<div class="list-group" th:if="${category ne null}">
+							<a th:each="category : ${category.children}" th:href="@{__${WEBSITE_PATH}__/category/__${category.code}__}" th:text="${category.name}" class="list-group-item">Link</a>
 						</div>
 					</div>
-					-->
 				</div>
 			</div>
 		</div>

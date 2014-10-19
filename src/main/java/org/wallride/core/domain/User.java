@@ -2,7 +2,7 @@ package org.wallride.core.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Formula;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -23,6 +23,10 @@ public class User extends DomainObject<Long> {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 
+	@Column(length = 200, nullable = false, unique = true)
+	@Field(analyze = Analyze.NO)
+	private String code;
+
 	@Column(name="login_id", length=100, nullable=false, unique=true)
 	@Field
 	private String loginId;
@@ -38,8 +42,16 @@ public class User extends DomainObject<Long> {
 	@IndexedEmbedded
 	private PersonalName name = new PersonalName();
 
+	@Column(length = 500)
+	@Field
+	private String nickname;
+
 	@Column(length=500, nullable=false)
 	private String email;
+
+	@Lob
+	@Column
+	private String description;
 
 //	@Formula("(" +
 //			"select count(distinct article.id) from user " +
@@ -56,6 +68,14 @@ public class User extends DomainObject<Long> {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getLoginId() {
@@ -82,6 +102,14 @@ public class User extends DomainObject<Long> {
 		this.name = name;
 	}
 
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -90,7 +118,15 @@ public class User extends DomainObject<Long> {
 		this.email = email;
 	}
 
-//	public int getArticleCount() {
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	//	public int getArticleCount() {
 //		return articleCount;
 //	}
 

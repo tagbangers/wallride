@@ -26,6 +26,8 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 
 	private String language;
 
+	private Long authorId;
+
 	public String getKeyword() {
 		return keyword;
 	}
@@ -74,6 +76,14 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 		this.language = language;
 	}
 
+	public Long getAuthorId() {
+		return authorId;
+	}
+
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
+	}
+
 	public boolean isEmpty() {
 		if (StringUtils.hasText(getKeyword())) {
 			return false;
@@ -90,6 +100,7 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 				.categoryIds(categoryIds)
 				.tagIds(tagIds)
 				.language(language)
+				.authorId(authorId)
 				.status(Post.Status.PUBLISHED)
 				.build();
 	}
