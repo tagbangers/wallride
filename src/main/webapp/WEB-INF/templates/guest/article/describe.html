@@ -40,7 +40,7 @@
 					<li th:each="tag : ${article.tags}"><a th:href="@{__${WEBSITE_PATH}__/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
 				</ul>
 				<div class="page-footer">
-					<p><a th:href="@{__${WEBSITE_PATH}__/user/{name}(name=${article.author.code})}" th:text="${article.author}"></a></p>
+					<p><a th:href="@{__${WEBSITE_PATH}__/author/{name}(name=${article.author.code})}" th:text="${article.author}"></a></p>
 				</div>
 			</article>
 		</div>

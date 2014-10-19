@@ -5,7 +5,31 @@
 .post-cover {
 	width: 100%;
 }
+.author {
+	background-color: #F5F5F5;
+	padding: 15px;
+	border-radius: 5px;
+}
+.author pre {
+	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+	border: transparent;
+	padding: 0;
 
+}
+.pagination-group {
+	margin-top: 20px;
+}
+.pagination-summary {
+	line-height: 30px;
+	margin-right: 15px;
+}
+.pagination {
+	margin: 0;
+}
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
+	background-color: #839CB1;
+	border-color: #839CB1;
+}
 #wrap > .post-cover + .container {
 	padding-top: 0px;
 }
