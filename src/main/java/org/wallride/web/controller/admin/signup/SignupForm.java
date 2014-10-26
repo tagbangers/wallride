@@ -6,6 +6,7 @@ import org.wallride.core.service.SignupRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
@@ -13,16 +14,13 @@ public class SignupForm implements Serializable {
 
 	@NotNull
 	private String token;
-
 	@NotNull
+	@Pattern(regexp = "^[\\w\\-]+$")
 	private String loginId;
-	
 	@NotNull
 	private String loginPassword;
-
 	@Valid
 	private Name name = new Name();
-
 	@NotNull
 	@Email
 	private String email;

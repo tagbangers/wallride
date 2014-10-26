@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
 
 @Entity
-@Table(name="user")
+@Table(name = "user")
 @DynamicInsert
 @DynamicUpdate
 @Indexed
@@ -20,24 +20,20 @@ import java.io.UnsupportedEncodingException;
 public class User extends DomainObject<Long> {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(length = 200, nullable = false, unique = true)
+	@Column(name = "login_id", length = 100, nullable = false, unique = true)
 	@Field(analyze = Analyze.NO)
-	private String code;
-
-	@Column(name="login_id", length=100, nullable=false, unique=true)
-	@Field
 	private String loginId;
-	
-	@Column(name="login_password", length=500, nullable=false)
+
+	@Column(name = "login_password", length = 500, nullable = false)
 	private String loginPassword;
 
 	@Embedded
 	@AttributeOverrides({
-			@AttributeOverride(name="firstName", column=@Column(name="name_first", length=50, nullable=false)),
-			@AttributeOverride(name="lastName", column=@Column(name="name_last", length=50, nullable=false)),
+			@AttributeOverride(name = "firstName", column = @Column(name = "name_first", length = 50, nullable = false)),
+			@AttributeOverride(name = "lastName", column = @Column(name = "name_last", length = 50, nullable = false)),
 	})
 	@IndexedEmbedded
 	private PersonalName name = new PersonalName();
@@ -46,7 +42,7 @@ public class User extends DomainObject<Long> {
 	@Field
 	private String nickname;
 
-	@Column(length=500, nullable=false)
+	@Column(length = 200, nullable = false, unique = true)
 	private String email;
 
 	@Lob
@@ -70,22 +66,14 @@ public class User extends DomainObject<Long> {
 		this.id = id;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public String getLoginId() {
 		return loginId;
 	}
-	
+
 	public void setLoginId(String loginId) {
 		this.loginId = loginId;
 	}
-	
+
 	public String getLoginPassword() {
 		return loginPassword;
 	}

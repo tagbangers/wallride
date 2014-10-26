@@ -13,7 +13,6 @@ public class UserEditForm extends DomainObjectEditForm {
 
 	@NotNull
 	private Long id;
-	private String code;
 	private PersonalName name;
 	private String nickname;
 	private String email;
@@ -25,14 +24,6 @@ public class UserEditForm extends DomainObjectEditForm {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public PersonalName getName() {
@@ -71,7 +62,6 @@ public class UserEditForm extends DomainObjectEditForm {
 		UserUpdateRequest.Builder builder = new UserUpdateRequest.Builder();
 		return builder
 				.id(id)
-				.code(code)
 				.name(name)
 				.nickname(nickname)
 				.email(email)

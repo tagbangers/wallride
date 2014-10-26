@@ -14,7 +14,7 @@ import org.wallride.core.domain.User;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
 
-import javax.inject.Inject;
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +25,7 @@ import java.util.Date;
 @Transactional(rollbackFor=Exception.class)
 public class AuthorizedUserDetailsService extends SavedRequestAwareAuthenticationSuccessHandler implements UserDetailsService {
 	
-	@Inject
+	@Resource
 	private UserRepository userRepository;
 	
 	private static Logger logger = LoggerFactory.getLogger(AuthorizedUserDetailsService.class); 
@@ -35,8 +35,14 @@ public class AuthorizedUserDetailsService extends SavedRequestAwareAuthenticatio
 		if (!StringUtils.hasText(username)) {
 			throw new UsernameNotFoundException("Username is empty");
 		}
-		
-		User user = userRepository.findByLoginId(username);
+
+		User user;
+		if (!username.contains("@")) {
+			user = userRepository.findByLoginId(username);
+		} else {
+			user = userRepository.findByEmail(username);
+		}
+
 		if (user == null) {
 			throw new UsernameNotFoundException("User ID not existing. [" + username + "]");
 		}

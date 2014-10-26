@@ -4,6 +4,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
+import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.BlogService;
 
@@ -48,12 +49,19 @@ public class UserUtils {
 			params.put("language", processingContext.getContext().getLocale().getLanguage());
 		}
 		builder.path("/author/{code}");
-		params.put("code", user.getCode());
+		params.put("code", user.getLoginId());
 
 		UriComponents components = builder.buildAndExpand(params);
 		if (encode) {
 			components = components.encode();
 		}
 		return components.toUriString();
+	}
+
+	public String title(User user) {
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		return String.format("%s | %s",
+				user.getNickname(),
+				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
 	}
 }
