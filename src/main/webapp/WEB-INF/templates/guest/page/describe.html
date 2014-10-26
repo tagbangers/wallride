@@ -32,20 +32,23 @@
 			<img th:if="${page.cover ne null}" th:src="@{${#medias.link(page.cover)}(w=1200,h=300,m=1)}" class="post-cover" />
 			<div class="container">
 				<div class="row">
-					<article class="col-md-12">
+					<div class="col-md-12">
+
+					</div>
+					<article class="col-md-9">
 						<div class="page-header">
 							<h1 th:text="${page.title}"></h1>
 						</div>
 						<p th:utext="${#posts.body(page)}"></p>
 						<time></time>
 					</article>
-					<!--
 					<div class="col-md-3">
-						<div class="list-group" th:if="${!#lists.isEmpty(page.children)}" style="margin-top: 40px;">
-							<a th:each="page : ${page.children}" th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:text="${page.title}" class="list-group-item">Link</a>
+						<!--/*/ <th:block th:if="${PAGE_TREE.getNodeById(page.id) ne null}"> /*/-->
+						<div class="list-group"  style="margin-top: 40px;">
+							<a th:unless="${#lists.isEmpty(PAGE_TREE.getNodeById(page.id).children)}" th:each="child : ${PAGE_TREE.getNodeById(page.id).children}" th:href="@{${#posts.path(child.page)}}" th:text="${child.page.title}" class="list-group-item">Link</a>
 						</div>
+						<!--/*/ </th:block> /*/-->
 					</div>
-					-->
 				</div>
 			</div>
 		</div>
