@@ -25,7 +25,7 @@ public class WallRideWebAppInitializer extends AbstractContextLoaderInitializer 
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		servletContext.setInitParameter("spring.profiles.default", "default");
+		servletContext.setInitParameter("spring.profiles.default", "develop");
 		
 		EnumSet<DispatcherType> dispatcherTypes = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD);
 
