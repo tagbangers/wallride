@@ -85,6 +85,11 @@ public class ArticleSearchController extends DomainObjectSearchController<Articl
 	public String partBulkDeleteDialog() {
 		return "/article/index::bulk-delete-form";
 	}
+        
+        @RequestMapping(params="part=change-status-form")
+	public String partChangeStatusDialog() {
+		return "/article/index::change-status-form";
+	}
 
 	@Override
 	protected Class<ArticleSearchForm> getDomainObjectSearchFormClass() {
