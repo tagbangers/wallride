@@ -211,16 +211,17 @@
 										<script th:inline="javascript">
 											$(function() {
 												$('#wr-page-content :input[name="body"]').redactor({
+													buttonSource: true,
 													minHeight: 300,
 													convertDivs: false,
 													convertImageLinks: true,
 													convertVideoLinks: true,
 													imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-													imageGetJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
+													imageManagerJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
 													toolbarFixed: true,
 													toolbarFixedBox: true,
 													removeEmptyTags: false,
-													plugins: ['fontcolor', 'fontsize', 'fullscreen']
+													plugins: ['table', 'video', 'fontsize', 'fontcolor', 'fullscreen', 'counter', 'imagemanager']
 												});
 											});
 										</script>
