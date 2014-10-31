@@ -12,13 +12,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessor;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.AntPathRequestMatcher;
 import org.wallride.core.service.AuthorizedUserDetailsService;
+import org.wallride.core.support.ProxyInsecureChannelProcessor;
+import org.wallride.core.support.ProxySecureChannelProcessor;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -76,7 +81,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.csrf()
 				.disable();
 		if (environment.getProperty("security.admin.force.ssl", Boolean.class, false)) {
+			List<ChannelProcessor> channelProcessors = new ArrayList<>();
+			channelProcessors.add(new ProxySecureChannelProcessor());
+			channelProcessors.add(new ProxyInsecureChannelProcessor());
+
 			http.requiresChannel()
+				.channelProcessors(channelProcessors)
 				.anyRequest().requiresSecure();
 		}
 		// @formatter:on

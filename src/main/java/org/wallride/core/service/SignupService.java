@@ -45,7 +45,7 @@ public class SignupService {
 	}
 
 	@CacheEvict(value="users", allEntries=true)
-	public AuthorizedUser signup(SignupRequest request, BindingResult errors) throws BindException {
+	public AuthorizedUser signup(SignupRequest request) throws ServiceException {
 		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(request.getToken());
 		boolean valid = false;
 		if (invitation != null) {
@@ -55,12 +55,14 @@ public class SignupService {
 			throw new HttpForbiddenException();
 		}
 
-		User duplicate = userRepository.findByLoginId(request.getLoginId());
+		User duplicate;
+		duplicate = userRepository.findByLoginId(request.getLoginId());
 		if (duplicate != null) {
-			errors.rejectValue("loginId", "NotDuplicate");
+			throw new DuplicateLoginIdException(request.getLoginId());
 		}
-		if (errors.hasErrors()) {
-			throw new BindException(errors);
+		duplicate = userRepository.findByEmail(request.getEmail());
+		if (duplicate != null) {
+			throw new DuplicateEmailException(request.getEmail());
 		}
 
 		LocalDateTime now = new LocalDateTime();

@@ -17,7 +17,7 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/setup")
 public class SetupController {
-	
+
 	@Inject
 	private SetupService setupService;
 	@Inject
@@ -27,8 +27,8 @@ public class SetupController {
 	public SetupForm setupForm() {
 		return new SetupForm();
 	}
-	
-	@RequestMapping(method=RequestMethod.GET)
+
+	@RequestMapping(method = RequestMethod.GET)
 	public String setup() {
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		if (blog != null) {
@@ -36,8 +36,8 @@ public class SetupController {
 		}
 		return "/setup";
 	}
-	
-	@RequestMapping(method=RequestMethod.POST)
+
+	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			@Valid @ModelAttribute("form") SetupForm form,
 			BindingResult result,

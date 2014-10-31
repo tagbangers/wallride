@@ -64,7 +64,7 @@ public class UserEditController {
 		redirectAttributes.addFlashAttribute("savedUser", user);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", user.getId());
-		return "redirect:/_admin/{language}/user/edit?id={id}";
+		return "redirect:/_admin/{language}/users/describe";
 	}
 
 	@RequestMapping(method= RequestMethod.POST, params="_step.cancel")
@@ -72,6 +72,6 @@ public class UserEditController {
 			@Valid @ModelAttribute("form") UserEditForm form,
 			RedirectAttributes redirectAttributes) {
 		redirectAttributes.addAttribute("id", form.getId());
-		return "redirect:/_admin/user/describe/{id}";
+		return "redirect:/_admin/users/describe/{id}";
 	}
 }

@@ -1,7 +1,7 @@
 package org.wallride.web.controller.admin.user;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
+import org.wallride.core.domain.PersonalName;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.UserUpdateRequest;
 import org.wallride.web.support.DomainObjectEditForm;
@@ -13,17 +13,10 @@ public class UserEditForm extends DomainObjectEditForm {
 
 	@NotNull
 	private Long id;
-
-	private LocalDateTime date;
-	
-	private String title;
-
-	private Long coverId;
-
-	private String body;
-
-	@NotNull
-	private String language;
+	private PersonalName name;
+	private String nickname;
+	private String email;
+	private String description;
 
 	public Long getId() {
 		return id;
@@ -33,55 +26,46 @@ public class UserEditForm extends DomainObjectEditForm {
 		this.id = id;
 	}
 
-	public LocalDateTime getDate() {
-		return date;
+	public PersonalName getName() {
+		return name;
 	}
 
-	public void setDate(LocalDateTime date) {
-		this.date = date;
+	public void setName(PersonalName name) {
+		this.name = name;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public Long getCoverId() {
-		return coverId;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
-	public void setCoverId(Long coverId) {
-		this.coverId = coverId;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public String getBody() {
-		return body;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setBody(String body) {
-		this.body = body;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public UserUpdateRequest buildUserUpdateRequest() {
 		UserUpdateRequest.Builder builder = new UserUpdateRequest.Builder();
 		return builder
 				.id(id)
-				.date(date)
-				.title(title)
-				.coverId(coverId)
-				.body(body)
-				.language(language)
+				.name(name)
+				.nickname(nickname)
+				.email(email)
+				.description(description)
 				.build();
 	}
 

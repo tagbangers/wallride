@@ -61,6 +61,7 @@ public class Post extends DomainObject<Long> {
 	private LocalDateTime date;
 
 	@ManyToOne
+	@IndexedEmbedded
 	private User author;
 
 	@Enumerated(EnumType.STRING)

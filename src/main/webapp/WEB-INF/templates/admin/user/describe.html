@@ -42,8 +42,20 @@
 									<td th:text="${user.loginId}">ログインID</td>
 								</tr>
 								<tr>
+									<th>URL</th>
+									<td><a th:href="${#users.link(user)}" target="_blank"><span class="glyphicon glyphicon-share-alt"></span> <span th:text="${#users.link(user, false)}">http://</span></a></td>
+								</tr>
+								<tr>
+									<th th:text="#{Nickname}">Nickname</th>
+									<td th:text="${user.nickname}"></td>
+								</tr>
+								<tr>
 									<th th:text="#{Email}">メールアドレス</th>
 									<td th:text="${user.email}">メールアドレス</td>
+								</tr>
+								<tr>
+									<th>プロフィール</th>
+									<td><pre th:utext="${user.description}"></pre></td>
 								</tr>
 								<tr>
 									<th th:text="#{Posts}">投稿記事数</th>

@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class PageDescribeController extends AbstractController {
 
-	private static final String PATH_PATTERN = "/{language}/{code}";
+	private static final String PATH_PATTERN = "/{language}/**/{code}";
 
 	private BlogService blogService;
 	private PageService pageService;

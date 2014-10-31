@@ -42,8 +42,8 @@
 					</div>
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-nav">
-							<li class="active"><a th:href="@{__${WEBSITE_PATH}__/}">Home</a></li>
-							<li th:each="node : ${PAGE_TREE.rootNodes}"><a th:href="@{__${WEBSITE_PATH}__/__${node.page.code}__}" th:text="${node.page.title}">About</a></li>
+							<li ><a th:href="@{__${WEBSITE_PATH}__/}">Home</a></li>
+							<li th:each="node : ${PAGE_TREE.rootNodes}" th:classappend="${node.contains(page) ? 'active' : ''}"><a th:href="@{__${WEBSITE_PATH}__/__${node.page.code}__}" th:text="${node.page.title}">About</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li class="dropdown">

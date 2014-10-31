@@ -52,7 +52,7 @@
 					<div class="row">
 						<div class="col-sm-12">
 							<h2 th:text="#{PopularPosts}">Popular Posts</h2>
-							<dl th:each="post : ${popularPosts}" class="list-inline">
+							<dl th:each="post : ${popularPosts}">
 								<dt><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${post.id})}" th:text="${post.title}">Title</a></dt>
 								<dd th:text="${post.date.toString('yyyy/MM/dd (E)', #locale)}">yyyy/MM/dd</dd>
 							</dl>

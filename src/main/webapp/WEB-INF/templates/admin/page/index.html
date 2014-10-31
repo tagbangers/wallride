@@ -87,8 +87,8 @@
 											<th th:text="#{Title}">Title</th>
 											<th th:text="#{Author}">Author</th>
 											<th th:text="#{Date}">Date</th>
-											<th th:text="#{Views}">Views</th>
-											<th></th>
+											<th class="text-right" th:text="#{Views}">Views</th>
+											<th class="text-center"></th>
 										</tr>
 									</thead>
 									<tbody>
@@ -98,8 +98,8 @@
 											<td th:text="${page.title?:'(No Titled)'}" style="font-weight: bold;">事務所移転のお知らせ</td>
 											<td><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a></td>
 											<td th:text="${page.date ne null ? page.date.toString('yyyy/MM/dd (E)', #locale) : ''}">yyyy/mm/dd (E)</td>
-											<td th:text="${page.views}">0</td>
-											<td><a th:attr="href=@{__${ADMIN_PATH}__/pages/edit(id=${page.id},token=${token})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+											<td class="text-right" th:text="${page.views}">0</td>
+											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/pages/edit(id=${page.id},token=${token})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 										</tr>
 									</tbody>
 								</table>

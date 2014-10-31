@@ -10,13 +10,11 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.HandlerMapping;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Tag;
+import org.wallride.core.domain.*;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.TagService;
+import org.wallride.core.service.UserService;
 import org.wallride.core.support.Pagination;
 import org.wallride.web.support.HttpNotFoundException;
 
@@ -37,6 +35,8 @@ public class ArticleIndexController {
 	private CategoryService categoryService;
 	@Inject
 	private TagService tagService;
+	@Inject
+	private UserService userService;
 
 	@RequestMapping("/{language}/")
 	public String index(
@@ -170,4 +170,29 @@ public class ArticleIndexController {
 		model.addAttribute("pagination", new Pagination<>(articles));
 		return "/article/index";
 	}
+
+	@RequestMapping("/{language}/author/{loginId}")
+	public String author(
+			@PathVariable String language,
+			@PathVariable String loginId,
+			@PageableDefault(10) Pageable pageable,
+			HttpServletRequest request,
+			Model model) {
+		User author = userService.readUserByLoginId(loginId);
+		if (author == null) {
+			throw new HttpNotFoundException();
+		}
+
+		ArticleSearchForm form = new ArticleSearchForm() {};
+		form.setLanguage(language);
+		form.setAuthorId(author.getId());
+
+		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		model.addAttribute("author", author);
+		model.addAttribute("articles", articles);
+		model.addAttribute("pageable", pageable);
+		model.addAttribute("pagination", new Pagination<>(articles));
+		return "/article/author";
+	}
+
 }

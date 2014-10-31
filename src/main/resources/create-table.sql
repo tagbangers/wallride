@@ -159,7 +159,9 @@ create table user (
 	login_password varchar(500) not null,
 	name_first varchar(50) not null,
 	name_last varchar(50) not null,
-	email varchar(500) not null,
+	nickname varchar(500),
+	email varchar(200) not null,
+	description longtext,
 	created_at datetime not null,
 	created_by varchar(100),
 	updated_at datetime not null,
@@ -198,6 +200,9 @@ alter table tag
 
 alter table user
 	add constraint UK_6ntlp6n5ltjg6hhxl66jj5u0l  unique (login_id);
+
+alter table user
+	add constraint UK_h1vneshxbwkd1ailk02vdy2qu  unique (email);
 
 alter table article
 	add constraint FK_3mlcrjv9clnvarg3o8fysvnkx
