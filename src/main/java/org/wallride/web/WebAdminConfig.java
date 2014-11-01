@@ -1,11 +1,10 @@
-package org.wallride.config;
+package org.wallride.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.Formatter;
 import org.springframework.format.FormatterRegistry;
@@ -15,42 +14,45 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.MessageCodesResolver;
-import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.servlet.view.BeanNameViewResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-import org.wallride.core.repository.MediaRepository;
+import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
+import org.wallride.core.support.Settings;
 import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
-import org.wallride.web.controller.guest.page.PageDescribeController;
-import org.wallride.web.support.*;
+import org.wallride.web.support.DefaultModelAttributeInterceptor;
+import org.wallride.web.support.PathVariableLocaleResolver;
+import org.wallride.web.support.SetupRedirectInterceptor;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 @Configuration
-@ComponentScan(basePackages= "org.wallride.web.controller.guest", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
-public class WebGuestConfig extends WebMvcConfigurationSupport {
+@ComponentScan(basePackages= "org.wallride.web.controller.admin", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
+@EnableWebMvc
+public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
@@ -68,27 +70,10 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	private PageService pageService;
 
 	@Inject
-	private ResourceLoader resourceLoader;
+	private Settings settings;
 
 	@Inject
 	private Environment environment;
-
-	@Resource
-	private MediaRepository mediaRepository;
-
-	@Override
-	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
-
-		handlerMapping.setUrlPathHelper(new LanguageUrlPathHelper(blogService));
-		handlerMapping.setDefaultHandler(new PageDescribeController(blogService, pageService));
-
-		handlerMapping.setOrder(Integer.MAX_VALUE);
-		handlerMapping.setInterceptors(getInterceptors());
-		handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager());
-		return handlerMapping;
-//		return super.requestMappingHandlerMapping();    //To change body of overridden methods use File | Settings | File Templates.
-	}
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -106,9 +91,14 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		converters.add(jackson);
 	}
 
+//	@Override
+//	public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+//		exceptionResolvers.add(new ExceptionHandlerExceptionResolver());
+//	}
+
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/**").addResourceLocations("/WEB-INF/resources/guest/");
+		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/resources/admin/");
 		registry.setOrder(Integer.MIN_VALUE);
 	}
 
@@ -148,36 +138,6 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	// additional webmvc-related beans
 
 	@Bean
-	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
-		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
-		mediaHttpRequestHandler.setBlogService(blogService);
-		mediaHttpRequestHandler.setMediaRepository(mediaRepository);
-		mediaHttpRequestHandler.setResourceLoader(resourceLoader);
-		mediaHttpRequestHandler.setCacheSeconds(86400);
-
-		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
-		urlMap.put("/media/{key}", mediaHttpRequestHandler);
-
-		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
-		handlerMapping.setOrder(0);
-		handlerMapping.setUrlMap(urlMap);
-		return handlerMapping;
-	}
-
-//	@Bean
-//	public SimpleUrlHandlerMapping pageUrlHandlerMapping() {
-//		PageHttpRequestHandler pageHttpRequestHandler = new PageHttpRequestHandler();
-//
-//		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
-//		urlMap.put("/{language}/{code}", pageHttpRequestHandler);
-//
-//		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
-//		handlerMapping.setOrder(2);
-//		handlerMapping.setUrlMap(urlMap);
-//		return handlerMapping;
-//	}
-
-	@Bean
 	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
 		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
 		defaultModelAttributeInterceptor.setBlogService(blogService);
@@ -193,23 +153,52 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		return setupRedirectInterceptor;
 	}
 
-	@Bean
-	public ServletContextTemplateResolver templateResolver() {
-		ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
+	@Bean(name="adminTemplateResolver")
+	public TemplateResolver adminTemplateResolver() {
+		TemplateResolver resolver = new TemplateResolver();
+		resolver.setResourceResolver(thymeleafResourceResolver());
+		resolver.setPrefix(environment.getRequiredProperty("template.admin.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
 		// NB, selecting HTML5 as the template mode.
 		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(environment.getRequiredProperty("template.guest.cache", Boolean.class));
+		resolver.setCacheable(environment.getRequiredProperty("template.admin.cache", Boolean.class));
+		resolver.setOrder(2);
 		return resolver;
-
 	}
 
-	@Bean
-	public SpringTemplateEngine templateEngine() {
+	@Bean(name="guestTemplateResolver")
+	public TemplateResolver guestTemplateResolver() {
+		TemplateResolver resolver = new TemplateResolver();
+		resolver.setResourceResolver(thymeleafResourceResolver());
+		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
+		resolver.setSuffix(".html");
+		resolver.setCharacterEncoding("UTF-8");
+		resolver.setTemplateMode("HTML5");
+		resolver.setCacheable(environment.getRequiredProperty("template.guest.cache", Boolean.class));
+		resolver.setOrder(2);
+		return resolver;
+	}
+
+	@Bean(name="adminTemplateEngine")
+	public SpringTemplateEngine adminTemplateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
-		engine.setTemplateResolver(templateResolver());
+		Set<TemplateResolver> resolvers = new HashSet<>();
+		resolvers.add(adminTemplateResolver());
+		engine.setTemplateResolvers(resolvers);
+
+		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(customThymeleafDialect);
+		engine.setAdditionalDialects(dialects);
+		return engine;
+	}
+
+	@Bean(name="guestTemplateEngine")
+	public SpringTemplateEngine guestTemplateEngine() {
+		SpringTemplateEngine engine = new SpringTemplateEngine();
+		Set<TemplateResolver> resolvers = new HashSet<>();
+		resolvers.add(guestTemplateResolver());
+		engine.setTemplateResolvers(resolvers);
 
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(customThymeleafDialect);
@@ -218,17 +207,15 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	public BeanNameViewResolver beanNameViewResolver() {
-		BeanNameViewResolver viewResolver = new BeanNameViewResolver();
-		viewResolver.setOrder(1);
-		return viewResolver;
+	public SpringResourceResourceResolver thymeleafResourceResolver() {
+		return new SpringResourceResourceResolver();
 	}
 
 	@Bean
-	public ThymeleafViewResolver thymeleafViewResolver() {
+	public ViewResolver viewResolver() {
 		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-		viewResolver.setTemplateEngine(templateEngine());
-		viewResolver.setOrder(2);
+		viewResolver.setTemplateEngine(adminTemplateEngine());
+		viewResolver.setOrder(1);
 		viewResolver.setViewNames(new String[] { "*" });
 		viewResolver.setCache(false);
 		viewResolver.setCharacterEncoding("UTF-8");
@@ -246,19 +233,5 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
 		pathVariableLocaleResolver.setBlogService(blogService);
 		return pathVariableLocaleResolver;
-	}
-
-	@Bean(name = "atomFeedView")
-	public View atomFeedView() {
-		AtomFeedView view = new AtomFeedView();
-		view.setBlogService(blogService);
-		return view;
-	}
-
-	@Bean(name = "rssFeedView")
-	public View rssFeedView() {
-		RssFeedView view = new RssFeedView();
-		view.setBlogService(blogService);
-		return view;
 	}
 }

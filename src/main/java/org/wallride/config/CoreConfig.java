@@ -47,10 +47,10 @@ public class CoreConfig {
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasenames(
-				"/WEB-INF/messages/messages",
-				"/WEB-INF/messages/validations",
-				"/WEB-INF/messages/enumerations",
-				"/WEB-INF/messages/languages"
+				"classpath:/messages/messages",
+				"classpath:/messages/validations",
+				"classpath:/messages/enumerations",
+				"classpath:/messages/languages"
 		);
 		return messageSource;
 	}
