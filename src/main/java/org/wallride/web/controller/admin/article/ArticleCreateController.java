@@ -61,14 +61,14 @@ public class ArticleCreateController {
 
 	@RequestMapping(method=RequestMethod.GET)
 	public String create() {
-		return "/article/create";
+		return "article/create";
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params="part=category-fieldset")
 	public String partCategoryFieldset(@PathVariable String language, Model model) {
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);
 		model.addAttribute("categoryTree", categoryTree);
-		return "/article/create::#category-fieldset";
+		return "article/create::#category-fieldset";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
@@ -112,7 +112,7 @@ public class ArticleCreateController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/article/create";
+			return "article/create";
 		}
 
 		Article article = null;
@@ -127,7 +127,7 @@ public class ArticleCreateController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/article/create";
+			return "article/create";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);

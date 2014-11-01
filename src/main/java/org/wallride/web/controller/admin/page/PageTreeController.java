@@ -28,7 +28,7 @@ public class PageTreeController {
 	public String index(@PathVariable String language, Model model) {
 		PageTree pageTree = pageService.readPageTree(language);
 		model.addAttribute("pageTree", pageTree);
-		return "/page/tree";
+		return "page/tree";
 	}
 
 	@RequestMapping(params="part=page-create-form")
@@ -36,7 +36,7 @@ public class PageTreeController {
 		PageTree pageTree = pageService.readPageTree(language);
 		model.addAttribute("parentId", parentId);
 		model.addAttribute("pageTree", pageTree);
-		return "/page/tree::page-create-form";
+		return "page/tree::page-create-form";
 	}
 
 	@RequestMapping(params="part=page-edit-form")
@@ -45,12 +45,12 @@ public class PageTreeController {
 		Page page = pageTree.getPageById(id);
 		model.addAttribute("pageTree", pageTree);
 		model.addAttribute("page", page);
-		return "/page/tree::page-edit-form";
+		return "page/tree::page-edit-form";
 	}
 
 	@RequestMapping(params="part=page-delete-form")
 	public String partPageDeleteDialog(@RequestParam long id, Model model) {
 		model.addAttribute("targetId", id);
-		return "/page/tree::page-delete-form";
+		return "page/tree::page-delete-form";
 	}
 }

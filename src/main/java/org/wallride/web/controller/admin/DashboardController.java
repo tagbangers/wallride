@@ -57,7 +57,7 @@ public class DashboardController {
 		model.addAttribute("recentPublishedArticles", recentPublishedArticles(language));
 		model.addAttribute("recentDraftArticles", recentDraftArticles(language));
 
-		return "/dashboard";
+		return "dashboard";
 	}
 
 	private List<Post> popularPosts(String language) {

@@ -38,7 +38,7 @@ public class SignupController {
 
 	@RequestMapping(method=RequestMethod.GET)
 	public String signup() {
-		return "/signup/signup";
+		return "signup/signup";
 	}
 
 	@RequestMapping(method=RequestMethod.POST)
@@ -46,17 +46,17 @@ public class SignupController {
 			@Valid @ModelAttribute("form") SignupForm form,
 			BindingResult errors) {
 		if (errors.hasErrors()) {
-			return "/signup/signup";
+			return "signup/signup";
 		}
 
 		try {
 			signupService.signup(form.buildSignupRequest());
 		} catch (DuplicateLoginIdException e) {
 			errors.rejectValue("loginId", "NotDuplicate");
-			return "/signup/signup";
+			return "signup/signup";
 		} catch (DuplicateEmailException e) {
 			errors.rejectValue("email", "NotDuplicate");
-			return "/signup/signup";
+			return "signup/signup";
 		}
 
 		return "redirect:/_admin/login";

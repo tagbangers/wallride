@@ -51,7 +51,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	@RequestMapping("/{language}/{year:[0-9]{4}}")
@@ -69,7 +69,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}")
@@ -89,7 +89,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}")
@@ -109,7 +109,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	@RequestMapping("/{language}/category/**")
@@ -134,7 +134,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	private String extractPathFromPattern(final HttpServletRequest request){
@@ -168,7 +168,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	@RequestMapping("/{language}/author/{loginId}")
@@ -192,7 +192,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/author";
+		return "article/author";
 	}
 
 }

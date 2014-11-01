@@ -26,12 +26,12 @@ public class LoginController {
 	
 	@RequestMapping
 	public String form() {
-		return "/login";
+		return "login";
 	}
 	
 	@RequestMapping(params="failed")
 	public String failed(Model model) {
 		model.addAttribute("failed", true);
-		return "/login";
+		return "login";
 	}
 }

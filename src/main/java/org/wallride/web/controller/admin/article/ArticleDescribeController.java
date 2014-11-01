@@ -47,7 +47,7 @@ public class ArticleDescribeController extends DomainObjectDescribeController<Ar
 			@RequestParam long id, Model model) {
 		Article article = articleService.readArticleById(id, language);
 		model.addAttribute("article", article);
-		return "/article/describe::delete-form";
+		return "article/describe::delete-form";
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class ArticleDescribeController extends DomainObjectDescribeController<Ar
 
 	@Override
 	protected String getViewName() {
-		return "/article/describe";
+		return "article/describe";
 	}
 
 	@Override
