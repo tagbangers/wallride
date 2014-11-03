@@ -65,7 +65,11 @@ public class Application extends SpringBootServletInitializer {
 	@Bean
 	public FilterRegistrationBean characterEncodingFilter() {
 		CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+		characterEncodingFilter.setEncoding("UTF-8");
+		characterEncodingFilter.setForceEncoding(true);
+
 		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setName("characterEncodingFilter");
 		registration.setFilter(characterEncodingFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 		registration.addUrlPatterns("/*");
@@ -75,7 +79,9 @@ public class Application extends SpringBootServletInitializer {
 	@Bean
 	public FilterRegistrationBean hiddenHttpMethodFilter() {
 		HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
+
 		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setName("hiddenHttpMethodFilter");
 		registration.setFilter(hiddenHttpMethodFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 		registration.addUrlPatterns("/*");
