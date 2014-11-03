@@ -1,9 +1,18 @@
 package org.wallride.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleHierarchyVoter;
+import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,9 +22,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessor;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.util.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.wallride.core.service.AuthorizedUserDetailsService;
 import org.wallride.core.support.ProxyInsecureChannelProcessor;
 import org.wallride.core.support.ProxySecureChannelProcessor;
@@ -28,79 +39,180 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
 	@Inject
 	private DataSource dataSource;
 
-	@Inject
-	private Environment environment;
-
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		// @formatter:off
 		auth
-			.userDetailsService(authorizedStaffDetailsService())
+			.userDetailsService(authorizedUserDetailsService())
 			.passwordEncoder(new StandardPasswordEncoder());
 		// @formatter:on
 	}
 
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		// @formatter:off
-		web
-			.ignoring()
-				.antMatchers("/_admin/resources/**")
-				.antMatchers("/_admin/setup**")
-				.antMatchers("/_admin/signup**");
-		// @formatter:on
-	}
+	@Configuration
+	@Order(1)
+	public static class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		// @formatter:off
-		http.antMatcher("/_admin/**")
-			.authorizeRequests()
-				.antMatchers("/_admin/**").hasRole("USER")
-				.and()
-			.formLogin()
-				.loginPage("/_admin/login").permitAll()
-				.loginProcessingUrl("/_admin/login")
-				.defaultSuccessUrl("/_admin/")
-				.failureUrl("/_admin/login?failed")
-				.and()
-			.logout()
-				.logoutRequestMatcher(new AntPathRequestMatcher("/_admin/logout", "GET"))
-				.logoutSuccessUrl("/_admin/login")
-				.and()
-			.rememberMe()
-				.tokenRepository(persistentTokenRepository())
-				.and()
-			.headers()
-				.frameOptions().disable()
-			.csrf()
-				.disable();
-		if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
-			List<ChannelProcessor> channelProcessors = new ArrayList<>();
-			channelProcessors.add(new ProxySecureChannelProcessor());
-			channelProcessors.add(new ProxyInsecureChannelProcessor());
+//		@Inject
+//		private AccessDecisionManager accessDecisionManager;
+//		@Inject
+//		private SecurityExpressionHandler securityExpressionHandler;
+		@Inject
+		private PersistentTokenRepository persistentTokenRepository;
+		@Inject
+		private Environment environment;
 
-			http.requiresChannel()
-				.channelProcessors(channelProcessors)
-				.anyRequest().requiresSecure();
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			// @formatter:off
+			web
+				.ignoring()
+					.antMatchers("/_admin/resources/**")
+					.antMatchers("/_admin/setup**")
+					.antMatchers("/_admin/signup**");
+			// @formatter:on
 		}
-		// @formatter:on
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			// @formatter:off
+			http.antMatcher("/_admin/**")
+				.authorizeRequests()
+//					.accessDecisionManager(accessDecisionManager)
+//		            .expressionHandler(securityExpressionHandler)
+					.antMatchers("/_admin/**").hasRole("ADMIN")
+					.and()
+				.formLogin()
+					.loginPage("/_admin/login").permitAll()
+					.loginProcessingUrl("/_admin/login")
+					.defaultSuccessUrl("/_admin/")
+					.failureUrl("/_admin/login?failed")
+					.and()
+				.logout()
+					.logoutRequestMatcher(new AntPathRequestMatcher("/_admin/logout", "GET"))
+					.logoutSuccessUrl("/_admin/login")
+					.and()
+				.rememberMe()
+					.tokenRepository(persistentTokenRepository)
+					.and()
+				.headers()
+					.frameOptions().disable()
+				.csrf()
+					.disable()
+				.exceptionHandling()
+					.accessDeniedPage("/_admin/login");
+			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
+				List<ChannelProcessor> channelProcessors = new ArrayList<>();
+				channelProcessors.add(new ProxySecureChannelProcessor());
+				channelProcessors.add(new ProxyInsecureChannelProcessor());
+
+				http.requiresChannel()
+					.channelProcessors(channelProcessors)
+					.anyRequest().requiresSecure();
+			}
+			// @formatter:on
+		}
+	}
+
+	@Configuration
+	@Order(2)
+	public static class GuestSecurityConfig extends WebSecurityConfigurerAdapter {
+
+//		@Inject
+//		private AccessDecisionManager accessDecisionManager;
+//		@Inject
+//		private SecurityExpressionHandler securityExpressionHandler;
+		@Inject
+		private PersistentTokenRepository persistentTokenRepository;
+		@Inject
+		private Environment environment;
+
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			// @formatter:off
+			web
+				.ignoring()
+					.antMatchers("/resources/**");
+			// @formatter:on
+		}
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			// @formatter:off
+			http.antMatcher("/**")
+				.authorizeRequests()
+//					.accessDecisionManager(accessDecisionManager)
+//		            .expressionHandler(securityExpressionHandler)
+					.antMatchers("/comments/**").hasRole("VIEWER")
+					.and()
+				.formLogin()
+					.loginPage("/account/login").permitAll()
+					.loginProcessingUrl("/account/login")
+					.defaultSuccessUrl("/")
+					.failureUrl("/account/login?failed")
+					.and()
+				.logout()
+					.logoutRequestMatcher(new AntPathRequestMatcher("/account/logout", "GET"))
+					.logoutSuccessUrl("/account/login")
+					.and()
+				.rememberMe()
+					.tokenRepository(persistentTokenRepository)
+					.and()
+				.headers()
+					.frameOptions().disable()
+				.csrf()
+					.disable()
+				.exceptionHandling()
+					.accessDeniedPage("/account/login");
+			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
+				List<ChannelProcessor> channelProcessors = new ArrayList<>();
+				channelProcessors.add(new ProxySecureChannelProcessor());
+				channelProcessors.add(new ProxyInsecureChannelProcessor());
+
+				http.requiresChannel()
+					.channelProcessors(channelProcessors)
+					.anyRequest().requiresSecure();
+			}
+			// @formatter:on
+		}
 	}
 
 	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
-
-	@Bean
-	public UserDetailsService authorizedStaffDetailsService() {
+	public UserDetailsService authorizedUserDetailsService() {
 		return new AuthorizedUserDetailsService();
+	}
+
+//	@Bean
+//	public SecurityExpressionHandler securityExpressionHandler(){
+//		DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+//		expressionHandler.setRoleHierarchy(roleHierarchy());
+//		return expressionHandler;
+//	}
+//
+//	@Bean
+//	public AffirmativeBased accessDecisionManager() {
+//		List<AccessDecisionVoter> decisionVoters = new ArrayList<>();
+//		WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
+//		webExpressionVoter.setExpressionHandler(securityExpressionHandler());
+//		decisionVoters.add(webExpressionVoter);
+//		decisionVoters.add(roleVoter());
+//		return new AffirmativeBased(decisionVoters);
+//	}
+
+	@Bean
+	public RoleHierarchy roleHierarchy() {
+		RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+		hierarchy.setHierarchy("ROLE_ADMIN > ROLE_VIEWER");
+		return hierarchy;
+	}
+
+	@Bean
+	public RoleVoter roleVoter() {
+		return new RoleHierarchyVoter(roleHierarchy());
 	}
 
 	@Bean
@@ -109,5 +221,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		repository.setDataSource(dataSource);
 		return repository;
 	}
-
 }

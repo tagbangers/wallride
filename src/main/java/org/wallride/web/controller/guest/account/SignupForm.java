@@ -1,4 +1,4 @@
-package org.wallride.web.controller.admin.signup;
+package org.wallride.web.controller.guest.account;
 
 import org.hibernate.validator.constraints.Email;
 import org.wallride.core.domain.PersonalName;
@@ -13,8 +13,6 @@ import java.io.Serializable;
 public class SignupForm implements Serializable {
 
 	@NotNull
-	private String token;
-	@NotNull
 	@Pattern(regexp = "^[\\w\\-]+$")
 	private String loginId;
 	@NotNull
@@ -24,14 +22,6 @@ public class SignupForm implements Serializable {
 	@NotNull
 	@Email
 	private String email;
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
 
 	public String getLoginId() {
 		return loginId;
@@ -78,7 +68,6 @@ public class SignupForm implements Serializable {
 
 		@NotNull
 		private String firstName;
-
 		@NotNull
 		private String lastName;
 

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" />
+		<meta name="keywords" />
+		<meta name="author" content="" />
+		<title>Signup</title>
+		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
+		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
+		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/atom.xml}" />
+		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/rss.xml}" />
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+		<link rel="stylesheet" th:href="@{/resources/css/sticky-footer-navbar.css}" href="#" />
+		<link rel="stylesheet" th:href="@{/resources/css/common.css}" href="#" />
+		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:replace="layout::head-script"> /*/-->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		<![endif]-->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		<script th:src="@{/resources/lib/jquery.lazyload.min.js}" src="#"></script>
+		<!--/*/ </th:block> /*/-->
+	</head>
+	<body>
+		<div id="wrap">
+			<div th:replace="layout::nav"></div>
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="page-header">
+							<h1>Login</h1>
+						</div>
+						<form th:action="@{login}" action="#" method="post">
+							<div class="form-group">
+								<label th:text="#{UserName}">User Name</label>
+								<input type="text" name="username" class="form-control" th:attr="placeholder=#{UserName}" autofocus="autofocus" autocomplete="off" />
+							</div>
+							<div class="form-group">
+								<label th:text="#{Password}">Password</label>
+								<input type="password" name="password" class="form-control" th:attr="placeholder=#{Password}" autocomplete="off" />
+							</div>
+							<div class="checkbox">
+								<label><input type="checkbox" name="remember-me" th:text="#{RememberMe}"/></label>
+							</div>
+							<div class="form-group">
+								<button class="btn btn-lg btn-primary" type="submit" th:text="#{LogIn}">Log in</button>
+								<a class="btn btn-link btn-lg btn-default" th:href="@{__${WEBSITE_PATH}__/account/signup}">Sign up</a>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="layout::footer" id="footer"></div>
+	</body>
+</html>
