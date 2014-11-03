@@ -38,7 +38,7 @@ public class CategoryIndexController {
 	public String index(@PathVariable String language, Model model) {
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);
 		model.addAttribute("categoryTree", categoryTree);
-		return "/category/index";
+		return "category/index";
 	}
 
 	@RequestMapping(params="part=category-create-form")
@@ -46,7 +46,7 @@ public class CategoryIndexController {
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);
 		model.addAttribute("parentId", parentId);
 		model.addAttribute("categoryTree", categoryTree);
-		return "/category/index::category-create-form";
+		return "category/index::category-create-form";
 	}
 
 	@RequestMapping(params="part=category-edit-form")
@@ -55,12 +55,12 @@ public class CategoryIndexController {
 		Category category = categoryTree.getCategoryById(id);
 		model.addAttribute("categoryTree", categoryTree);
 		model.addAttribute("category", category);
-		return "/category/index::category-edit-form";
+		return "category/index::category-edit-form";
 	}
 
 	@RequestMapping(params="part=category-delete-form")
 	public String partCategoryDeleteForm(@RequestParam long id, Model model) {
 		model.addAttribute("targetId", id);
-		return "/category/index::category-delete-form";
+		return "category/index::category-delete-form";
 	}
 }

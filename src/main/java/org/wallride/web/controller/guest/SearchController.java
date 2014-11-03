@@ -34,6 +34,6 @@ public class SearchController {
 		model.addAttribute("posts", posts);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(posts));
-		return "/search";
+		return "search";
 	}
 }

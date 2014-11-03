@@ -34,7 +34,7 @@ public class UserEditController {
 		User user = userService.readUserById(id);
 		UserEditForm form = UserEditForm.fromDomainObject(user);
 		model.addAttribute("form", form);
-		return "/user/edit";
+		return "user/edit";
 	}
 
 	@RequestMapping(method= RequestMethod.POST, params="_step.save")
@@ -46,7 +46,7 @@ public class UserEditController {
 			HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/user/edit";
+			return "user/edit";
 		}
 
 		User user = null;
@@ -56,7 +56,7 @@ public class UserEditController {
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {
 				logger.debug("Errors: {}", errors);
-				return "/user/edit";
+				return "user/edit";
 			}
 			throw e;
 		}

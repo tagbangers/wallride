@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.frameOptions().disable()
 			.csrf()
 				.disable();
-		if (environment.getProperty("security.admin.force.ssl", Boolean.class, false)) {
+		if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
 			List<ChannelProcessor> channelProcessors = new ArrayList<>();
 			channelProcessors.add(new ProxySecureChannelProcessor());
 			channelProcessors.add(new ProxyInsecureChannelProcessor());

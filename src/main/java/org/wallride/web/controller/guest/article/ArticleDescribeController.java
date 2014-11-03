@@ -44,6 +44,6 @@ public class ArticleDescribeController {
 		}
 
 		model.addAttribute("article", article);
-		return "/article/describe";
+		return "article/describe";
 	}
 }

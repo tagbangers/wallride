@@ -34,7 +34,7 @@ public class ArticleDeleteController {
 //		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/article/describe";
+			return "article/describe";
 		}
 
 		Article article = null;
@@ -44,7 +44,7 @@ public class ArticleDeleteController {
 		catch (BindException e) {
 			if (errors.hasErrors()) {
 				logger.debug("Errors: {}", errors);
-				return "/article/describe";
+				return "article/describe";
 			}
 			throw new RuntimeException(e);
 		}

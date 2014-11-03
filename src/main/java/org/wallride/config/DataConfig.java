@@ -73,7 +73,15 @@ public class DataConfig implements BatchConfigurer {
 		jobLauncher.afterPropertiesSet();
 		return jobLauncher;
 	}
-	
+
+	@Override
+	public JobExplorer getJobExplorer() throws Exception {
+		JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
+		factory.setDataSource(dataSource());
+		factory.afterPropertiesSet();
+		return factory.getObject();
+	}
+
 	@Override
 	public PlatformTransactionManager getTransactionManager() throws UnsupportedEncodingException {
 		JpaTransactionManager bean = new JpaTransactionManager();
@@ -144,13 +152,5 @@ public class DataConfig implements BatchConfigurer {
 		entityManager.setJpaProperties(properties);
 		
 		return entityManager;
-	}
-	
-	@Bean
-	public JobExplorer jobExplorer() throws Exception {
-		JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
-		factory.setDataSource(dataSource());
-		factory.afterPropertiesSet();
-		return (JobExplorer) factory.getObject();
 	}
 }

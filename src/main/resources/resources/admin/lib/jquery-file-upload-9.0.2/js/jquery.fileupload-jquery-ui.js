@@ -16,7 +16,7 @@
     'use strict';
     if (typeof define === 'function' && define.amd) {
         // Register as an anonymous AMD module:
-        define(['jquery', './jquery.fileupload-ui'], factory);
+        define(['jquery', './jquery.fileupload-ui.js'], factory);
     } else {
         // Browser globals:
         factory(window.jQuery);

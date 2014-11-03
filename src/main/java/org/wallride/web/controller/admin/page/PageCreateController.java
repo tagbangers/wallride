@@ -57,14 +57,14 @@ public class PageCreateController {
 
 	@RequestMapping(method=RequestMethod.GET)
 	public String create() {
-		return "/page/create";
+		return "page/create";
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params="part=page-fieldset")
 	public String partPageFieldset(@PathVariable String language, Model model) {
 		PageTree pageTree = pageService.readPageTree(language);
 		model.addAttribute("pageTree", pageTree);
-		return "/page/create::#page-fieldset";
+		return "page/create::#page-fieldset";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
@@ -109,7 +109,7 @@ public class PageCreateController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/page/create";
+			return "page/create";
 		}
 
 		Page page = null;
@@ -124,7 +124,7 @@ public class PageCreateController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/page/create";
+			return "page/create";
 		}
 
 		redirectAttributes.addFlashAttribute("savedPage", page);

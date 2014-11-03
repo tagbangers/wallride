@@ -60,7 +60,7 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
 
 	@Override
 	protected String getViewName() {
-		return "/user/describe";
+		return "user/describe";
 	}
 
 	@Override

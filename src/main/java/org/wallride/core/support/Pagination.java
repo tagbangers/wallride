@@ -30,11 +30,11 @@ public class Pagination<T> {
 	}
 
 	public boolean hasPreviousPage() {
-		return page.hasPreviousPage();
+		return page.hasPrevious();
 	}
 
 	public boolean hasNextPage() {
-		return page.hasNextPage();
+		return page.hasNext();
 	}
 
 	public long getNumberOfFirstElement() {
