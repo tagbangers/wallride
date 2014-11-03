@@ -24,18 +24,18 @@ public class CoreConfig {
 	@Inject
 	private Environment environment;
 
-	@Configuration
-	@Profile("default")
-	@PropertySource("classpath:environment-default.properties")
-	static class Default extends PropertySourcesPlaceholderConfigurer {
-	}
-
-
-	@Configuration
-	@Profile("develop")
-	@PropertySource("classpath:environment-develop.properties")
-	static class Develop extends PropertySourcesPlaceholderConfigurer {
-	}
+//	@Configuration
+//	@Profile("default")
+//	@PropertySource("classpath:application-default.properties")
+//	static class Default extends PropertySourcesPlaceholderConfigurer {
+//	}
+//
+//
+//	@Configuration
+//	@Profile("develop")
+//	@PropertySource("classpath:application-develop.properties")
+//	static class Develop extends PropertySourcesPlaceholderConfigurer {
+//	}
 
 //	@Configuration
 //	@Profile("junit")
