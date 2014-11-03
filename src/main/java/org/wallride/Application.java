@@ -1,15 +1,18 @@
 package org.wallride;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.builder.ParentContextApplicationContextInitializer;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
+import org.springframework.boot.context.web.ServletContextApplicationContextInitializer;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +20,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -28,6 +31,7 @@ import org.wallride.web.WebAdminConfig;
 import org.wallride.web.WebGuestConfig;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumSet;
@@ -35,13 +39,29 @@ import java.util.EnumSet;
 @Configuration
 @EnableAutoConfiguration(exclude = {DispatcherServletAutoConfiguration.class, WebMvcAutoConfiguration.class, ThymeleafAutoConfiguration.class})
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
-public class Application /*extends SpringBootServletInitializer*/ {
+public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 //		SpringApplication.run(Application.class, args);
 		new SpringApplicationBuilder(Application.class)
 				.contextClass(ExtendedAnnotationConfigEmbeddedWebApplicationContext.class)
 				.run(args);
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(Application.class);
+	}
+
+	@Override
+	protected WebApplicationContext createRootApplicationContext(ServletContext servletContext) {
+		SpringApplicationBuilder application = new SpringApplicationBuilder();
+		application.initializers(new ServletContextApplicationContextInitializer(servletContext));
+		application.contextClass(ExtendedAnnotationConfigEmbeddedWebApplicationContext.class);
+		application = configure(application);
+		// Ensure error pages are registered
+//		application.sources(ErrorPageFilter.class);
+		return (WebApplicationContext) application.run();
 	}
 
 	@Bean
@@ -106,22 +126,18 @@ public class Application /*extends SpringBootServletInitializer*/ {
 				if (pos != -1) {
 					bucketName = path.substring(0, pos);
 					key = path.substring(pos + 1);
-				}
-				else {
+				} else {
 					bucketName = path;
 				}
 				return new AmazonS3Resource(getBean(AmazonS3Client.class), bucketName, key);
-			}
-			else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
+			} else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 				return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
-			}
-			else {
+			} else {
 				try {
 					// Try to parse the location as a URL...
 					URL url = new URL(location);
 					return new UrlResource(url);
-				}
-				catch (MalformedURLException ex) {
+				} catch (MalformedURLException ex) {
 					// No URL -> resolve as resource path.
 					return getResourceByPath(location);
 				}
