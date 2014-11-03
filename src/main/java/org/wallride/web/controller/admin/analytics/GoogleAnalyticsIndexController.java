@@ -20,6 +20,6 @@ public class GoogleAnalyticsIndexController {
 	public String describe(Model model) {
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		model.addAttribute("googleAnalytics", blog.getGoogleAnalytics());
-		return "/analytics/index";
+		return "analytics/index";
 	}
 }

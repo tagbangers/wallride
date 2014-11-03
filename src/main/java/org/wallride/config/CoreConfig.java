@@ -24,18 +24,18 @@ public class CoreConfig {
 	@Inject
 	private Environment environment;
 
-	@Configuration
-	@Profile("default")
-	@PropertySource("classpath:environment-default.properties")
-	static class Default extends PropertySourcesPlaceholderConfigurer {
-	}
-
-
-	@Configuration
-	@Profile("develop")
-	@PropertySource("classpath:environment-develop.properties")
-	static class Develop extends PropertySourcesPlaceholderConfigurer {
-	}
+//	@Configuration
+//	@Profile("default")
+//	@PropertySource("classpath:application-default.properties")
+//	static class Default extends PropertySourcesPlaceholderConfigurer {
+//	}
+//
+//
+//	@Configuration
+//	@Profile("develop")
+//	@PropertySource("classpath:application-develop.properties")
+//	static class Develop extends PropertySourcesPlaceholderConfigurer {
+//	}
 
 //	@Configuration
 //	@Profile("junit")
@@ -47,10 +47,10 @@ public class CoreConfig {
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasenames(
-				"/WEB-INF/messages/messages",
-				"/WEB-INF/messages/validations",
-				"/WEB-INF/messages/enumerations",
-				"/WEB-INF/messages/languages"
+				"classpath:/messages/messages",
+				"classpath:/messages/validations",
+				"classpath:/messages/enumerations",
+				"classpath:/messages/languages"
 		);
 		return messageSource;
 	}

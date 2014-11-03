@@ -34,7 +34,7 @@ public class SetupController {
 		if (blog != null) {
 			throw new HttpForbiddenException();
 		}
-		return "/setup";
+		return "setup";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)

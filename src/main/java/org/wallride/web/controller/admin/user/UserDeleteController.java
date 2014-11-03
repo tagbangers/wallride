@@ -29,7 +29,7 @@ public class UserDeleteController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/user/delete";
+			return "user/delete";
 		}
 		
 		try {
@@ -38,11 +38,11 @@ public class UserDeleteController {
 		catch (BindException e) {
 			if (errors.hasErrors()) {
 				logger.debug("Errors: {}", errors);
-				return "/user/delete";
+				return "user/delete";
 			}
 			throw new RuntimeException(e);
 		}
 		
-		return "/user/delete";
+		return "user/delete";
 	}
 }

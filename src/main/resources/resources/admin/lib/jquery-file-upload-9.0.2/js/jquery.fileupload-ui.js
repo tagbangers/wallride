@@ -19,7 +19,7 @@
         define([
             'jquery',
             'tmpl',
-            './jquery.fileupload-image',
+            './jquery.fileupload-image.js',
             './jquery.fileupload-audio',
             './jquery.fileupload-video',
             './jquery.fileupload-validate'

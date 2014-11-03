@@ -39,7 +39,7 @@ public abstract class DomainObjectDescribeController<D extends DomainObject, F e
 				D last = searchResults.getContent().get(searchResults.getContent().size() - 1);
 
 				if (ObjectUtils.nullSafeEquals(domainObject, first)) {
-					if (searchResults.hasPreviousPage()) {
+					if (searchResults.hasPrevious()) {
 						Page<D> previousResults = readDomainObjects(condition.getForm(), condition.getPageable().previousOrFirst());
 						previousObject = previousResults.getContent().get(previousResults.getContent().size() - 1);
 						previousPageable = condition.getPageable().previousOrFirst();
@@ -49,7 +49,7 @@ public abstract class DomainObjectDescribeController<D extends DomainObject, F e
 				}
 
 				if (ObjectUtils.nullSafeEquals(domainObject, last)) {
-					if (searchResults.hasNextPage()) {
+					if (searchResults.hasNext()) {
 						Page<D> nextResults = readDomainObjects(condition.getForm(), condition.getPageable().next());
 						nextObject = nextResults.getContent().get(0);
 						nextPageable = condition.getPageable().next();

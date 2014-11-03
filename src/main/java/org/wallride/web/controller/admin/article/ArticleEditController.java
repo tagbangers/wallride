@@ -80,7 +80,7 @@ public class ArticleEditController {
 		Article draft = articleService.readDraftById(id);
 		model.addAttribute("draft", draft);
 
-		return "/article/edit";
+		return "article/edit";
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params="draft")
@@ -105,7 +105,7 @@ public class ArticleEditController {
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft);
 		model.addAttribute("form", form);
 
-		return "/article/edit";
+		return "article/edit";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
@@ -150,7 +150,7 @@ public class ArticleEditController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/article/edit";
+			return "article/edit";
 		}
 
 		Article article = null;
@@ -165,7 +165,7 @@ public class ArticleEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/article/edit";
+			return "article/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);
@@ -182,7 +182,7 @@ public class ArticleEditController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/article/edit";
+			return "article/edit";
 		}
 
 		Article article = null;
@@ -197,7 +197,7 @@ public class ArticleEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/article/edit";
+			return "article/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);
@@ -214,7 +214,7 @@ public class ArticleEditController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/article/edit";
+			return "article/edit";
 		}
 
 		Article article = null;
@@ -229,7 +229,7 @@ public class ArticleEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/article/edit";
+			return "article/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedArticle", article);

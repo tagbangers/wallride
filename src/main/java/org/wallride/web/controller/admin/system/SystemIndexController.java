@@ -11,6 +11,6 @@ public class SystemIndexController {
 	@RequestMapping
 	public String index(Model model) {
 		model.addAttribute("system", System.getProperties());
-		return "/system/index";
+		return "system/index";
 	}
 }

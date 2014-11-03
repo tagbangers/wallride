@@ -74,7 +74,7 @@ public class PageEditController {
 		Page draft = pageService.readDraftById(id);
 		model.addAttribute("draft", draft);
 
-		return "/page/edit";
+		return "page/edit";
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params="draft")
@@ -99,7 +99,7 @@ public class PageEditController {
 		PageEditForm form = PageEditForm.fromDomainObject(draft);
 		model.addAttribute("form", form);
 
-		return "/page/edit";
+		return "page/edit";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
@@ -144,7 +144,7 @@ public class PageEditController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/page/edit";
+			return "page/edit";
 		}
 
 		Page page = null;
@@ -159,7 +159,7 @@ public class PageEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/page/edit";
+			return "page/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedPage", page);
@@ -176,7 +176,7 @@ public class PageEditController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/page/edit";
+			return "page/edit";
 		}
 
 		Page page = null;
@@ -191,7 +191,7 @@ public class PageEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/page/edit";
+			return "page/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedPage", page);
@@ -208,7 +208,7 @@ public class PageEditController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/page/edit";
+			return "page/edit";
 		}
 
 		Page page = null;
@@ -223,7 +223,7 @@ public class PageEditController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/page/edit";
+			return "page/edit";
 		}
 
 		redirectAttributes.addFlashAttribute("savedPage", page);

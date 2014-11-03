@@ -81,7 +81,7 @@ public class PageSearchController extends DomainObjectSearchController<Page, Pag
 
 	@RequestMapping(params="part=bulk-delete-form")
 	public String partBulkDeleteDialog() {
-		return "/page/index::bulk-delete-form";
+		return "page/index::bulk-delete-form";
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class PageSearchController extends DomainObjectSearchController<Page, Pag
 
 	@Override
 	protected String getViewName() {
-		return "/page/index";
+		return "page/index";
 	}
 
 	@Override

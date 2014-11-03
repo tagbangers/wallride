@@ -46,7 +46,7 @@ public class PageDescribeController extends DomainObjectDescribeController<Page,
 			@RequestParam long id, Model model) {
 		Page page = pageService.readPageById(id, language);
 		model.addAttribute("page", page);
-		return "/page/describe::delete-form";
+		return "page/describe::delete-form";
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class PageDescribeController extends DomainObjectDescribeController<Page,
 
 	@Override
 	protected String getViewName() {
-		return "/page/describe";
+		return "page/describe";
 	}
 
 	@Override

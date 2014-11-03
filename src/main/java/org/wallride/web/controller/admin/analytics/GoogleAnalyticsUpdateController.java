@@ -43,7 +43,7 @@ public class GoogleAnalyticsUpdateController {
 
 	@RequestMapping(method = RequestMethod.GET, params = "step.edit")
 	public String edit(Model model) {
-		return "/analytics/edit";
+		return "analytics/edit";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
