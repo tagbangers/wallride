@@ -7,7 +7,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.AffirmativeBased;
@@ -57,8 +56,8 @@ public class SecurityConfig {
 	@Order(1)
 	public static class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
 
-//		@Inject
-//		private AccessDecisionManager accessDecisionManager;
+		@Inject
+		private AccessDecisionManager accessDecisionManager;
 //		@Inject
 //		private SecurityExpressionHandler securityExpressionHandler;
 		@Inject
@@ -82,7 +81,7 @@ public class SecurityConfig {
 			// @formatter:off
 			http.antMatcher("/_admin/**")
 				.authorizeRequests()
-//					.accessDecisionManager(accessDecisionManager)
+					.accessDecisionManager(accessDecisionManager)
 //		            .expressionHandler(securityExpressionHandler)
 					.antMatchers("/_admin/**").hasRole("ADMIN")
 					.and()
@@ -122,8 +121,8 @@ public class SecurityConfig {
 	@Order(2)
 	public static class GuestSecurityConfig extends WebSecurityConfigurerAdapter {
 
-//		@Inject
-//		private AccessDecisionManager accessDecisionManager;
+		@Inject
+		private AccessDecisionManager accessDecisionManager;
 //		@Inject
 //		private SecurityExpressionHandler securityExpressionHandler;
 		@Inject
@@ -145,19 +144,19 @@ public class SecurityConfig {
 			// @formatter:off
 			http.antMatcher("/**")
 				.authorizeRequests()
-//					.accessDecisionManager(accessDecisionManager)
+					.accessDecisionManager(accessDecisionManager)
 //		            .expressionHandler(securityExpressionHandler)
-					.antMatchers("/comments/**").hasRole("VIEWER")
+					.antMatchers("/{language}/comments/**").hasRole("VIEWER")
 					.and()
 				.formLogin()
-					.loginPage("/account/login").permitAll()
-					.loginProcessingUrl("/account/login")
+					.loginPage("/{language}/account/login").permitAll()
+					.loginProcessingUrl("/{language}/account/login")
 					.defaultSuccessUrl("/")
-					.failureUrl("/account/login?failed")
+					.failureUrl("/{language}/account/login?failed")
 					.and()
 				.logout()
-					.logoutRequestMatcher(new AntPathRequestMatcher("/account/logout", "GET"))
-					.logoutSuccessUrl("/account/login")
+					.logoutRequestMatcher(new AntPathRequestMatcher("/{language}/account/logout", "GET"))
+					.logoutSuccessUrl("/")
 					.and()
 				.rememberMe()
 					.tokenRepository(persistentTokenRepository)
@@ -186,22 +185,29 @@ public class SecurityConfig {
 		return new AuthorizedUserDetailsService();
 	}
 
-//	@Bean
-//	public SecurityExpressionHandler securityExpressionHandler(){
-//		DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-//		expressionHandler.setRoleHierarchy(roleHierarchy());
-//		return expressionHandler;
-//	}
-//
-//	@Bean
-//	public AffirmativeBased accessDecisionManager() {
-//		List<AccessDecisionVoter> decisionVoters = new ArrayList<>();
-//		WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
-//		webExpressionVoter.setExpressionHandler(securityExpressionHandler());
-//		decisionVoters.add(webExpressionVoter);
-//		decisionVoters.add(roleVoter());
-//		return new AffirmativeBased(decisionVoters);
-//	}
+	@Bean
+	public AffirmativeBased accessDecisionManager() {
+		List<AccessDecisionVoter> accessDecisionVoters = new ArrayList<>();
+		accessDecisionVoters.add(roleVoter());
+		accessDecisionVoters.add(webExpressionVoter());
+
+		AffirmativeBased accessDecisionManager = new AffirmativeBased(accessDecisionVoters);
+		return accessDecisionManager;
+	}
+
+	@Bean
+	public WebExpressionVoter webExpressionVoter() {
+		WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
+		webExpressionVoter.setExpressionHandler(webSecurityExpressionHandler());
+		return webExpressionVoter;
+	}
+
+	@Bean
+	public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
+		DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler = new DefaultWebSecurityExpressionHandler();
+		defaultWebSecurityExpressionHandler.setRoleHierarchy(roleHierarchy());
+		return defaultWebSecurityExpressionHandler;
+	}
 
 	@Bean
 	public RoleHierarchy roleHierarchy() {

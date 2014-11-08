@@ -24,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
@@ -188,6 +189,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		engine.setTemplateResolvers(resolvers);
 
 		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(new SpringSecurityDialect());
 		dialects.add(customThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
@@ -201,6 +203,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		engine.setTemplateResolvers(resolvers);
 
 		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(new SpringSecurityDialect());
 		dialects.add(customThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
