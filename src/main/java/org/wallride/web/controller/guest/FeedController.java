@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 @Controller
-@RequestMapping("/{language}/feed")
+@RequestMapping("/feed")
 public class FeedController {
 
 	private static final PageRequest DEFAULT_PAGE_REQUEST = new PageRequest(0, 50);

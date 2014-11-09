@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 @Controller
-@RequestMapping(value="/{language}/users/describe", method= RequestMethod.GET)
+@RequestMapping(value="/users/describe", method= RequestMethod.GET)
 public class UserDescribeController extends DomainObjectDescribeController<User, UserSearchForm> {
 
 	@Inject

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.DuplicateEmailException;
 import org.wallride.core.service.DuplicateLoginIdException;
@@ -16,7 +17,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/{language}/account/signup")
+@RequestMapping("/account/signup")
 public class SignupController {
 
 	public static final String FORM_MODEL_KEY = "form";
@@ -46,9 +47,11 @@ public class SignupController {
 	public String signup(
 			@Valid @ModelAttribute("form") SignupForm form,
 			BindingResult errors,
+			BlogLanguage blogLanguage,
 			RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute(FORM_MODEL_KEY, form);
 		redirectAttributes.addFlashAttribute(ERRORS_MODEL_KEY, errors);
+		redirectAttributes.addAttribute("language", blogLanguage.getLanguage());
 
 		if (errors.hasErrors()) {
 			return "redirect:/{language}/account/signup?step.edit";

@@ -15,7 +15,7 @@ import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/{language}/users/invitations/resend")
+@RequestMapping("/users/invitations/resend")
 public class UserInvitationResendController {
 
 	@Inject

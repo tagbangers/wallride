@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping(value="/{language}/pages/describe", method=RequestMethod.GET)
+@RequestMapping(value="/pages/describe", method=RequestMethod.GET)
 public class PageDescribeController extends DomainObjectDescribeController<Page, PageSearchForm> {
 
 	@Inject

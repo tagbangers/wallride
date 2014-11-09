@@ -28,7 +28,7 @@ import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
-@RequestMapping("/{language}/articles/create")
+@RequestMapping("/articles/create")
 public class ArticleCreateController {
 
 	private static Logger logger = LoggerFactory.getLogger(ArticleCreateController.class);

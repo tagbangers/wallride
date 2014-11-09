@@ -16,7 +16,7 @@ import org.wallride.core.support.Pagination;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/{language}/search")
+@RequestMapping("/search")
 public class SearchController {
 
 	@Inject

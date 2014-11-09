@@ -28,7 +28,7 @@ import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
-@RequestMapping("/{language}/articles/edit")
+@RequestMapping("/articles/edit")
 public class ArticleEditController {
 	
 	private static Logger logger = LoggerFactory.getLogger(ArticleEditController.class); 

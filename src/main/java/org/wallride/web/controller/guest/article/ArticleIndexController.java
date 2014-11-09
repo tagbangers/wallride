@@ -38,23 +38,23 @@ public class ArticleIndexController {
 	@Inject
 	private UserService userService;
 
-	@RequestMapping("/{language}/")
-	public String index(
-			@PathVariable String language,
-			@PageableDefault(10) Pageable pageable,
-			HttpSession session,
-			Model model) {
-		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+//	@RequestMapping("/")
+//	public String index(
+//			@PathVariable String language,
+//			@PageableDefault(10) Pageable pageable,
+//			HttpSession session,
+//			Model model) {
+//		ArticleSearchForm form = new ArticleSearchForm() {};
+//		form.setLanguage(language);
+//
+//		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+//		model.addAttribute("articles", articles);
+//		model.addAttribute("pageable", pageable);
+//		model.addAttribute("pagination", new Pagination<>(articles));
+//		return "article/index";
+//	}
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
-		model.addAttribute("articles", articles);
-		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(articles));
-		return "article/index";
-	}
-
-	@RequestMapping("/{language}/{year:[0-9]{4}}")
+	@RequestMapping("/{year:[0-9]{4}}")
 	public String year(
 			@PathVariable String language,
 			@PathVariable int year,
@@ -72,7 +72,7 @@ public class ArticleIndexController {
 		return "article/index";
 	}
 
-	@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}")
+	@RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}")
 	public String month(
 			@PathVariable String language,
 			@PathVariable int year,
@@ -92,7 +92,7 @@ public class ArticleIndexController {
 		return "article/index";
 	}
 
-	@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}")
+	@RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}")
 	public String day(
 			@PathVariable String language,
 			@PathVariable int year,
@@ -112,7 +112,7 @@ public class ArticleIndexController {
 		return "article/index";
 	}
 
-	@RequestMapping("/{language}/category/**")
+	@RequestMapping("/category/**")
 	public String category(
 			@PathVariable String language,
 			@PageableDefault(10) Pageable pageable,
@@ -147,7 +147,7 @@ public class ArticleIndexController {
 		return finalPath;
 	}
 
-	@RequestMapping("/{language}/tag/{name}")
+	@RequestMapping("/tag/{name}")
 	public String tag(
 			@PathVariable String language,
 			@PathVariable String name,
@@ -171,7 +171,7 @@ public class ArticleIndexController {
 		return "article/index";
 	}
 
-	@RequestMapping("/{language}/author/{loginId}")
+	@RequestMapping("/author/{loginId}")
 	public String author(
 			@PathVariable String language,
 			@PathVariable String loginId,

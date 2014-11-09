@@ -25,7 +25,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.thymeleaf.dialect.IDialect;
@@ -33,14 +32,13 @@ import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
-import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.AuthorizedUserMethodArgumentResolver;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
@@ -84,7 +82,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
 		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
 
-		handlerMapping.setUrlPathHelper(new LanguageUrlPathHelper(blogService));
+//		handlerMapping.setUrlPathHelper(new LanguageUrlPathHelper(blogService));
 		handlerMapping.setDefaultHandler(new PageDescribeController(blogService, pageService));
 
 		handlerMapping.setOrder(Integer.MAX_VALUE);
@@ -134,8 +132,12 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		BlogLanguageMethodArgumentResolver blogLanguageMethodArgumentResolver = new BlogLanguageMethodArgumentResolver();
+		blogLanguageMethodArgumentResolver.setBlogService(blogService);
+
 		argumentResolvers.add(new PageableHandlerMethodArgumentResolver());
 		argumentResolvers.add(new AuthorizedUserMethodArgumentResolver());
+		argumentResolvers.add(blogLanguageMethodArgumentResolver);
 	}
 
 	@Override
@@ -254,9 +256,9 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Bean
 	public LocaleResolver localeResolver() {
-		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
-		pathVariableLocaleResolver.setBlogService(blogService);
-		return pathVariableLocaleResolver;
+		BlogLanguageLocaleResolver blogLanguageLocaleResolver = new BlogLanguageLocaleResolver();
+		blogLanguageLocaleResolver.setBlogService(blogService);
+		return blogLanguageLocaleResolver;
 	}
 
 	@Bean(name = "atomFeedView")

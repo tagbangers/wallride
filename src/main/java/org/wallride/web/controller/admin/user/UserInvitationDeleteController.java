@@ -15,7 +15,7 @@ import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/{language}/users/invitations/delete")
+@RequestMapping("/users/invitations/delete")
 public class UserInvitationDeleteController {
 
 	@Inject

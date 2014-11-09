@@ -14,7 +14,7 @@ import org.wallride.core.service.MediaService;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/{language}/media/create")
+@RequestMapping("/media/create")
 public class MediaCreateController {
 
 	@Inject

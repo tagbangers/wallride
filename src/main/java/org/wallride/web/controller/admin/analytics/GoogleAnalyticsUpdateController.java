@@ -20,7 +20,7 @@ import org.wallride.core.support.AuthorizedUser;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/{language}/analytics/edit")
+@RequestMapping("/analytics/edit")
 public class GoogleAnalyticsUpdateController {
 
 	@Inject

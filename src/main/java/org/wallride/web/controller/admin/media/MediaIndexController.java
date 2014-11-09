@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 @Controller
-@RequestMapping("/{language}/media/index")
+@RequestMapping("/media/index")
 public class MediaIndexController {
 
 	@Inject

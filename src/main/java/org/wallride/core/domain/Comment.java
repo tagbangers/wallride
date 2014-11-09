@@ -1,5 +1,6 @@
 package org.wallride.core.domain;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
@@ -16,7 +17,7 @@ import javax.persistence.*;
 @Analyzer(definition = "synonyms")
 @Indexed
 @SuppressWarnings("serial")
-public class Comment extends DomainObject<Long> {
+public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -103,5 +104,12 @@ public class Comment extends DomainObject<Long> {
 
 	public void setApproved(boolean approved) {
 		this.approved = approved;
+	}
+
+	public int compareTo(Comment comment) {
+		return new CompareToBuilder()
+				.append(comment.getDate(), getDate())
+				.append(comment.getId(), getId())
+				.toComparison();
 	}
 }

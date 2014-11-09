@@ -28,16 +28,15 @@ import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
-import org.wallride.web.controller.admin.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.AuthorizedUserMethodArgumentResolver;
+import org.wallride.web.support.BlogLanguageLocaleResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
-import org.wallride.web.support.PathVariableLocaleResolver;
 import org.wallride.web.support.SetupRedirectInterceptor;
 
 import javax.inject.Inject;
@@ -233,8 +232,8 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public LocaleResolver localeResolver() {
-		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
-		pathVariableLocaleResolver.setBlogService(blogService);
-		return pathVariableLocaleResolver;
+		BlogLanguageLocaleResolver blogLanguageLocaleResolver = new BlogLanguageLocaleResolver();
+		blogLanguageLocaleResolver.setBlogService(blogService);
+		return blogLanguageLocaleResolver;
 	}
 }

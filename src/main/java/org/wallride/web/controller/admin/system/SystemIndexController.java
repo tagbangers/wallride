@@ -5,7 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/{language}/system/index")
+@RequestMapping("/system/index")
 public class SystemIndexController {
 
 	@RequestMapping

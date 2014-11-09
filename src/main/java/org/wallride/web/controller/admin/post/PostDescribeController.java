@@ -15,7 +15,7 @@ import org.wallride.web.support.HttpNotFoundException;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping(value="/{language}/posts/describe", method= RequestMethod.GET)
+@RequestMapping(value="/posts/describe", method= RequestMethod.GET)
 public class PostDescribeController {
 
 	@Inject

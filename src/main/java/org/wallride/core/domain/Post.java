@@ -84,6 +84,11 @@ public class Post extends DomainObject<Long> {
 	@SortNatural
 	private SortedSet<Post> drafts;
 
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	@SortNatural
+	private SortedSet<Comment> comments;
+
 	@ManyToMany
 	@JoinTable(
 			name="post_related_post",
@@ -209,8 +214,12 @@ public class Post extends DomainObject<Long> {
 		this.drafts = drafts;
 	}
 
-	public List<Media> getMedias() {
-		return medias;
+	public SortedSet<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(SortedSet<Comment> comments) {
+		this.comments = comments;
 	}
 
 	public Set<Post> getRelatedPosts() {
@@ -219,6 +228,10 @@ public class Post extends DomainObject<Long> {
 
 	public void setRelatedPosts(Set<Post> relatedPosts) {
 		this.relatedPosts = relatedPosts;
+	}
+
+	public List<Media> getMedias() {
+		return medias;
 	}
 
 	public void setMedias(List<Media> medias) {

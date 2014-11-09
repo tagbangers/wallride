@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/{language}/error/{code}")
+@RequestMapping("/error/{code}")
 public class ErrorController {
 
 	@RequestMapping

@@ -21,7 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/{language}/account/login")
+@RequestMapping("/account/login")
 public class LoginController {
 	
 	@RequestMapping

@@ -10,7 +10,7 @@ import org.wallride.core.service.BlogService;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/{language}/analytics")
+@RequestMapping("/analytics")
 public class GoogleAnalyticsIndexController {
 
 	@Inject

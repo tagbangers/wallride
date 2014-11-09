@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping(value="/{language}/articles/delete", method=RequestMethod.POST)
+@RequestMapping(value="/articles/delete", method=RequestMethod.POST)
 public class ArticleDeleteController {
 	
 	private static Logger logger = LoggerFactory.getLogger(ArticleDeleteController.class); 

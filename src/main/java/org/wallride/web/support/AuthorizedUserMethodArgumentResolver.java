@@ -1,4 +1,4 @@
-package org.wallride.web.controller.admin;
+package org.wallride.web.support;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

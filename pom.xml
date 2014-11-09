@@ -15,6 +15,7 @@
 		<org.hibernate.version>4.3.5.Final</org.hibernate.version>
 		<org.hibernate.search.version>4.5.1.Final</org.hibernate.search.version>
 		<org.infinispan.version>6.0.2.Final</org.infinispan.version>
+		<com.amazonaws.version>1.9.0</com.amazonaws.version>
 	</properties>
 
 	<repositories>
@@ -216,7 +217,7 @@
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>1.9.0</version>
+			<version>${com.amazonaws.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-logging</artifactId>
@@ -259,6 +260,13 @@
 			<version>1.5.0</version>
 		</dependency>
 		-->
+
+		<!-- Url Rewrite Filter -->
+		<dependency>
+			<groupId>org.tuckey</groupId>
+			<artifactId>urlrewritefilter</artifactId>
+			<version>4.0.4</version>
+		</dependency>
 
 		<!-- Commons -->
 		<dependency>

@@ -22,11 +22,13 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 import org.wallride.config.CoreConfig;
 import org.wallride.core.support.AmazonS3Resource;
 import org.wallride.core.support.AmazonS3ResourceLoader;
 import org.wallride.web.WebAdminConfig;
 import org.wallride.web.WebGuestConfig;
+import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
@@ -73,6 +75,7 @@ public class Application extends SpringBootServletInitializer {
 		registration.setFilter(characterEncodingFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 		registration.addUrlPatterns("/*");
+		registration.setOrder(1);
 		return registration;
 	}
 
@@ -85,6 +88,21 @@ public class Application extends SpringBootServletInitializer {
 		registration.setFilter(hiddenHttpMethodFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 		registration.addUrlPatterns("/*");
+		registration.setOrder(2);
+		return registration;
+	}
+
+	@Bean
+	public FilterRegistrationBean urlRewriteFilter() {
+		UrlRewriteFilter urlRewriteFilter = new ExtendedUrlRewriteFilter();
+
+		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setName("urlRewriteFilter");
+		registration.setFilter(urlRewriteFilter);
+		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
+		registration.addUrlPatterns("/*");
+		registration.setOrder(3);
+		registration.getInitParameters().put("confPath", "classpath:urlrewrite.xml");
 		return registration;
 	}
 

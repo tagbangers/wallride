@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Controller
-@RequestMapping(value="/{language}/users/bulk-delete", method= RequestMethod.POST)
+@RequestMapping(value="/users/bulk-delete", method= RequestMethod.POST)
 public class UserBulkDeleteController {
 
 	@Inject
