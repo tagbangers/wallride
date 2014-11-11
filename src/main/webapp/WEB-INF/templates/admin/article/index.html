@@ -58,7 +58,7 @@
                                 <div class="btn-toolbar wr-bulk-action pull-left">
                                     <div class="btn-group">
                                         <a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
-                                        <a th:href="@{__${ADMIN_PATH}__/articles/index(part=change-status-form)}" data-toggle="modal" data-target="#change-status-modal" class="btn btn-default disabled">Change Status </a>
+                                        <a th:href="@{__${ADMIN_PATH}__/articles/index(part=change-status-form)}" data-toggle="modal" data-target="#change-status-modal" class="btn btn-default">Change All Status </a>
                                     </div>
                                 </div>
                                 <div class="pagination-group pull-right">
@@ -109,26 +109,26 @@
                                             <h4 class="modal-title">Change Status</h4>
                                         </div>
                                         <div class="modal-body">
-                                            <p>Chose new status that you want to change.</p>
+                                            <p>Select a new status that you want to change.</p>
                                             <div class="radio">
-                                                <input type="radio" name="statusArticle"  value="Published" /> Published
+                                                <input type="radio" name="status"  value="PUBLISHED" /> Published
                                             </div>
                                             <div class="radio">
-                                                <input type="radio" name="statusArticle" value="Draft" /> Draft
+                                                <input type="radio" name="status" value="DRAFT" checked="checked" /> Draft
                                             </div>
                                             <div class="radio">
-                                                <input type="radio" name="statusArticle" value="SCHEDULED" /> SCHEDULED
+                                                <input type="radio" name="status" value="SCHEDULED" /> scheduled
                                             </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-                                            <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/change-status}"  >Modify</button>
+                                            <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/change-status}"  >Change</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!--/#Change-status-article-->
-                            
+
                             <!-- #bulk-delete-modal -->
                             <div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div id="bulk-delete-dialog" class="modal-dialog">

@@ -41,4 +41,6 @@ public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCu
 
 	@Query("select count(tag.id) from Tag tag where tag.language = :language ")
 	long count(@Param("language") String language);
+        
+        
 }

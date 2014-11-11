@@ -36,7 +36,6 @@ public class ArticleDeleteController {
 			logger.debug("Errors: {}", errors);
 			return "/article/describe";
 		}
-
 		Article article = null;
 		try {
 			article = articleService.deleteArticle(form.buildArticleDeleteRequest(), errors);

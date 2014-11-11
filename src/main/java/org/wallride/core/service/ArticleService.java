@@ -490,4 +490,8 @@ public class ArticleService {
         articleRepository.save(article);
         return article;
     }
+    
+    public void changeAllStatus(Post.Status status, String language){
+        articleRepository.changeAllStatusArticle(status, language);
+    }
 }

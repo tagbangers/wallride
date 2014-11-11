@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.wallride.core.service;
 
 /**
@@ -11,12 +10,13 @@ package org.wallride.core.service;
  * @author hung132
  */
 public class ArticleChangeStatusRequest {
-    
+
     private Long id;
     private String language;
     private String newStatus;
-    
-    public ArticleChangeStatusRequest(){}
+
+    public ArticleChangeStatusRequest() {
+    }
 
     public Long getId() {
         return id;
@@ -29,28 +29,32 @@ public class ArticleChangeStatusRequest {
     public String getNewStatus() {
         return newStatus;
     }
-    
-    public static class Builder{
+
+    public static class Builder {
+
         private Long id;
         private String language;
         private String newStatus;
 
-        public void setId(Long id) {
+        public Builder id(Long id) {
             this.id = id;
+            return this;
         }
 
-        public void setLanguage(String language) {
+        public Builder language(String language) {
             this.language = language;
+            return this;
         }
 
-        public void setNewStatus(String newStatus) {
+        public Builder status(String newStatus) {
             this.newStatus = newStatus;
+            return this;
         }
-        
-        public  ArticleChangeStatusRequest build(){
+
+        public ArticleChangeStatusRequest build() {
             ArticleChangeStatusRequest request = new ArticleChangeStatusRequest();
             request.id = id;
-            request.language =language;
+            request.language = language;
             request.newStatus = newStatus;
             return request;
         }

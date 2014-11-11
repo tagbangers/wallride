@@ -90,4 +90,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Modifying
 	@Query("delete from Article article where article.drafted = :drafted ")
 	void deleteByDrafted(@Param("drafted") Article dradted);
+        
+        @Modifying
+        @Query("UPDATE Post SET status = :status WHERE language = :language") 
+        void changeAllStatusArticle(@Param("status") Post.Status status, @Param("language") String language);
 }
