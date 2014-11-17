@@ -12,7 +12,7 @@ import org.wallride.core.service.BlogService;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/analytics")
+@RequestMapping("/{language}/analytics")
 public class GoogleAnalyticsDeleteController {
 
 	@Inject

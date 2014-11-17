@@ -45,13 +45,13 @@ public class CategoryRestController {
 		return RestValidationErrorModel.fromBindingResult(e.getBindingResult(), messageSourceAccessor);
 	}
 
-	@RequestMapping(value="/categories", method= RequestMethod.GET)
+	@RequestMapping(value="/{language}/categories", method= RequestMethod.GET)
 	public @ResponseBody CategoryIndexModel index(@PathVariable String language) {
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);
 		return new CategoryIndexModel(categoryTree);
 	}
 
-	@RequestMapping(value="/categories", method=RequestMethod.POST)
+	@RequestMapping(value="/{language}/categories", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectSavedModel save(
 			@Valid CategoryCreateForm form,
 			BindingResult result,
@@ -68,7 +68,7 @@ public class CategoryRestController {
 		return new DomainObjectSavedModel<Long>(category);
 	}
 
-	@RequestMapping(value="/categories/{id}", method=RequestMethod.POST)
+	@RequestMapping(value="/{language}/categories/{id}", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectUpdatedModel update(
 			@Valid CategoryEditForm form,
 			BindingResult result,
@@ -87,7 +87,7 @@ public class CategoryRestController {
 		return new DomainObjectUpdatedModel<Long>(category);
 	}
 
-	@RequestMapping(value="/categories/{id}", method= RequestMethod.DELETE)
+	@RequestMapping(value="/{language}/categories/{id}", method= RequestMethod.DELETE)
 	public @ResponseBody DomainObjectDeletedModel<Long> delete(
 			@PathVariable String language,
 			@PathVariable long id,
@@ -101,7 +101,7 @@ public class CategoryRestController {
 		return new DomainObjectDeletedModel<Long>(category);
 	}
 
-	@RequestMapping(value="/categories", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/{language}/categories", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody CategoryIndexModel sort(@PathVariable String language, @RequestBody List<Map<String, Object>> data) {
 		categoryService.updateCategoryHierarchy(data, language);
 		CategoryTree categoryTree = categoryService.readCategoryTree(language);

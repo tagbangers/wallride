@@ -11,7 +11,7 @@ import org.wallride.core.service.PostService;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/analytics/sync")
+@RequestMapping("/{language}/analytics/sync")
 public class GoogleAnalyticsSyncController {
 
 	@Inject

@@ -12,7 +12,7 @@ import org.wallride.core.service.SystemService;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/system/re-index")
+@RequestMapping("/{language}/system/re-index")
 public class ReIndexController {
 
 	private static final int BATCH_SIZE = 10;

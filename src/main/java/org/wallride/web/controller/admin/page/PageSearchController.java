@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/pages/index")
+@RequestMapping("/{language}/pages/index")
 public class PageSearchController extends DomainObjectSearchController<Page, PageSearchForm> {
 	
 	@Inject

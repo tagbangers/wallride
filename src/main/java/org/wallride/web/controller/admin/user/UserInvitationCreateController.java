@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Controller
-@RequestMapping("/users/invitations/create")
+@RequestMapping("/{language}/users/invitations/create")
 public class UserInvitationCreateController {
 
 	@Inject

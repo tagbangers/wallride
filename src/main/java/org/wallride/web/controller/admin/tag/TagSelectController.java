@@ -20,7 +20,7 @@ public class TagSelectController {
 	@Inject
 	private TagService tagService;
 
-	@RequestMapping(value="/tags/select")
+	@RequestMapping(value="/{language}/tags/select")
 	public @ResponseBody List<DomainObjectSelectModel> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
@@ -39,7 +39,7 @@ public class TagSelectController {
 		return results;
 	}
 
-	@RequestMapping(value="/tags/select/{id}", method= RequestMethod.GET)
+	@RequestMapping(value="/{language}/tags/select/{id}", method= RequestMethod.GET)
 	public @ResponseBody DomainObjectSelectModel select(
 			@PathVariable String language,
 			@PathVariable Long id,

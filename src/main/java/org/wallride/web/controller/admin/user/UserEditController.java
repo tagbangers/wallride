@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 
 @Controller
-@RequestMapping("/users/edit")
+@RequestMapping("/{language}/users/edit")
 public class UserEditController {
 	
 	private static Logger logger = LoggerFactory.getLogger(UserEditController.class);

@@ -45,18 +45,18 @@ public class PageRestController {
 		return RestValidationErrorModel.fromBindingResult(e.getBindingResult(), messageSourceAccessor);
 	}
 
-	@RequestMapping(value="/pages", method= RequestMethod.GET)
+	@RequestMapping(value="/{language}/pages", method= RequestMethod.GET)
 	public @ResponseBody PageIndexModel index(@PathVariable String language) {
 		PageTree pageTree = pageService.readPageTree(language);
 		return new PageIndexModel(pageTree);
 	}
 
-//	@RequestMapping(value="/pages/{id}", method= RequestMethod.GET)
+//	@RequestMapping(value="/{language}/pages/{id}", method= RequestMethod.GET)
 //	public void describe() {
 //
 //	}
 
-	@RequestMapping(value="/pages", method=RequestMethod.POST)
+	@RequestMapping(value="/{language}/pages", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectSavedModel save(
 			@Valid PageCreateForm form,
 			BindingResult result,
@@ -73,7 +73,7 @@ public class PageRestController {
 		return new DomainObjectSavedModel<>(page);
 	}
 
-//	@RequestMapping(value="/pages/{id}", method=RequestMethod.POST)
+//	@RequestMapping(value="/{language}/pages/{id}", method=RequestMethod.POST)
 //	public @ResponseBody DomainObjectUpdatedModel update(
 //			@Valid PageEditForm form,
 //			BindingResult result,
@@ -92,7 +92,7 @@ public class PageRestController {
 //		return new DomainObjectUpdatedModel<Long>(page);
 //	}
 
-	@RequestMapping(value="/pages/{id}", method= RequestMethod.DELETE)
+	@RequestMapping(value="/{language}/pages/{id}", method= RequestMethod.DELETE)
 	public @ResponseBody DomainObjectDeletedModel<Long> delete(
 			@PathVariable String language,
 			@PathVariable long id,
@@ -106,7 +106,7 @@ public class PageRestController {
 		return new DomainObjectDeletedModel<Long>(page);
 	}
 
-	@RequestMapping(value="/pages", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/{language}/pages", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody PageIndexModel sort(@PathVariable String language, @RequestBody List<Map<String, Object>> data) {
 		pageService.updatePageHierarchy(data, language);
 		PageTree pageTree = pageService.readPageTree(language);

@@ -26,7 +26,7 @@ import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
-@RequestMapping("/pages/edit")
+@RequestMapping("/{language}/pages/edit")
 public class PageEditController {
 	
 	private static Logger logger = LoggerFactory.getLogger(PageEditController.class); 

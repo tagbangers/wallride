@@ -24,7 +24,7 @@ public class PostSelectController {
 	@Inject
 	private PostService postService;
 
-	@RequestMapping(value="/posts/select")
+	@RequestMapping(value="/{language}/posts/select")
 	public @ResponseBody List<DomainObjectSelectModel> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
@@ -43,7 +43,7 @@ public class PostSelectController {
 		return results;
 	}
 
-	@RequestMapping(value="/posts/select/{id}")
+	@RequestMapping(value="/{language}/posts/select/{id}")
 	public @ResponseBody DomainObjectSelectModel select(
 			@PathVariable String language,
 			@RequestParam Long id,

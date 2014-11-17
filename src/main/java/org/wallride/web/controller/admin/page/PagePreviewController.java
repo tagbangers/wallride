@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/pages/preview")
+@RequestMapping("/{language}/pages/preview")
 public class PagePreviewController {
 
 	@Inject

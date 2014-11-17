@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/tags/index")
+@RequestMapping("/{language}/tags/index")
 @SessionAttributes(types = {TagSearchForm.class})
 public class TagSearchController {
 

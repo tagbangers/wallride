@@ -40,7 +40,7 @@ public class TagRestController {
 		return RestValidationErrorModel.fromBindingResult(e.getBindingResult(), messageSourceAccessor);
 	}
 
-	@RequestMapping(value="/tags", method=RequestMethod.POST)
+	@RequestMapping(value="/{language}/tags", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectSavedModel save(
 			@Valid TagCreateForm form,
 			BindingResult errors,
@@ -65,7 +65,7 @@ public class TagRestController {
 		return new DomainObjectSavedModel<>(savedTag);
 	}
 
-	@RequestMapping(value="/tags/{id}", method=RequestMethod.POST)
+	@RequestMapping(value="/{language}/tags/{id}", method=RequestMethod.POST)
 	public @ResponseBody DomainObjectUpdatedModel update(
 			@Valid TagEditForm form,
 			BindingResult errors,

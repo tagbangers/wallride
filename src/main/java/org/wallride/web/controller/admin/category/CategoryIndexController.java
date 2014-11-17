@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/categories/index")
+@RequestMapping("/{language}/categories/index")
 public class CategoryIndexController {
 
 	@Inject

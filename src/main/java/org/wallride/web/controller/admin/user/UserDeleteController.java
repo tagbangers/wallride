@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping(value="/users/delete", method= RequestMethod.POST)
+@RequestMapping(value="/{language}/users/delete", method= RequestMethod.POST)
 public class UserDeleteController {
 	
 	private static Logger logger = LoggerFactory.getLogger(UserDeleteController.class);

@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 @Controller
-@RequestMapping("/users/invitations/index")
+@RequestMapping("/{language}/users/invitations/index")
 public class UserInvitationIndexController {
 
 	@Inject

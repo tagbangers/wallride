@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Controller
-@RequestMapping(value="/pages/bulk-delete", method=RequestMethod.POST)
+@RequestMapping(value="/{language}/pages/bulk-delete", method=RequestMethod.POST)
 public class PageBulkDeleteController {
 
 	@Inject

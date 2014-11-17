@@ -7,7 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.*;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Post;
 import org.wallride.core.service.*;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
@@ -20,8 +23,8 @@ public class DashboardController {
 	private static final int POPULAR_POSTS_DAYS = 7;
 	private static final int POPULAR_POSTS_COUNT = 10;
 
-//	@Inject
-//	private BlogService blogService;
+	@Inject
+	private BlogService blogService;
 	@Inject
 	private PostService postService;
 	@Inject
@@ -31,31 +34,28 @@ public class DashboardController {
 	@Inject
 	private CategoryService categoryService;
 	
-//	@RequestMapping({"/","/dashboard"})
-//	public String dashboard(RedirectAttributes redirectAttributes) {
-//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-//		String defaultLanguage = blog.getDefaultLanguage();
-//		redirectAttributes.addAttribute("language", defaultLanguage);
-//		return "redirect:/_admin/{language}/";
-//	}
-
 	@RequestMapping({"/","/dashboard"})
-	public String dashboard(
-//			@PathVariable String language,
-			BlogLanguage blogLanguage,
-			Model model) {
-		long articleCount = articleService.countArticlesByStatus(Post.Status.PUBLISHED, blogLanguage.getLanguage());
-		long pageCount = pageService.countPagesByStatus(Post.Status.PUBLISHED, blogLanguage.getLanguage());
+	public String dashboard(RedirectAttributes redirectAttributes) {
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		String defaultLanguage = blog.getDefaultLanguage();
+		redirectAttributes.addAttribute("language", defaultLanguage);
+		return "redirect:/_admin/{language}/";
+	}
+	
+	@RequestMapping("/{language}/")
+	public String dashboard(@PathVariable String language, Model model) {
+		long articleCount = articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
+		long pageCount = pageService.countPagesByStatus(Post.Status.PUBLISHED, language);
 
-		CategoryTree categoryTreeHasArticle = categoryService.readCategoryTree(blogLanguage.getLanguage(), true);
+		CategoryTree categoryTreeHasArticle = categoryService.readCategoryTree(language, true);
 		long categoryCount = categoryTreeHasArticle.getCategories().size();
 
 		model.addAttribute("articleCount", articleCount);
 		model.addAttribute("pageCount", pageCount);
 		model.addAttribute("categoryCount", categoryCount);
-		model.addAttribute("popularPosts", popularPosts(blogLanguage.getLanguage()));
-		model.addAttribute("recentPublishedArticles", recentPublishedArticles(blogLanguage.getLanguage()));
-		model.addAttribute("recentDraftArticles", recentDraftArticles(blogLanguage.getLanguage()));
+		model.addAttribute("popularPosts", popularPosts(language));
+		model.addAttribute("recentPublishedArticles", recentPublishedArticles(language));
+		model.addAttribute("recentDraftArticles", recentDraftArticles(language));
 
 		return "dashboard";
 	}

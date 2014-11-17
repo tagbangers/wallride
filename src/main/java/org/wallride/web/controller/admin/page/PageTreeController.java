@@ -13,7 +13,7 @@ import org.wallride.core.service.PageService;
 import javax.inject.Inject;
 
 @Controller
-@RequestMapping("/pages/tree")
+@RequestMapping("/{language}/pages/tree")
 public class PageTreeController {
 
 	@Inject
