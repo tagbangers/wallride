@@ -45,7 +45,7 @@ public class CommentController {
 			throw new BindException(result);
 		}
 
-		CreateCommentRequest request = form.toCreateCommentRequest(authorizedUser);
+		CreateCommentRequest request = form.toCreateCommentRequest(blogLanguage, authorizedUser);
 		Comment comment = commentService.createComment(request, authorizedUser);
 		return comment;
 	}

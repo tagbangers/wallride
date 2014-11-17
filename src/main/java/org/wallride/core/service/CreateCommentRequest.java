@@ -1,17 +1,26 @@
 package org.wallride.core.service;
 
 import org.joda.time.LocalDateTime;
+import org.wallride.core.domain.BlogLanguage;
 
 import java.io.Serializable;
 
 public class CreateCommentRequest implements Serializable {
 
+	private BlogLanguage blogLanguage;
 	private long postId;
 	private long authorId;
 	private LocalDateTime date;
 	private String content;
 	private boolean approved;
-	private String language;
+
+	public BlogLanguage getBlogLanguage() {
+		return blogLanguage;
+	}
+
+	public void setBlogLanguage(BlogLanguage blogLanguage) {
+		this.blogLanguage = blogLanguage;
+	}
 
 	public long getPostId() {
 		return postId;
@@ -51,14 +60,6 @@ public class CreateCommentRequest implements Serializable {
 
 	public void setApproved(boolean approved) {
 		this.approved = approved;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 }
 
