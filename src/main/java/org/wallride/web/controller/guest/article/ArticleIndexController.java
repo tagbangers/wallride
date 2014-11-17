@@ -56,12 +56,12 @@ public class ArticleIndexController {
 
 	@RequestMapping("/{year:[0-9]{4}}")
 	public String year(
-			@PathVariable String language,
 			@PathVariable int year,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.setDateFrom(new LocalDateTime(year, 1, 1, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, 12, 31, 0, 0, 0));
 
@@ -74,13 +74,13 @@ public class ArticleIndexController {
 
 	@RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}")
 	public String month(
-			@PathVariable String language,
 			@PathVariable int year,
 			@PathVariable int month,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		LocalDateTime date = new LocalDateTime(year, month, 1, 0, 0, 0);
 		form.setDateFrom(new LocalDateTime(year, month, 1, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, month, date.dayOfMonth().getMaximumValue(), 23, 59, 59));
@@ -94,14 +94,14 @@ public class ArticleIndexController {
 
 	@RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}")
 	public String day(
-			@PathVariable String language,
 			@PathVariable int year,
 			@PathVariable int month,
 			@PathVariable int day,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.setDateFrom(new LocalDateTime(year, month, day, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, month, day, 23, 59, 59));
 
@@ -114,19 +114,19 @@ public class ArticleIndexController {
 
 	@RequestMapping("/category/**")
 	public String category(
-			@PathVariable String language,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			HttpServletRequest request,
 			Model model) {
 		String path = extractPathFromPattern(request);
 		String[] codes = path.split("/");
 		String lastCode = codes[codes.length - 1];
 
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.readCategoryTree(blogLanguage.getLanguage());
 		Category category = categoryTree.getCategoryByCode(lastCode);
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.getCategoryIds().add(category.getId());
 
 		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
@@ -149,18 +149,18 @@ public class ArticleIndexController {
 
 	@RequestMapping("/tag/{name}")
 	public String tag(
-			@PathVariable String language,
 			@PathVariable String name,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			HttpServletRequest request,
 			Model model) {
-		Tag tag = tagService.readTagByName(name, language);
+		Tag tag = tagService.readTagByName(name, blogLanguage.getLanguage());
 		if (tag == null) {
 			throw new HttpNotFoundException();
 		}
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.getTagIds().add(tag.getId());
 
 		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
@@ -173,9 +173,9 @@ public class ArticleIndexController {
 
 	@RequestMapping("/author/{loginId}")
 	public String author(
-			@PathVariable String language,
 			@PathVariable String loginId,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			HttpServletRequest request,
 			Model model) {
 		User author = userService.readUserByLoginId(loginId);
@@ -184,7 +184,7 @@ public class ArticleIndexController {
 		}
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.setAuthorId(author.getId());
 
 		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);

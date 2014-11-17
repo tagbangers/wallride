@@ -8,6 +8,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.service.CommentService;
 import org.wallride.core.service.CreateCommentRequest;
@@ -36,9 +37,9 @@ public class CommentController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
 	public Comment create(
-			@PathVariable String language,
 			@Validated CommentForm form,
 			BindingResult result,
+			BlogLanguage blogLanguage,
 			AuthorizedUser authorizedUser) throws BindException {
 		if (result.hasErrors()) {
 			throw new BindException(result);

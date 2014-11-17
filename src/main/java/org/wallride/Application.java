@@ -41,6 +41,12 @@ import java.util.EnumSet;
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {
 
+	public static final String GUEST_SERVLET_NAME = "guestServlet";
+	public static final String GUEST_SERVLET_PATH = "";
+
+	public static final String ADMIN_SERVLET_NAME = "adminServlet";
+	public static final String ADMIN_SERVLET_PATH = "/_admin";
+
 	public static void main(String[] args) {
 //		SpringApplication.run(Application.class, args);
 		new SpringApplicationBuilder(Application.class)
@@ -114,9 +120,9 @@ public class Application extends SpringBootServletInitializer {
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
 
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
-		registration.setName("adminServlet");
+		registration.setName(ADMIN_SERVLET_NAME);
 		registration.setLoadOnStartup(1);
-		registration.addUrlMappings("/_admin/*");
+		registration.addUrlMappings(ADMIN_SERVLET_PATH + "/*");
 		return registration;
 	}
 
@@ -129,9 +135,9 @@ public class Application extends SpringBootServletInitializer {
 
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
 //		registration.setName(DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME);
-		registration.setName("guestServlet");
+		registration.setName(GUEST_SERVLET_NAME);
 		registration.setLoadOnStartup(2);
-		registration.addUrlMappings("/*");
+		registration.addUrlMappings(GUEST_SERVLET_PATH + "/*");
 		return registration;
 	}
 

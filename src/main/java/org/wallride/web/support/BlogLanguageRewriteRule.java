@@ -1,10 +1,12 @@
 package org.wallride.web.support;
 
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.UrlPathHelper;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteMatch;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteRule;
+import org.wallride.Application;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.service.BlogService;
@@ -25,16 +27,22 @@ public class BlogLanguageRewriteRule extends RewriteRule {
 
 	@Override
 	public RewriteMatch matches(HttpServletRequest request, HttpServletResponse response) {
+		UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+		String servletPath = urlPathHelper.getOriginatingServletPath(request);
+		if (ObjectUtils.nullSafeEquals(servletPath, Application.ADMIN_SERVLET_PATH)) {
+			return null;
+		}
+
+		String lookupPath = urlPathHelper.getLookupPathForRequest(request);
+
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
 		BlogService blogService = context.getBean(BlogService.class);
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 
-		UrlPathHelper urlPathHelper = new UrlPathHelper();
-		String path = urlPathHelper.getLookupPathForRequest(request);
-
 		BlogLanguage matchedBlogLanguage = null;
 		for (BlogLanguage blogLanguage : blog.getLanguages()) {
-			if (path.startsWith("/" + blogLanguage.getLanguage() + "/")) {
+			if (lookupPath.startsWith("/" + blogLanguage.getLanguage() + "/")) {
 				matchedBlogLanguage = blogLanguage;
 				break;
 			}

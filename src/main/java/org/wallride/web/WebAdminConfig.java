@@ -35,8 +35,8 @@ import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
 import org.wallride.core.support.Settings;
 import org.wallride.web.support.AuthorizedUserMethodArgumentResolver;
-import org.wallride.web.support.BlogLanguageLocaleResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
+import org.wallride.web.support.PathVariableLocaleResolver;
 import org.wallride.web.support.SetupRedirectInterceptor;
 
 import javax.inject.Inject;
@@ -232,8 +232,8 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
 	public LocaleResolver localeResolver() {
-		BlogLanguageLocaleResolver blogLanguageLocaleResolver = new BlogLanguageLocaleResolver();
-		blogLanguageLocaleResolver.setBlogService(blogService);
-		return blogLanguageLocaleResolver;
+		PathVariableLocaleResolver pathVariableLocaleResolver = new PathVariableLocaleResolver();
+		pathVariableLocaleResolver.setBlogService(blogService);
+		return pathVariableLocaleResolver;
 	}
 }

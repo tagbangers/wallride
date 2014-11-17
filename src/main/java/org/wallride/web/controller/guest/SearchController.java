@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PostService;
 import org.wallride.core.service.SearchPostRequest;
@@ -24,11 +25,11 @@ public class SearchController {
 
 	@RequestMapping
 	public String search(
-			@PathVariable String language,
 			@RequestParam String keyword,
 			@PageableDefault(50) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
-		SearchPostRequest request = new SearchPostRequest(language).withKeyword(keyword);
+		SearchPostRequest request = new SearchPostRequest(blogLanguage.getLanguage()).withKeyword(keyword);
 		Page<Post> posts = postService.readPosts(request, pageable);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("posts", posts);
