@@ -11,6 +11,7 @@ import org.wallride.core.domain.Tag;
 import javax.persistence.LockModeType;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
 
 @Repository
 @Transactional
@@ -42,5 +43,7 @@ public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCu
 	@Query("select count(tag.id) from Tag tag where tag.language = :language ")
 	long count(@Param("language") String language);
         
+//        @Query("SELECT DISTINCT  a.id FROM  Tag t LEFT JOIN t.articles a WHERE t.id IN :ids")
+//        List<Long> findArticleIdByTagIdForMerge(@Param("ids") List<Long> tagId);
         
 }

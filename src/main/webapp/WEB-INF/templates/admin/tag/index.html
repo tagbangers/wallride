@@ -95,12 +95,12 @@
                                         <div class="modal-body">
                                             <div class="form-group">
                                                 <p>Tag name of the merged</p>
-                                                <input type="text"  id="input1" name="newtagname" placeholder="Enter a large new tag" class="form-control" />
+                                                <input type="text"  id="input1" name="newTagName" placeholder="Enter a large new tag" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-default" data-dismiss="modal" >Close</button>
-                                            <button class="btn btn-primary"  id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}" disabled="disabled" >Save Changes</button>
+                                            <button class="btn btn-primary"  id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}"  >Save Changes</button> 
                                         </div>
                                     </div>
                                 </div>
@@ -130,14 +130,14 @@
                                 // <![CDATA[
                                 $(function() {
 
-                                      $('#input1').on('keyup', (function() {
-                                          if ($(this).val() == '') {
-                                              $('#button1').prop('disabled', false);
-                                          } else{
-                                              $('#button1').prop('disabled', true);
-                                            }
-                                    });
-                                    
+//                                      $('#input1').on('keyup', (function() {
+//                                          if ($(this).val() == '') {
+//                                              $('#button1').prop('disabled', false);
+//                                          } else{
+//                                              $('#button1').prop('disabled', true);
+//                                            }
+//                                    });
+//                                    
                                     $('#bulk-delete-modal').on('hidden.bs.modal', function() {
                                         $(this).removeData('bs.modal');
                                     });
@@ -201,7 +201,7 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div class="form-group">
-                                                    <input type="text" name="name" class="form-control" th:attr="placeholder=#{TagName}" />
+                                                    <input type="text" name="name" class="form-control" th:attr="placeholder=#{TagName}"/>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">

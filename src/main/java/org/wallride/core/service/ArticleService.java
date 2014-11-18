@@ -494,4 +494,9 @@ public class ArticleService {
     public void changeAllStatus(Post.Status status, String language){
         articleRepository.changeAllStatusArticle(status, language);
     }
+    
+    public void updateArticleForTagMerging(Article article){
+        articleRepository.saveAndFlush(article);
+    }
+    
 }

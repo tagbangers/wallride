@@ -59,6 +59,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 
 	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.drafted = :drafted and article.id = (select max(article.id) from article where article.drafted = :drafted) ")
 	Article findDraft(@Param("drafted") Article drafted);
+        
+        @Query("SELECT  DISTINCT article  FROM Article article LEFT JOIN FETCH article.tags t WHERE t.id IN :ids")
+        List<Article> findByTagIds(@Param("ids") List<Long> ids) ;
 
 	@Query("select count(article.id) from Article article where article.language = :language and article.drafted is null ")
 	long count(@Param("language") String language);

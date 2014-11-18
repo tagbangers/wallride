@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" th:replace="layout::head('WallRide')" />
+        <title>Tags | WallRide</title>
+    </head>
+    <body>
+        <h1>FOR TEST</h1>
+        <h1 th:each="id: ${ids}">
+            <h1 th:text="${id}"></h1>
+        </h1>
+
+        <h1 th:text="${newtagname}">dsds</h1>
+        ---------------------
+        <h1 th:each="article : ${listArticle}">
+            <h1 th:text="${article['title']}"></h1>
+        </h1>
+    </body>
+</html>
