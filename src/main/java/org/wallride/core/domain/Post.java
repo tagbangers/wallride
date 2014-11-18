@@ -1,5 +1,6 @@
 package org.wallride.core.domain;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -89,7 +90,14 @@ public class Post extends DomainObject<Long> {
 			name="post_related_post",
 			joinColumns = { @JoinColumn(name="post_id")},
 			inverseJoinColumns = { @JoinColumn(name="related_id") })
-	private Set<Post> relatedPosts = new HashSet<>();
+	private Set<Post> relatedToPosts = new HashSet<>();
+
+	@ManyToMany
+	@JoinTable(
+			name="post_related_post",
+			joinColumns = { @JoinColumn(name="related_id")},
+			inverseJoinColumns = { @JoinColumn(name="post_id") })
+	private Set<Post> relatedByPosts = new HashSet<>();
 
 	@ManyToMany
 	@JoinTable(name="post_media", joinColumns=@JoinColumn(name="post_id", referencedColumnName="id"), inverseJoinColumns=@JoinColumn(name="media_id", referencedColumnName="id"))
@@ -213,12 +221,24 @@ public class Post extends DomainObject<Long> {
 		return medias;
 	}
 
-	public Set<Post> getRelatedPosts() {
-		return relatedPosts;
+	public List<Post> getRelatedPosts() {
+		return (List<Post>)CollectionUtils.union(getRelatedToPosts(), getRelatedByPosts());
 	}
 
-	public void setRelatedPosts(Set<Post> relatedPosts) {
-		this.relatedPosts = relatedPosts;
+	public Set<Post> getRelatedToPosts() {
+		return relatedToPosts;
+	}
+
+	public void setRelatedToPosts(Set<Post> relatedToPosts) {
+		this.relatedToPosts = relatedToPosts;
+	}
+
+	public Set<Post> getRelatedByPosts() {
+		return relatedByPosts;
+	}
+
+	public void setRelatedByPosts(Set<Post> relatedByPosts) {
+		this.relatedByPosts = relatedByPosts;
 	}
 
 	public void setMedias(List<Media> medias) {

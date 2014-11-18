@@ -143,7 +143,7 @@ public class ArticleService {
 		for (long relatedId : request.getRelatedPostIds()) {
 			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
 		}
-		article.setRelatedPosts(relatedPosts);
+		article.setRelatedToPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());
@@ -322,7 +322,7 @@ public class ArticleService {
 		for (long relatedId : request.getRelatedPostIds()) {
 			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
 		}
-		article.setRelatedPosts(relatedPosts);
+		article.setRelatedToPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());

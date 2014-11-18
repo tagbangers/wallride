@@ -94,7 +94,7 @@
 								<dt th:text="#{RelatedPosts}">Related Posts</dt>
 								<dd>
 									<ul class="list-unstyled">
-										<li th:each="relatedPost : ${page.relatedPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
+										<li th:each="relatedPost : ${page.relatedToPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
 									</ul>
 								</dd>
 							</dl>

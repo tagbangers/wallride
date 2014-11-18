@@ -203,7 +203,7 @@ public class ArticleEditForm extends DomainObjectEditForm {
 		}
 		form.setTags(StringUtils.join(tagNames, ","));
 
-		for (Post post : article.getRelatedPosts()) {
+		for (Post post : article.getRelatedToPosts()) {
 			form.getRelatedPostIds().add(post.getId());
 		}
 
