@@ -1,4 +1,4 @@
-package org.wallride.web.controller.guest.account;
+package org.wallride.web.controller.guest.user;
 
 import org.hibernate.validator.constraints.Email;
 import org.wallride.core.domain.PersonalName;

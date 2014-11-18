@@ -7,7 +7,7 @@
 		<meta name="description" />
 		<meta name="keywords" />
 		<meta name="author" content="" />
-		<title>Signup</title>
+		<title>Profile</title>
 		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
 		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
 		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/atom.xml}" />
@@ -33,9 +33,9 @@
 				<div class="row">
 					<div class="col-sm-6">
 						<div class="page-header">
-							<h1><span th:text="#{Signup}">Signup</span></h1>
+							<h1>Profile</h1>
 						</div>
-						<form th:action="@{__${WEBSITE_PATH}__/account/signup}" th:object="${form}" method="post" role="form">
+						<form th:action="@{__${WEBSITE_PATH}__/signup}" th:object="${form}" method="post" role="form">
 							<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}" th:text="#{Error}">Error</p>
 							<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
 								<label class="control-label" th:text="#{Email}">E-mail</label>
@@ -49,13 +49,6 @@
 								<div>
 									<input type="text" th:field="*{loginId}" class="form-control" th:attr="placeholder=#{LoginId}" autocomplete="off" />
 									<span class="help-block" th:each="err : ${#fields.errors('loginId')}" th:text="${err}" />
-								</div>
-							</div>
-							<div class="form-group" th:classappend="${#fields.hasErrors('loginPassword')}? has-error">
-								<label class="control-label" th:text="#{Password}">Password</label>
-								<div>
-									<input type="password" th:field="*{loginPassword}" class="form-control" th:attr="placeholder=#{Password}" placeholder="Password" autocomplete="off" />
-									<span class="help-block" th:each="err : ${#fields.errors('loginPassword')}" th:text="${err}" />
 								</div>
 							</div>
 							<div class="form-group" th:classappend="${#fields.hasErrors('name.firstName')}? has-error">
@@ -73,7 +66,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<button class="btn btn-lg btn-primary"><span class="glyphicon glyphicon-ok"></span> <span th:text="#{Signup}">Signup</span></button>
+								<button class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> <span th:text="#{Save}">Save</span></button>
 							</div>
 						</form>
 					</div>

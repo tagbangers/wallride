@@ -5,7 +5,7 @@ import org.wallride.core.domain.BlogLanguage;
 
 import java.io.Serializable;
 
-public class CreateCommentRequest implements Serializable {
+public class CommentCreateRequest implements Serializable {
 
 	private BlogLanguage blogLanguage;
 	private long postId;

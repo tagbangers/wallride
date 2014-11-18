@@ -3,7 +3,7 @@ package org.wallride.web.controller.guest.comment;
 import org.joda.time.LocalDateTime;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.User;
-import org.wallride.core.service.CreateCommentRequest;
+import org.wallride.core.service.CommentCreateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -31,8 +31,8 @@ public class CommentForm implements Serializable {
 		this.content = content;
 	}
 
-	public CreateCommentRequest toCreateCommentRequest(BlogLanguage blogLanguage, User author) {
-		CreateCommentRequest request = new CreateCommentRequest();
+	public CommentCreateRequest toCreateCommentRequest(BlogLanguage blogLanguage, User author) {
+		CommentCreateRequest request = new CommentCreateRequest();
 		request.setBlogLanguage(blogLanguage);
 		request.setPostId(getPostId());
 		request.setAuthorId(author.getId());

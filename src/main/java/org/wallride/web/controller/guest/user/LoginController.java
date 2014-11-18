@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package org.wallride.web.controller.guest.account;
+package org.wallride.web.controller.guest.user;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/account/login")
+@RequestMapping("/login")
 public class LoginController {
 	
 	@RequestMapping
 	public String form() {
-		return "account/login";
+		return "user/login";
 	}
 	
 	@RequestMapping(params="failed")
 	public String failed(Model model) {
 		model.addAttribute("failed", true);
-		return "account/login";
+		return "user/login";
 	}
 }

@@ -28,7 +28,7 @@ public class CommentService {
 
 	private static Logger logger = LoggerFactory.getLogger(CommentService.class);
 
-	public Comment createComment(CreateCommentRequest request, AuthorizedUser createdBy) {
+	public Comment createComment(CommentCreateRequest request, AuthorizedUser createdBy) {
 		Post post = postRepository.findById(request.getPostId(), request.getBlogLanguage().getLanguage());
 		if (post == null) {
 			throw new ServiceException("Post was not found [" + request.getPostId() + "]");

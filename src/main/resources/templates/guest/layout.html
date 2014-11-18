@@ -46,13 +46,14 @@
 							<li th:each="node : ${PAGE_TREE.rootNodes}" th:classappend="${node.contains(page) ? 'active' : ''}"><a th:href="@{__${WEBSITE_PATH}__/__${node.page.code}__}" th:text="${node.page.title}">About</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
-							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{__${WEBSITE_PATH}__/account/signup}">Sign Up</a></li>
-							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{__${WEBSITE_PATH}__/account/login}">Log In</a></li>
+							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{__${WEBSITE_PATH}__/signup}">Sign Up</a></li>
+							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{__${WEBSITE_PATH}__/login}">Log In</a></li>
 							<li class="dropdown" sec:authorize="hasRole('ROLE_VIEWER')">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span th:text="${#authentication.name}">User Name</span> <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li><a href="#">Settings</a></li>
-									<li><a th:href="@{__${WEBSITE_PATH}__/account/logout}">Log Out</a></li>
+									<li><a th:href="@{__${WEBSITE_PATH}__/settings/profile}">Edit Profile</a></li>
+									<li><a th:href="@{__${WEBSITE_PATH}__/settings/password}">Edit Password</a></li>
+									<li><a th:href="@{__${WEBSITE_PATH}__/logout}">Log Out</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">

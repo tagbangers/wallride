@@ -108,8 +108,8 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 
 	public int compareTo(Comment comment) {
 		return new CompareToBuilder()
-				.append(comment.getDate(), getDate())
-				.append(comment.getId(), getId())
+				.append(getDate(), comment.getDate())
+				.append(getId(), comment.getId())
 				.toComparison();
 	}
 }

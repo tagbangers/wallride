@@ -6,7 +6,7 @@ import org.wallride.core.domain.Post;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SearchPostRequest {
+public class PostSearchRequest {
 
 	private Collection<Long> postIds = new ArrayList<>();
 	private Post.Status status = Post.Status.PUBLISHED;
@@ -15,7 +15,7 @@ public class SearchPostRequest {
 	private LocalDateTime dateTo;
 	private String language;
 
-	public SearchPostRequest(String language) {
+	public PostSearchRequest(String language) {
 		this.language = language;
 	}
 
@@ -27,7 +27,7 @@ public class SearchPostRequest {
 		this.postIds = postIds;
 	}
 
-	public SearchPostRequest withPostIds(Long... postIds) {
+	public PostSearchRequest withPostIds(Long... postIds) {
 		if (getPostIds() == null) {
 			setPostIds(new ArrayList<Long>(postIds.length));
 		}
@@ -45,7 +45,7 @@ public class SearchPostRequest {
 		this.status = status;
 	}
 	
-	public SearchPostRequest withStatus(Post.Status status) {
+	public PostSearchRequest withStatus(Post.Status status) {
 		this.status = status;
 		return this;
 	}
@@ -58,7 +58,7 @@ public class SearchPostRequest {
 		this.keyword = keyword;
 	}
 
-	public SearchPostRequest withKeyword(String keyword) {
+	public PostSearchRequest withKeyword(String keyword) {
 		this.keyword = keyword;
 		return this;
 	}
@@ -71,7 +71,7 @@ public class SearchPostRequest {
 		this.dateFrom = dateFrom;
 	}
 
-	public SearchPostRequest withDateFrom(LocalDateTime dateFrom) {
+	public PostSearchRequest withDateFrom(LocalDateTime dateFrom) {
 		this.dateFrom = dateFrom;
 		return this;
 	}
@@ -84,7 +84,7 @@ public class SearchPostRequest {
 		this.dateTo = dateTo;
 	}
 
-	public SearchPostRequest withDateTo(LocalDateTime dateTo) {
+	public PostSearchRequest withDateTo(LocalDateTime dateTo) {
 		this.dateTo = dateTo;
 		return this;
 	}
@@ -97,7 +97,7 @@ public class SearchPostRequest {
 		this.language = language;
 	}
 
-	public SearchPostRequest withLanguage(String language) {
+	public PostSearchRequest withLanguage(String language) {
 		this.language = language;
 		return this;
 	}

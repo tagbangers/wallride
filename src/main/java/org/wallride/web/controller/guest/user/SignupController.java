@@ -1,4 +1,4 @@
-package org.wallride.web.controller.guest.account;
+package org.wallride.web.controller.guest.user;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/account/signup")
+@RequestMapping("/signup")
 public class SignupController {
 
 	public static final String FORM_MODEL_KEY = "form";
@@ -40,7 +40,7 @@ public class SignupController {
 
 	@RequestMapping(method = RequestMethod.GET, params = "step.edit")
 	public String edit(Model model) {
-		return "account/signup";
+		return "user/signup";
 	}
 
 	@RequestMapping(method=RequestMethod.POST)
@@ -54,17 +54,17 @@ public class SignupController {
 		redirectAttributes.addAttribute("language", blogLanguage.getLanguage());
 
 		if (errors.hasErrors()) {
-			return "redirect:/{language}/account/signup?step.edit";
+			return "redirect:/{language}/signup?step.edit";
 		}
 
 		try {
 			signupService.signup(form.toSignupRequest(), User.Role.VIEWER);
 		} catch (DuplicateLoginIdException e) {
 			errors.rejectValue("loginId", "NotDuplicate");
-			return "redirect:/{language}/account/signup?step.edit";
+			return "redirect:/{language}/signup?step.edit";
 		} catch (DuplicateEmailException e) {
 			errors.rejectValue("email", "NotDuplicate");
-			return "redirect:/{language}/account/signup?step.edit";
+			return "redirect:/{language}/signup?step.edit";
 		}
 
 		redirectAttributes.getFlashAttributes().clear();

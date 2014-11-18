@@ -10,8 +10,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Comment;
+import org.wallride.core.service.CommentCreateRequest;
 import org.wallride.core.service.CommentService;
-import org.wallride.core.service.CreateCommentRequest;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.RestValidationErrorModel;
 
@@ -45,7 +45,7 @@ public class CommentController {
 			throw new BindException(result);
 		}
 
-		CreateCommentRequest request = form.toCreateCommentRequest(blogLanguage, authorizedUser);
+		CommentCreateRequest request = form.toCreateCommentRequest(blogLanguage, authorizedUser);
 		Comment comment = commentService.createComment(request, authorizedUser);
 		return comment;
 	}

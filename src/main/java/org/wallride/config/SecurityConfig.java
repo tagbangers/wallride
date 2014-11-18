@@ -146,16 +146,17 @@ public class SecurityConfig {
 				.authorizeRequests()
 					.accessDecisionManager(accessDecisionManager)
 //		            .expressionHandler(securityExpressionHandler)
+					.antMatchers("/settings/**").hasRole("VIEWER")
 					.antMatchers("/comments/**").hasRole("VIEWER")
 					.and()
 				.formLogin()
-					.loginPage("/account/login").permitAll()
-					.loginProcessingUrl("/account/login")
+					.loginPage("/login").permitAll()
+					.loginProcessingUrl("/login")
 					.defaultSuccessUrl("/")
-					.failureUrl("/account/login?failed")
+					.failureUrl("/login?failed")
 					.and()
 				.logout()
-					.logoutRequestMatcher(new AntPathRequestMatcher("/account/logout", "GET"))
+					.logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
 					.logoutSuccessUrl("/")
 					.and()
 				.rememberMe()
@@ -166,7 +167,7 @@ public class SecurityConfig {
 				.csrf()
 					.disable()
 				.exceptionHandling()
-					.accessDeniedPage("/account/login");
+					.accessDeniedPage("/login");
 			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
 				List<ChannelProcessor> channelProcessors = new ArrayList<>();
 				channelProcessors.add(new ProxySecureChannelProcessor());

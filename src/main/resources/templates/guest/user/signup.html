@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" />
+		<meta name="keywords" />
+		<meta name="author" content="" />
+		<title>Signup</title>
+		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
+		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
+		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/atom.xml}" />
+		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/rss.xml}" />
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+		<link rel="stylesheet" th:href="@{/resources/css/sticky-footer-navbar.css}" href="#" />
+		<link rel="stylesheet" th:href="@{/resources/css/common.css}" href="#" />
+		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:replace="layout::head-script"> /*/-->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		<![endif]-->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		<script th:src="@{/resources/lib/jquery.lazyload.min.js}" src="#"></script>
+		<!--/*/ </th:block> /*/-->
+	</head>
+	<body>
+		<div id="wrap">
+			<div th:replace="layout::nav"></div>
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="page-header">
+							<h1><span th:text="#{Signup}">Signup</span></h1>
+						</div>
+						<form th:action="@{__${WEBSITE_PATH}__/signup}" th:object="${form}" method="post" role="form">
+							<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}" th:text="#{Error}">Error</p>
+							<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
+								<label class="control-label" th:text="#{Email}">E-mail</label>
+								<div>
+									<input type="text" th:field="*{email}" class="form-control" th:attr="placeholder=#{Email}" autocomplete="off" />
+									<span class="help-block" th:each="err : ${#fields.errors('email')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('loginId')}? has-error">
+								<label class="control-label" th:text="#{LoginId}">Login ID</label>
+								<div>
+									<input type="text" th:field="*{loginId}" class="form-control" th:attr="placeholder=#{LoginId}" autocomplete="off" />
+									<span class="help-block" th:each="err : ${#fields.errors('loginId')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('loginPassword')}? has-error">
+								<label class="control-label" th:text="#{Password}">Password</label>
+								<div>
+									<input type="password" th:field="*{loginPassword}" class="form-control" th:attr="placeholder=#{Password}" placeholder="Password" autocomplete="off" />
+									<span class="help-block" th:each="err : ${#fields.errors('loginPassword')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('name.firstName')}? has-error">
+								<label class="control-label" th:text="#{FirstName}">FirstName</label>
+								<div>
+									<input type="text" th:field="*{name.firstName}" placeholder="First Name" th:attr="placeholder=#{FirstName}" class="form-control" />
+									<span class="help-block" th:each="err : ${#fields.errors('name.firstName')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('name.lastName')}? has-error">
+								<label class="control-label" th:text="#{LastName}">LastName</label>
+								<div>
+									<input type="text" th:field="*{name.lastName}" placeholder="Last Name" th:attr="placeholder=#{LastName}" class="form-control" />
+									<span class="help-block" th:each="err : ${#fields.errors('name.lastName')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group">
+								<button class="btn btn-lg btn-primary"><span class="glyphicon glyphicon-ok"></span> <span th:text="#{Signup}">Signup</span></button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="layout::footer" id="footer"></div>
+	</body>
+</html>

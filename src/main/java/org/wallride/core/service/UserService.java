@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -85,6 +87,31 @@ public class UserService {
 
 		user = userRepository.saveAndFlush(user);
 		return user;
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public User updateProfile(ProfileUpdateRequest request, AuthorizedUser updatedBy) {
+		User user = userRepository.findByIdForUpdate(request.getUserId());
+		if (user == null) {
+			throw new IllegalArgumentException("The user does not exist");
+		}
+		user.setName(request.getName());
+		user.setUpdatedAt(LocalDateTime.now());
+		user.setUpdatedBy(updatedBy.toString());
+		return userRepository.saveAndFlush(user);
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public User updatePassword(PasswordUpdateRequest request, AuthorizedUser updatedBy) {
+		User user = userRepository.findByIdForUpdate(request.getUserId());
+		if (user == null) {
+			throw new IllegalArgumentException("The user does not exist");
+		}
+		PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+		user.setLoginPassword(passwordEncoder.encode(request.getPassword()));
+		user.setUpdatedAt(LocalDateTime.now());
+		user.setUpdatedBy(updatedBy.toString());
+		return userRepository.saveAndFlush(user);
 	}
 
 	@CacheEvict(value="users", allEntries=true)
