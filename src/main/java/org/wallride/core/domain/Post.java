@@ -12,10 +12,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 @Entity
 @Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
@@ -221,8 +218,9 @@ public class Post extends DomainObject<Long> {
 		return medias;
 	}
 
-	public List<Post> getRelatedPosts() {
-		return (List<Post>)CollectionUtils.union(getRelatedToPosts(), getRelatedByPosts());
+	public Set<Post> getRelatedPosts() {
+		List<Post> relatedPostList = (List<Post>)CollectionUtils.union(getRelatedToPosts(), getRelatedByPosts());
+		return new HashSet<Post>(relatedPostList);
 	}
 
 	public Set<Post> getRelatedToPosts() {
