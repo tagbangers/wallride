@@ -484,12 +484,12 @@ public class ArticleService {
         return counts;
     }
 
-    public Article changeStatusAricle(ArticleChangeStatusRequest request) {
-        Article article = articleRepository.findById(request.getId(), request.getLanguage());
-        article.setStatus(Post.Status.DRAFT);
-        articleRepository.save(article);
-        return article;
-    }
+//    public Article changeStatusAricle(ArticleChangeStatusRequest request) {
+//        Article article = articleRepository.findById(request.getId(), request.getLanguage());
+//        article.setStatus(Post.Status.DRAFT);
+//        articleRepository.save(article);
+//        return article;
+//    }
     
     public void changeAllStatus(Post.Status status, String language){
         articleRepository.changeAllStatusArticle(status, language);

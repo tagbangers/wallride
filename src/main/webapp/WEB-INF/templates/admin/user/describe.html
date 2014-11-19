@@ -1,61 +1,83 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
-		<title>WallRide</title>
-	</head>
-	<body>
-		<header th:replace="layout::header"></header>
-		<div>
-			<div id="wr-page-header">
-				<div class="page-header container-fluid">
-					<div class="pull-left">
-						<h1 th:text="${user.name}">Name</h1>
-					</div>
-					<div class="pull-right">
-						<div class="btn-group">
-							<div th:classappend="${previousObject eq null}?'disabled'" class="previous">
-								<a class="btn btn-default" th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
-							</div>
-						</div>
-						<div class="btn-group">
-							<div th:classappend="${nextObject eq null}?'disabled'" class="next">
-								<a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
-							</div>
-						</div>
-						<div class="btn-group">
-							<a th:href="@{__${ADMIN_PATH}__/users/edit(id=${user.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div id="wr-page-content">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-sm-12 describe">
-							<div style="margin-bottom: 15px">
-								<img style="width:150px; border-radius: 50%" th:src="${user.getGravatarUrl(170)}" src="http://placehold.it/170/eeeeee/ffffff" />
-							</div>
-							<table class="table">
-								<tr>
-									<th th:text="#{LoginId}">ログインID</th>
-									<td th:text="${user.loginId}">ログインID</td>
-								</tr>
-								<tr>
-									<th th:text="#{Email}">メールアドレス</th>
-									<td th:text="${user.email}">メールアドレス</td>
-								</tr>
-								<tr>
-									<th th:text="#{Posts}">投稿記事数</th>
-									<td th:text="${articleCounts.get(user.id)}?:0">投稿記事数</td>
-								</tr>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<footer>
-		</footer>
-	</body>
+    <head>
+        <meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
+        <title>WallRide</title>
+
+        <style>
+            #wr-page-content .describe  div.btn-group{
+                cursor: pointer;
+                position: absolute;
+                top: 89px;
+                left: 20px;
+                display: none;
+            }
+            #wr-page-content .describe .image-box {display: inline-block;}
+            #wr-page-content .describe .image-box:hover .btn-group {
+                display: block;
+            }
+
+        </style>
+    </head>
+    <body>
+        <header th:replace="layout::header"></header>
+        <div>
+            <div id="wr-page-header">
+                <div class="page-header container-fluid">
+                    <div class="pull-left">
+                        <h1 th:text="${user.name}">Name</h1>
+                    </div>
+                    <div class="pull-right">
+                        <div class="btn-group">
+                            <div th:classappend="${previousObject eq null}?'disabled'" class="previous">
+                                <a class="btn btn-default" th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div th:classappend="${nextObject eq null}?'disabled'" class="next">
+                                <a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/users/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <a th:href="@{__${ADMIN_PATH}__/users/edit(id=${user.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="wr-page-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 describe">
+                            <div style="margin-bottom: 15px; position: relative;">
+                                <div class="image-box">
+                                <img style="width:150px; border-radius: 50%" th:src="${user.getGravatarUrl(170)}" src="http://placehold.it/170/eeeeee/ffffff" />
+                                <div class="btn-group">
+                                    <a href="#" type="button" class="btn btn-info" > Change avarta</a>
+                                </div>
+                                </div>
+                            </div>
+
+
+                            <table class="table">
+                                <tr>
+                                    <th th:text="#{LoginId}">ログインID</th>
+                                    <td th:text="${user.loginId}">ログインID</td>
+                                </tr>
+                                <tr>
+                                    <th th:text="#{Email}">メールアドレス</th>
+                                    <td th:text="${user.email}">メールアドレス</td>
+                                </tr>
+                                <tr>
+                                    <th th:text="#{Posts}">投稿記事数</th>
+                                    <td th:text="${articleCounts.get(user.id)}?:0">投稿記事数</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>
+        </footer>
+    </body>
 </html>

@@ -9,8 +9,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -37,20 +39,21 @@ public class TagMergeController {
     ArticleService articleService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public String mergeTags(TagMergeForm form, RedirectAttributes redirect, Model model, AuthorizedUser authorizedUser) {
-        model.addAttribute("ids", form.getIds());
-        model.addAttribute("newtagname", form.getNewTagName());
+    public String mergeTags(@Valid TagMergeForm form, BindingResult errors, RedirectAttributes redirect, AuthorizedUser authorizedUser) {
+        
+        if (errors.hasErrors()) {
+            return "redirect:/_admin/{language}/tags/index";
+        }
         List<Long> tagsForMerging = form.getIds();
         TagCreateRequest requestCreate = new TagCreateRequest.Builder()
                 .name(form.getNewTagName())
                 .language(form.getLanguage())
                 .build();
-        
+
         // create a new merged tag
         Tag mergedTag = tagService.createTag(requestCreate, authorizedUser);
         // get all articles that have tag.
         List<Article> articles = tagService.getArticles(tagsForMerging);
-        model.addAttribute("listArticle", articles);
         for (Article article : articles) {
             SortedSet<Tag> tags = article.getTags();
             Iterator<Tag> tagIterator = tags.iterator();
@@ -67,8 +70,9 @@ public class TagMergeController {
         }
         //delete  old tags after merging
         tagService.deleteTagsAfterMerging(form, null);
-        return "redirect:/_admin/{language}/tags/index";
-        // return "/tag/hung"; 
+
+        redirect.addFlashAttribute("mergedTags", articles);
+        return "redirect:/_admin/{language}/tags/index"; 
     }
 
 }

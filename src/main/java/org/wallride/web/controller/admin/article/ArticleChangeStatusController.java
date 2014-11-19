@@ -17,25 +17,17 @@ import org.wallride.core.service.ArticleChangeStatusRequest;
 import org.wallride.core.service.ArticleService;
 
 /**
- * http://localhost:8080/wallride/_admin/en/articles/change-status
+ * 
  */
 @Controller
 @RequestMapping(value = "/{language}/articles/change-status", method = RequestMethod.POST)
 public class ArticleChangeStatusController {
 
-//    @Inject
-//	private ArticleService articleService;
     @Inject
     private ArticleService articleService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public String changeStatus(ArticleChangeStatusForm form, Model model) {
-
-        model.addAttribute("ids", form.getIds());
-        model.addAttribute("form", form);
-//        ArticleChangeStatusRequest request = form.buildArticleChangeStatusRequest();
-//        
-//        articleService.changeStatusAricle(request);
+    public String changeStatus(ArticleChangeStatusForm form, RedirectAttributes redirect) {
 
         Post.Status status = Post.Status.PUBLISHED;
         if (form.getStatus().equals("DRAFT")) {
@@ -44,9 +36,8 @@ public class ArticleChangeStatusController {
             if(form.getStatus().equals("SCHEDULED"))
             status = Post.Status.SCHEDULED;
         }
-
         articleService.changeAllStatus(status, form.getLanguage());
-//        return "/article/hung";
+        redirect.addFlashAttribute("changedStatus", articleService);
         return "redirect:/_admin/{language}/articles/index";
     }
 }

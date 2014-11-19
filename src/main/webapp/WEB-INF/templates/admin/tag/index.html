@@ -29,6 +29,10 @@
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <span th:text="#{DeletedTags}">Tags Deleted.</span>
                     </div>
+                    <div class="alert alert-success" th:if="${mergedTags ne null}">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <span>Tags Merged.</span>
+                    </div>
                     <section class="search-condition">
                         <div class="search-condition-simple clearfix">
                             <form class="form-inline" method="post" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
@@ -95,12 +99,12 @@
                                         <div class="modal-body">
                                             <div class="form-group">
                                                 <p>Tag name of the merged</p>
-                                                <input type="text"  id="input1" name="newTagName" placeholder="Enter a large new tag" class="form-control" />
+                                                <input type="text"  name="newTagName" placeholder="Enter a large new tag" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-default" data-dismiss="modal" >Close</button>
-                                            <button class="btn btn-primary"  id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}"  >Save Changes</button> 
+                                            <button class="btn btn-primary"  id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}" disabled="true"  >Merge</button> 
                                         </div>
                                     </div>
                                 </div>
@@ -129,21 +133,22 @@
                             <script th:inline="javascript">
                                 // <![CDATA[
                                 $(function() {
-
-//                                      $('#input1').on('keyup', (function() {
-//                                          if ($(this).val() == '') {
-//                                              $('#button1').prop('disabled', false);
-//                                          } else{
-//                                              $('#button1').prop('disabled', true);
-//                                            }
-//                                    });
-//                                    
                                     $('#bulk-delete-modal').on('hidden.bs.modal', function() {
                                         $(this).removeData('bs.modal');
                                     });
                                     $('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
                                         var confirmed = $(this);
                                         $('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
+                                    });
+                                    $('#merge-tag-modal').on('keyup', ':input[name="newTagName"]', function() {
+                                        //console.log(1);
+                                        var newTagName = $(this);
+                                        if (newTagName.val() === '') {
+                                            $('#merge-tag-modal .btn-primary').prop('disabled', true);
+                                        } else {
+                                            $('#merge-tag-modal .btn-primary').prop('disabled', false);
+                                        }
+
                                     });
                                     $('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
                                         if (!$(e.target).is(':checkbox') && !$(e.target).is('a')) {
