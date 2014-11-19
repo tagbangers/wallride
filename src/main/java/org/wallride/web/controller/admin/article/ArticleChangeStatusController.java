@@ -37,7 +37,7 @@ public class ArticleChangeStatusController {
             status = Post.Status.SCHEDULED;
         }
         articleService.changeAllStatus(status, form.getLanguage());
-        redirect.addFlashAttribute("changedStatus", articleService);
+        redirect.addFlashAttribute("changedStatus", "success");
         return "redirect:/_admin/{language}/articles/index";
     }
 }

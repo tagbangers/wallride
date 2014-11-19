@@ -27,6 +27,10 @@
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <span th:text="#{DeletedArticles}">Articles Deleted.</span>
                     </div>
+                    <div class="alert alert-success" th:if="${changedStatus ne null}">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <span>Status Changed.</span>
+                    </div>
                     <section class="search-condition">
                         <div class="search-condition-simple clearfix">
                             <form class="form-inline" method="post" th:action="@{/_admin/__${language}__/articles/index}" th:object="${form}">
