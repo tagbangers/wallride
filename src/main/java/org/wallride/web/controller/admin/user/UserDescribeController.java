@@ -72,4 +72,9 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
 	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
 		return userService.readUsers(form.buildUserSearchRequest(), pageable);
 	}
+        
+        @RequestMapping(value="{language}/users/describe/change-avatar", method=RequestMethod.POST)
+        public String changeAvatar(){
+            return "";
+        }
 }
