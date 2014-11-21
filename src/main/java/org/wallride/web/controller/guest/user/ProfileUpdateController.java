@@ -1,6 +1,5 @@
 package org.wallride.web.controller.guest.user;
 
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.User;
+import org.wallride.core.service.DuplicateEmailException;
+import org.wallride.core.service.DuplicateLoginIdException;
 import org.wallride.core.service.ProfileUpdateRequest;
 import org.wallride.core.service.UserService;
 import org.wallride.core.support.AuthorizedUser;
@@ -38,6 +39,8 @@ public class ProfileUpdateController {
 		User user = userService.readUserById(authorizedUser.getId());
 
 		ProfileUpdateForm form = new ProfileUpdateForm();
+		form.setEmail(user.getEmail());
+		form.setLoginId(user.getLoginId());
 		ProfileUpdateForm.Name name = new ProfileUpdateForm.Name();
 		name.setFirstName(user.getName().getFirstName());
 		name.setLastName(user.getName().getLastName());
@@ -55,7 +58,7 @@ public class ProfileUpdateController {
 	public String update(
 			@Validated @ModelAttribute(FORM_MODEL_KEY) ProfileUpdateForm form,
 			BindingResult errors,
-			@AuthenticationPrincipal AuthorizedUser authorizedUser,
+			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute(FORM_MODEL_KEY, form);
 		redirectAttributes.addFlashAttribute(ERRORS_MODEL_KEY, errors);
@@ -66,9 +69,20 @@ public class ProfileUpdateController {
 
 		ProfileUpdateRequest request = new ProfileUpdateRequest()
 				.withUserId(authorizedUser.getId())
+				.withEmail(form.getEmail())
+				.withLoginId(form.getLoginId())
 				.withName(form.getName().getFirstName(), form.getName().getLastName());
 
-		User updatedUser = userService.updateProfile(request, authorizedUser);
+		User updatedUser;
+		try {
+			updatedUser = userService.updateProfile(request, authorizedUser);
+		} catch (DuplicateLoginIdException e) {
+			errors.rejectValue("loginId", "NotDuplicate");
+			return "redirect:/settings/profile?step.edit";
+		} catch (DuplicateEmailException e) {
+			errors.rejectValue("email", "NotDuplicate");
+			return "redirect:/settings/profile?step.edit";
+		}
 
 		redirectAttributes.getFlashAttributes().clear();
 		redirectAttributes.addFlashAttribute("updatedUser", updatedUser);

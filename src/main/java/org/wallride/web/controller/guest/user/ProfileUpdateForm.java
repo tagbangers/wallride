@@ -13,14 +13,22 @@ import java.io.Serializable;
 
 public class ProfileUpdateForm implements Serializable {
 
+	@Email
+	private String email;
 	@NotNull
 	@Pattern(regexp = "^[\\w\\-]+$")
 	private String loginId;
 	@Valid
 	private Name name = new Name();
 	@NotNull
-	@Email
-	private String email;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
 	public String getLoginId() {
 		return loginId;
@@ -38,19 +46,10 @@ public class ProfileUpdateForm implements Serializable {
 		this.name = name;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public ProfileUpdateRequest toProfileUpdateRequest() {
 		ProfileUpdateRequest request = new ProfileUpdateRequest();
-//		request.setEmail(getEmail());
-//		request.setLoginId(getLoginId());
-//		request.setLoginPassword(getLoginPassword());
+		request.setEmail(getEmail());
+		request.setLoginId(getLoginId());
 		request.setName(new PersonalName(getName().getFirstName(), getName().getLastName()));
 		return request;
 	}

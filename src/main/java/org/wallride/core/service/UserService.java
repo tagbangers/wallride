@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -95,6 +96,23 @@ public class UserService {
 		if (user == null) {
 			throw new IllegalArgumentException("The user does not exist");
 		}
+
+		User duplicate;
+		if (!ObjectUtils.nullSafeEquals(request.getEmail(), user.getEmail())) {
+			duplicate = userRepository.findByEmail(request.getEmail());
+			if (duplicate != null) {
+				throw new DuplicateEmailException(request.getEmail());
+			}
+		}
+		if (!ObjectUtils.nullSafeEquals(request.getLoginId(), user.getLoginId())) {
+			duplicate = userRepository.findByLoginId(request.getLoginId());
+			if (duplicate != null) {
+				throw new DuplicateLoginIdException(request.getLoginId());
+			}
+		}
+
+		user.setEmail(request.getEmail());
+		user.setLoginId(request.getLoginId());
 		user.setName(request.getName());
 		user.setUpdatedAt(LocalDateTime.now());
 		user.setUpdatedBy(updatedBy.toString());

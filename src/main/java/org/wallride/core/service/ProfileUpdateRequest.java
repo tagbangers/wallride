@@ -5,6 +5,8 @@ import org.wallride.core.domain.PersonalName;
 public class ProfileUpdateRequest {
 
 	private long userId;
+	private String email;
+	private String loginId;
 	private PersonalName name;
 
 	public long getUserId() {
@@ -17,6 +19,32 @@ public class ProfileUpdateRequest {
 
 	public ProfileUpdateRequest withUserId(long userId) {
 		this.userId = userId;
+		return this;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public ProfileUpdateRequest withEmail(String email) {
+		this.email = email;
+		return this;
+	}
+
+	public String getLoginId() {
+		return loginId;
+	}
+
+	public void setLoginId(String loginId) {
+		this.loginId = loginId;
+	}
+
+	public ProfileUpdateRequest withLoginId(String loginId) {
+		this.loginId = loginId;
 		return this;
 	}
 

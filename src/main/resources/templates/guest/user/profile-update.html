@@ -33,9 +33,14 @@
 				<div class="row">
 					<div class="col-sm-6">
 						<div class="page-header">
-							<h1>Profile</h1>
+							<h1 th:text="#{Profile}">Profile</h1>
 						</div>
-						<form th:action="@{__${WEBSITE_PATH}__/signup}" th:object="${form}" method="post" role="form">
+						<div class="alert alert-success" th:if="${updatedUser ne null}">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<span th:text="#{SavedProfile}">Profile saved.</span>
+						</div>
+						<form th:action="@{__${WEBSITE_PATH}__/settings/profile}" th:object="${form}" method="post" role="form">
+							<input type="hidden" name="_method" value="put" />
 							<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}" th:text="#{Error}">Error</p>
 							<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
 								<label class="control-label" th:text="#{Email}">E-mail</label>
