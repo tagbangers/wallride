@@ -1,5 +1,9 @@
 package org.wallride.web.controller.admin.user;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,6 +19,10 @@ import org.wallride.web.support.DomainObjectDescribeController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Controller
 @RequestMapping(value="/{language}/users/describe", method= RequestMethod.GET)
@@ -74,7 +82,25 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
 	}
         
         @RequestMapping(value="{language}/users/describe/change-avatar", method=RequestMethod.POST)
-        public String changeAvatar(){
-            return "";
+        public String changeAvatar(CommonsMultipartFile file, BindingResult errors){
+            if (errors.hasErrors()) {
+                return "redirect:/{language}/users/describe";
+            }
+            if (file.getSize() >0) {
+                String fileName = file.getOriginalFilename();
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+                try {
+                    inputStream = file.getInputStream();
+                    File newFile = new File("E:/"+ fileName);
+                    if (!newFile.exists()) {
+                        newFile.createNewFile();
+                    }
+                    
+                } catch (IOException ex) {
+                    Logger.getLogger(UserDescribeController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            return "redirect:/{{language}/users/describe";
         }
 }
