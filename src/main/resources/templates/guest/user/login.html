@@ -41,7 +41,7 @@
 								<input type="text" name="username" class="form-control" th:attr="placeholder=#{UserName}" autofocus="autofocus" autocomplete="off" tabindex="1" />
 							</div>
 							<div class="form-group">
-								<label><span th:text="#{Password}">Password</span> <a th:href="@{/password-reset}">(forgot password)</a></label>
+								<label><span th:text="#{Password}">Password</span> <a th:href="@{/password-reset}">(<span th:text="#{ForgotPassword}">Forgot password</span>)</a></label>
 								<input type="password" name="password" class="form-control" th:attr="placeholder=#{Password}" autocomplete="off" tabindex="2" />
 							</div>
 							<div class="checkbox">
