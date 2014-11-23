@@ -46,8 +46,8 @@
 							<li th:each="node : ${PAGE_TREE.rootNodes}" th:classappend="${node.contains(page) ? 'active' : ''}"><a th:href="@{/__${node.page.code}__}" th:text="${node.page.title}">About</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
-							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{/signup}">Sign Up</a></li>
-							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{/login}">Log In</a></li>
+							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{/signup}" th:text="#{Signup}">Sign Up</a></li>
+							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{/login}" th:text="#{LogIn}">Log In</a></li>
 							<li class="dropdown" sec:authorize="hasRole('ROLE_VIEWER')">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span th:text="${#authentication.name}">User Name</span> <b class="caret"></b></a>
 								<ul class="dropdown-menu">

@@ -20,15 +20,20 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.access.channel.ChannelProcessor;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.wallride.core.service.AuthorizedUserDetailsService;
 import org.wallride.core.support.ProxyInsecureChannelProcessor;
 import org.wallride.core.support.ProxySecureChannelProcessor;
+import org.wallride.web.support.BlogLanguageRedirectStrategy;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -141,6 +146,19 @@ public class SecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			RedirectStrategy redirectStrategy = new BlogLanguageRedirectStrategy();
+
+			SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+			successHandler.setRedirectStrategy(redirectStrategy);
+			successHandler.setDefaultTargetUrl("/");
+
+			SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler("/login?failed");
+			failureHandler.setRedirectStrategy(redirectStrategy);
+
+			SimpleUrlLogoutSuccessHandler logoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
+			logoutSuccessHandler.setRedirectStrategy(redirectStrategy);
+			logoutSuccessHandler.setDefaultTargetUrl("/");
+
 			// @formatter:off
 			http.antMatcher("/**")
 				.authorizeRequests()
@@ -152,12 +170,12 @@ public class SecurityConfig {
 				.formLogin()
 					.loginPage("/login").permitAll()
 					.loginProcessingUrl("/login")
-					.defaultSuccessUrl("/")
-					.failureUrl("/login?failed")
+					.successHandler(successHandler)
+					.failureHandler(failureHandler)
 					.and()
 				.logout()
 					.logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
-					.logoutSuccessUrl("/")
+					.logoutSuccessHandler(logoutSuccessHandler)
 					.and()
 				.rememberMe()
 					.tokenRepository(persistentTokenRepository)
