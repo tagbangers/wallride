@@ -13,6 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
+import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 
 import javax.inject.Inject;
 
@@ -66,6 +67,11 @@ public class CoreConfig {
 		DefaultMessageCodesResolver resolver = new DefaultMessageCodesResolver();
 		resolver.setPrefix("validation.");
 		return resolver;
+	}
+
+	@Bean
+	public SpringResourceResourceResolver springResourceResourceResolver() {
+		return new SpringResourceResourceResolver();
 	}
 
 	@Bean

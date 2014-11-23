@@ -57,6 +57,8 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
+	@Inject
+	private SpringResourceResourceResolver springResourceResourceResolver;
 
 	@Inject
 	private CustomThymeleafDialect customThymeleafDialect;
@@ -203,7 +205,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public TemplateResolver templateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(thymeleafResourceResolver());
+		resolver.setResourceResolver(springResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
@@ -224,11 +226,6 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		dialects.add(customThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
-	}
-
-	@Bean
-	public SpringResourceResourceResolver thymeleafResourceResolver() {
-		return new SpringResourceResourceResolver();
 	}
 
 	@Bean

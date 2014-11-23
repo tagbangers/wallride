@@ -1,6 +1,8 @@
 package org.wallride.web.controller.guest.user;
 
 import org.hibernate.validator.constraints.Length;
+import org.wallride.core.service.PasswordResetTokenCreateRequest;
+import org.wallride.core.support.AuthorizedUser;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -39,5 +41,11 @@ public class PasswordResetForm implements Serializable {
 
 	public void setNewPasswordRetype(String newPasswordRetype) {
 		this.newPasswordRetype = newPasswordRetype;
+	}
+
+	public PasswordResetTokenCreateRequest toPasswordResetTokenCreateRequest() {
+		PasswordResetTokenCreateRequest request = new PasswordResetTokenCreateRequest();
+		request.setEmail(getEmail());
+		return request;
 	}
 }

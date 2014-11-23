@@ -51,9 +51,9 @@
 							<li class="dropdown" sec:authorize="hasRole('ROLE_VIEWER')">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span th:text="${#authentication.name}">User Name</span> <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li><a th:href="@{/settings/profile}">Edit Profile</a></li>
-									<li><a th:href="@{/settings/password}">Edit Password</a></li>
-									<li><a th:href="@{/logout}">Log Out</a></li>
+									<li><a th:href="@{/settings/profile}" th:text="#{EditProfile}">Edit Profile</a></li>
+									<li><a th:href="@{/settings/password}" th:text="#{EditPassword}">Edit Password</a></li>
+									<li><a th:href="@{/logout}" th:text="#{LogOut}">Log Out</a></li>
 								</ul>
 							</li>
 							<li class="dropdown">

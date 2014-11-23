@@ -33,10 +33,12 @@ import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.PasswordResetToken;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.repository.PasswordResetTokenRepository;
 import org.wallride.core.repository.UserFullTextSearchTerm;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.support.BlogLanguageDataValueProcessor;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -69,15 +71,67 @@ public class UserService {
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
+	@Inject
+	private Environment environment;
+
 	@Resource
 	private UserRepository userRepository;
 	@Resource
 	private UserInvitationRepository userInvitationRepository;
+	@Resource
+	private PasswordResetTokenRepository passwordResetTokenRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
 	public PasswordResetToken createPasswordResetToken(PasswordResetTokenCreateRequest request) {
+		User user = userRepository.findByEmail(request.getEmail());
+		if (user == null) {
+			throw new EmailNotFoundException();
+		}
+
+		LocalDateTime now = LocalDateTime.now();
 		PasswordResetToken passwordResetToken = new PasswordResetToken();
+		passwordResetToken.setUser(user);
+		passwordResetToken.setEmail(user.getEmail());
+		passwordResetToken.setExpiredAt(now.plusHours(24));
+		passwordResetToken.setCreatedAt(now);
+		passwordResetToken.setCreatedBy(user.toString());
+		passwordResetToken.setUpdatedAt(now);
+		passwordResetToken.setUpdatedBy(user.toString());
+		passwordResetToken = passwordResetTokenRepository.saveAndFlush(passwordResetToken);
+
+		try {
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
+//			String resetLink = ServletUriComponentsBuilder.fromCurrentContextPath()
+//					.path("/{language}")
+//					.path("/password-reset")
+//					.query()
+//					.queryParam()
+//					.queryParam("token", passwordResetToken.getToken())
+//					.buildAndExpand().toString();
+
+			Context ctx = new Context(LocaleContextHolder.getLocale());
+			ctx.setVariable("passwordResetToken", passwordResetToken);
+//			ctx.setVariable("resetLink", resetLink);
+
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+			MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
+//			message.setSubject(MessageFormat.format(
+//					messageSourceAccessor.getMessage("InvitationMessageTitle", LocaleContextHolder.getLocale()),
+//					blogTitle));
+			message.setSubject("[WallRide] Please reset your password");
+			message.setFrom(environment.getRequiredProperty("mail.from"));
+			message.setTo(passwordResetToken.getEmail());
+
+			String htmlContent = templateEngine.process("password-reset", ctx);
+			message.setText(htmlContent, true); // true = isHtml
+
+			mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			throw new ServiceException(e);
+		}
+
 		return passwordResetToken;
 	}
 

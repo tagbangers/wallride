@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.PasswordResetToken;
+import org.wallride.core.service.EmailNotFoundException;
 import org.wallride.core.service.PasswordResetTokenCreateRequest;
 import org.wallride.core.service.UserService;
+import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
 
@@ -38,16 +40,22 @@ public class PasswordResetController {
 	public String token(
 			@Validated @ModelAttribute(FORM_MODEL_KEY) PasswordResetForm form,
 			BindingResult errors,
+			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute(FORM_MODEL_KEY, form);
 		redirectAttributes.addFlashAttribute(ERRORS_MODEL_KEY, errors);
 
-		if (errors.hasErrors()) {
+		if (errors.hasFieldErrors("email")) {
 			return "redirect:/password-reset";
 		}
 
-		PasswordResetTokenCreateRequest request = new PasswordResetTokenCreateRequest();
-		PasswordResetToken passwordResetToken = userService.createPasswordResetToken(request);
+		PasswordResetTokenCreateRequest request = form.toPasswordResetTokenCreateRequest();
+		PasswordResetToken passwordResetToken;
+		try {
+			passwordResetToken = userService.createPasswordResetToken(request);
+		} catch (EmailNotFoundException e) {
+			return "redirect:/password-reset";
+		}
 
 		redirectAttributes.getFlashAttributes().clear();
 		redirectAttributes.addFlashAttribute("passwordResetToken", passwordResetToken);
@@ -55,7 +63,11 @@ public class PasswordResetController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, params = "step.token")
-	public String token() {
+	public String token(Model model) {
+		PasswordResetToken passwordResetToken = (PasswordResetToken) model.asMap().get("passwordResetToken");
+		if (passwordResetToken == null) {
+			return "redirect:/password-reset";
+		}
 		return "user/password-reset2-token";
 	}
 
@@ -69,6 +81,10 @@ public class PasswordResetController {
 			@Validated @ModelAttribute(FORM_MODEL_KEY) PasswordResetForm form,
 			BindingResult errors,
 			RedirectAttributes redirectAttributes) {
+		if (errors.hasFieldErrors("newPassword*")) {
+			return "redirect:/password-reset?step.reset";
+		}
+
 		return "redirect:/login";
 	}
 }

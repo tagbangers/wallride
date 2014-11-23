@@ -56,6 +56,8 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
+	@Inject
+	private SpringResourceResourceResolver springResourceResourceResolver;
 
 	@Inject
 	private CustomThymeleafDialect customThymeleafDialect;
@@ -156,7 +158,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="adminTemplateResolver")
 	public TemplateResolver adminTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(thymeleafResourceResolver());
+		resolver.setResourceResolver(springResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("template.admin.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
@@ -170,7 +172,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	@Bean(name="guestTemplateResolver")
 	public TemplateResolver guestTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(thymeleafResourceResolver());
+		resolver.setResourceResolver(springResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");
@@ -206,11 +208,6 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		dialects.add(customThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
-	}
-
-	@Bean
-	public SpringResourceResourceResolver thymeleafResourceResolver() {
-		return new SpringResourceResourceResolver();
 	}
 
 	@Bean
