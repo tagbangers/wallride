@@ -43,11 +43,6 @@ public class UserUtils {
 
 	private String path(UriComponentsBuilder builder, User user, boolean encode) {
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
-		if (languages != null && languages.length > 1) {
-			builder.path("/{language}");
-			params.put("language", processingContext.getContext().getLocale().getLanguage());
-		}
 		builder.path("/author/{code}");
 		params.put("code", user.getLoginId());
 
