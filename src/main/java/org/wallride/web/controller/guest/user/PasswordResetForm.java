@@ -1,8 +1,8 @@
 package org.wallride.web.controller.guest.user;
 
 import org.hibernate.validator.constraints.Length;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.service.PasswordResetTokenCreateRequest;
-import org.wallride.core.support.AuthorizedUser;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -12,6 +12,8 @@ public class PasswordResetForm implements Serializable {
 
 	@NotNull
 	private String email;
+	@NotNull
+	private String token;
 	@NotNull
 	@Pattern(regexp = "^\\p{ASCII}*$")
 	@Length(min = 8, max = 32)
@@ -25,6 +27,14 @@ public class PasswordResetForm implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public String getNewPassword() {
@@ -43,9 +53,10 @@ public class PasswordResetForm implements Serializable {
 		this.newPasswordRetype = newPasswordRetype;
 	}
 
-	public PasswordResetTokenCreateRequest toPasswordResetTokenCreateRequest() {
+	public PasswordResetTokenCreateRequest toPasswordResetTokenCreateRequest(BlogLanguage blogLanguage) {
 		PasswordResetTokenCreateRequest request = new PasswordResetTokenCreateRequest();
 		request.setEmail(getEmail());
+		request.setLanguage(blogLanguage.getLanguage());
 		return request;
 	}
 }

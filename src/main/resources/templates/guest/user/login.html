@@ -38,18 +38,18 @@
 						<form th:action="@{/login}" action="#" method="post">
 							<div class="form-group">
 								<label th:text="#{UserName}">User Name</label>
-								<input type="text" name="username" class="form-control" th:attr="placeholder=#{UserName}" autofocus="autofocus" autocomplete="off" />
+								<input type="text" name="username" class="form-control" th:attr="placeholder=#{UserName}" autofocus="autofocus" autocomplete="off" tabindex="1" />
 							</div>
 							<div class="form-group">
-								<label th:text="#{Password}">Password</label>
-								<input type="password" name="password" class="form-control" th:attr="placeholder=#{Password}" autocomplete="off" />
+								<label><span th:text="#{Password}">Password</span> <a th:href="@{/password-reset}">(forgot password)</a></label>
+								<input type="password" name="password" class="form-control" th:attr="placeholder=#{Password}" autocomplete="off" tabindex="2" />
 							</div>
 							<div class="checkbox">
-								<label><input type="checkbox" name="remember-me" th:text="#{RememberMe}"/></label>
+								<label><input type="checkbox" name="remember-me" th:text="#{RememberMe}" tabindex="3" /></label>
 							</div>
 							<div class="form-group">
-								<button class="btn btn-lg btn-primary" type="submit" th:text="#{LogIn}">Log in</button>
-								<a class="btn btn-link btn-lg btn-default" th:href="@{/signup}">Sign up</a>
+								<button class="btn btn-lg btn-primary" type="submit" th:text="#{LogIn}" tabindex="4">Log in</button>
+								<a class="btn btn-link btn-lg btn-default" th:href="@{/signup}" th:text="#{Signup}">Sign up</a>
 							</div>
 						</form>
 					</div>

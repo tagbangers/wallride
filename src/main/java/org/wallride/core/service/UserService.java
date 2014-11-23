@@ -38,7 +38,6 @@ import org.wallride.core.repository.UserFullTextSearchTerm;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.web.support.BlogLanguageDataValueProcessor;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -103,17 +102,22 @@ public class UserService {
 		try {
 			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
-//			String resetLink = ServletUriComponentsBuilder.fromCurrentContextPath()
-//					.path("/{language}")
-//					.path("/password-reset")
-//					.query()
-//					.queryParam()
-//					.queryParam("token", passwordResetToken.getToken())
-//					.buildAndExpand().toString();
+
+			ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+			if (blog.isMultiLanguage()) {
+				builder.path("/{language}");
+			}
+			builder.path("/password-reset");
+			builder.path("/{token}");
+
+			Map<String, Object> urlVariables = new LinkedHashMap<>();
+			urlVariables.put("language", request.getLanguage());
+			urlVariables.put("token", passwordResetToken.getToken());
+			String resetLink = builder.buildAndExpand(urlVariables).toString();
 
 			Context ctx = new Context(LocaleContextHolder.getLocale());
 			ctx.setVariable("passwordResetToken", passwordResetToken);
-//			ctx.setVariable("resetLink", resetLink);
+			ctx.setVariable("resetLink", resetLink);
 
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
 			MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
@@ -174,6 +178,23 @@ public class UserService {
 		user.setUpdatedAt(LocalDateTime.now());
 		user.setUpdatedBy(updatedBy.toString());
 		return userRepository.saveAndFlush(user);
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public User updatePassword(PasswordUpdateRequest request, PasswordResetToken passwordResetToken) {
+		User user = userRepository.findByIdForUpdate(request.getUserId());
+		if (user == null) {
+			throw new IllegalArgumentException("The user does not exist");
+		}
+		PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+		user.setLoginPassword(passwordEncoder.encode(request.getPassword()));
+		user.setUpdatedAt(LocalDateTime.now());
+		user.setUpdatedBy(passwordResetToken.getUser().toString());
+		user = userRepository.saveAndFlush(user);
+
+		passwordResetTokenRepository.delete(passwordResetToken);
+
+		return user;
 	}
 
 	@CacheEvict(value="users", allEntries=true)
@@ -368,5 +389,9 @@ public class UserService {
 //	@Cacheable(value="users", key="'invitations.list'")
 	public List<UserInvitation> readUserInvitations() {
 		return userInvitationRepository.findAll(new Sort(Sort.Direction.DESC, "createdAt"));
+	}
+
+	public PasswordResetToken readPasswordResetToken(String token) {
+		return passwordResetTokenRepository.findByToken(token);
 	}
 }
