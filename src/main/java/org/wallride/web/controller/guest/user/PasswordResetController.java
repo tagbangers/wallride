@@ -1,6 +1,7 @@
 package org.wallride.web.controller.guest.user;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +24,11 @@ public class PasswordResetController {
 	@Inject
 	private UserService userService;
 
+	@ModelAttribute(FORM_MODEL_KEY)
+	public PasswordResetForm setupPasswordResetForm() {
+		return new PasswordResetForm();
+	}
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String entry() {
 		return "user/password-reset1-entry";
@@ -37,7 +43,7 @@ public class PasswordResetController {
 		redirectAttributes.addFlashAttribute(ERRORS_MODEL_KEY, errors);
 
 		if (errors.hasErrors()) {
-			return "redirect:/settings/email/edit";
+			return "redirect:/password-reset";
 		}
 
 		PasswordResetTokenCreateRequest request = new PasswordResetTokenCreateRequest();

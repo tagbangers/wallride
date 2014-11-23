@@ -36,12 +36,11 @@ public class ArticleDescribeController {
 
 		LocalDate date = new LocalDate(year, month, day);
 		if (!article.getDate().toLocalDate().equals(date)) {
-			redirectAttributes.addAttribute("language", blogLanguage.getLanguage());
 			redirectAttributes.addAttribute("year", article.getDate().getYear());
 			redirectAttributes.addAttribute("month", article.getDate().getMonthOfYear());
 			redirectAttributes.addAttribute("day", article.getDate().getDayOfMonth());
 			redirectAttributes.addAttribute("code", code);
-			return "redirect:/{language}/{year}/{month}/{day}/{code}";
+			return "redirect:/{year}/{month}/{day}/{code}";
 		}
 
 		model.addAttribute("article", article);
