@@ -111,6 +111,18 @@ create table page (
 	primary key (id)
 ) ENGINE=InnoDB;
 
+create table password_reset_token (
+	token varchar(50) not null,
+	user_id bigint not null,
+	email varchar(200) not null,
+	expired_at datetime not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (token)
+) ENGINE=InnoDB;
+
 create table post (
 	id bigint not null auto_increment,
 	code varchar(200),
@@ -294,6 +306,11 @@ alter table page
 	add constraint FK_88lc5ox4n3kvd7vc10nvx8nn6
 	foreign key (id)
 	references post (id);
+
+alter table password_reset_token
+	add constraint FK_f90ivichjaokvmovxpnlm5nin
+	foreign key (user_id)
+	references user (id);
 
 alter table post
 	add constraint FK_ik65bluepv8oxdfvgbj5qdcsj

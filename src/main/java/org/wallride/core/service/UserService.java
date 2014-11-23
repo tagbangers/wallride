@@ -30,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.PasswordResetToken;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserFullTextSearchTerm;
@@ -66,9 +67,6 @@ public class UserService {
 	private TemplateEngine templateEngine;
 
 	@Inject
-	private Environment environment;
-
-	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@Resource
@@ -77,6 +75,11 @@ public class UserService {
 	private UserInvitationRepository userInvitationRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
+
+	public PasswordResetToken createPasswordResetToken(PasswordResetTokenCreateRequest request) {
+		PasswordResetToken passwordResetToken = new PasswordResetToken();
+		return passwordResetToken;
+	}
 
 	@CacheEvict(value="users", allEntries=true)
 	public User updateUser(UserUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) throws ValidationException {

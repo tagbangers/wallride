@@ -49,7 +49,7 @@ public class BlogLanguageRewriteRule extends RewriteRule {
 		}
 
 		if (matchedBlogLanguage == null) {
-			return null;
+			matchedBlogLanguage = blog.getLanguage(blog.getDefaultLanguage());
 		}
 
 		return new BlogLanguageRewriteMatch(matchedBlogLanguage);

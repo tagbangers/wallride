@@ -35,7 +35,7 @@
 						<div class="page-header">
 							<h1><span th:text="#{Signup}">Signup</span></h1>
 						</div>
-						<form th:action="@{__${WEBSITE_PATH}__/signup}" th:object="${form}" method="post" role="form">
+						<form th:action="@{/signup}" th:object="${form}" method="post" role="form">
 							<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}" th:text="#{Error}">Error</p>
 							<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
 								<label class="control-label" th:text="#{Email}">E-mail</label>

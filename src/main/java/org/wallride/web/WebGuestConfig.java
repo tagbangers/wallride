@@ -26,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
@@ -239,7 +240,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Bean
 	public ThymeleafViewResolver thymeleafViewResolver() {
-		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
 		viewResolver.setTemplateEngine(templateEngine());
 		viewResolver.setOrder(2);
 		viewResolver.setViewNames(new String[] { "*" });
@@ -273,5 +274,10 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		RssFeedView view = new RssFeedView();
 		view.setBlogService(blogService);
 		return view;
+	}
+
+	@Bean
+	public RequestDataValueProcessor requestDataValueProcessor() {
+		return new BlogLanguageDataValueProcessor();
 	}
 }

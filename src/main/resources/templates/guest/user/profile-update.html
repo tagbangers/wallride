@@ -39,7 +39,7 @@
 							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 							<span th:text="#{SavedProfile}">Profile saved.</span>
 						</div>
-						<form th:action="@{__${WEBSITE_PATH}__/settings/profile}" th:object="${form}" method="post" role="form">
+						<form th:action="@{/settings/profile}" th:object="${form}" method="post" role="form">
 							<input type="hidden" name="_method" value="put" />
 							<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}" th:text="#{Error}">Error</p>
 							<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">

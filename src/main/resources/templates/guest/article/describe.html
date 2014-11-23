@@ -37,14 +37,14 @@
 				<p th:utext="${#posts.body(article)}"></p>
 				<time></time>
 				<ul th:if="${article.tags}" class="list-inline">
-					<li th:each="tag : ${article.tags}"><a th:href="@{__${WEBSITE_PATH}__/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
+					<li th:each="tag : ${article.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
 				</ul>
 				<div class="page-footer">
 					<p><a th:href="@{${#users.path(article.author)}}" th:text="${article.author}"></a></p>
 				</div>
 				<div>
 					<h2>Comments</h2>
-					<form id="comment-form" th:action="@{__${WEBSITE_PATH}__/comments/new}" class="well">
+					<form id="comment-form" th:action="@{/comments/new}" class="well">
 						<input type="hidden" name="postId" th:value="${article.id}" />
 						<div class="form-group">
 							<textarea name="content" class="form-control" rows="3"></textarea>

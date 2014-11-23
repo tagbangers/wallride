@@ -35,7 +35,7 @@
 						<div class="page-header">
 							<h1>Login</h1>
 						</div>
-						<form th:action="@{login}" action="#" method="post">
+						<form th:action="@{/login}" action="#" method="post">
 							<div class="form-group">
 								<label th:text="#{UserName}">User Name</label>
 								<input type="text" name="username" class="form-control" th:attr="placeholder=#{UserName}" autofocus="autofocus" autocomplete="off" />
@@ -49,7 +49,7 @@
 							</div>
 							<div class="form-group">
 								<button class="btn btn-lg btn-primary" type="submit" th:text="#{LogIn}">Log in</button>
-								<a class="btn btn-link btn-lg btn-default" th:href="@{__${WEBSITE_PATH}__/account/signup}">Sign up</a>
+								<a class="btn btn-link btn-lg btn-default" th:href="@{/account/signup}">Sign up</a>
 							</div>
 						</form>
 					</div>
