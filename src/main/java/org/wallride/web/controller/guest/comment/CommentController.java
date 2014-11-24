@@ -36,7 +36,7 @@ public class CommentController {
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
-	public Comment create(
+	public CommentCreatedModel create(
 			@Validated CommentForm form,
 			BindingResult result,
 			BlogLanguage blogLanguage,
@@ -47,7 +47,7 @@ public class CommentController {
 
 		CommentCreateRequest request = form.toCreateCommentRequest(blogLanguage, authorizedUser);
 		Comment comment = commentService.createComment(request, authorizedUser);
-		return comment;
+		return new CommentCreatedModel(comment);
 	}
 
 	@RequestMapping(value = "/{id}/edit", method = RequestMethod.PUT)

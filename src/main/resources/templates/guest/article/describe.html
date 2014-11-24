@@ -29,7 +29,7 @@
 	<body>
 		<div id="wrap">
 			<div th:replace="layout::nav"></div>
-			<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=1200,h=500,m=1)}" class="post-cover" />
+			<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=1200,h=400,m=1)}" class="post-cover" />
 			<article class="container">
 				<div class="page-header">
 					<h1 th:text="${article.title}"></h1>
@@ -43,37 +43,74 @@
 					<p><a th:href="@{${#users.path(article.author)}}" th:text="${article.author}"></a></p>
 				</div>
 				<div>
-					<h2>Comments</h2>
-					<form id="comment-form" th:action="@{/comments/new}" class="well">
+					<h3 th:text="#{Comments}">Comments</h3>
+					<ul id="comment-list" class="list-group">
+						<li class="list-group-item" th:each="comment : ${article.comments}">
+							<div class="dropdown pull-right">
+								<button class="btn btn-default btn-link btn-xs dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
+								<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></li>
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{Delete}">Delete</span></a></li>
+								</ul>
+							</div>
+							<span th:text="${comment.authorName}">User Name</span> |
+							<time th:text="${comment.createdAt.toString('yyyy/MM/dd HH:mm', #locale)}">2014-01-01 00:00</time>
+							<p th:text="${comment.content}">Content</p>
+						</li>
+					</ul>
+					<script id="comment-tmpl" type="text/x-jsrender">
+						<li class="list-group-item">
+							<div class="dropdown pull-right">
+								<button class="btn btn-default btn-link btn-xs dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
+								<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></li>
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{Delete}">Delete</span></a></li>
+								</ul>
+							</div>
+							<span>User Name</span> |
+							<time>2014-01-01 00:00</time>
+							<p>{{:content}}</p>
+						</li>
+					</script>
+					<button id="comment-write" class="btn btn-default"><span class="glyphicon glyphicon-comment"></span> Write a comment</button>
+					<form id="comment-form" th:action="@{/comments/new}" class="well collapse">
 						<input type="hidden" name="postId" th:value="${article.id}" />
 						<div class="form-group">
 							<textarea name="content" class="form-control" rows="3"></textarea>
 						</div>
-						<button type="submit" class="btn btn-primary">Post</button>
+						<button id="comment-cancel" class="btn btn-default" th:text="#{Cancel}">Cancel</button>
+						<button id="comment-post" class="btn btn-primary" data-loading-text="Loading..." th:text="#{Post}">Post</button>
 					</form>
-					<ul id="comment-list" class="list-group">
-						<li class="list-group-item" th:each="comment : ${article.comments}">
-							<span th:text="${comment.authorName}">User Name</span>
-							<span>2014-01-01 00:00</span>
-							<p th:text="${comment.content}">Content</p>
-						</li>
-					</ul>
 					<script>
 						$(function() {
-							$('#comment-form button[type="submit"]').click(function() {
-								console.dir('post!!');
+							$('#comment-write').click(function(e) {
+								e.preventDefault();
+								$('#comment-write').hide();
+								$('#comment-form').show();
+							});
+							$('#comment-cancel').click(function(e) {
+								e.preventDefault();
+								$('#comment-write').show();
+								$('#comment-form').hide();
+							});
+							$('#comment-post').click(function(e) {
+								e.preventDefault();
 								var $self = $(this);
-
+								$self.button('loading');
 								$.ajax({
 									url: $self.closest('form').attr('action'),
 									type: 'POST',
 									data: $self.closest('form').serialize()
-								}).done(function() {
-									console.dir('done');
+								}).done(function(data) {
+									var $template = $.templates("#comment-tmpl");
+									var html = $template.render(data);
+									$("#comment-list").append(html);
+									$('#comment-write').show();
+									$('#comment-form').hide();
+									$self.button('reset');
 								}).fail(function() {
 									console.dir('fail');
 								});
-								return false;
 							});
 						});
 					</script>
