@@ -27,6 +27,8 @@ public class PasswordResetController {
 	public static final String FORM_MODEL_KEY = "form";
 	public static final String ERRORS_MODEL_KEY = BindingResult.MODEL_KEY_PREFIX + FORM_MODEL_KEY;
 
+	public static final String INVALID_PASSOWRD_RESET_LINK_ATTR_NAME = "invalidPasswordResetLink";
+
 	@Inject
 	private UserService userService;
 
@@ -78,13 +80,16 @@ public class PasswordResetController {
 
 	@RequestMapping(value = "/{token}", method = RequestMethod.GET)
 	public String edit(
-			@PathVariable String token) {
+			@PathVariable String token,
+			RedirectAttributes redirectAttributes) {
 		PasswordResetToken passwordResetToken = userService.readPasswordResetToken(token);
 		if (passwordResetToken == null) {
+			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
 		}
 		LocalDateTime now = new LocalDateTime();
 		if (now.isAfter(passwordResetToken.getExpiredAt())) {
+			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
 		}
 
@@ -103,10 +108,12 @@ public class PasswordResetController {
 
 		PasswordResetToken passwordResetToken = userService.readPasswordResetToken(token);
 		if (passwordResetToken == null) {
+			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
 		}
 		LocalDateTime now = new LocalDateTime();
 		if (now.isAfter(passwordResetToken.getExpiredAt())) {
+			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
 		}
 
