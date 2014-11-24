@@ -19,7 +19,8 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 	
 	static final String DEFAULT_SELECT_QUERY = 
-			"from User user ";
+			"from User user " +
+			"left join fetch user.roles role ";
 
 	@Query("select user.id from User user order by user.id")
 	List<Long> findId();
