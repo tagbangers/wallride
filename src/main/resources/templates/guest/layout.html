@@ -45,6 +45,12 @@
 							<li th:each="node : ${PAGE_TREE.rootNodes}" th:classappend="${node.contains(page) ? 'active' : ''}"><a th:href="@{/__${node.page.code}__}" th:text="${node.page.title}">About</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span th:text="${#messages.msg('Language.' + #locale.language)}">Language</span> <b class="caret"></b></a>
+								<ul class="dropdown-menu">
+									<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${#messages.msg('Language.' + key)}" href="#" >English</a></li>
+								</ul>
+							</li>
 							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{/signup}" th:text="#{Signup}">Sign Up</a></li>
 							<li th:if="${!#authorization.expression('hasRole(''ROLE_VIEWER'')')}"><a th:href="@{/login}" th:text="#{LogIn}">Log In</a></li>
 							<li class="dropdown" sec:authorize="hasRole('ROLE_VIEWER')">
@@ -53,12 +59,6 @@
 									<li><a th:href="@{/settings/profile}"><span class="glyphicon glyphicon-cog"></span> <span th:text="#{EditProfile}">Edit Profile</span></a></li>
 									<li><a th:href="@{/settings/password}"><span class="glyphicon glyphicon-lock"></span> <span th:text="#{EditPassword}">Edit Password</span></a></li>
 									<li><a th:href="@{/logout}"><span class="glyphicon glyphicon-log-out"></span> <span th:text="#{LogOut}">Log Out</span></a></li>
-								</ul>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span th:text="${#messages.msg('Language.' + #locale.language)}">Language</span> <b class="caret"></b></a>
-								<ul class="dropdown-menu">
-									<li th:each="key : ${LANGUAGE_LINKS.keySet()}"><a th:href="${LANGUAGE_LINKS.get(key)}" th:text="${#messages.msg('Language.' + key)}" href="#" >English</a></li>
 								</ul>
 							</li>
 						</ul>

@@ -58,6 +58,7 @@ public class PasswordResetController {
 		try {
 			passwordResetToken = userService.createPasswordResetToken(request);
 		} catch (EmailNotFoundException e) {
+			errors.rejectValue("email", "UsedEmail");
 			return "redirect:/password-reset";
 		}
 
@@ -95,6 +96,7 @@ public class PasswordResetController {
 			@PathVariable String token,
 			@Validated @ModelAttribute(FORM_MODEL_KEY) PasswordResetForm form,
 			BindingResult errors,
+			BlogLanguage blogLanguage,
 			RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute(FORM_MODEL_KEY, form);
 		redirectAttributes.addFlashAttribute(ERRORS_MODEL_KEY, errors);
@@ -119,7 +121,8 @@ public class PasswordResetController {
 
 		PasswordUpdateRequest request = new PasswordUpdateRequest()
 				.withUserId(passwordResetToken.getUser().getId())
-				.withPassword(form.getNewPassword());
+				.withPassword(form.getNewPassword())
+				.withLanguage(blogLanguage.getLanguage());
 		userService.updatePassword(request, passwordResetToken);
 
 		redirectAttributes.getFlashAttributes().clear();

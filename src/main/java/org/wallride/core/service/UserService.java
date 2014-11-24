@@ -121,10 +121,9 @@ public class UserService {
 
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
 			MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
-//			message.setSubject(MessageFormat.format(
-//					messageSourceAccessor.getMessage("InvitationMessageTitle", LocaleContextHolder.getLocale()),
-//					blogTitle));
-			message.setSubject("[WallRide] Please reset your password");
+			message.setSubject(MessageFormat.format(
+					messageSourceAccessor.getMessage("PasswordResetSubject", LocaleContextHolder.getLocale()),
+					blogTitle));
 			message.setFrom(environment.getRequiredProperty("mail.from"));
 			message.setTo(passwordResetToken.getEmail());
 
@@ -193,6 +192,41 @@ public class UserService {
 		user = userRepository.saveAndFlush(user);
 
 		passwordResetTokenRepository.delete(passwordResetToken);
+
+		try {
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
+
+			ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+			if (blog.isMultiLanguage()) {
+				builder.path("/{language}");
+			}
+			builder.path("/login");
+
+			Map<String, Object> urlVariables = new LinkedHashMap<>();
+			urlVariables.put("language", request.getLanguage());
+			urlVariables.put("token", passwordResetToken.getToken());
+			String loginLink = builder.buildAndExpand(urlVariables).toString();
+
+			Context ctx = new Context(LocaleContextHolder.getLocale());
+			ctx.setVariable("passwordResetToken", passwordResetToken);
+			ctx.setVariable("resetLink", loginLink);
+
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+			MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
+			message.setSubject(MessageFormat.format(
+					messageSourceAccessor.getMessage("PasswordChangedSubject", LocaleContextHolder.getLocale()),
+					blogTitle));
+			message.setFrom(environment.getRequiredProperty("mail.from"));
+			message.setTo(passwordResetToken.getEmail());
+
+			String htmlContent = templateEngine.process("password-changed", ctx);
+			message.setText(htmlContent, true); // true = isHtml
+
+			mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			throw new ServiceException(e);
+		}
 
 		return user;
 	}

@@ -4,6 +4,7 @@ public class PasswordUpdateRequest {
 
 	private long userId;
 	private String password;
+	private String language;
 
 	public long getUserId() {
 		return userId;
@@ -28,6 +29,19 @@ public class PasswordUpdateRequest {
 
 	public PasswordUpdateRequest withPassword(String password) {
 		this.password = password;
+		return this;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public PasswordUpdateRequest withLanguage(String language) {
+		this.language = language;
 		return this;
 	}
 }
