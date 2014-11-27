@@ -34,6 +34,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 			"left join fetch article.categories category " +
 			"left join fetch article.tags tag " +
 			"left join fetch article.comments comment " +
+			"left join fetch comment.author commentAuthor " +
 			"left join fetch article.relatedPosts relatedPost ";
 
 	@Query("select article.id from Article article order by article.date desc ")

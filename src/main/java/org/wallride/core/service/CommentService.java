@@ -62,7 +62,11 @@ public class CommentService {
 		if (!ObjectUtils.nullSafeEquals(comment.getAuthor(), updatedBy)) {
 			throw new ServiceException();
 		}
+
+		LocalDateTime now = LocalDateTime.now();
 		comment.setContent(request.getContent());
+		comment.setUpdatedAt(now);
+		comment.setUpdatedBy(updatedBy.toString());
 		return commentRepository.saveAndFlush(comment);
 	}
 

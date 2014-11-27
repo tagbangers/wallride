@@ -48,22 +48,26 @@ public class CommentRestController {
 			throw new BindException(result);
 		}
 
-		CommentCreateRequest request = form.toCreateCommentRequest(blogLanguage, authorizedUser);
+		CommentCreateRequest request = form.toCommentCreateRequest(blogLanguage, authorizedUser);
 		Comment comment = commentService.createComment(request, authorizedUser);
 		return new CommentSavedModel(comment);
 	}
 
-	@RequestMapping(value = "/{id}/edit", method = RequestMethod.PUT)
-	public String update(
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	public CommentSavedModel update(
 			@PathVariable long id,
 			@Validated CommentForm form,
 			BindingResult result,
-			AuthorizedUser authorizedUser) {
-		CommentUpdateRequest request = new CommentUpdateRequest();
-		return "";
+			AuthorizedUser authorizedUser) throws BindException {
+		if (result.hasFieldErrors("content")) {
+			throw new BindException(result);
+		}
+		CommentUpdateRequest request = form.toCommentUpdateRequest(id);
+		Comment comment = commentService.updateComment(request, authorizedUser);
+		return new CommentSavedModel(comment);
 	}
 
-	@RequestMapping(value = "/{id}/delete", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public DomainObjectDeletedModel<Long> delete(
 			@PathVariable long id,
 			AuthorizedUser authorizedUser) {
