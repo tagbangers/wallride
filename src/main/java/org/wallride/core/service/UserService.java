@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -21,14 +23,17 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.PasswordResetToken;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.repository.PasswordResetTokenRepository;
 import org.wallride.core.repository.UserFullTextSearchTerm;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
@@ -63,17 +68,75 @@ public class UserService {
 	private TemplateEngine templateEngine;
 
 	@Inject
-	private Environment environment;
+	private MessageSourceAccessor messageSourceAccessor;
 
 	@Inject
-	private MessageSourceAccessor messageSourceAccessor;
+	private Environment environment;
 
 	@Resource
 	private UserRepository userRepository;
 	@Resource
 	private UserInvitationRepository userInvitationRepository;
+	@Resource
+	private PasswordResetTokenRepository passwordResetTokenRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
+
+	public PasswordResetToken createPasswordResetToken(PasswordResetTokenCreateRequest request) {
+		User user = userRepository.findByEmail(request.getEmail());
+		if (user == null) {
+			throw new EmailNotFoundException();
+		}
+
+		LocalDateTime now = LocalDateTime.now();
+		PasswordResetToken passwordResetToken = new PasswordResetToken();
+		passwordResetToken.setUser(user);
+		passwordResetToken.setEmail(user.getEmail());
+		passwordResetToken.setExpiredAt(now.plusHours(24));
+		passwordResetToken.setCreatedAt(now);
+		passwordResetToken.setCreatedBy(user.toString());
+		passwordResetToken.setUpdatedAt(now);
+		passwordResetToken.setUpdatedBy(user.toString());
+		passwordResetToken = passwordResetTokenRepository.saveAndFlush(passwordResetToken);
+
+		try {
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
+
+			ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+			if (blog.isMultiLanguage()) {
+				builder.path("/{language}");
+			}
+			builder.path("/password-reset");
+			builder.path("/{token}");
+
+			Map<String, Object> urlVariables = new LinkedHashMap<>();
+			urlVariables.put("language", request.getLanguage());
+			urlVariables.put("token", passwordResetToken.getToken());
+			String resetLink = builder.buildAndExpand(urlVariables).toString();
+
+			Context ctx = new Context(LocaleContextHolder.getLocale());
+			ctx.setVariable("passwordResetToken", passwordResetToken);
+			ctx.setVariable("resetLink", resetLink);
+
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+			MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
+			message.setSubject(MessageFormat.format(
+					messageSourceAccessor.getMessage("PasswordResetSubject", LocaleContextHolder.getLocale()),
+					blogTitle));
+			message.setFrom(environment.getRequiredProperty("mail.from"));
+			message.setTo(passwordResetToken.getEmail());
+
+			String htmlContent = templateEngine.process("password-reset", ctx);
+			message.setText(htmlContent, true); // true = isHtml
+
+			mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			throw new ServiceException(e);
+		}
+
+		return passwordResetToken;
+	}
 
 	@CacheEvict(value="users", allEntries=true)
 	public User updateUser(UserUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) throws ValidationException {
@@ -85,6 +148,100 @@ public class UserService {
 
 		user = userRepository.saveAndFlush(user);
 		return user;
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public User updateProfile(ProfileUpdateRequest request, AuthorizedUser updatedBy) {
+		User user = userRepository.findByIdForUpdate(request.getUserId());
+		if (user == null) {
+			throw new IllegalArgumentException("The user does not exist");
+		}
+
+		User duplicate;
+		if (!ObjectUtils.nullSafeEquals(request.getEmail(), user.getEmail())) {
+			duplicate = userRepository.findByEmail(request.getEmail());
+			if (duplicate != null) {
+				throw new DuplicateEmailException(request.getEmail());
+			}
+		}
+		if (!ObjectUtils.nullSafeEquals(request.getLoginId(), user.getLoginId())) {
+			duplicate = userRepository.findByLoginId(request.getLoginId());
+			if (duplicate != null) {
+				throw new DuplicateLoginIdException(request.getLoginId());
+			}
+		}
+
+		user.setEmail(request.getEmail());
+		user.setLoginId(request.getLoginId());
+		user.setName(request.getName());
+		user.setUpdatedAt(LocalDateTime.now());
+		user.setUpdatedBy(updatedBy.toString());
+		return userRepository.saveAndFlush(user);
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public User updatePassword(PasswordUpdateRequest request, PasswordResetToken passwordResetToken) {
+		User user = userRepository.findByIdForUpdate(request.getUserId());
+		if (user == null) {
+			throw new IllegalArgumentException("The user does not exist");
+		}
+		PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+		user.setLoginPassword(passwordEncoder.encode(request.getPassword()));
+		user.setUpdatedAt(LocalDateTime.now());
+		user.setUpdatedBy(passwordResetToken.getUser().toString());
+		user = userRepository.saveAndFlush(user);
+
+		passwordResetTokenRepository.delete(passwordResetToken);
+
+		try {
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
+
+			ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+			if (blog.isMultiLanguage()) {
+				builder.path("/{language}");
+			}
+			builder.path("/login");
+
+			Map<String, Object> urlVariables = new LinkedHashMap<>();
+			urlVariables.put("language", request.getLanguage());
+			urlVariables.put("token", passwordResetToken.getToken());
+			String loginLink = builder.buildAndExpand(urlVariables).toString();
+
+			Context ctx = new Context(LocaleContextHolder.getLocale());
+			ctx.setVariable("passwordResetToken", passwordResetToken);
+			ctx.setVariable("resetLink", loginLink);
+
+			MimeMessage mimeMessage = mailSender.createMimeMessage();
+			MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
+			message.setSubject(MessageFormat.format(
+					messageSourceAccessor.getMessage("PasswordChangedSubject", LocaleContextHolder.getLocale()),
+					blogTitle));
+			message.setFrom(environment.getRequiredProperty("mail.from"));
+			message.setTo(passwordResetToken.getEmail());
+
+			String htmlContent = templateEngine.process("password-changed", ctx);
+			message.setText(htmlContent, true); // true = isHtml
+
+			mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			throw new ServiceException(e);
+		}
+
+		return user;
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public User updatePassword(PasswordUpdateRequest request, AuthorizedUser updatedBy) {
+		User user = userRepository.findByIdForUpdate(request.getUserId());
+		if (user == null) {
+			throw new IllegalArgumentException("The user does not exist");
+		}
+		PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+		user.setLoginPassword(passwordEncoder.encode(request.getPassword()));
+		user.setUpdatedAt(LocalDateTime.now());
+		user.setUpdatedBy(updatedBy.toString());
+		return userRepository.saveAndFlush(user);
 	}
 
 	@CacheEvict(value="users", allEntries=true)
@@ -266,5 +423,9 @@ public class UserService {
 //	@Cacheable(value="users", key="'invitations.list'")
 	public List<UserInvitation> readUserInvitations() {
 		return userInvitationRepository.findAll(new Sort(Sort.Direction.DESC, "createdAt"));
+	}
+
+	public PasswordResetToken readPasswordResetToken(String token) {
+		return passwordResetTokenRepository.findByToken(token);
 	}
 }

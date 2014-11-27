@@ -62,6 +62,21 @@ create table category (
 	primary key (id)
 ) ENGINE=InnoDB;
 
+create table comment (
+	id bigint not null auto_increment,
+	post_id bigint not null,
+	author_id bigint,
+	author_name varchar(200) not null,
+	date datetime not null,
+	content longtext not null,
+	approved bit not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (id)
+) ENGINE=InnoDB;
+
 create table media (
 	id varchar(50) not null,
 	mime_type varchar(50) not null,
@@ -94,6 +109,18 @@ create table page (
 	rgt integer not null,
 	parent_id bigint,
 	primary key (id)
+) ENGINE=InnoDB;
+
+create table password_reset_token (
+	token varchar(50) not null,
+	user_id bigint not null,
+	email varchar(200) not null,
+	expired_at datetime not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (token)
 ) ENGINE=InnoDB;
 
 create table post (
@@ -183,6 +210,12 @@ create table user_invitation (
 	primary key (token)
 ) ENGINE=InnoDB;
 
+create table user_role (
+	user_id bigint not null,
+	role varchar(20) not null,
+	primary key (user_id, role)
+) ENGINE=InnoDB;
+
 alter table blog
 	add constraint UK_398ypeix0usuwxip7hl30tl95  unique (code);
 
@@ -239,6 +272,16 @@ alter table category
 	foreign key (parent_id)
 	references category (id);
 
+alter table comment
+	add constraint FK_9aq5p2jgf17y6b38x5ayd90oc
+	foreign key (author_id)
+	references user (id);
+
+alter table comment
+	add constraint FK_f1sl0xkd2lucs7bve3ktt3tu5
+	foreign key (post_id)
+	references post (id);
+
 alter table navigation_item
 	add constraint FK_e986fb2rhw2a7a2m2col2f1fg
 	foreign key (parent_id)
@@ -263,6 +306,11 @@ alter table page
 	add constraint FK_88lc5ox4n3kvd7vc10nvx8nn6
 	foreign key (id)
 	references post (id);
+
+alter table password_reset_token
+	add constraint FK_f90ivichjaokvmovxpnlm5nin
+	foreign key (user_id)
+	references user (id);
 
 alter table post
 	add constraint FK_ik65bluepv8oxdfvgbj5qdcsj
@@ -298,6 +346,11 @@ alter table post_related_post
 	add constraint FK_9h3eog304whtvhs23f3lmd5ow
 	foreign key (post_id)
 	references post (id);
+
+alter table user_role
+	add constraint FK_apcc8lxk2xnug8377fatvbn04
+	foreign key (user_id)
+	references user (id);
 
 create table persistent_logins (
 	username varchar(64) not null,

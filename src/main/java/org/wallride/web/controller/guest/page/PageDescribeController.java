@@ -6,9 +6,12 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UrlPathHelper;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Page;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.PageService;
+import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
 import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.LanguageUrlPathHelper;
 
@@ -18,7 +21,7 @@ import java.util.Map;
 
 public class PageDescribeController extends AbstractController {
 
-	private static final String PATH_PATTERN = "/{language}/**/{code}";
+	private static final String PATH_PATTERN = "/**/{code}";
 
 	private BlogService blogService;
 	private PageService pageService;
@@ -32,6 +35,12 @@ public class PageDescribeController extends AbstractController {
 
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
+		if (blogLanguage == null) {
+			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			blogLanguage = blog.getLanguage(blog.getDefaultLanguage());
+		}
+
 		String path = urlPathHelper.getLookupPathForRequest(request);
 
 		PathMatcher pathMatcher = new AntPathMatcher();
@@ -42,7 +51,7 @@ public class PageDescribeController extends AbstractController {
 		Map<String, String> variables = pathMatcher.extractUriTemplateVariables(PATH_PATTERN, path);
 		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, variables);
 
-		Page page = pageService.readPageByCode(variables.get("code"), variables.get("language"));
+		Page page = pageService.readPageByCode(variables.get("code"), blogLanguage.getLanguage());
 		if (page == null) {
 			throw new HttpNotFoundException();
 		}

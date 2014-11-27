@@ -2,6 +2,7 @@ package org.wallride.core.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -10,6 +11,8 @@ import org.springframework.util.DigestUtils;
 
 import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Entity
 @Table(name = "user")
@@ -18,6 +21,13 @@ import java.io.UnsupportedEncodingException;
 @Indexed
 @SuppressWarnings("serial")
 public class User extends DomainObject<Long> {
+
+	public enum Role {
+		ADMIN,
+		EDITOR,
+		AUTHOR,
+		VIEWER,
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,13 +59,12 @@ public class User extends DomainObject<Long> {
 	@Column
 	private String description;
 
-//	@Formula("(" +
-//			"select count(distinct article.id) from user " +
-//			"inner join post post on post.author_id = user.id " +
-//			"inner join article article on article.id = post.id " +
-//			"where post.author_id = id " +
-//			"and post.status = 'PUBLISHED')")
-//	private int articleCount;
+	@ElementCollection
+	@SortNatural
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role", length = 20, nullable = false)
+	private SortedSet<Role> roles = new TreeSet<>();
 
 	@Override
 	public Long getId() {
@@ -114,9 +123,13 @@ public class User extends DomainObject<Long> {
 		this.description = description;
 	}
 
-	//	public int getArticleCount() {
-//		return articleCount;
-//	}
+	public SortedSet<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(SortedSet<Role> roles) {
+		this.roles = roles;
+	}
 
 	public String getGravatarUrl(int size) throws UnsupportedEncodingException {
 		String hash = DigestUtils.md5DigestAsHex(getEmail().getBytes("CP1252"));

@@ -68,11 +68,6 @@ public class PostUtils {
 
 	private String path(UriComponentsBuilder builder, Article article, boolean encode) {
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
-		if (languages != null && languages.length > 1) {
-			builder.path("/{language}");
-			params.put("language", processingContext.getContext().getLocale().getLanguage());
-		}
 		builder.path("/{year}/{month}/{day}/{code}");
 		params.put("year", String.format("%04d", article.getDate().getYear()));
 		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
@@ -88,11 +83,6 @@ public class PostUtils {
 
 	private String path(UriComponentsBuilder builder, Page page, boolean encode) {
 		Map<String, Object> params = new HashMap<>();
-		String[] languages = (String[]) processingContext.getContext().getVariables().get("LANGUAGES");
-		if (languages != null && languages.length > 1) {
-			builder.path("/{language}");
-			params.put("language", processingContext.getContext().getLocale().getLanguage());
-		}
 
 		PageTree pageTree = (PageTree) processingContext.getContext().getVariables().get("PAGE_TREE_ALL");
 //		PageTree pageTree = defaultModelAttributeService.readPageTree(LocaleContextHolder.getLocale().getLanguage());

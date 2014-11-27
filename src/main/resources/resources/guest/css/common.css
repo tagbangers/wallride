@@ -30,8 +30,19 @@
 	background-color: #839CB1;
 	border-color: #839CB1;
 }
+#wrap > .container {
+	padding: 60px 15px 0;
+}
 #wrap > .post-cover + .container {
 	padding-top: 0px;
+}
+#comment-list .list-group-item {
+	border-radius: 0;
+	border-top-width: 1px;
+	border-right-width: 0;
+	border-bottom-width: 1px;
+	border-left-width: 0;
+	padding-left: 0;
 }
 a {
 	color: #839CB1;
@@ -58,4 +69,8 @@ body {
 }
 h1, h2, h3, h4, h5 {
 	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}
+
+.footer {
+	margin-top: 20px;
 }

@@ -156,12 +156,12 @@ public class PostService {
 		}
 	}
 
-	public Page<Post> readPosts(SearchPostRequest request) {
+	public Page<Post> readPosts(PostSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
 		return readPosts(request, pageable);
 	}
 
-	public Page<Post> readPosts(SearchPostRequest request, Pageable pageable) {
+	public Page<Post> readPosts(PostSearchRequest request, Pageable pageable) {
 		return postRepository.search(request, pageable);
 	}
 
@@ -212,10 +212,10 @@ public class PostService {
 					postIds.add(Long.parseLong((String) row.get(0)));
 				}
 
-				SearchPostRequest searchPostRequest = new SearchPostRequest(language);
-				searchPostRequest.setPostIds(postIds);
-				searchPostRequest.setStatus(Post.Status.PUBLISHED);
-				Page<Post> page = postRepository.search(searchPostRequest, new PageRequest(0, postIds.size()));
+				PostSearchRequest postSearchRequest = new PostSearchRequest(language);
+				postSearchRequest.setPostIds(postIds);
+				postSearchRequest.setStatus(Post.Status.PUBLISHED);
+				Page<Post> page = postRepository.search(postSearchRequest, new PageRequest(0, postIds.size()));
 				List<Post> posts = new ArrayList<>(page.getContent());
 				for (long postId : postIds) {
 					Post match = null;

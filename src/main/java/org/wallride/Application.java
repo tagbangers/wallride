@@ -2,6 +2,7 @@ package org.wallride;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
@@ -18,15 +19,19 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
+import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 import org.wallride.config.CoreConfig;
 import org.wallride.core.support.AmazonS3Resource;
 import org.wallride.core.support.AmazonS3ResourceLoader;
 import org.wallride.web.WebAdminConfig;
 import org.wallride.web.WebGuestConfig;
+import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
@@ -38,6 +43,12 @@ import java.util.EnumSet;
 @EnableAutoConfiguration(exclude = {DispatcherServletAutoConfiguration.class, WebMvcAutoConfiguration.class, ThymeleafAutoConfiguration.class})
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {
+
+	public static final String GUEST_SERVLET_NAME = "guestServlet";
+	public static final String GUEST_SERVLET_PATH = "";
+
+	public static final String ADMIN_SERVLET_NAME = "adminServlet";
+	public static final String ADMIN_SERVLET_PATH = "/_admin";
 
 	public static void main(String[] args) {
 //		SpringApplication.run(Application.class, args);
@@ -73,6 +84,7 @@ public class Application extends SpringBootServletInitializer {
 		registration.setFilter(characterEncodingFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 		registration.addUrlPatterns("/*");
+		registration.setOrder(1);
 		return registration;
 	}
 
@@ -85,6 +97,21 @@ public class Application extends SpringBootServletInitializer {
 		registration.setFilter(hiddenHttpMethodFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
 		registration.addUrlPatterns("/*");
+		registration.setOrder(2);
+		return registration;
+	}
+
+	@Bean
+	public FilterRegistrationBean urlRewriteFilter() {
+		UrlRewriteFilter urlRewriteFilter = new ExtendedUrlRewriteFilter();
+
+		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setName("urlRewriteFilter");
+		registration.setFilter(urlRewriteFilter);
+		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
+		registration.addUrlPatterns("/*");
+		registration.setOrder(3);
+		registration.getInitParameters().put("confPath", "classpath:urlrewrite.xml");
 		return registration;
 	}
 
@@ -96,9 +123,9 @@ public class Application extends SpringBootServletInitializer {
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
 
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
-		registration.setName("adminServlet");
+		registration.setName(ADMIN_SERVLET_NAME);
 		registration.setLoadOnStartup(1);
-		registration.addUrlMappings("/_admin/*");
+		registration.addUrlMappings(ADMIN_SERVLET_PATH + "/*");
 		return registration;
 	}
 
@@ -111,10 +138,15 @@ public class Application extends SpringBootServletInitializer {
 
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
 //		registration.setName(DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME);
-		registration.setName("guestServlet");
+		registration.setName(GUEST_SERVLET_NAME);
 		registration.setLoadOnStartup(2);
-		registration.addUrlMappings("/*");
+		registration.addUrlMappings(GUEST_SERVLET_PATH + "/*");
 		return registration;
+	}
+
+	@Bean
+	public RequestContextListener requestContextListener() {
+		return new RequestContextListener();
 	}
 
 	public static class ExtendedAnnotationConfigEmbeddedWebApplicationContext extends AnnotationConfigEmbeddedWebApplicationContext {
