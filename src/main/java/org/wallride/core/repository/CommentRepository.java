@@ -12,7 +12,7 @@ import javax.persistence.LockModeType;
 
 @Repository
 @Transactional
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long>, CommentRepositoryCustom {
 
 	static final String DEFAULT_OBJECT_SELECT_QUERY =
 			"from Comment comment " +

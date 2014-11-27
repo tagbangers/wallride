@@ -1,6 +1,8 @@
 package org.wallride.web.controller.guest.article;
 
 import org.joda.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.BlogLanguage;
+import org.wallride.core.domain.Comment;
 import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.CommentSearchRequest;
+import org.wallride.core.service.CommentService;
 import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
@@ -19,6 +24,8 @@ public class ArticleDescribeController {
 
 	@Inject
 	private ArticleService articleService;
+	@Inject
+	private CommentService commentService;
 
 	@RequestMapping
 	public String describe(
@@ -43,7 +50,12 @@ public class ArticleDescribeController {
 			return "redirect:/{year}/{month}/{day}/{code}";
 		}
 
+		CommentSearchRequest request = new CommentSearchRequest();
+		request.setPostId(article.getId());
+		Page<Comment> comments = commentService.readComments(request, new PageRequest(0, 1000));
+
 		model.addAttribute("article", article);
+		model.addAttribute("comments", comments);
 		return "article/describe";
 	}
 }

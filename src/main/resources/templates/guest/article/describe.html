@@ -45,7 +45,7 @@
 				<div>
 					<h3 th:text="#{Comments}">Comments</h3>
 					<ul id="comment-list" class="list-group">
-						<li class="list-group-item" th:each="comment : ${article.comments}" th:attr='data-comment-id=${comment.id}'>
+						<li class="list-group-item" th:each="comment : ${comments}" th:attr='data-comment-id=${comment.id}'>
 							<div class="dropdown pull-right" th:if="${#authentication.principal eq comment.author}">
 								<button class="btn btn-default btn-link btn-xs dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">

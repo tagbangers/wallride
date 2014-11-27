@@ -24,6 +24,7 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@IndexedEmbedded
 	private Post post;
 
 	@ManyToOne(fetch = FetchType.LAZY)

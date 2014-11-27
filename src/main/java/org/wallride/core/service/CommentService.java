@@ -3,6 +3,9 @@ package org.wallride.core.service;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -80,5 +83,14 @@ public class CommentService {
 		}
 		commentRepository.delete(comment);
 		return comment;
+	}
+
+	public Page<Comment> readComments(CommentSearchRequest request) {
+		Pageable pageable = new PageRequest(0, 10);
+		return readComments(request, pageable);
+	}
+
+	public Page<Comment> readComments(CommentSearchRequest request, Pageable pageable) {
+		return commentRepository.search(request, pageable);
 	}
 }
