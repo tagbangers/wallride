@@ -25,82 +25,83 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Controller
-@RequestMapping(value="/{language}/users/describe", method= RequestMethod.GET)
+@RequestMapping(value = "/{language}/users/describe", method = RequestMethod.GET)
 public class UserDescribeController extends DomainObjectDescribeController<User, UserSearchForm> {
 
-	@Inject
-	private UserService userService;
+    @Inject
+    private UserService userService;
 
-	@Inject
-	private ArticleService articleService;
+    @Inject
+    private ArticleService articleService;
 
-	@ModelAttribute("articleCounts")
-	public Map<Long, Long> articleCounts(@PathVariable String language) {
-		return articleService.countArticlesByAuthorIdGrouped(Post.Status.PUBLISHED, language);
-	}
+    @ModelAttribute("articleCounts")
+    public Map<Long, Long> articleCounts(@PathVariable String language) {
+        return articleService.countArticlesByAuthorIdGrouped(Post.Status.PUBLISHED, language);
+    }
 
-	@RequestMapping
-	public String describe(
-			@RequestParam long id,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, null, model, session);
-	}
+    @RequestMapping
+    public String describe(
+            @RequestParam long id,
+            Model model,
+            HttpSession session) {
+        return super.requestMappingDescribe(id, null, model, session);
+    }
 
-	@RequestMapping(params = "pageable")
-	public String describe(
-			@RequestParam long id,
-			@PageableDefault(50) Pageable pageable,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, pageable, model, session);
-	}
+    @RequestMapping(params = "pageable")
+    public String describe(
+            @RequestParam long id,
+            @PageableDefault(50) Pageable pageable,
+            Model model,
+            HttpSession session) {
+        return super.requestMappingDescribe(id, pageable, model, session);
+    }
 
-	@Override
-	protected Class<UserSearchForm> getDomainObjectSearchFormClass() {
-		return UserSearchForm.class;
-	}
+    @RequestMapping(value = "{language}/users/describe/change-avatar", method = RequestMethod.GET)
+    public String changeAvatar() {
+//            CommonsMultipartFile file, BindingResult errors
+//            if (errors.hasErrors()) {
+//                return "redirect:/{language}/users/describe";
+//            }
+//            if (file.getSize() >0) {
+//                String fileName = file.getOriginalFilename();
+//                InputStream inputStream = null;
+//                OutputStream outputStream = null;
+//                try {
+//                    inputStream = file.getInputStream();
+//                    File newFile = new File("E:/"+ fileName);
+//                    if (!newFile.exists()) {
+//                        newFile.createNewFile();
+//                    }
+//                    
+//                } catch (IOException ex) {
+//                    Logger.getLogger(UserDescribeController.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+        return "redirect:/{language}/users/describe/index";
+    }
 
-	@Override
-	protected String getModelAttributeName() {
-		return "user";
-	}
+    @Override
+    protected Class<UserSearchForm> getDomainObjectSearchFormClass() {
+        return UserSearchForm.class;
+    }
 
-	@Override
-	protected String getViewName() {
-		return "/user/describe";
-	}
+    @Override
+    protected String getModelAttributeName() {
+        return "user";
+    }
 
-	@Override
-	protected User readDomainObject(long id) {
-		return userService.readUserById(id);
-	}
+    @Override
+    protected String getViewName() {
+        return "/user/describe";
+    }
 
-	@Override
-	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
-		return userService.readUsers(form.buildUserSearchRequest(), pageable);
-	}
-        
-        @RequestMapping(value="{language}/users/describe/change-avatar", method=RequestMethod.POST)
-        public String changeAvatar(CommonsMultipartFile file, BindingResult errors){
-            if (errors.hasErrors()) {
-                return "redirect:/{language}/users/describe";
-            }
-            if (file.getSize() >0) {
-                String fileName = file.getOriginalFilename();
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = file.getInputStream();
-                    File newFile = new File("E:/"+ fileName);
-                    if (!newFile.exists()) {
-                        newFile.createNewFile();
-                    }
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(UserDescribeController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            return "redirect:/{{language}/users/describe";
-        }
+    @Override
+    protected User readDomainObject(long id) {
+        return userService.readUserById(id);
+    }
+
+    @Override
+    protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
+        return userService.readUsers(form.buildUserSearchRequest(), pageable);
+    }
 }
