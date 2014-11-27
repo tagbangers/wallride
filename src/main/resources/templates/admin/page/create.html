@@ -32,7 +32,7 @@
 											var action = /*[[@{__${ADMIN_PATH}__/pages/preview}]]*/ '#';
 											form.attr('action', action);
 											form.attr('target', '_blank');
-											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').redactor('get'));
+											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
 											form.submit();
 										});
 									});
@@ -46,7 +46,7 @@
 											var $this = $(this);
 											$this.button('loading');
 											var $form = $this.closest('form');
-											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').redactor('get'));
+											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
 											var data = $form.serializeArray();
 											data.push({name: 'draft', value: 1});
 											$.ajax({

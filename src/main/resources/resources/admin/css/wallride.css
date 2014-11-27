@@ -55,9 +55,6 @@ a:hover {
 	color: #78BFD8;
 	text-decoration: none;
 }
-a:focus {
-	background-color: #F5D03B;
-}
 pre {
 	border: transparent;
 	background-color: transparent;

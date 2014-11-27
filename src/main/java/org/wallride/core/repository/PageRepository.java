@@ -33,6 +33,8 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 			"left join fetch page.children children " +
 			"left join fetch page.relatedToPosts relatedToPosts " +
 			"left join fetch page.relatedByPosts relatedByPosts ";
+			"left join fetch page.comments comment " +
+			"left join fetch page.relatedPosts relatedPost ";
 
 	@Query("select page.id from Page page order by page.id")
 	List<Long> findId();

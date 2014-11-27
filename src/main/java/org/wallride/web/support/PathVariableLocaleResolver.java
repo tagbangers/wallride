@@ -6,9 +6,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.LocaleResolver;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.service.BlogService;
-import org.wallride.core.support.Settings;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

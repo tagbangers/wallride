@@ -5,8 +5,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.UserInvitationRepository;
@@ -14,16 +12,16 @@ import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.HttpForbiddenException;
 
-import javax.inject.Inject;
+import javax.annotation.Resource;
+import java.util.Collection;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class SignupService {
 
-	@Inject
+	@Resource
 	private UserRepository userRepository;
-
-	@Inject
+	@Resource
 	private UserInvitationRepository userInvitationRepository;
 
 	public UserInvitation readUserInvitation(String token) {
@@ -45,14 +43,21 @@ public class SignupService {
 	}
 
 	@CacheEvict(value="users", allEntries=true)
-	public AuthorizedUser signup(SignupRequest request) throws ServiceException {
-		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(request.getToken());
-		boolean valid = false;
-		if (invitation != null) {
-			valid = validateInvitation(invitation);
-		}
-		if (!valid) {
-			throw new HttpForbiddenException();
+	public AuthorizedUser signup(SignupRequest request, User.Role role) throws ServiceException {
+		return signup(request, role, null);
+	}
+
+	@CacheEvict(value="users", allEntries=true)
+	public AuthorizedUser signup(SignupRequest request, User.Role role, String token) throws ServiceException {
+		UserInvitation invitation = null;
+		if (token != null) {
+			invitation = userInvitationRepository.findByTokenForUpdate(token);
+			if (invitation == null) {
+				throw new HttpForbiddenException();
+			}
+			if (!validateInvitation(invitation)) {
+				throw new HttpForbiddenException();
+			}
 		}
 
 		User duplicate;
@@ -66,9 +71,11 @@ public class SignupService {
 		}
 
 		LocalDateTime now = new LocalDateTime();
-		invitation.setAccepted(true);
-		invitation.setAcceptedAt(now);
-		userInvitationRepository.saveAndFlush(invitation);
+		if (invitation != null) {
+			invitation.setAccepted(true);
+			invitation.setAcceptedAt(now);
+			userInvitationRepository.saveAndFlush(invitation);
+		}
 
 		User user = new User();
 		user.setLoginId(request.getLoginId());
@@ -77,6 +84,7 @@ public class SignupService {
 		user.getName().setFirstName(request.getName().getFirstName());
 		user.getName().setLastName(request.getName().getLastName());
 		user.setEmail(request.getEmail());
+		user.getRoles().add(role);
 		user.setCreatedAt(now);
 		user.setUpdatedAt(now);
 		user = userRepository.saveAndFlush(user);
