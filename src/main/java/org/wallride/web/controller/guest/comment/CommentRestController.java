@@ -11,22 +11,25 @@ import org.springframework.web.bind.annotation.*;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.service.CommentCreateRequest;
+import org.wallride.core.service.CommentDeleteRequest;
 import org.wallride.core.service.CommentService;
+import org.wallride.core.service.CommentUpdateRequest;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.support.DomainObjectDeletedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 
 @RestController
 @RequestMapping("/comments")
-public class CommentController {
+public class CommentRestController {
 
 	@Inject
 	private CommentService commentService;
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
-	private static Logger logger = LoggerFactory.getLogger(CommentController.class);
+	private static Logger logger = LoggerFactory.getLogger(CommentRestController.class);
 
 	@ExceptionHandler(BindException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -36,7 +39,7 @@ public class CommentController {
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
-	public CommentCreatedModel create(
+	public CommentSavedModel create(
 			@Validated CommentForm form,
 			BindingResult result,
 			BlogLanguage blogLanguage,
@@ -47,16 +50,26 @@ public class CommentController {
 
 		CommentCreateRequest request = form.toCreateCommentRequest(blogLanguage, authorizedUser);
 		Comment comment = commentService.createComment(request, authorizedUser);
-		return new CommentCreatedModel(comment);
+		return new CommentSavedModel(comment);
 	}
 
 	@RequestMapping(value = "/{id}/edit", method = RequestMethod.PUT)
-	public String update() {
+	public String update(
+			@PathVariable long id,
+			@Validated CommentForm form,
+			BindingResult result,
+			AuthorizedUser authorizedUser) {
+		CommentUpdateRequest request = new CommentUpdateRequest();
 		return "";
 	}
 
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.DELETE)
-	public String delete() {
-		return "";
+	public DomainObjectDeletedModel<Long> delete(
+			@PathVariable long id,
+			AuthorizedUser authorizedUser) {
+		CommentDeleteRequest request = new CommentDeleteRequest();
+		request.setId(id);
+		Comment comment = commentService.deleteComment(request, authorizedUser);
+		return new DomainObjectDeletedModel<>(comment);
 	}
 }

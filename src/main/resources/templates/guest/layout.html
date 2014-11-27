@@ -11,7 +11,7 @@
 		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
 		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/atom.xml}" />
 		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/rss.xml}" />
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
 		<link rel="stylesheet" th:href="@{/resources/css/sticky-footer-navbar.css}" href="#" />
 		<link rel="stylesheet" th:href="@{/resources/css/common.css}" href="#" />
 		<!--/*/ </th:block> /*/-->
@@ -21,7 +21,7 @@
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 		<![endif]-->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 		<script th:src="@{/resources/lib/jsrender.min.js}" src="#"></script>
 		<script th:src="@{/resources/lib/jquery.lazyload.min.js}" src="#"></script>
 		<!--/*/ </th:block> /*/-->
@@ -76,7 +76,7 @@
 				<p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>
 			</div>
 		</div>
-		<div th:fragment="footer" id="footer">
+		<div th:fragment="footer" class="footer">
 			<div class="container">
 				<p class="text-muted credit">&copy; WallRide</p>
 			</div>

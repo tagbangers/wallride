@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.User;
@@ -53,11 +54,27 @@ public class CommentService {
 		return commentRepository.saveAndFlush(comment);
 	}
 
-	public Comment updateComment() {
-		return null;
+	public Comment updateComment(CommentUpdateRequest request, AuthorizedUser updatedBy) {
+		Comment comment = commentRepository.findByIdForUpdate(request.getId());
+		if (comment == null) {
+			throw new ServiceException();
+		}
+		if (!ObjectUtils.nullSafeEquals(comment.getAuthor(), updatedBy)) {
+			throw new ServiceException();
+		}
+		comment.setContent(request.getContent());
+		return commentRepository.saveAndFlush(comment);
 	}
 
-	public Comment deleteComment() {
-		return null;
+	public Comment deleteComment(CommentDeleteRequest request, AuthorizedUser deletedBy) {
+		Comment comment = commentRepository.findByIdForUpdate(request.getId());
+		if (comment == null) {
+			throw new ServiceException();
+		}
+		if (!ObjectUtils.nullSafeEquals(comment.getAuthor(), deletedBy)) {
+			throw new ServiceException();
+		}
+		commentRepository.delete(comment);
+		return comment;
 	}
 }
