@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.core.support.CustomThymeleafDialect;
@@ -19,6 +20,8 @@ import java.util.Set;
 @Configuration
 public class MailConfig {
 
+	@Inject
+	private SpringResourceResourceResolver springResourceResourceResolver;
 	@Inject
 	private CustomThymeleafDialect customThymeleafDialect;
 
@@ -55,7 +58,8 @@ public class MailConfig {
 
 	@Bean(name="emailTemplateResolver")
 	public TemplateResolver emailTemplateResolver() {
-		ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+		TemplateResolver resolver = new TemplateResolver();
+		resolver.setResourceResolver(springResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("template.mail.path"));
 		resolver.setSuffix(".html");
 		resolver.setCharacterEncoding("UTF-8");

@@ -1,0 +1,138 @@
+    <!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>WallRide</title>
+		<link href="#" th:href="@{/resources/lib/bootstrap-3.0.1/css/bootstrap.min.css}" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="page-header">
+				<h1 th:text="#{Setup}">Setup</h1>
+			</div>
+			<form action="#" th:action="@{setup}" th:object="${form}" method="post" class="form-horizontal" role="form">
+				<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}">Oops</p>
+				<fieldset>
+					<legend th:text="#{Website}">Website</legend>
+					<div class="form-group" th:classappend="${#fields.hasErrors('websiteTitle')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{WebsiteTitle}">Website Title</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{websiteTitle}" class="form-control" th:attr="placeholder=#{WebsiteTitle}" />
+							<span class="help-block" th:each="err : ${#fields.errors('websiteTitle')}" th:text="${err}" />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend th:text="#{Languages}">Languages</legend>
+					<div class="form-group" th:classappend="${#fields.hasErrors('defaultLanguage')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{DefaultLanguage}">Default Language</label>
+						<div class="col-sm-5">
+							<select name="defaultLanguage" class="form-control">
+								<option value="" th:text="#{SelectDefaultLanguage}">Select Default Language</option>
+								<option value="en" th:selected="*{defaultLanguage eq 'en'}">English</option>
+								<option value="ja" th:selected="*{defaultLanguage eq 'ja'}">日本語</option>
+								<option value="de" th:selected="*{defaultLanguage eq 'de'}">Deutsch</option>
+								<option value="es" th:selected="*{defaultLanguage eq 'es'}">Español</option>
+								<option value="it" th:selected="*{defaultLanguage eq 'it'}">Italiano</option>
+								<option value="fr" th:selected="*{defaultLanguage eq 'fr'}">Français</option>
+								<option value="ru" th:selected="*{defaultLanguage eq 'ru'}">русский</option>
+								<option value="vi" th:selected="*{defaultLanguage eq 'vi'}">Tiếng Việt</option>
+							</select>
+							<span class="help-block" th:each="err : ${#fields.errors('defaultLanguage')}" th:text="${err}" />
+						</div>
+					</div>
+					<div class="form-group" th:classappend="${#fields.hasErrors('languages')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{OtherLanguages}">Other Languages</label>
+						<div class="col-sm-5">
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="en" th:checked="${#lists.contains(form.languages, 'en')}" /> English</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="ja" th:checked="${#lists.contains(form.languages, 'ja')}" /> 日本語</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="de" th:checked="${#lists.contains(form.languages, 'de')}" /> Deutsch</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="es" th:checked="${#lists.contains(form.languages, 'es')}" /> Español</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="it" th:checked="${#lists.contains(form.languages, 'it')}" /> Italiano</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="fr" th:checked="${#lists.contains(form.languages, 'fr')}" /> Français</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="ru" th:checked="${#lists.contains(form.languages, 'ru')}" /> русский</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="vi" th:checked="${#lists.contains(form.languages, 'vi')}" /> Tiếng Việt</label></div>
+							<span class="help-block" th:each="err : ${#fields.errors('languages')}" th:text="${err}" />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend th:text="#{MediaFiles}">Media Files</legend>
+					<div class="form-group" th:classappend="${#fields.hasErrors('mediaUrlPrefix')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{MediaUrlPrefix}">URL Prefix</label>
+						<div class="col-sm-10">
+							<input type="text" th:field="*{mediaUrlPrefix}" class="form-control" th:attr="placeholder=#{MediaUrlPrefix}" />
+							<span class="help-block" th:each="err : ${#fields.errors('mediaUrlPrefix')}" th:text="${err}" />
+						</div>
+					</div>
+					<div class="form-group" th:classappend="${#fields.hasErrors('mediaPath')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{MediaPath}">Location</label>
+						<div class="col-sm-10">
+							<input type="text" th:field="*{mediaPath}" class="form-control" th:attr="placeholder=#{MediaPath}" />
+							<span class="help-block" th:each="err : ${#fields.errors('mediaPath')}" th:text="${err}" />
+						</div>
+					</div>
+				</fieldset>
+				<!--/*
+				<fieldset>
+					<legend th:text="#{MailServer}">Mail server</legend>
+					<div class="form-group" th:classappend="${#fields.hasErrors('mailSmtpHost')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{Hostname}">Hostname</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{mailSmtpHost}" class="form-control" th:attr="placeholder=#{Hostname}" />
+							<span class="help-block" th:each="err : ${#fields.errors('mailSmtpHost')}" th:text="${err}" />
+						</div>
+					</div>
+					<div class="form-group" th:classappend="${#fields.hasErrors('mailFrom')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{EmailFrom}">Email from</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{mailFrom}" class="form-control" th:attr="placeholder=#{EmailFrom}" />
+							<span class="help-block" th:each="err : ${#fields.errors('mailFrom')}" th:text="${err}" />
+						</div>
+					</div>
+				</fieldset>
+				*/-->
+				<fieldset>
+					<legend th:text="#{User}">User</legend>
+					<div class="form-group" th:classappend="${#fields.hasErrors('loginId')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{LoginId}">Login ID</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{loginId}" class="form-control" placeholder="Login ID" th:attr="placeholder=#{LoginId}" autocomplete="off" />
+							<span class="help-block" th:each="err : ${#fields.errors('loginId')}" th:text="${err}" />
+						</div>
+					</div>
+					<div class="form-group" th:classappend="${#fields.hasErrors('loginPassword')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{Password}">Password</label>
+						<div class="col-sm-5">
+							<input type="password" th:field="*{loginPassword}" class="form-control" th:attr="placeholder=#{Password}" autocomplete="off" />
+							<span class="help-block" th:each="err : ${#fields.errors('loginPassword')}" th:text="${err}" />
+						</div>
+					</div>
+					<div class="form-group" th:classappend="${#fields.hasErrors('name.*')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{Name}">Name</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{name.firstName}" th:attr="placeholder=#{FirstName}" class="form-control" />
+							<span class="help-block" th:each="err : ${#fields.errors('name.firstName')}" th:text="${err}" />
+						</div>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{name.lastName}" th:attr="placeholder=#{LastName}" placeholder="Last Name" class="form-control" />
+							<span class="help-block" th:each="err : ${#fields.errors('name.lastName')}" th:text="${err}" />
+						</div>
+					</div>
+					<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
+						<label class="col-sm-2 control-label" th:text="#{Email}">E-mail</label>
+						<div class="col-sm-5">
+							<input type="text" th:field="*{email}" class="form-control" th:attr="placeholder=#{Email}" placeholder="E-mail" autocomplete="off" />
+							<span class="help-block" th:each="err : ${#fields.errors('email')}" th:text="${err}" />
+						</div>
+					</div>
+				</fieldset>
+				<br />
+				<div class="well">
+					<button name="_step.cancel" class="btn btn-default" th:text="#{Cancel}">Cancel</button>
+					<button name="_step.save" class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> <span th:text="#{Save}">Save</span></button>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

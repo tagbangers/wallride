@@ -29,6 +29,6 @@ public class UserInvitationIndexController {
 
 	@RequestMapping(method= RequestMethod.GET)
 	public String index() {
-		return "/user/invitation/index";
+		return "user/invitation/index";
 	}
 }

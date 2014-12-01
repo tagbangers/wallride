@@ -24,6 +24,8 @@ public class ArticleFullTextSearchTerm implements Serializable {
 
 	private Collection<Long> tagIds = new ArrayList<>();
 
+	private Long authorId;
+
 	private String language;
 
 	public Post.Status getStatus() {
@@ -80,6 +82,14 @@ public class ArticleFullTextSearchTerm implements Serializable {
 
 	public void setTagIds(Collection<Long> tagIds) {
 		this.tagIds = tagIds;
+	}
+
+	public Long getAuthorId() {
+		return authorId;
+	}
+
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
 	}
 
 	public String getLanguage() {

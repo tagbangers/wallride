@@ -13,6 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
+import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 
 import javax.inject.Inject;
 
@@ -24,18 +25,18 @@ public class CoreConfig {
 	@Inject
 	private Environment environment;
 
-	@Configuration
-	@Profile("default")
-	@PropertySource("classpath:environment-default.properties")
-	static class Default extends PropertySourcesPlaceholderConfigurer {
-	}
-
-
-	@Configuration
-	@Profile("develop")
-	@PropertySource("classpath:environment-develop.properties")
-	static class Develop extends PropertySourcesPlaceholderConfigurer {
-	}
+//	@Configuration
+//	@Profile("default")
+//	@PropertySource("classpath:application-default.properties")
+//	static class Default extends PropertySourcesPlaceholderConfigurer {
+//	}
+//
+//
+//	@Configuration
+//	@Profile("develop")
+//	@PropertySource("classpath:application-develop.properties")
+//	static class Develop extends PropertySourcesPlaceholderConfigurer {
+//	}
 
 //	@Configuration
 //	@Profile("junit")
@@ -47,10 +48,10 @@ public class CoreConfig {
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasenames(
-				"/WEB-INF/messages/messages",
-				"/WEB-INF/messages/validations",
-				"/WEB-INF/messages/enumerations",
-				"/WEB-INF/messages/languages"
+				"classpath:/messages/messages",
+				"classpath:/messages/validations",
+				"classpath:/messages/enumerations",
+				"classpath:/messages/languages"
 		);
 		return messageSource;
 	}
@@ -66,6 +67,11 @@ public class CoreConfig {
 		DefaultMessageCodesResolver resolver = new DefaultMessageCodesResolver();
 		resolver.setPrefix("validation.");
 		return resolver;
+	}
+
+	@Bean
+	public SpringResourceResourceResolver springResourceResourceResolver() {
+		return new SpringResourceResourceResolver();
 	}
 
 	@Bean

@@ -22,7 +22,7 @@ public class ReIndexController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String index() {
-		return "/system/re-index";
+		return "system/re-index";
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)

@@ -12,8 +12,6 @@ import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
@@ -102,12 +100,16 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 			}
 		}
 
+		if (term.getAuthorId() != null) {
+			junction.must(qb.keyword().onField("author.id").matching(term.getAuthorId()).createQuery());
+		}
+
 		Query searchQuery = junction.createQuery();
 		
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(Article.class)
 				.setFetchMode("cover", FetchMode.JOIN)
-				.setFetchMode("author", FetchMode.JOIN)
+				.setFetchMode("user", FetchMode.JOIN)
 				.setFetchMode("categories", FetchMode.JOIN);
 //				.setFetchMode("tags", FetchMode.JOIN);
 

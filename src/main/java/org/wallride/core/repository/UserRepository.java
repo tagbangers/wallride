@@ -19,17 +19,18 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 	
 	static final String DEFAULT_SELECT_QUERY = 
-			"from User user ";
+			"from User user " +
+			"left join fetch user.roles role ";
 
 	@Query("select user.id from User user order by user.id")
 	List<Long> findId();
-	
+
 	@Query(DEFAULT_SELECT_QUERY + "where user.id in (:ids) ")
 	List<User> findByIdIn(@Param("ids") Collection<Long> ids);
 	
 	@Query(DEFAULT_SELECT_QUERY + "where user.id = :id ")
 	User findById(@Param("id") Long id);
-	
+
 	@Query(DEFAULT_SELECT_QUERY + "where user.id = :id ")
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	User findByIdForUpdate(@Param("id")Long id);
@@ -43,6 +44,9 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
 	@Query(DEFAULT_SELECT_QUERY + "where user.loginId = :loginId ")
 	User findByLoginId(@Param("loginId") String loginId);
+
+	@Query(DEFAULT_SELECT_QUERY + "where user.email = :email ")
+	User findByEmail(@Param("email") String email);
 
 	@Modifying
 	@Query("update User set lastLoginTime = :lastLoginTime where id = :id ")

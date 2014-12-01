@@ -34,7 +34,7 @@ public class PageDeleteController {
 //		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "/page/describe";
+			return "page/describe";
 		}
 
 		Page page = null;
@@ -44,7 +44,7 @@ public class PageDeleteController {
 		catch (BindException e) {
 			if (errors.hasErrors()) {
 				logger.debug("Errors: {}", errors);
-				return "/page/describe";
+				return "page/describe";
 			}
 			throw new RuntimeException(e);
 		}

@@ -56,30 +56,6 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
         return super.requestMappingDescribe(id, pageable, model, session);
     }
 
-    /*@RequestMapping(value = "/{language}/users/describe/change-avatar", method = RequestMethod.POST)
-    public String changeAvatar() {
-//            CommonsMultipartFile file, BindingResult errors
-//            if (errors.hasErrors()) {
-//                return "redirect:/{language}/users/describe";
-//            }
-//            if (file.getSize() >0) {
-//                String fileName = file.getOriginalFilename();
-//                InputStream inputStream = null;
-//                OutputStream outputStream = null;
-//                try {
-//                    inputStream = file.getInputStream();
-//                    File newFile = new File("E:/"+ fileName);
-//                    if (!newFile.exists()) {
-//                        newFile.createNewFile();
-//                    }
-//                    
-//                } catch (IOException ex) {
-//                    Logger.getLogger(UserDescribeController.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-        return "redirect:/_admin/{language}/users/describe/index";
-    }*/
-
     @Override
     protected Class<UserSearchForm> getDomainObjectSearchFormClass() {
         return UserSearchForm.class;

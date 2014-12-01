@@ -83,7 +83,7 @@ public class ArticleSearchController extends DomainObjectSearchController<Articl
 
 	@RequestMapping(params="part=bulk-delete-form")
 	public String partBulkDeleteDialog() {
-		return "/article/index::bulk-delete-form";
+		return "article/index::bulk-delete-form";
 	}
         
         @RequestMapping(params="part=change-status-form")
@@ -103,7 +103,7 @@ public class ArticleSearchController extends DomainObjectSearchController<Articl
 
 	@Override
 	protected String getViewName() {
-		return "/article/index";
+		return "article/index";
 	}
 
 	@Override

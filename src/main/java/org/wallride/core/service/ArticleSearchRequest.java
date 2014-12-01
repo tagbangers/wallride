@@ -18,6 +18,7 @@ public class ArticleSearchRequest implements Serializable {
 	private LocalDateTime dateTo;
 	private Collection<Long> categoryIds;
 	private Collection<Long> tagIds;
+	private Long authorId;
 	private Post.Status status;
 	private String language;
 
@@ -43,6 +44,10 @@ public class ArticleSearchRequest implements Serializable {
 
 	public Collection<Long> getTagIds() {
 		return tagIds;
+	}
+
+	public Long getAuthorId() {
+		return authorId;
 	}
 
 	public Post.Status getStatus() {
@@ -91,6 +96,7 @@ public class ArticleSearchRequest implements Serializable {
 		private LocalDateTime dateTo;
 		private Collection<Long> categoryIds;
 		private Collection<Long> tagIds;
+		private Long authorId;
 		private Post.Status status;
 		private String language;
 
@@ -122,6 +128,11 @@ public class ArticleSearchRequest implements Serializable {
 			return this;
 		}
 
+		public Builder authorId(Long authorId) {
+			this.authorId = authorId;
+			return this;
+		}
+
 		public Builder status(Post.Status status) {
 			this.status = status;
 			return this;
@@ -139,6 +150,7 @@ public class ArticleSearchRequest implements Serializable {
 			request.dateTo = dateTo;
 			request.categoryIds = categoryIds;
 			request.tagIds = tagIds;
+			request.authorId = authorId;
 			request.status = status;
 			request.language = language;
 			return request;

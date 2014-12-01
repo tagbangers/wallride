@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 @Transactional(rollbackFor = Exception.class)
 public class ArticleService {
 
+
     @Resource
     private BlogService blogService;
     @Resource
@@ -269,12 +270,8 @@ public class ArticleService {
         article.setCover(cover);
         article.setTitle(request.getTitle());
         article.setBody(request.getBody());
+	
 
-//		User author = null;
-//		if (request.getAuthorId() != null) {
-//			author = entityManager.getReference(User.class, request.getAuthorId());
-//		}
-//		article.setAuthor(author);
         LocalDateTime date = request.getDate();
         if (Post.Status.PUBLISHED.equals(article.getStatus())) {
             if (date == null) {
@@ -499,4 +496,5 @@ public class ArticleService {
         articleRepository.saveAndFlush(article);
     }
     
+		
 }

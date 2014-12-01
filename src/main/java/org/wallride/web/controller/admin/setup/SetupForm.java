@@ -6,6 +6,7 @@ import org.wallride.core.service.SetupRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class SetupForm implements Serializable {
 //	private String mailFrom;
 
 	@NotNull
+	@Pattern(regexp = "^[\\w\\-]+$")
 	private String loginId;
 	
 	@NotNull

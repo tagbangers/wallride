@@ -31,7 +31,7 @@ public class UserInvitationCreateController {
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) throws MessagingException {
 		if (result.hasErrors()) {
-			return "/user/invitation/index";
+			return "user/invitation/index";
 		}
 		List<UserInvitation> invitations = userService.inviteUsers(form.buildUserInvitationCreateRequest(), result, authorizedUser);
 		redirectAttributes.addFlashAttribute("savedInvitations", invitations);

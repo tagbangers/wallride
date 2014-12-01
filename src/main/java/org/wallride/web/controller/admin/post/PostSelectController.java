@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.wallride.core.domain.Post;
+import org.wallride.core.service.PostSearchRequest;
 import org.wallride.core.service.PostService;
-import org.wallride.core.service.SearchPostRequest;
 import org.wallride.web.support.DomainObjectSelectModel;
 
 import javax.inject.Inject;
@@ -28,7 +28,7 @@ public class PostSelectController {
 	public @ResponseBody List<DomainObjectSelectModel> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
-		SearchPostRequest request = new SearchPostRequest(language)
+		PostSearchRequest request = new PostSearchRequest(language)
 				.withStatus(Post.Status.PUBLISHED)
 				.withKeyword(keyword);
 		Page<Post> posts = postService.readPosts(request, new PageRequest(0, 30));

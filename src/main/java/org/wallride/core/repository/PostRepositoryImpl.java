@@ -24,7 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.SearchPostRequest;
+import org.wallride.core.service.PostSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -36,7 +36,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	private EntityManager entityManager;
 
 	@Override
-	public Page<Post> search(SearchPostRequest request, Pageable pageable) {
+	public Page<Post> search(PostSearchRequest request, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()

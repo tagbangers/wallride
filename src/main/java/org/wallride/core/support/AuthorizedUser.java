@@ -3,10 +3,13 @@ package org.wallride.core.support;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.wallride.core.domain.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class AuthorizedUser extends User implements UserDetails {
@@ -15,7 +18,12 @@ public class AuthorizedUser extends User implements UserDetails {
 
 	public AuthorizedUser(User user) {
 		BeanUtils.copyProperties(user, this);
-		authorities = AuthorityUtils.createAuthorityList("ROLE_USER");
+
+		List<GrantedAuthority> authorities = new ArrayList<>(user.getRoles().size());
+		for (Role role : user.getRoles()) {
+			authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+		}
+		this.authorities = authorities;
 	}
 	
 	@Override

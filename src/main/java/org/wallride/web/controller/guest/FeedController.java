@@ -7,10 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Post;
+import org.wallride.core.domain.*;
 import org.wallride.core.service.ArticleSearchRequest;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
@@ -21,7 +18,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 @Controller
-@RequestMapping("/{language}/feed")
+@RequestMapping("/feed")
 public class FeedController {
 
 	private static final PageRequest DEFAULT_PAGE_REQUEST = new PageRequest(0, 50);
@@ -34,11 +31,11 @@ public class FeedController {
 
 	@RequestMapping("rss.xml")
 	public String indexRss(
-			@PathVariable String language,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchRequest request = new ArticleSearchRequest.Builder()
 				.status(Post.Status.PUBLISHED)
-				.language(language)
+				.language(blogLanguage.getLanguage())
 				.build();
 		Page<Article> articles = articleService.readArticles(request, DEFAULT_PAGE_REQUEST);
 		model.addAttribute("articles", new TreeSet<>(articles.getContent()));
@@ -47,25 +44,25 @@ public class FeedController {
 
 	@RequestMapping("atom.xml")
 	public String indexAtom(
-			@PathVariable String language,
+			BlogLanguage blogLanguage,
 			Model model) {
-		indexRss(language, model);
+		indexRss(blogLanguage, model);
 		return "atomFeedView";
 	}
 
 	@RequestMapping("category/{categoryCode}/rss.xml")
 	public String categoryRss(
-			@PathVariable String language,
 			@PathVariable String categoryCode,
+			BlogLanguage blogLanguage,
 			Model model) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.readCategoryTree(blogLanguage.getLanguage());
 		Category category = categoryTree.getCategoryByCode(categoryCode);
 		List<Long> categoryIds = new ArrayList<>();
 		categoryIds.add(category.getId());
 
 		ArticleSearchRequest request = new ArticleSearchRequest.Builder()
 				.status(Post.Status.PUBLISHED)
-				.language(language)
+				.language(blogLanguage.getLanguage())
 				.categoryIds(categoryIds)
 				.build();
 
@@ -76,10 +73,10 @@ public class FeedController {
 
 	@RequestMapping("category/{categoryCode}/atom.xml")
 	public String categoryAtom(
-			@PathVariable String language,
 			@PathVariable String categoryCode,
+			BlogLanguage blogLanguage,
 			Model model) {
-		categoryRss(language, categoryCode, model);
+		categoryRss(categoryCode, blogLanguage, model);
 		return "atomFeedView";
 	}
 }

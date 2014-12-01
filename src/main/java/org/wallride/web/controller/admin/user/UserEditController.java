@@ -34,7 +34,7 @@ public class UserEditController {
 		User user = userService.readUserById(id);
 		UserEditForm form = UserEditForm.fromDomainObject(user);
 		model.addAttribute("form", form);
-		return "/user/edit";
+		return "user/edit";
 	}
 
 	@RequestMapping(method= RequestMethod.POST, params="_step.save")
@@ -46,7 +46,7 @@ public class UserEditController {
 			HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
-			return "/user/edit";
+			return "user/edit";
 		}
 
 		User user = null;
@@ -56,7 +56,7 @@ public class UserEditController {
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {
 				logger.debug("Errors: {}", errors);
-				return "/user/edit";
+				return "user/edit";
 			}
 			throw e;
 		}
@@ -64,7 +64,7 @@ public class UserEditController {
 		redirectAttributes.addFlashAttribute("savedUser", user);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", user.getId());
-		return "redirect:/_admin/{language}/user/edit?id={id}";
+		return "redirect:/_admin/{language}/users/describe";
 	}
 
 	@RequestMapping(method= RequestMethod.POST, params="_step.cancel")
@@ -72,6 +72,6 @@ public class UserEditController {
 			@Valid @ModelAttribute("form") UserEditForm form,
 			RedirectAttributes redirectAttributes) {
 		redirectAttributes.addAttribute("id", form.getId());
-		return "redirect:/_admin/user/describe/{id}";
+		return "redirect:/_admin/users/describe/{id}";
 	}
 }

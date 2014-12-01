@@ -14,32 +14,13 @@ import java.net.URL;
 
 public class AmazonS3Resource implements Resource {
 	
-//	private static Logger logger = LoggerFactory.getLogger(AmazonS3Resource.class); 
-
 	private AmazonS3Client client;
 	
 	private String bucketName;
 	
 	private String key;
 
-	ObjectMetadata metadata;
-
-//	private long lastModified;
-//
-//	private long contentLength;
-	
-//	private static File cacheRoot;
-	
-//	static {
-//		cacheRoot = new File(System.getProperty("java.io.tmpdir"), AmazonS3Resource.class.getCanonicalName());
-//		logger.debug("キャッシュディレクトリとして {} を使用します。", cacheRoot.getAbsolutePath());
-//		if (!cacheRoot.exists() && !cacheRoot.mkdirs()) {
-//			logger.error("キャッシュディレクトリ {} が作成できません。", cacheRoot.getAbsolutePath());
-//			throw new RuntimeException(
-//					"Directory that preserves the file for cache cannot be used. " +
-//					cacheRoot.getAbsolutePath());
-//		}
-//	}
+	private ObjectMetadata metadata;
 
 	public AmazonS3Resource(AmazonS3Client client, String bucketName, String key) {
 		this.client = client;
@@ -61,24 +42,7 @@ public class AmazonS3Resource implements Resource {
 	
 	@Override
 	public InputStream getInputStream() throws IOException {
-//		File cache = new File(cacheRoot, bucketName + File.separator + key);
-//		if (cache.exists()) {
-//			if (lastModified == 0) {
-//				lastModified = lastModified();
-//			}
-//			if (cache.lastModified() > (lastModified + 1000)) {
-//				return new FileInputStream(cache);
-//			}
-//		}
-		
 		S3Object object = client.getObject(bucketName, key);
-		
-//		cache.getParentFile().mkdirs();
-//		File temp = new File(cache.getParentFile(), '.' + cache.getName() + '.' + RandomStringUtils.randomNumeric(10));
-//		FileUtils.writeByteArrayToFile(temp, IOUtils.toByteArray(object.getObjectContent()));
-//		cache.delete();
-//		FileUtils.moveFile(temp, cache);
-//		return new FileInputStream(cache);
 		return object.getObjectContent();
 	}
 

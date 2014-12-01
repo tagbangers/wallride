@@ -70,7 +70,7 @@ public class UserSearchController extends DomainObjectSearchController<User, Use
 
 	@RequestMapping(params="part=bulk-delete-form")
 	public String partBulkDeleteDialog() {
-		return "/user/index::bulk-delete-form";
+		return "user/index::bulk-delete-form";
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class UserSearchController extends DomainObjectSearchController<User, Use
 
 	@Override
 	protected String getViewName() {
-		return "/user/index";
+		return "user/index";
 	}
 
 	@Override

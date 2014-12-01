@@ -52,7 +52,7 @@ public class TagSearchController {
 		model.addAttribute("tags", tags);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(tags));
-		return "/tag/index";
+		return "tag/index";
 	}
 
 	@RequestMapping(params = "clear")
@@ -68,7 +68,7 @@ public class TagSearchController {
 	public String partTagCreateForm(
 			@PathVariable String language,
 			Model model) {
-		return "/tag/index::tag-create-form";
+		return "tag/index::tag-create-form";
 	}
 
 	@RequestMapping(params = "part=tag-edit-form")
@@ -78,13 +78,13 @@ public class TagSearchController {
 			Model model) {
 		Tag tag = tagService.readTagById(id, language);
 		model.addAttribute("tag", tag);
-		return "/tag/index::tag-edit-form";
+		return "tag/index::tag-edit-form";
 	}
 
 	@RequestMapping(params = "part=bulk-delete-form")
 	public String partBulkDeleteForm(
 			@PathVariable String language) {
-		return "/tag/index::bulk-delete-form";
+		return "tag/index::bulk-delete-form";
 	}
 	@RequestMapping(params = "part=merge-tag-form")
 	public String mergeTagForm(@PathVariable String language) {

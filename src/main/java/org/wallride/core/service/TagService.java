@@ -166,7 +166,4 @@ public class TagService {
 
     }
 
-//    public void mergeTags(List<Long> articleIds){
-//        articleRepository.findByTagIds(articleIds)
-//    }
 }

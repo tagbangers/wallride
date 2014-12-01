@@ -1,5 +1,6 @@
 package org.wallride.core.domain;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -11,10 +12,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 @Entity
 @Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
@@ -61,6 +59,7 @@ public class Post extends DomainObject<Long> {
 	private LocalDateTime date;
 
 	@ManyToOne
+	@IndexedEmbedded
 	private User author;
 
 	@Enumerated(EnumType.STRING)
@@ -83,12 +82,24 @@ public class Post extends DomainObject<Long> {
 	@SortNatural
 	private SortedSet<Post> drafts;
 
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	@SortNatural
+	private SortedSet<Comment> comments;
+
 	@ManyToMany
 	@JoinTable(
 			name="post_related_post",
 			joinColumns = { @JoinColumn(name="post_id")},
 			inverseJoinColumns = { @JoinColumn(name="related_id") })
-	private Set<Post> relatedPosts = new HashSet<>();
+	private Set<Post> relatedToPosts = new HashSet<>();
+
+	@ManyToMany
+	@JoinTable(
+			name="post_related_post",
+			joinColumns = { @JoinColumn(name="related_id")},
+			inverseJoinColumns = { @JoinColumn(name="post_id") })
+	private Set<Post> relatedByPosts = new HashSet<>();
 
 	@ManyToMany
 	@JoinTable(name="post_media", joinColumns=@JoinColumn(name="post_id", referencedColumnName="id"), inverseJoinColumns=@JoinColumn(name="media_id", referencedColumnName="id"))
@@ -208,16 +219,37 @@ public class Post extends DomainObject<Long> {
 		this.drafts = drafts;
 	}
 
-	public List<Media> getMedias() {
-		return medias;
+	public SortedSet<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(SortedSet<Comment> comments) {
+		this.comments = comments;
 	}
 
 	public Set<Post> getRelatedPosts() {
-		return relatedPosts;
+		List<Post> relatedPostList = (List<Post>)CollectionUtils.union(getRelatedToPosts(), getRelatedByPosts());
+		return new HashSet<Post>(relatedPostList);
 	}
 
-	public void setRelatedPosts(Set<Post> relatedPosts) {
-		this.relatedPosts = relatedPosts;
+	public Set<Post> getRelatedToPosts() {
+		return relatedToPosts;
+	}
+
+	public void setRelatedToPosts(Set<Post> relatedToPosts) {
+		this.relatedToPosts = relatedToPosts;
+	}
+
+	public Set<Post> getRelatedByPosts() {
+		return relatedByPosts;
+	}
+
+	public void setRelatedByPosts(Set<Post> relatedByPosts) {
+		this.relatedByPosts = relatedByPosts;
+	}
+
+	public List<Media> getMedias() {
+		return medias;
 	}
 
 	public void setMedias(List<Media> medias) {

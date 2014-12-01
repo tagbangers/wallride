@@ -127,7 +127,7 @@ public class PageService {
 		for (long relatedId : request.getRelatedPostIds()) {
 			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
 		}
-		page.setRelatedPosts(relatedPosts);
+		page.setRelatedToPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());
@@ -299,7 +299,7 @@ public class PageService {
 		for (long relatedId : request.getRelatedPostIds()) {
 			relatedPosts.add(entityManager.getReference(Post.class, relatedId));
 		}
-		page.setRelatedPosts(relatedPosts);
+		page.setRelatedToPosts(relatedPosts);
 
 		Seo seo = new Seo();
 		seo.setTitle(request.getSeoTitle());

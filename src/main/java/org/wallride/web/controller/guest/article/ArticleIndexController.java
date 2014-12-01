@@ -10,13 +10,11 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.HandlerMapping;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Tag;
+import org.wallride.core.domain.*;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.TagService;
+import org.wallride.core.service.UserService;
 import org.wallride.core.support.Pagination;
 import org.wallride.web.support.HttpNotFoundException;
 
@@ -37,31 +35,33 @@ public class ArticleIndexController {
 	private CategoryService categoryService;
 	@Inject
 	private TagService tagService;
+	@Inject
+	private UserService userService;
 
-	@RequestMapping("/{language}/")
-	public String index(
-			@PathVariable String language,
-			@PageableDefault(10) Pageable pageable,
-			HttpSession session,
-			Model model) {
-		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+//	@RequestMapping("/")
+//	public String index(
+//			@PathVariable String language,
+//			@PageableDefault(10) Pageable pageable,
+//			HttpSession session,
+//			Model model) {
+//		ArticleSearchForm form = new ArticleSearchForm() {};
+//		form.setLanguage(language);
+//
+//		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+//		model.addAttribute("articles", articles);
+//		model.addAttribute("pageable", pageable);
+//		model.addAttribute("pagination", new Pagination<>(articles));
+//		return "article/index";
+//	}
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
-		model.addAttribute("articles", articles);
-		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
-	}
-
-	@RequestMapping("/{language}/{year:[0-9]{4}}")
+	@RequestMapping("/{year:[0-9]{4}}")
 	public String year(
-			@PathVariable String language,
 			@PathVariable int year,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.setDateFrom(new LocalDateTime(year, 1, 1, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, 12, 31, 0, 0, 0));
 
@@ -69,18 +69,18 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
-	@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}")
+	@RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}")
 	public String month(
-			@PathVariable String language,
 			@PathVariable int year,
 			@PathVariable int month,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		LocalDateTime date = new LocalDateTime(year, month, 1, 0, 0, 0);
 		form.setDateFrom(new LocalDateTime(year, month, 1, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, month, date.dayOfMonth().getMaximumValue(), 23, 59, 59));
@@ -89,19 +89,19 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
-	@RequestMapping("/{language}/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}")
+	@RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}")
 	public String day(
-			@PathVariable String language,
 			@PathVariable int year,
 			@PathVariable int month,
 			@PathVariable int day,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.setDateFrom(new LocalDateTime(year, month, day, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, month, day, 23, 59, 59));
 
@@ -109,24 +109,24 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
-	@RequestMapping("/{language}/category/**")
+	@RequestMapping("/category/**")
 	public String category(
-			@PathVariable String language,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			HttpServletRequest request,
 			Model model) {
 		String path = extractPathFromPattern(request);
 		String[] codes = path.split("/");
 		String lastCode = codes[codes.length - 1];
 
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.readCategoryTree(blogLanguage.getLanguage());
 		Category category = categoryTree.getCategoryByCode(lastCode);
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.getCategoryIds().add(category.getId());
 
 		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
@@ -134,7 +134,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
 
 	private String extractPathFromPattern(final HttpServletRequest request){
@@ -147,20 +147,20 @@ public class ArticleIndexController {
 		return finalPath;
 	}
 
-	@RequestMapping("/{language}/tag/{name}")
+	@RequestMapping("/tag/{name}")
 	public String tag(
-			@PathVariable String language,
 			@PathVariable String name,
 			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
 			HttpServletRequest request,
 			Model model) {
-		Tag tag = tagService.readTagByName(name, language);
+		Tag tag = tagService.readTagByName(name, blogLanguage.getLanguage());
 		if (tag == null) {
 			throw new HttpNotFoundException();
 		}
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(language);
+		form.setLanguage(blogLanguage.getLanguage());
 		form.getTagIds().add(tag.getId());
 
 		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
@@ -168,6 +168,31 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "/article/index";
+		return "article/index";
 	}
+
+	@RequestMapping("/author/{loginId}")
+	public String author(
+			@PathVariable String loginId,
+			@PageableDefault(10) Pageable pageable,
+			BlogLanguage blogLanguage,
+			HttpServletRequest request,
+			Model model) {
+		User author = userService.readUserByLoginId(loginId);
+		if (author == null) {
+			throw new HttpNotFoundException();
+		}
+
+		ArticleSearchForm form = new ArticleSearchForm() {};
+		form.setLanguage(blogLanguage.getLanguage());
+		form.setAuthorId(author.getId());
+
+		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		model.addAttribute("author", author);
+		model.addAttribute("articles", articles);
+		model.addAttribute("pageable", pageable);
+		model.addAttribute("pagination", new Pagination<>(articles));
+		return "article/author";
+	}
+
 }

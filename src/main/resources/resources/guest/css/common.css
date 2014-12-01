@@ -1,0 +1,76 @@
+.wr-post-summary {
+	margin-bottom: 20px;
+}
+
+.post-cover {
+	width: 100%;
+}
+.author {
+	background-color: #F5F5F5;
+	padding: 15px;
+	border-radius: 5px;
+}
+.author pre {
+	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+	border: transparent;
+	padding: 0;
+
+}
+.pagination-group {
+	margin-top: 20px;
+}
+.pagination-summary {
+	line-height: 30px;
+	margin-right: 15px;
+}
+.pagination {
+	margin: 0;
+}
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
+	background-color: #839CB1;
+	border-color: #839CB1;
+}
+#wrap > .container {
+	padding: 60px 15px 0;
+}
+#wrap > .post-cover + .container {
+	padding-top: 0px;
+}
+#comment-list .list-group-item {
+	border-radius: 0;
+	border-top-width: 1px;
+	border-right-width: 0;
+	border-bottom-width: 1px;
+	border-left-width: 0;
+	padding-left: 0;
+}
+a {
+	color: #839CB1;
+}
+
+a:hover, a:focus {
+	color: #B2CDE4;
+}
+
+table {
+	border: 1px solid #ccc;
+	width: 100%;
+	margin: 20px 0;
+}
+table th, table td {
+	border: 1px solid #ccc;
+	padding: 10px;
+}
+table th {
+	width: 30%;
+}
+body {
+	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}
+h1, h2, h3, h4, h5 {
+	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}
+
+.footer {
+	margin-top: 20px;
+}

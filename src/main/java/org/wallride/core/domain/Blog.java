@@ -117,4 +117,8 @@ public class Blog extends DomainObject<Long> {
 	public String getTitle(String language) {
 		return getLanguage(language).getTitle();
 	}
+
+	public boolean isMultiLanguage() {
+		return (getLanguages().size() > 1);
+	}
 }

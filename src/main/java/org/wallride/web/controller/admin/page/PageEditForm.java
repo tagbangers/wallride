@@ -191,7 +191,7 @@ public class PageEditForm extends DomainObjectEditForm {
 		form.setCoverId(page.getCover() != null ? page.getCover().getId() : null);
 		form.setParentId(page.getParent() != null ? page.getParent().getId() : null);
 
-		for (Post post : page.getRelatedPosts()) {
+		for (Post post : page.getRelatedToPosts()) {
 			form.getRelatedPostIds().add(post.getId());
 		}
 
