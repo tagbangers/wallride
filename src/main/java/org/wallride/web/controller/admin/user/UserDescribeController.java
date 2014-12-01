@@ -1,5 +1,9 @@
 package org.wallride.web.controller.admin.user;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,61 +19,65 @@ import org.wallride.web.support.DomainObjectDescribeController;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Controller
-@RequestMapping(value="/{language}/users/describe", method= RequestMethod.GET)
+@RequestMapping(value = "/{language}/users/describe", method = RequestMethod.GET)
 public class UserDescribeController extends DomainObjectDescribeController<User, UserSearchForm> {
 
-	@Inject
-	private UserService userService;
+    @Inject
+    private UserService userService;
 
-	@Inject
-	private ArticleService articleService;
+    @Inject
+    private ArticleService articleService;
 
-	@ModelAttribute("articleCounts")
-	public Map<Long, Long> articleCounts(@PathVariable String language) {
-		return articleService.countArticlesByAuthorIdGrouped(Post.Status.PUBLISHED, language);
-	}
+    @ModelAttribute("articleCounts")
+    public Map<Long, Long> articleCounts(@PathVariable String language) {
+        return articleService.countArticlesByAuthorIdGrouped(Post.Status.PUBLISHED, language);
+    }
 
-	@RequestMapping
-	public String describe(
-			@RequestParam long id,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, null, model, session);
-	}
+    @RequestMapping
+    public String describe(
+            @RequestParam long id,
+            Model model,
+            HttpSession session) {
+        return super.requestMappingDescribe(id, null, model, session);
+    }
 
-	@RequestMapping(params = "pageable")
-	public String describe(
-			@RequestParam long id,
-			@PageableDefault(50) Pageable pageable,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, pageable, model, session);
-	}
+    @RequestMapping(params = "pageable")
+    public String describe(
+            @RequestParam long id,
+            @PageableDefault(50) Pageable pageable,
+            Model model,
+            HttpSession session) {
+        return super.requestMappingDescribe(id, pageable, model, session);
+    }
 
-	@Override
-	protected Class<UserSearchForm> getDomainObjectSearchFormClass() {
-		return UserSearchForm.class;
-	}
+    @Override
+    protected Class<UserSearchForm> getDomainObjectSearchFormClass() {
+        return UserSearchForm.class;
+    }
 
-	@Override
-	protected String getModelAttributeName() {
-		return "user";
-	}
+    @Override
+    protected String getModelAttributeName() {
+        return "user";
+    }
 
-	@Override
-	protected String getViewName() {
-		return "user/describe";
-	}
+    @Override
+    protected String getViewName() {
+        return "/user/describe";
+    }
 
-	@Override
-	protected User readDomainObject(long id) {
-		return userService.readUserById(id);
-	}
+    @Override
+    protected User readDomainObject(long id) {
+        return userService.readUserById(id);
+    }
 
-	@Override
-	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
-		return userService.readUsers(form.buildUserSearchRequest(), pageable);
-	}
+    @Override
+    protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
+        return userService.readUsers(form.buildUserSearchRequest(), pageable);
+    }
 }

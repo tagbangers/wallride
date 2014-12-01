@@ -1,282 +1,319 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
-		<title>Tags | WallRide</title>
-	</head>
-	<body>
-		<header th:replace="layout::header"></header>
-		<div>
-			<div id="wr-page-header">
-				<div class="page-header container-fluid">
-					<div class="pull-left">
-						<h1 th:text="#{Tags}">Tags</h1>
-					</div>
-					<div class="pull-right">
-						<div class="btn-group">
-							<a th:href="@{__${ADMIN_PATH}__/tags/index?part=tag-create-form}" data-toggle="modal" data-target="#tag-create-modal" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewTag}">Add New Tag</span></a>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div id="wr-page-content">
-				<div class="container-fluid">
-					<div class="alert alert-success" th:if="${savedTag ne null}">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-						<span th:text="#{SavedTag}">Tag saved.</span>
-					</div>
-					<div class="alert alert-success" th:if="${deletedTags ne null}">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-						<span th:text="#{DeletedTags}">Tags Deleted.</span>
-					</div>
-					<section class="search-condition">
-						<div class="search-condition-simple clearfix">
-							<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
-								<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
-								<div class="form-group pull-left">
-									<div class="input-group keyword-search">
-										<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
-										<span class="input-group-btn">
-											<button class="btn btn-default" type="submit" name="search"><span class="glyphicon glyphicon-search"></span></button>
-										</span>
-									</div>
-								</div>
-							</form>
-						</div>
-					</section>
-					<section class="search-result">
-						<form method="post">
-							<div class="search-result-header clearfix">
-								<div class="btn-toolbar wr-bulk-action pull-left">
-									<div class="btn-group">
-										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
-									</div>
-								</div>
-								<div class="pagination-group pull-right">
-									<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
-									<div class="pull-right">
-										<ul class="pagination paginateon-sm">
-											<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
-											<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
-											<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
-										</ul>
-									</div>
-								</div>
-							</div>
-							<div class="table-responsive">
-								<table class="table table-hover">
-									<thead>
-										<tr>
-											<th class="wr-tr-checkbox" style="width:40px"><input type="checkbox" /></th>
-											<th th:text="#{TagName}">Tag Name</th>
-											<th class="text-right" th:text="#{ArticleCount}">Count</th>
-											<th></th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr th:each="tag : ${tags}">
-											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${tag.id}" /></td>
-											<td th:text="${tag.name}"></td>
-											<td class="text-right"><span class="badge wr-tree-option" th:text="${articleCounts.get(tag.id)}?:0">16</span></td>
-											<td class="text-center"><a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-edit-form,id=${tag.id})}" data-toggle="modal" data-target="#tag-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<!-- #bulk-delete-modal -->
-							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="bulk-delete-dialog" class="modal-dialog">
-									<div th:fragment="bulk-delete-form" class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-											<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
-										</div>
-										<div class="modal-body">
-											<p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
-											<label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
-										</div>
-										<div class="modal-footer">
-											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!--/#bulk-delete-modal -->
-							<script th:inline="javascript">
-								// <![CDATA[
-								$(function() {
-									$('#bulk-delete-modal').on('hidden.bs.modal', function() {
-										$(this).removeData('bs.modal');
-									});
-									$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
-										var confirmed = $(this);
-										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
-									});
-									$('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
-										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')){
-											window.location = $(e.target).closest('tr').data('href');
-										};
-									});
-									$('#wr-page-content .search-result').on('click', '[data-action]', function(e) {
-										var form = $(this).closest('form');
-										form.attr('action', $(this).data('action'));
-										form.submit();
-										e.preventDefault();
-									});
-									$('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
-										checkboxSelector: ':checkbox',
-										selectAll: '.search-result th.wr-tr-checkbox'
-									});
-									$('#wr-page-content .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
-										e.stopPropagation();
-									});
-									$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
-										var checked = $(this).prop('checked');
-										if (checked) {
-											$(this).closest('tr').addClass('warning');
-										}
-										else {
-											$(this).closest('tr').removeClass('warning');
-										}
-										var checkedSomeone = false;
-										console.dir($(this));
-										$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
-											if ($(e).prop('checked')) {
-												checkedSomeone = true;
-												return;
-											}
-										});
-										if (checkedSomeone) {
-											$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
-										}
-										else {
-											$('#wr-page-content .search-result .wr-bulk-action .btn').addClass('disabled');
-										}
-									});
-								});
-								// ]]>
-							</script>
-							<!-- #tag-create-modal -->
-							<div id="tag-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="tag-create-dialog" class="modal-dialog">
-									<div class="modal-content">
-										<form th:fragment="tag-create-form">
-											<div class="modal-header">
-												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-												<h4 class="modal-title" th:text="#{AddNewTag}">Add New Tag</h4>
-											</div>
-											<div class="modal-body">
-												<div class="form-group">
-													<input type="text" name="name" class="form-control" th:attr="placeholder=#{TagName}" />
-												</div>
-											</div>
-											<div class="modal-footer">
-												<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-												<button class="btn btn-primary" id="save-tag" th:text="#{Save}">Save</button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-							<!--/#tag-create-modal -->
-							<script th:inline="javascript">
-								$(function() {
-									$('#wr-page-content').on('click', '#save-tag', function(e) {
-										e.preventDefault();
-										var self = this;
-										$(self).button('loading');
-										var form = $(this).closest('form');
-										var data = {
-											name: $(':input[name="name"]', form).val()
-										};
-										$.ajax({
-											url: /*[[@{__${ADMIN_PATH}__/tags.json}]]*/ '#',
-											type: 'post',
-											data: data,
-											success: function() {
-												location = /*[[@{__${ADMIN_PATH}__/tags/index?created}]]*/ '#';
-											},
-											error: function(jqXHR) {
-												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-													var field = $(':input[name="' + field + '"]', form);
-													$(field).closest('.form-group').addClass('has-error');
-													$(field).closest('.form-group').find('.help-block.has-error').remove();
-													$(field).after($('<span class="help-block has-error" />').text(message));
-												});
-												$(self).button('reset');
-											}
-										});
-									});
-									$('#wr-page-content').on('hidden.bs.modal', '#tag-create-modal', function() {
-										$(this).removeData('bs.modal');
-									});
-								});
-							</script>
-							<!-- #tag-edit-modal -->
-							<div id="tag-edit-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="tag-edit-dialog" class="modal-dialog">
-									<div class="modal-content">
-										<form th:fragment="tag-edit-form" th:if="${tag}">
-											<div class="modal-header">
-												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-												<h4 class="modal-title" th:text="#{EditTag}">Edit Tag</h4>
-											</div>
-											<div class="modal-body">
-												<div class="form-group">
-													<input type="text" name="name" th:value="${tag.name}" class="form-control" th:attr="placeholder=#{TagName}" placeholder="Tag Name" />
-												</div>
-											</div>
-											<div class="modal-footer">
-												<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-												<button id="update-tag" class="btn btn-primary" th:text="#{Save}" th:attr="data-id=${tag.id}">Save</button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-							<!--/#tag-edit-modal -->
-							<script th:inline="javascript">
-								$(function() {
-									$('#wr-page-content').on('click', '#update-tag', function(e) {
-										e.preventDefault();
-										var self = $(this);
-										self.button('loading');
-										var form = self.closest('form');
-										var data = {
-											name: $(':input[name="name"]', form).val()
-										};
-										/*[+
-										 var url = [[@{__${ADMIN_PATH}__/tags/}]] + self.data('id') + '.json';
-										 +]*/
-										$.ajax({
-											url: url,
-											type: 'post',
-											data: data,
-											success: function() {
-												location = /*[[@{__${ADMIN_PATH}__/tags/index?updated}]]*/ '#';
-											},
-											error: function(jqXHR) {
-												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-													var field = $(':input[name="' + field + '"]', form);
-													$(field).closest('.form-group').addClass('has-error');
-													$(field).closest('.form-group').find('.help-block.has-error').remove();
-													$(field).after($('<span class="help-block has-error" />').text(message));
-												});
-												$(self).button('reset');
-											}
-										});
-									});
-									$('#wr-page-content').on('hidden.bs.modal', '#tag-edit-modal', function() {
-										$(this).removeData('bs.modal');
-									});
-								});
-							</script>
-							<!-- #tag-delete-modal -->
-						</form>
-					</section>
-				</div>
-			</div>
-		</div>
-	</body>
+    <head>
+        <meta charset="utf-8" th:replace="layout::head('WallRide')" />
+        <title>Tags | WallRide</title>
+    </head>
+    <body>
+        <header th:replace="layout::header"></header>
+        <div>
+            <div id="wr-page-header">
+                <div class="page-header container-fluid">
+                    <div class="pull-left">
+                        <h1 th:text="#{Tags}">Tags</h1>
+                    </div>
+                    <div class="pull-right">
+                        <div class="btn-group">
+                            <a th:href="@{__${ADMIN_PATH}__/tags/index?part=tag-create-form}" data-toggle="modal" data-target="#tag-create-modal" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewTag}">Add New Tag</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="wr-page-content">
+                <div class="container-fluid">
+                    <div class="alert alert-success" th:if="${savedTag ne null}">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <span th:text="#{SavedTag}">Tag saved.</span>
+                    </div>
+                    <div class="alert alert-success" th:if="${deletedTags ne null}">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <span th:text="#{DeletedTags}">Tags Deleted.</span>
+                    </div>
+                    <div class="alert alert-success" th:if="${mergedTags ne null}">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <span>Tags Merged.</span>
+                    </div>
+                    <section class="search-condition">
+                        <div class="search-condition-simple clearfix">
+                            <form class="form-inline" method="post" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
+                                <input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
+                                <div class="form-group pull-left">
+                                    <div class="input-group keyword-search">
+                                        <input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="submit" name="search"><span class="glyphicon glyphicon-search"></span></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                    <section class="search-result">
+                        <form method="post">
+                            <div class="search-result-header clearfix">
+                                <div class="btn-toolbar wr-bulk-action pull-left">
+                                    <div class="btn-group">
+                                        <a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+                                        <a th:href="@{__${ADMIN_PATH}__/tags/index(part=merge-tag-form)}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled">Merge</a>
+                                    </div>
+                                </div>
+                                <div class="pagination-group pull-right">
+                                    <div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
+                                    <div class="pull-right">
+                                        <ul class="pagination paginateon-sm">
+                                            <li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
+                                            <li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
+                                            <li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/tags/index(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="wr-tr-checkbox" style="width:40px"><input type="checkbox" /></th>
+                                            <th th:text="#{TagName}">Tag Name</th>
+                                            <th class="text-right" th:text="#{ArticleCount}">Count</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="tag : ${tags}">
+                                            <td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${tag.id}" /></td>
+                                            <td th:text="${tag.name}"></td>
+                                            <td class="text-right"><span class="badge wr-tree-option" th:text="${articleCounts.get(tag.id)}?:0">16</span></td>
+                                            <td class="text-center"><a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-edit-form,id=${tag.id})}" data-toggle="modal" data-target="#tag-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--#merge-tag-modal-->
+                            <div id="merge-tag-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div id="merge-tag-dialog" class="modal-dialog">
+                                    <div th:fragment="merge-tag-form" class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" >Merge Tags</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <p>Tag name of the merged</p>
+                                                <input type="text"  name="newTagName" placeholder="Enter a large new tag" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-default" data-dismiss="modal" >Close</button>
+                                            <button class="btn btn-primary"  id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}" disabled="true"  >Merge</button> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/#merge-tag-modal-->
+                            <!-- #bulk-delete-modal -->
+                            <div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div id="bulk-delete-dialog" class="modal-dialog">
+                                    <div th:fragment="bulk-delete-form" class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
+                                            <label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+                                            <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/#bulk-delete-modal -->
+                            <script th:inline="javascript">
+                                // <![CDATA[
+                                $(function() {
+                                    $('#bulk-delete-modal').on('hidden.bs.modal', function() {
+                                        $(this).removeData('bs.modal');
+                                    });
+                                    $('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
+                                        var confirmed = $(this);
+                                        $('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
+                                    });
+                                    $('#merge-tag-modal').on('keyup', ':input[name="newTagName"]', function() {
+                                        //console.log(1);
+                                        var newTagName = $(this);
+                                        if (newTagName.val() === '') {
+                                            $('#merge-tag-modal .btn-primary').prop('disabled', true);
+                                        } else {
+                                            $('#merge-tag-modal .btn-primary').prop('disabled', false);
+                                        }
+
+                                    });
+                                    $('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
+                                        if (!$(e.target).is(':checkbox') && !$(e.target).is('a')) {
+                                            window.location = $(e.target).closest('tr').data('href');
+                                        }
+                                        ;
+                                    });
+                                    $('#wr-page-content .search-result').on('click', '[data-action]', function(e) {
+                                        var form = $(this).closest('form');
+                                        form.attr('action', $(this).data('action'));
+                                        form.submit();
+                                        e.preventDefault();
+                                    });
+                                    $('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
+                                        checkboxSelector: ':checkbox',
+                                        selectAll: '.search-result th.wr-tr-checkbox'
+                                    });
+                                    $('#wr-page-content .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
+                                        e.stopPropagation();
+                                    });
+                                    $('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
+                                        var checked = $(this).prop('checked');
+                                        if (checked) {
+                                            $(this).closest('tr').addClass('warning');
+                                        }
+                                        else {
+                                            $(this).closest('tr').removeClass('warning');
+                                        }
+                                        var checkedSomeone = false;
+                                        console.dir($(this));
+                                        $('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
+                                            if ($(e).prop('checked')) {
+                                                checkedSomeone = true;
+                                                return;
+                                            }
+                                        });
+                                        if (checkedSomeone) {
+                                            $('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
+                                        }
+                                        else {
+                                            $('#wr-page-content .search-result .wr-bulk-action .btn').addClass('disabled');
+                                        }
+                                    });
+                                });
+                                // ]]>
+                            </script>
+                            <!-- #tag-create-modal -->
+                            <div id="tag-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div id="tag-create-dialog" class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form th:fragment="tag-create-form">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title" th:text="#{AddNewTag}">Add New Tag</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <input type="text" name="name" class="form-control" th:attr="placeholder=#{TagName}"/>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+                                                <button class="btn btn-primary" id="save-tag" th:text="#{Save}">Save</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/#tag-create-modal -->
+                            <script th:inline="javascript">
+                                $(function() {
+                                    $('#wr-page-content').on('click', '#save-tag', function(e) {
+                                        e.preventDefault();
+                                        var self = this;
+                                        $(self).button('loading');
+                                        var form = $(this).closest('form');
+                                        var data = {
+                                            name: $(':input[name="name"]', form).val()
+                                        };
+                                        $.ajax({
+                                            url: /*[[@{__${ADMIN_PATH}__/tags.json}]]*/ '#',
+                                            type: 'post',
+                                            data: data,
+                                            success: function() {
+                                                location = /*[[@{__${ADMIN_PATH}__/tags/index?created}]]*/ '#';
+                                            },
+                                            error: function(jqXHR) {
+                                                $.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+                                                    var field = $(':input[name="' + field + '"]', form);
+                                                    $(field).closest('.form-group').addClass('has-error');
+                                                    $(field).closest('.form-group').find('.help-block.has-error').remove();
+                                                    $(field).after($('<span class="help-block has-error" />').text(message));
+                                                });
+                                                $(self).button('reset');
+                                            }
+                                        });
+                                    });
+                                    $('#wr-page-content').on('hidden.bs.modal', '#tag-create-modal', function() {
+                                        $(this).removeData('bs.modal');
+                                    });
+                                });</script>
+                            <!-- #tag-edit-modal -->
+                            <div id="tag-edit-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div id="tag-edit-dialog" class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form th:fragment="tag-edit-form" th:if="${tag}">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title" th:text="#{EditTag}">Edit Tag</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <input type="text" name="name" th:value="${tag.name}" class="form-control" th:attr="placeholder=#{TagName}" placeholder="Tag Name" />
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+                                                <button id="update-tag" class="btn btn-primary" th:text="#{Save}" th:attr="data-id=${tag.id}">Save</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/#tag-edit-modal -->
+                            <script th:inline="javascript">
+                                $(function() {
+                                    $('#wr-page-content').on('click', '#update-tag', function(e) {
+                                        e.preventDefault();
+                                        var self = $(this);
+                                        self.button('loading');
+                                        var form = self.closest('form');
+                                        var data = {
+                                            name: $(':input[name="name"]', form).val()
+                                        };
+                                        /*[+
+                                         var url = [[@{__${ADMIN_PATH}__/tags/}]] + self.data('id') + '.json';
+                                         +]*/
+                                        $.ajax({
+                                            url: url,
+                                            type: 'post',
+                                            data: data,
+                                            success: function() {
+                                                location = /*[[@{__${ADMIN_PATH}__/tags/index?updated}]]*/ '#';
+                                            },
+                                            error: function(jqXHR) {
+                                                $.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+                                                    var field = $(':input[name="' + field + '"]', form);
+                                                    $(field).closest('.form-group').addClass('has-error');
+                                                    $(field).closest('.form-group').find('.help-block.has-error').remove();
+                                                    $(field).after($('<span class="help-block has-error" />').text(message));
+                                                });
+                                                $(self).button('reset');
+                                            }
+                                        });
+                                    });
+                                    $('#wr-page-content').on('hidden.bs.modal', '#tag-edit-modal', function() {
+                                        $(this).removeData('bs.modal');
+                                    });
+                                });
+                            </script>
+                            <!-- #tag-delete-modal -->
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
