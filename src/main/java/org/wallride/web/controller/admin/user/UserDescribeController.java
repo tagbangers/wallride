@@ -56,7 +56,7 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
         return super.requestMappingDescribe(id, pageable, model, session);
     }
 
-    @RequestMapping(value = "{language}/users/describe/change-avatar", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/{language}/users/describe/change-avatar", method = RequestMethod.POST)
     public String changeAvatar() {
 //            CommonsMultipartFile file, BindingResult errors
 //            if (errors.hasErrors()) {
@@ -77,8 +77,8 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
 //                    Logger.getLogger(UserDescribeController.class.getName()).log(Level.SEVERE, null, ex);
 //                }
 //            }
-        return "redirect:/{language}/users/describe/index";
-    }
+        return "redirect:/_admin/{language}/users/describe/index";
+    }*/
 
     @Override
     protected Class<UserSearchForm> getDomainObjectSearchFormClass() {

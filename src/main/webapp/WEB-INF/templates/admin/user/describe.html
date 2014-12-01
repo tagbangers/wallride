@@ -70,7 +70,6 @@
                                         <a href="#" type="button" class="btn btn-info" data-toggle="modal" data-target="#change-avatar-modal" >Change Avatar</a>
                                     </div>
                                 </div>
-                                        <a th:href="@{__${ADMIN_PATH}__/users/describe/change-avatar}" type="button" class="btn btn-info"  >Change </a>
                             </div>
                             <table class="table">
                                 <tr>
@@ -118,7 +117,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-                                <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/describe/change-avatar}" >Change</button>
+                                <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/change-avatar}" >Change</button>
                             </div>
                         </div>
                     </form>
@@ -139,12 +138,14 @@
                         }
                     });
 
-                    $('#change-avatar-dialog .btn-primary').on('click', '[data-action]', function(e) {
-                        var form = $(this).closest('form');
+                    $('#change-avatar-modal .btn-primary').on('click', '[data-action]', function(e) {
+                    	console.log(1);
+                    	   var form = $(this).closest('form');
+                        
                         form.attr('action', $(this).data('action'));
 //                       form.attr('enctype','multipart/form-data');
-                        form.submit();
-                        e.preventDefault();
+                        form.submit(); 
+                        /* e.preventDefault(); */
                     });
                 });
             </script>

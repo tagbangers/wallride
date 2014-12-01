@@ -4,3 +4,4 @@ target/
 .classpath
 .idea
 wallride.iml
+/bin/
