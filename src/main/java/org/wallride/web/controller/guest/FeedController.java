@@ -33,10 +33,9 @@ public class FeedController {
 	public String indexRss(
 			BlogLanguage blogLanguage,
 			Model model) {
-		ArticleSearchRequest request = new ArticleSearchRequest.Builder()
-				.status(Post.Status.PUBLISHED)
-				.language(blogLanguage.getLanguage())
-				.build();
+		ArticleSearchRequest request = new ArticleSearchRequest()
+				.withStatus(Post.Status.PUBLISHED)
+				.withLanguage(blogLanguage.getLanguage());
 		Page<Article> articles = articleService.readArticles(request, DEFAULT_PAGE_REQUEST);
 		model.addAttribute("articles", new TreeSet<>(articles.getContent()));
 		return "rssFeedView";
@@ -60,11 +59,10 @@ public class FeedController {
 		List<Long> categoryIds = new ArrayList<>();
 		categoryIds.add(category.getId());
 
-		ArticleSearchRequest request = new ArticleSearchRequest.Builder()
-				.status(Post.Status.PUBLISHED)
-				.language(blogLanguage.getLanguage())
-				.categoryIds(categoryIds)
-				.build();
+		ArticleSearchRequest request = new ArticleSearchRequest()
+				.withStatus(Post.Status.PUBLISHED)
+				.withLanguage(blogLanguage.getLanguage())
+				.withCategoryIds(categoryIds);
 
 		Page<Article> articles = articleService.readArticles(request, DEFAULT_PAGE_REQUEST);
 		model.addAttribute("articles", new TreeSet<>(articles.getContent()));

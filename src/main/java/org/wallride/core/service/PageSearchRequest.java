@@ -1,40 +1,85 @@
 package org.wallride.core.service;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.StringUtils;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
-import org.wallride.core.repository.PageFullTextSearchTerm;
 
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class PageSearchRequest implements Serializable {
-	
+
 	private String keyword;
-	
+	private Long authorId;
 	private Post.Status status;
-	
 	private String language;
 
 	public PageSearchRequest() {
 		this.language = LocaleContextHolder.getLocale().getLanguage();
 	}
 
+	public PageSearchRequest(BlogLanguage blogLanguage) {
+		this.language = blogLanguage.getLanguage();
+	}
+
 	public String getKeyword() {
 		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	public PageSearchRequest withKeyword(String keyword) {
+		this.keyword = keyword;
+		return this;
+	}
+
+	public Long getAuthorId() {
+		return authorId;
+	}
+
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
+	}
+
+	public PageSearchRequest withAuthorId(Long authorId) {
+		this.authorId = authorId;
+		return this;
 	}
 
 	public Post.Status getStatus() {
 		return status;
 	}
 
+	public void setStatus(Post.Status status) {
+		this.status = status;
+	}
+
+	public PageSearchRequest withStatus(Post.Status status) {
+		this.status = status;
+		return this;
+	}
+
 	public String getLanguage() {
 		return language;
 	}
 
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public PageSearchRequest withLanguage(String language) {
+		this.language = language;
+		return this;
+	}
+
 	public boolean isEmpty() {
 		if (StringUtils.hasText(getKeyword())) {
+			return false;
+		}
+		if (getAuthorId() != null) {
 			return false;
 		}
 		if (getStatus() != null) {
@@ -44,44 +89,5 @@ public class PageSearchRequest implements Serializable {
 			return false;
 		}
 		return true;
-	}
-	
-	public PageFullTextSearchTerm toFullTextSearchTerm() {
-		PageFullTextSearchTerm term = new PageFullTextSearchTerm();
-		BeanUtils.copyProperties(this, term);
-		return term;
-	}
-
-	public static class Builder  {
-
-		private String keyword;
-		private Post.Status status;
-		private String language;
-
-		public Builder() {
-		}
-
-		public Builder keyword(String keyword) {
-			this.keyword = keyword;
-			return this;
-		}
-
-		public Builder status(Post.Status status) {
-			this.status = status;
-			return this;
-		}
-
-		public Builder language(String language) {
-			this.language = language;
-			return this;
-		}
-
-		public PageSearchRequest build() {
-			PageSearchRequest request = new PageSearchRequest();
-			request.keyword = keyword;
-			request.status = status;
-			request.language = language;
-			return request;
-		}
 	}
 }

@@ -4,6 +4,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SortNatural;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.TreeSet;
 @Table(name="category", uniqueConstraints=@UniqueConstraint(columnNames={"code", "language"}))
 @DynamicInsert
 @DynamicUpdate
+@Indexed
 @SuppressWarnings("serial")
 public class Category extends DomainObject<Long> implements Comparable<Category> {
 

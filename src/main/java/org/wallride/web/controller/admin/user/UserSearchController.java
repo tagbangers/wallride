@@ -95,6 +95,6 @@ public class UserSearchController extends DomainObjectSearchController<User, Use
 
 	@Override
 	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
-		return userService.readUsers(form.buildUserSearchRequest(), pageable);
+		return userService.readUsers(form.toUserSearchRequest(), pageable);
 	}
 }

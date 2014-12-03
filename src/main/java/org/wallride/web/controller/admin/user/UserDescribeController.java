@@ -70,6 +70,6 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
 
 	@Override
 	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
-		return userService.readUsers(form.buildUserSearchRequest(), pageable);
+		return userService.readUsers(form.toUserSearchRequest(), pageable);
 	}
 }

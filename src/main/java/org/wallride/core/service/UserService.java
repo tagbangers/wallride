@@ -34,7 +34,6 @@ import org.wallride.core.domain.PasswordResetToken;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.repository.PasswordResetTokenRepository;
-import org.wallride.core.repository.UserFullTextSearchTerm;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
@@ -393,8 +392,7 @@ public class UserService {
 	}
 
 	public Page<User> readUsers(UserSearchRequest request, Pageable pageable) {
-		UserFullTextSearchTerm term = request.toFullTextSearchTerm();
-		return userRepository.findByFullTextSearchTerm(term, pageable);
+		return userRepository.search(request, pageable);
 	}
 
 	private List<User> readUsers(Collection<Long> ids) {

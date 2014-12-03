@@ -68,7 +68,7 @@ public class DashboardController {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.PUBLISHED);
-		Page<Article> page = articleService.readArticles(form.buildArticleSearchRequest());
+		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
 		return page.getContent();
 	}
 
@@ -76,7 +76,7 @@ public class DashboardController {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setLanguage(language);
 		form.setStatus(Post.Status.DRAFT);
-		Page<Article> page = articleService.readArticles(form.buildArticleSearchRequest());
+		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
 		return page.getContent();
 	}
 }

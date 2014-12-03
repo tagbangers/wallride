@@ -10,7 +10,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -20,39 +19,35 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.Article;
-import org.wallride.core.service.ArticleSearchRequest;
+import org.wallride.core.domain.Category;
+import org.wallride.core.service.CategorySearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
+public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
 	
 	@Override
-	public Page<Article> search(ArticleSearchRequest request, Pageable pageable) {
+	public Page<Category> search(CategorySearchRequest request, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
-				.forEntity(Article.class)
+				.forEntity(Category.class)
 				.get();
 		
 		@SuppressWarnings("rawtypes")
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
 
-		junction.must(qb.keyword().onField("drafted").ignoreAnalyzer().matching("_null_").createQuery());
-
 		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
-					"title", "body",
-					"categories.name", "tags.name",
+					"name"
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);
 			parser.setDefaultOperator(Operator.AND);
@@ -70,61 +65,20 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 			}
 			junction.must(query);
 		}
-		if (request.getStatus() != null) {
-			junction.must(qb.keyword().onField("status").matching(request.getStatus()).createQuery());
-		}
+
 		if (StringUtils.hasText(request.getLanguage())) {
 			junction.must(qb.keyword().onField("language").matching(request.getLanguage()).createQuery());
-		}
-
-		if (request.getDateFrom() != null) {
-			junction.must(qb.range().onField("date").above(request.getDateFrom()).createQuery());
-		}
-		if (request.getDateTo() != null) {
-			junction.must(qb.range().onField("date").below(request.getDateTo()).createQuery());
-		}
-
-		if (!CollectionUtils.isEmpty(request.getCategoryIds())) {
-			for (long categoryId : request.getCategoryIds()) {
-				junction.must(qb.keyword().onField("categories.id").matching(categoryId).createQuery());
-			}
-		}
-		if (!CollectionUtils.isEmpty(request.getCategoryCodes())) {
-			for (String categoryCode : request.getCategoryCodes()) {
-				junction.must(qb.keyword().onField("categories.code").matching(categoryCode).createQuery());
-			}
-		}
-
-		if (!CollectionUtils.isEmpty(request.getTagIds())) {
-			for (long tagId : request.getTagIds()) {
-				junction.must(qb.keyword().onField("tags.id").matching(tagId).createQuery());
-			}
-		}
-		if (!CollectionUtils.isEmpty(request.getTagNames())) {
-			for (String tagName : request.getTagNames()) {
-				junction.must(qb.keyword().onField("tags.name").matching(tagName).createQuery());
-			}
-		}
-
-		if (request.getAuthorId() != null) {
-			junction.must(qb.keyword().onField("author.id").matching(request.getAuthorId()).createQuery());
 		}
 
 		Query searchQuery = junction.createQuery();
 		
 		Session session = (Session) entityManager.getDelegate();
-		Criteria criteria = session.createCriteria(Article.class)
-				.setFetchMode("cover", FetchMode.JOIN)
-				.setFetchMode("user", FetchMode.JOIN)
-				.setFetchMode("categories", FetchMode.JOIN);
-//				.setFetchMode("tags", FetchMode.JOIN);
+		Criteria criteria = session.createCriteria(Category.class);
 
-		Sort sort = new Sort(
-				new SortField("date", SortField.STRING, true),
-				new SortField("id", SortField.LONG, true));
+		Sort sort = new Sort(new SortField("name", SortField.STRING));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
-				.createFullTextQuery(searchQuery, Article.class)
+				.createFullTextQuery(searchQuery, Category.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
 		persistenceQuery.setFirstResult(pageable.getOffset());
@@ -133,7 +87,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		int resultSize = persistenceQuery.getResultSize();
 
 		@SuppressWarnings("unchecked")
-		List<Article> results = persistenceQuery.getResultList();
+		List<Category> results = persistenceQuery.getResultList();
 		return new PageImpl<>(results, pageable, resultSize);
 	}
 }

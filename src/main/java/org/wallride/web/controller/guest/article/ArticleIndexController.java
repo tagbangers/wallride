@@ -11,16 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.HandlerMapping;
 import org.wallride.core.domain.*;
-import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.TagService;
-import org.wallride.core.service.UserService;
+import org.wallride.core.service.*;
 import org.wallride.core.support.Pagination;
 import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @Controller
 public class ArticleIndexController {
@@ -47,7 +43,7 @@ public class ArticleIndexController {
 //		ArticleSearchForm form = new ArticleSearchForm() {};
 //		form.setLanguage(language);
 //
-//		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+//		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 //		model.addAttribute("articles", articles);
 //		model.addAttribute("pageable", pageable);
 //		model.addAttribute("pagination", new Pagination<>(articles));
@@ -65,7 +61,7 @@ public class ArticleIndexController {
 		form.setDateFrom(new LocalDateTime(year, 1, 1, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, 12, 31, 0, 0, 0));
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
@@ -85,7 +81,7 @@ public class ArticleIndexController {
 		form.setDateFrom(new LocalDateTime(year, month, 1, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, month, date.dayOfMonth().getMaximumValue(), 23, 59, 59));
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
@@ -105,7 +101,7 @@ public class ArticleIndexController {
 		form.setDateFrom(new LocalDateTime(year, month, day, 0, 0, 0));
 		form.setDateTo(new LocalDateTime(year, month, day, 23, 59, 59));
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
@@ -129,7 +125,7 @@ public class ArticleIndexController {
 		form.setLanguage(blogLanguage.getLanguage());
 		form.getCategoryIds().add(category.getId());
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("category", category);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
@@ -152,18 +148,16 @@ public class ArticleIndexController {
 			@PathVariable String name,
 			@PageableDefault(10) Pageable pageable,
 			BlogLanguage blogLanguage,
-			HttpServletRequest request,
 			Model model) {
 		Tag tag = tagService.readTagByName(name, blogLanguage.getLanguage());
 		if (tag == null) {
 			throw new HttpNotFoundException();
 		}
 
-		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(blogLanguage.getLanguage());
-		form.getTagIds().add(tag.getId());
-
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		ArticleSearchRequest request = new ArticleSearchRequest()
+				.withLanguage(blogLanguage.getLanguage())
+				.withTagNames(name);
+		Page<Article> articles = articleService.readArticles(request, pageable);
 		model.addAttribute("tag", tag);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
@@ -187,7 +181,7 @@ public class ArticleIndexController {
 		form.setLanguage(blogLanguage.getLanguage());
 		form.setAuthorId(author.getId());
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("author", author);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);

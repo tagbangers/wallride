@@ -19,8 +19,10 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.User;
+import org.wallride.core.service.UserSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -32,7 +34,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	private EntityManager entityManager;
 	
 	@Override
-	public Page<User> findByFullTextSearchTerm(UserFullTextSearchTerm term, Pageable pageable) {
+	public Page<User> search(UserSearchRequest request, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
@@ -43,7 +45,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
 
-		if (StringUtils.hasText(term.getKeyword())) {
+		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
 					"loginId",
@@ -53,11 +55,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			parser.setDefaultOperator(Operator.AND);
 			Query query = null;
 			try {
-				query = parser.parse(term.getKeyword());
+				query = parser.parse(request.getKeyword());
 			}
 			catch (ParseException e1) {
 				try {
-					query = parser.parse(QueryParser.escape(term.getKeyword()));
+					query = parser.parse(QueryParser.escape(request.getKeyword()));
 				}
 				catch (ParseException e2) {
 					throw new RuntimeException(e2);
@@ -65,7 +67,13 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			}
 			junction.must(query);
 		}
-		
+
+		if (!CollectionUtils.isEmpty(request.getRoles())) {
+			for (User.Role role : request.getRoles()) {
+				junction.must(qb.keyword().onField("roles").matching(role).createQuery());
+			}
+		}
+
 		Query searchQuery = junction.createQuery();
 		
 		Session session = (Session) entityManager.getDelegate();

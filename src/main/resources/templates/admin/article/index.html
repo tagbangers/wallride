@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>Articles | WallRide</title>
@@ -18,6 +18,69 @@
 				</div>
 			</div>
 			<div id="wr-page-content">
+				<section class="search-condition">
+					<div class="navbar">
+						<div class="container-fluid">
+							<form id="search-form" class="navbar-form navbar-left" method="get" th:action="@{__${ADMIN_PATH}__/articles/index}" th:object="${form}">
+								<select th:field="*{status}" class="select2" th:placeholder="#{Status}">
+									<option value=""></option>
+									<option th:value="PUBLISHED"><span th:text="#{Post.Status.PUBLISHED}">Published</span> <span th:text="${'(' + countPublished + ')'}">(0)</span></option>
+									<option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
+									<option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
+								</select>
+								<input type="hidden" class="select2" th:field="*{categoryId}" th:attr="data-url=@{__${ADMIN_PATH}__/categories/select}" th:placeholder="#{Categories}" />
+								<input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}" />
+								<input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}" />
+								<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
+								<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+							</form>
+							<script th:inline="javascript">
+								$(function() {
+									$('#search-form select.select2').each(function(index) {
+										var $self = $(this);
+										$self.select2({
+											allowClear: true,
+											dropdownAutoWidth: true,
+											dropdownCssClass: 'select2-drop-search-form',
+										});
+									});
+									$('#search-form input.select2').each(function(index) {
+										var $self = $(this);
+										$self.select2({
+											minimumInputLength: 1,
+											allowClear: true,
+											dropdownAutoWidth: true,
+											dropdownCssClass: 'select2-drop-search-form',
+											ajax: {
+												url:  $self.attr('data-url'),
+												dataType: 'json',
+												data: function (term, page) {
+													return {
+														keyword: term
+													};
+												},
+												results: function (data, page) {
+													return {results: data};
+												}
+											},
+											initSelection: function(element, callback) {
+												var id = $(element).val();
+												if (id !== "") {
+													$.ajax($self.attr('data-url') + '/' + id + ".json", {
+														dataType: "json"
+													}).done(function(data) {
+														callback(data);
+													});
+												}
+											}
+										});
+									});
+								});
+							</script>
+						</div>
+					</div>
+				</section>
+
 				<div class="container-fluid">
 					<div class="alert alert-success" th:if="${deletedArticle ne null}">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -27,31 +90,6 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{DeletedArticles}">Articles Deleted.</span>
 					</div>
-					<section class="search-condition">
-						<div class="search-condition-simple clearfix">
-							<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/articles/index}" th:object="${form}">
-								<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
-								<input type="hidden" th:field="*{status}" />
-								<div class="form-group pull-left">
-									<div class="input-group keyword-search">
-										<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
-										<span class="input-group-btn">
-											<button class="btn btn-default" type="submit" name="search"><span class="glyphicon glyphicon-search"></span>
-											</button>
-										</span>
-									</div>
-								</div>
-								<div class="form-group pull-left status-condition">
-									<ul class="list-inline" style="line-height: 30px;">
-										<li th:disabled="${form.status ne null}"><a th:href="@{__${ADMIN_PATH}__/articles/index?search}" th:text="#{All}">All</a> <span class="total" th:text="${'(' + countAll + ')'}">(0)</span> | </li>
-										<li th:disabled="${#strings.toString(form.status) eq 'PUBLISHED'}"><a th:href="@{__${ADMIN_PATH}__/articles/index?search(status=PUBLISHED)}" th:text="#{Post.Status.PUBLISHED}">Published</a> <span class="total" th:text="${'(' + countPublished + ')'}">(0)</span> | </li>
-										<li th:disabled="${#strings.toString(form.status) eq 'SCHEDULED'}"><a th:href="@{__${ADMIN_PATH}__/articles/index?search(status=SCHEDULED)}" th:text="#{Post.Status.SCHEDULED}">Scheduled</a> <span class="total" th:text="${'(' + countScheduled + ')'}">(0)</span> | </li>
-										<li th:disabled="${#strings.toString(form.status) eq 'DRAFT'}"><a th:href="@{__${ADMIN_PATH}__/articles/index?search(status=DRAFT)}" th:text="#{Post.Status.DRAFT}">Draft</a> <span class="total" th:text="${'(' + countDraft + ')'}">(0)</span></li>
-									</ul>
-								</div>
-							</form>
-						</div>
-					</section>
 					<section class="search-result">
 						<form method="post">
 							<div class="search-result-header clearfix">
@@ -64,9 +102,9 @@
 									<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
 									<div class="pull-right">
 										<ul class="pagination paginateon-sm">
-											<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
-											<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
-											<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{__${ADMIN_PATH}__/articles/index(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
+											<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{${pagination.url}(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
+											<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{${pagination.url}(page=${p.pageNumber})}" th:text="${p.pageNumber + 1}"></a></li>
+											<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{${pagination.url}(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
 										</ul>
 									</div>
 								</div>
