@@ -1,10 +1,10 @@
-package org.wallride.web.controller.admin.tag;
+package org.wallride.web.controller.admin.user;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.wallride.core.domain.Tag;
-import org.wallride.core.service.TagService;
+import org.wallride.core.domain.User;
+import org.wallride.core.service.UserService;
 import org.wallride.web.support.DomainObjectSelectModel;
 
 import javax.inject.Inject;
@@ -14,42 +14,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class TagSelectController {
+public class UserSelectController {
 
 	@Inject
-	private TagService tagService;
+	private UserService userService;
 
-	@RequestMapping(value="/{language}/tags/select")
+	@RequestMapping(value="/{language}/users/select")
 	public @ResponseBody List<DomainObjectSelectModel> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
-		TagSearchForm form = new TagSearchForm();
+		UserSearchForm form = new UserSearchForm();
 		form.setKeyword(keyword);
-		form.setLanguage(language);
-		Page<Tag> tags = tagService.readTags(form.buildTagSearchRequest());
+		Page<User> users = userService.readUsers(form.toUserSearchRequest());
 
 		List<DomainObjectSelectModel> results = new ArrayList<>();
-		if (tags.hasContent()) {
-			for (Tag tag : tags) {
-				DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getId(), tag.getName());
+		if (users.hasContent()) {
+			for (User user : users) {
+				DomainObjectSelectModel model = new DomainObjectSelectModel(user.getId(), user.toString());
 				results.add(model);
 			}
 		}
 		return results;
 	}
 
-	@RequestMapping(value="/{language}/tags/select/{id}", method= RequestMethod.GET)
+	@RequestMapping(value="/{language}/users/select/{id}", method= RequestMethod.GET)
 	public @ResponseBody DomainObjectSelectModel select(
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
-		Tag tag = tagService.readTagById(id, language);
-		if (tag == null) {
+		User user = userService.readUserById(id);
+		if (user == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		}
 
-		DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getName(), tag.getName());
+		DomainObjectSelectModel model = new DomainObjectSelectModel(user.getId(), user.toString());
 		return model;
 	}
 }

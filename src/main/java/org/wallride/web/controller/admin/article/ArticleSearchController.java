@@ -1,32 +1,32 @@
 package org.wallride.web.controller.admin.article;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.wallride.Application;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
+import org.wallride.core.support.Pagination;
 import org.wallride.web.support.DomainObjectSearchCondition;
-import org.wallride.web.support.DomainObjectSearchController;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/{language}/articles/index")
-public class ArticleSearchController extends DomainObjectSearchController<Article, ArticleSearchForm> {
+public class ArticleSearchController {
 
 	@Inject
 	private ArticleService articleService;
@@ -51,69 +51,32 @@ public class ArticleSearchController extends DomainObjectSearchController<Articl
 		return articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
 	}
 
-	@RequestMapping(method=RequestMethod.GET)
-	public String index(
-			Model model,
-			HttpServletRequest request,
-			HttpServletResponse response,
-			HttpSession session)
-			throws Exception {
-		return super.requestMappingIndex(model, request, response, session);
+	@ModelAttribute("form")
+	public ArticleSearchForm setupArticleSearchForm() {
+		return new ArticleSearchForm();
 	}
 
-	@RequestMapping(params="page")
-	public String page(
+	@RequestMapping(method = RequestMethod.GET)
+	public String search(
+			@PathVariable String language,
+			@Validated ArticleSearchForm form,
+			BindingResult result,
 			@PageableDefault(50) Pageable pageable,
 			Model model,
-			HttpServletRequest request,
-			HttpServletResponse response,
 			HttpSession session) {
-		return super.requestMappingPage(pageable, model, request, response, session);
-	}
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 
-	@RequestMapping(params="search")
-	public String search(
-			@Valid ArticleSearchForm form,
-			BindingResult result,
-			Model model,
-			HttpSession session,
-			RedirectAttributes redirectAttributes) {
-		return super.requestMappingSearch(form, result, model, session, redirectAttributes);
-	}
+		new DomainObjectSearchCondition<>(session, form, pageable);
 
-	@RequestMapping(params="part=bulk-delete-form")
-	public String partBulkDeleteDialog() {
-		return "article/index::bulk-delete-form";
-	}
+		model.addAttribute("form", form);
+		model.addAttribute("articles", articles);
+		model.addAttribute("pageable", pageable);
 
-	@Override
-	protected Class<ArticleSearchForm> getDomainObjectSearchFormClass() {
-		return ArticleSearchForm.class;
-	}
-
-	@Override
-	protected String getModelAttributeName() {
-		return "articles";
-	}
-
-	@Override
-	protected String getViewName() {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromPath(Application.ADMIN_SERVLET_PATH);
+		builder.path("/{language}/articles/index");
+		builder.queryParams(form.toQueryParams());
+		String url = builder.buildAndExpand(language).toString();
+		model.addAttribute("pagination", new Pagination<>(articles, url));
 		return "article/index";
-	}
-
-	@Override
-	protected String getRedirectViewName() {
-		return "redirect:/_admin/{language}/articles/index";
-	}
-
-	@Override
-	protected Page<Article> readDomainObjects(ArticleSearchForm form, Pageable pageable) {
-		return articleService.readArticles(form.buildArticleSearchRequest(), pageable);
-	}
-
-	@Override
-	protected boolean validateCondition(DomainObjectSearchCondition<ArticleSearchForm> condition, HttpServletRequest request, HttpServletResponse response) {
-		String language = LocaleContextHolder.getLocale().getLanguage();
-		return language.equals(condition.getForm().getLanguage());
 	}
 }

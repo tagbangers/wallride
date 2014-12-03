@@ -12,9 +12,19 @@ public class Pagination<T> {
 	public static final int DEFAULT_INTERVAL = 5;
 
 	private Page<T> page;
+	private String url;
 
 	public Pagination(Page<T> page) {
 		this.page = page;
+	}
+
+	public Pagination(Page<T> page, String url) {
+		this.page = page;
+		this.url = url;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public int getCurrentPageNumber() {

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +22,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
-import org.wallride.core.repository.ArticleFullTextSearchTerm;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.TagRepository;
@@ -399,9 +397,7 @@ public class ArticleService {
 	}
 
 	public Page<Article> readArticles(ArticleSearchRequest request, Pageable pageable) {
-		ArticleFullTextSearchTerm term = request.toFullTextSearchTerm();
-		term.setLanguage(LocaleContextHolder.getLocale().getLanguage());
-		return articleRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm(), pageable);
+		return articleRepository.search(request, pageable);
 	}
 
 	public List<Article> readArticles(Collection<Long> ids) {
@@ -425,24 +421,24 @@ public class ArticleService {
 
 	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status + '.' + #size")
 	public SortedSet<Article> readArticlesByCategoryCode(String language, String code, Post.Status status, int size) {
-		ArticleFullTextSearchTerm term = new ArticleFullTextSearchTerm();
-		term.setLanguage(language);
-		term.getCategoryCodes().add(code);
-		term.setStatus(status);
+		ArticleSearchRequest request = new ArticleSearchRequest()
+				.withLanguage(language)
+				.withCategoryCodes(code)
+				.withStatus(status);
 
 		Pageable pageable = new PageRequest(0, size);
-		Page<Article> page = articleRepository.findByFullTextSearchTerm(term, pageable);
+		Page<Article> page = articleRepository.search(request, pageable);
 		return new TreeSet<>(page.getContent());
 	}
 
 	@Cacheable(value = "articles", key = "'list.latest.' + #language + '.' + #status + '.' + #size")
 	public SortedSet<Article> readLatestArticles(String language, Post.Status status, int size) {
-		ArticleFullTextSearchTerm term = new ArticleFullTextSearchTerm();
-		term.setLanguage(language);
-		term.setStatus(status);
+		ArticleSearchRequest request = new ArticleSearchRequest()
+				.withLanguage(language)
+				.withStatus(status);
 
 		Pageable pageable = new PageRequest(0, size);
-		Page<Article> page = articleRepository.findByFullTextSearchTerm(term, pageable);
+		Page<Article> page = articleRepository.search(request, pageable);
 		return new TreeSet<>(page.getContent());
 	}
 

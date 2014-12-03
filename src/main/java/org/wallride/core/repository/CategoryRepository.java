@@ -15,7 +15,7 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long>, CategoryRepositoryCustom {
 	
 	static final String DEFAULT_SELECT_QUERY = 
 			"from Category category " +

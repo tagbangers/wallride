@@ -6,7 +6,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.service.ArticleService;
@@ -30,7 +29,7 @@ public class IndexController {
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
 
-		Page<Article> articles = articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));

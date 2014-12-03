@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UrlPathHelper;
+import org.wallride.Application;
 import org.wallride.core.domain.*;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
@@ -115,7 +116,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 	private String buildAdminPath(String currentLanguage) {
 //		String contextPath = request.getContextPath();
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/_admin");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromPath(Application.ADMIN_SERVLET_PATH);
 		builder.path("/{language}");
 		return builder.buildAndExpand(currentLanguage).toUriString();
 	}

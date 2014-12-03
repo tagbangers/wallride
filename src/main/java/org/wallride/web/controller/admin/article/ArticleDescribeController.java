@@ -72,6 +72,6 @@ public class ArticleDescribeController extends DomainObjectDescribeController<Ar
 
 	@Override
 	protected Page<Article> readDomainObjects(ArticleSearchForm form, Pageable pageable) {
-		return articleService.readArticles(form.buildArticleSearchRequest(), pageable);
+		return articleService.readArticles(form.toArticleSearchRequest(), pageable);
 	}
 }

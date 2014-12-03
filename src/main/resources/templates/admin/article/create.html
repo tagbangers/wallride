@@ -288,7 +288,11 @@
 													};
 												},
 												results: function (data, page) {
-													return {results: data};
+													var results = [];
+													$.each(data, function() {
+														results.push({id: this.text, text: this.text});
+													});
+													return {results: results};
 												}
 											},
 											initSelection: function(element, callback) {

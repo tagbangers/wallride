@@ -1,10 +1,11 @@
-package org.wallride.web.controller.admin.tag;
+package org.wallride.web.controller.admin.category;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.TagService;
+import org.wallride.core.service.CategoryService;
 import org.wallride.web.support.DomainObjectSelectModel;
 
 import javax.inject.Inject;
@@ -14,42 +15,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class TagSelectController {
+public class CategorySelectController {
 
 	@Inject
-	private TagService tagService;
+	private CategoryService categoryService;
 
-	@RequestMapping(value="/{language}/tags/select")
+	@RequestMapping(value="/{language}/categories/select")
 	public @ResponseBody List<DomainObjectSelectModel> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
-		TagSearchForm form = new TagSearchForm();
+		CategorySearchForm form = new CategorySearchForm();
 		form.setKeyword(keyword);
 		form.setLanguage(language);
-		Page<Tag> tags = tagService.readTags(form.buildTagSearchRequest());
+		Page<Category> categories = categoryService.readCategories(form.toCategorySearchRequest());
 
 		List<DomainObjectSelectModel> results = new ArrayList<>();
-		if (tags.hasContent()) {
-			for (Tag tag : tags) {
-				DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getId(), tag.getName());
+		if (categories.hasContent()) {
+			for (Category category : categories) {
+				DomainObjectSelectModel model = new DomainObjectSelectModel(category.getId(), category.getName());
 				results.add(model);
 			}
 		}
 		return results;
 	}
 
-	@RequestMapping(value="/{language}/tags/select/{id}", method= RequestMethod.GET)
+	@RequestMapping(value="/{language}/categories/select/{id}", method= RequestMethod.GET)
 	public @ResponseBody DomainObjectSelectModel select(
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
-		Tag tag = tagService.readTagById(id, language);
-		if (tag == null) {
+		Category category = categoryService.readCategoryById(id, language);
+		if (category == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		}
 
-		DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getName(), tag.getName());
+		DomainObjectSelectModel model = new DomainObjectSelectModel(category.getId(), category.getName());
 		return model;
 	}
 }

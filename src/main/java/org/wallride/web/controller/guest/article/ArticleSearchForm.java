@@ -22,8 +22,6 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 
 	private Collection<Long> categoryIds = new ArrayList<>();
 
-	private Collection<Long> tagIds = new ArrayList<>();
-
 	private String language;
 
 	private Long authorId;
@@ -60,14 +58,6 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 		this.categoryIds = categoryIds;
 	}
 
-	public Collection<Long> getTagIds() {
-		return tagIds;
-	}
-
-	public void setTagIds(Collection<Long> tagIds) {
-		this.tagIds = tagIds;
-	}
-
 	public String getLanguage() {
 		return language;
 	}
@@ -91,18 +81,16 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 		return true;
 	}
 
-	public ArticleSearchRequest buildArticleSearchRequest() {
-		ArticleSearchRequest.Builder builder = new ArticleSearchRequest.Builder();
-		return builder
-				.keyword(keyword)
-				.dateFrom(dateFrom)
-				.dateTo(dateTo)
-				.categoryIds(categoryIds)
-				.tagIds(tagIds)
-				.language(language)
-				.authorId(authorId)
-				.status(Post.Status.PUBLISHED)
-				.build();
+	public ArticleSearchRequest toArticleSearchRequest() {
+		ArticleSearchRequest request = new ArticleSearchRequest();
+		request.setKeyword(getKeyword());
+		request.setDateFrom(getDateFrom());
+		request.setDateTo(getDateTo());
+		request.setCategoryIds(getCategoryIds());
+		request.setAuthorId(getAuthorId());
+		request.setLanguage(getLanguage());
+		request.setStatus(Post.Status.PUBLISHED);
+		return request;
 	}
 
 	@Override
@@ -115,7 +103,6 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 				.append(getDateFrom(), that.getDateFrom())
 				.append(getDateTo(), that.getDateTo())
 				.append(getCategoryIds(), that.getCategoryIds())
-				.append(getTagIds(), that.getTagIds())
 				.append(getLanguage(), that.getLanguage())
 				.isEquals();
 	}
@@ -127,7 +114,6 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 				.append(getDateFrom())
 				.append(getDateTo())
 				.append(getCategoryIds())
-				.append(getTagIds())
 				.append(getLanguage())
 				.toHashCode();
 	}

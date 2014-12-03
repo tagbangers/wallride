@@ -2,11 +2,15 @@ package org.wallride.core.service;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Tag;
 import org.wallride.core.repository.CategoryRepository;
 import org.wallride.core.support.AuthorizedUser;
 
@@ -125,6 +129,19 @@ public class CategoryService {
 		categoryRepository.shiftLft(category.getRgt());
 
 		return category;
+	}
+
+	public Category readCategoryById(long id, String language) {
+		return categoryRepository.findById(id, language);
+	}
+
+	public Page<Category> readCategories(CategorySearchRequest request) {
+		Pageable pageable = new PageRequest(0, 10);
+		return readCategories(request, pageable);
+	}
+
+	public Page<Category> readCategories(CategorySearchRequest request, Pageable pageable) {
+		return categoryRepository.search(request, pageable);
 	}
 
 	@Cacheable(value = "articles", key = "'category.tree.' + #language")

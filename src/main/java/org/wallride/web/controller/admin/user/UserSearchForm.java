@@ -28,10 +28,8 @@ public class UserSearchForm extends DomainObjectSearchForm {
 		return false;
 	}
 
-	public UserSearchRequest buildUserSearchRequest() {
-		UserSearchRequest.Builder builder = new UserSearchRequest.Builder();
-		return builder
-				.keyword(keyword)
-				.build();
+	public UserSearchRequest toUserSearchRequest() {
+		return new UserSearchRequest()
+				.withKeyword(getKeyword());
 	}
 }
