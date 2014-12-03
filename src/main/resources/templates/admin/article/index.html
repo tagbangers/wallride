@@ -22,19 +22,17 @@
 					<div class="navbar">
 						<div class="container-fluid">
 							<form id="search-form" class="navbar-form navbar-left" method="get" th:action="@{__${ADMIN_PATH}__/articles/index}" th:object="${form}">
-								<div class="pull-left">
-									<select th:field="*{status}" class="select2" th:placeholder="#{Status}">
-										<option value=""></option>
-										<option th:value="PUBLISHED"><span th:text="#{Post.Status.PUBLISHED}">Published</span> <span th:text="${'(' + countPublished + ')'}">(0)</span></option>
-										<option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
-										<option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
-									</select>
-									<input type="hidden" class="select2" th:field="*{categoryId}" th:attr="data-url=@{__${ADMIN_PATH}__/categories/select}" th:placeholder="#{Categories}" />
-									<input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}" />
-									<input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}" />
-									<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
-									<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-								</div>
+								<select th:field="*{status}" class="select2" th:placeholder="#{Status}">
+									<option value=""></option>
+									<option th:value="PUBLISHED"><span th:text="#{Post.Status.PUBLISHED}">Published</span> <span th:text="${'(' + countPublished + ')'}">(0)</span></option>
+									<option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
+									<option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
+								</select>
+								<input type="hidden" class="select2" th:field="*{categoryId}" th:attr="data-url=@{__${ADMIN_PATH}__/categories/select}" th:placeholder="#{Categories}" />
+								<input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}" />
+								<input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}" />
+								<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
+								<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
 							</form>
 							<script th:inline="javascript">
 								$(function() {

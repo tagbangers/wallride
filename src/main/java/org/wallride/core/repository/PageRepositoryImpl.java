@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Page;
+import org.wallride.core.service.PageSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -32,7 +33,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 	private EntityManager entityManager;
 	
 	@Override
-	public org.springframework.data.domain.Page<Page> findByFullTextSearchTerm(PageFullTextSearchTerm term, Pageable pageable) {
+	public org.springframework.data.domain.Page<Page> search(PageSearchRequest request, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
@@ -45,7 +46,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 		junction.must(qb.keyword().onField("drafted").ignoreAnalyzer().matching("_null_").createQuery());
 
-		if (StringUtils.hasText(term.getKeyword())) {
+		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
 					"title", "body",
@@ -54,11 +55,11 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 			parser.setDefaultOperator(Operator.AND);
 			Query query = null;
 			try {
-				query = parser.parse(term.getKeyword());
+				query = parser.parse(request.getKeyword());
 			}
 			catch (ParseException e1) {
 				try {
-					query = parser.parse(QueryParser.escape(term.getKeyword()));
+					query = parser.parse(QueryParser.escape(request.getKeyword()));
 				}
 				catch (ParseException e2) {
 					throw new RuntimeException(e2);
@@ -66,12 +67,16 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 			}
 			junction.must(query);
 		}
-		if (StringUtils.hasText(term.getLanguage())) {
-			junction.must(qb.keyword().onField("language").matching(term.getLanguage()).createQuery());
+		if (StringUtils.hasText(request.getLanguage())) {
+			junction.must(qb.keyword().onField("language").matching(request.getLanguage()).createQuery());
 		}
 
-		if (term.getStatus() != null) {
-			junction.must(qb.keyword().onField("status").matching(term.getStatus()).createQuery());
+		if (request.getStatus() != null) {
+			junction.must(qb.keyword().onField("status").matching(request.getStatus()).createQuery());
+		}
+
+		if (request.getAuthorId() != null) {
+			junction.must(qb.keyword().onField("author.id").matching(request.getAuthorId()).createQuery());
 		}
 
 		Query searchQuery = junction.createQuery();

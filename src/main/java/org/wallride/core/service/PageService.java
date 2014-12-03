@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
 import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.repository.PageFullTextSearchTerm;
 import org.wallride.core.repository.PageRepository;
 import org.wallride.core.support.AuthorizedUser;
 
@@ -428,9 +426,7 @@ public class PageService {
 	}
 
 	public org.springframework.data.domain.Page<Page> readPages(PageSearchRequest request, Pageable pageable) {
-		PageFullTextSearchTerm term = request.toFullTextSearchTerm();
-		term.setLanguage(LocaleContextHolder.getLocale().getLanguage());
-		return pageRepository.findByFullTextSearchTerm(request.toFullTextSearchTerm(), pageable);
+		return pageRepository.search(request, pageable);
 	}
 	
 	public List<Page> readPages(Collection<Long> ids) {

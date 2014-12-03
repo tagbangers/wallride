@@ -71,6 +71,6 @@ public class PageDescribeController extends DomainObjectDescribeController<Page,
 
 	@Override
 	protected org.springframework.data.domain.Page<Page> readDomainObjects(PageSearchForm form, Pageable pageable) {
-		return pageService.readPages(form.buildPageSearchRequest(), pageable);
+		return pageService.readPages(form.toPageSearchRequest(), pageable);
 	}
 }
