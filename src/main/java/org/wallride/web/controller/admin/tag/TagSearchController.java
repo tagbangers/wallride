@@ -86,4 +86,9 @@ public class TagSearchController {
 			@PathVariable String language) {
 		return "tag/index::bulk-delete-form";
 	}
+        
+        @RequestMapping(params= "part=merge-tag-form")
+        public String mergeTagFomr(@PathVariable String language){
+            return "/tag/index::merge-tag-form";
+        }
 }
