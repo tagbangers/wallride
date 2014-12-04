@@ -488,4 +488,8 @@ public class ArticleService {
 		}
 		return counts;
 	}
+        
+        public void changeAllStatus(Post.Status status, String language){
+            articleRepository.changeAllStatusArticle(status, language);
+        }
 }
