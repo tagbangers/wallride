@@ -96,4 +96,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
         @Query("UPDATE Post SET status = :status WHERE language= :language")
         void changeAllStatusArticle(@Param("status") Post.Status status, @Param("language") String language);
         
+        @Query("SELECT  DISTINCT article  FROM Article article LEFT JOIN FETCH article.tags t WHERE t.id IN :ids")
+        List<Article> findByTagIds(@Param("ids") List<Long> ids);
 }

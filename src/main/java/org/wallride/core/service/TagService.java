@@ -27,6 +27,10 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import org.wallride.core.domain.Article;
+import org.wallride.core.repository.ArticleRepository;
+import org.wallride.web.controller.admin.tag.TagMergeForm;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -40,7 +44,9 @@ public class TagService {
 	private MessageCodesResolver messageCodesResolver;
 	@Inject
 	private PlatformTransactionManager transactionManager;
-
+        @Inject
+        private ArticleRepository articleRepository;
+        
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag createTag(TagCreateRequest request, AuthorizedUser authorizedUser) {
 		Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
@@ -140,4 +146,23 @@ public class TagService {
 	public Page<Tag> readTags(TagSearchRequest request, Pageable pageable) {
 		return tagRepository.search(request, pageable);
 	}
+        
+        public List<Article> getArticles(List<Long> listTagId){
+            return articleRepository.findByTagIds(listTagId);
+        }
+        
+        public void deleteTagsAfterMerging(TagMergeForm form, BindingResult result){
+            for(Long tagId : form.getIds()){
+                TagDeleteRequest request = new TagDeleteRequest.Builder()
+                        .id(tagId)
+                        .language(form.getLanguage())
+                        .build();
+                try {
+                    deleteTag(request, result);
+                } catch (BindException ex) {
+                    java.util.logging.Logger.getLogger(TagService.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        }
 }
