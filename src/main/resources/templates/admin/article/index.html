@@ -100,7 +100,7 @@
                                 <div class="btn-toolbar wr-bulk-action pull-left">
                                     <div class="btn-group">
                                         <a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
-                                        <a th:href="@{__${ADMIN_PATH}__/articles/index(part=change-status-form)}" data-toggle="modal" data-target="#change-status-modal" class="btn btn-default">Change All Status </a>
+                                        <a th:href="@{__${ADMIN_PATH}__/articles/index(part=change-status-form)}" data-toggle="modal" data-target="#change-status-modal" class="btn btn-default change-status">Change Status </a>
                                     </div>
                                 </div>
                                 <div class="pagination-group pull-right">
@@ -129,7 +129,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
+                                        <tr  th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
                                             <td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${article.id}" /></td>
                                             <td th:class="'wr-post-status-' + ${article.status}" th:text="${#messages.msg('Post.Status.' + article.status)}">Status</td>
                                             <td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
@@ -169,6 +169,17 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <script th:inline="javascript">
+                                $(function() {
+                                    $("#wr-page-content .search-result .search-result-header .change-status").on("click",function(){
+                                        console.log(1);
+                                         $('#wr-page-content .search-result .table-responsive input[type="checkbox"]:checked').each(function(index){
+                                             console.log($(this).val());
+                                         });s
+                                    });
+                                });
+                            </script>
                             <!--/#Change-status-article-->
                             
                             <!-- #bulk-delete-modal -->

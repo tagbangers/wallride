@@ -68,7 +68,7 @@ public class TagMergeController {
             tags.add(newMergedTag);
             articleService.updateArticleForTagMerging(article);
         }
-        // delete old tag after mergin
+        // delete old tag after merging
         
         tagService.deleteTagsAfterMerging(form, errors);
         redirect.addFlashAttribute("mergedTags", articles);

@@ -6,24 +6,22 @@
 
 package org.wallride.web.controller.admin.article;
 
+import java.util.List;
 import org.wallride.core.service.ArticleChangeStatusRequest;
 
-/**
- *
- * @author hung132
- */
+
 public class ArticleChangeStatusForm {
-    private Long ids;
+    private List<Long> ids;
     private String language;
     private String status;
     
     public ArticleChangeStatusForm(){};
 
-    public Long getIds() {
+    public List<Long> getIds() {
         return ids;
     }
 
-    public void setIds(Long ids) {
+    public void setIds(List<Long> ids) {
         this.ids = ids;
     }
 
@@ -42,13 +40,13 @@ public class ArticleChangeStatusForm {
     public void setStatus(String status) {
         this.status = status;
     }
-    public ArticleChangeStatusRequest buildArticleChangeStatusRequest(){
-         ArticleChangeStatusRequest.Builder builder = new ArticleChangeStatusRequest.Builder();
-        return builder
-                .id(ids)
-                .language(language)
-                .status(status)
-                .build();
-    }
+//    public ArticleChangeStatusRequest buildArticleChangeStatusRequest(){
+//         ArticleChangeStatusRequest.Builder builder = new ArticleChangeStatusRequest.Builder();
+//        return builder
+//                .id(ids)
+//                .language(language)
+//                .status(status)
+//                .build();
+//    }
     
 }
