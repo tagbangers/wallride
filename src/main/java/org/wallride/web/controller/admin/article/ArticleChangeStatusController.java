@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.ArticleChangeStatusRequest;
 import org.wallride.core.service.ArticleService;
 
 /**

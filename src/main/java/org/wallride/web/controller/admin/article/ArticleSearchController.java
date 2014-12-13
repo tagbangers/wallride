@@ -80,8 +80,8 @@ public class ArticleSearchController {
         return "article/index";
     }
 
-    @RequestMapping(params = "part=change-status-form")
-    public String partChangeStatusDialog() {
-        return "/article/index::change-status-form";
-    }
+//    @RequestMapping(params = "part=change-status-form")
+//    public String partChangeStatusDialog() {
+//        return "/article/index::change-status-form";
+//    }
 }
