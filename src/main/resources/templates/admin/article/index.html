@@ -167,9 +167,22 @@
                                             <div class="radio draft">
                                                 <input type="radio" name="status" value="DRAFT" checked="checked" /> Draft
                                             </div>
-                                            <div class="radio scheduled">
-                                                <input type="radio" name="status" value="SCHEDULED" /> Scheduled
+<!--                                            <div class="radio scheduled">
+                                                <input type="radio" name="status" value="SCHEDULED" /> Scheduled  -
+                                                Date: <input type="text" name="date-scheduled" value="" class="form-control" placeholder="yyyy/MM/dd"/>
+                                            </div>-->
+                                            <div class="container radio scheduled">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <input type="radio" name="status" value="SCHEDULED" /> Scheduled .
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="form-group">
+                                                        Date: <input type="text" name="date-scheduled" value="" class="form-control" placeholder="yyyy/MM/dd" style="width:80%;"  disabled="true"/>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
@@ -183,19 +196,28 @@
                                  
                                 $(function() {
                                    // <![CDATA[
+                                   
+                                   $("#change-status-modal .modal-body input[type='radio']").on("change",function(){
+                                       console.log("change");
+                                     var selectedStatus = $("#change-status-modal .modal-body input[type='radio']:checked").val();
+                                     console.log(selectedStatus);
+                                         if(selectedStatus === "SCHEDULED"){
+                                              $("#change-status-modal .modal-body input[type='text']").prop("disabled",false);
+                                         }else{
+                                             $("#change-status-modal .modal-body input[type='text']").prop("disabled",true);
+                                         }
+                                     });
+                                   
                                     $('#change-status-modal').on('hidden.bs.modal', function() {
                                         $(this).removeData('bs.modal');
                                     });
                                     $("#wr-page-content .search-result .search-result-header .change-status").on("click",function(e){
                                         e.preventDefault();
-                                        console.log(1);
                                         var checkedBoxes =  $('#wr-page-content .search-result .table-responsive input[type="checkbox"]:checked');
                                         var identical= true;
                                         var firstStatus =  checkedBoxes.first().data("status");
-                                        console.log(firstStatus);
                                         checkedBoxes.each(function(){                                      
                                             var nextStatus  = $(this).data("status");
-                                            console.log(nextStatus);
                                             if(nextStatus !== firstStatus){
                                                  identical = false;
                                                  return false;
