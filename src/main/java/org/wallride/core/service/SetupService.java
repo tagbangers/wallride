@@ -5,19 +5,14 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.domain.User;
 import org.wallride.core.repository.BlogRepository;
-import org.wallride.core.repository.SettingRepository;
 import org.wallride.core.repository.UserRepository;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
@@ -26,10 +21,11 @@ public class SetupService {
 
 	@Resource
 	private UserRepository userRepository;
+
 	@Resource
 	private BlogRepository blogRepository;
 
-	@CacheEvict(value = {"users", "blogs"}, allEntries = true)
+	@CacheEvict(value = { "users", "blogs" }, allEntries = true)
 	public User setup(SetupRequest request) {
 		LocalDateTime now = new LocalDateTime();
 
@@ -42,6 +38,8 @@ public class SetupService {
 		user.getName().setFirstName(request.getName().getFirstName());
 		user.getName().setLastName(request.getName().getLastName());
 		user.setEmail(request.getEmail());
+
+		user.getRoles().add(User.Role.ADMIN);
 
 		user.setCreatedAt(now);
 		user.setUpdatedAt(now);
