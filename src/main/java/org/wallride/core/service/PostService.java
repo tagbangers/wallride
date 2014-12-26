@@ -2,6 +2,8 @@ package org.wallride.core.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -24,6 +26,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
@@ -83,7 +86,7 @@ public class PostService {
 	@Async
 	@Transactional(propagation = Propagation.NEVER)
 	public void syncGoogleAnalytics() {
-		logger.info("Starting sync google analytics");
+		logger.info("Start the synchronization to google analytics");
 
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
@@ -92,8 +95,10 @@ public class PostService {
 			return;
 		}
 
+		int count = 0;
+		Analytics analytics;
 		try {
-			PrivateKey privateKey = SecurityUtils.loadPrivateKeyFromKeyStore(
+			PrivateKey privateKey= SecurityUtils.loadPrivateKeyFromKeyStore(
 					SecurityUtils.getPkcs12KeyStore(), new ByteArrayInputStream(blog.getGoogleAnalytics().getServiceAccountP12FileContent()),
 					"notasecret", "privatekey", "notasecret");
 
@@ -103,33 +108,52 @@ public class PostService {
 			Set<String> scopes = new HashSet<>();
 			scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
 
-			GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
+			final GoogleCredential credential = new GoogleCredential.Builder().setTransport(httpTransport)
 					.setJsonFactory(jsonFactory)
 					.setServiceAccountId(googleAnalytics.getServiceAccountId())
 					.setServiceAccountScopes(scopes)
 					.setServiceAccountPrivateKey(privateKey)
 					.build();
 
-			Analytics analytics = new Analytics.Builder(httpTransport, jsonFactory, credential)
+			HttpRequestInitializer httpRequestInitializer = new HttpRequestInitializer() {
+				@Override
+				public void initialize(HttpRequest httpRequest) throws IOException {
+					credential.initialize(httpRequest);
+					httpRequest.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
+					httpRequest.setReadTimeout(3 * 60000);  // 3 minutes read timeout
+				}
+			};
+			analytics = new Analytics.Builder(httpTransport, jsonFactory, httpRequestInitializer)
 					.setApplicationName("WallRide")
 					.build();
+		} catch (Exception e) {
+			logger.warn("Failed to synchronize with Google Analytics", e);
+			throw new GoogleAnalyticsException(e);
+		}
 
-			int startIndex = 1;
-			int maxResults = 1000;
-			int totalResults = 0;
-			do {
-				final GaData gaData = analytics.data().ga()
+		int startIndex = 1;
+		int maxResults = 1000;
+		int maxRetry = 5;
+		int retryInterval = 5000; // milliseconds
+		int currentRetry = 0;
+		int totalResults = 0;
+		do {
+			try {
+				Analytics.Data.Ga.Get request = analytics.data().ga()
 						.get(googleAnalytics.getProfileId(), "2005-01-01", LocalDate.now().toString("yyyy-MM-dd"), "ga:pageviews")
 						.setDimensions(String.format("ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 						.setSort(String.format("-ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 						.setStartIndex(startIndex)
-						.setMaxResults(maxResults)
-						.execute();
+						.setMaxResults(maxResults);
+
+				logger.info(request.toString());
+				final GaData gaData = request.execute();
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-				transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-					public void doInTransactionWithoutResult(TransactionStatus status) {
+				count += transactionTemplate.execute(new TransactionCallback<Integer>() {
+					public Integer doInTransaction(TransactionStatus status) {
+						int count = 0;
 						for (List row : gaData.getRows()) {
 							long postId = Long.parseLong((String) row.get(0));
 							Post post = postRepository.findOne(postId);
@@ -137,23 +161,35 @@ public class PostService {
 								logger.debug("Post not found [{}]", postId);
 								continue;
 							}
+							logger.info("Update the PageView. Post ID [{}]: {} -> {}", post.getId(), post.getViews(), row.get(1));
 							post.setViews(Long.parseLong((String) row.get(1)));
-							post = postRepository.saveAndFlush(post);
+							postRepository.saveAndFlush(post);
+							count++;
 						}
+						return count;
 					}
 				});
 
 				startIndex += maxResults;
 				totalResults = gaData.getTotalResults();
+			} catch (IOException e) {
+				logger.warn("Failed to synchronize with Google Analytics", e);
+				if (currentRetry >= maxRetry) {
+					throw new GoogleAnalyticsException(e);
+				}
 
-			} while (startIndex <= totalResults);
-		} catch (GeneralSecurityException e) {
-			logger.warn("Failed to synchronize with Google Analytics", e);
-			throw new GoogleAnalyticsException(e);
-		} catch (IOException e) {
-			logger.warn("Failed to synchronize with Google Analytics", e);
-			throw new GoogleAnalyticsException(e);
-		}
+				currentRetry++;
+				logger.info("{} ms to sleep...", retryInterval);
+				try {
+					Thread.sleep(retryInterval);
+				} catch (InterruptedException ie) {
+					throw new GoogleAnalyticsException(e);
+				}
+				logger.info("Retry for the {} time", currentRetry);
+			}
+		} while (startIndex <= totalResults);
+
+		logger.info("Synchronization to google analytics is now COMPLETE. {} posts updated.", count);
 	}
 
 	public Page<Post> readPosts(PostSearchRequest request) {
