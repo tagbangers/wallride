@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>Tags | WallRide</title>
@@ -29,9 +29,10 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{DeletedTags}">Tags Deleted.</span>
 					</div>
-                                        <div class="alert alert-success" th:if="${mergedTags ne null}">
-                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Tags Merged.</span>
-                                        </div>
+					<div class="alert alert-success" th:if="${mergedTags ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span>Tags Merged.</span>
+					</div>
 					<section class="search-condition">
 						<div class="search-condition-simple clearfix">
 							<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
@@ -50,11 +51,13 @@
 					<section class="search-result">
 						<form method="post">
 							<div class="search-result-header clearfix">
-								<div class="btn-toolbar wr-bulk-action pull-left">
-									<div class="btn-group">
+								<div class="btn-toolbar pull-left">
+									<div class="btn-group wr-bulk-action">
 										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
-                                                                                <a th:href="@{__${ADMIN_PATH}__/tags/index(part=merge-tag-form)}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled">Merge</a>
-                                                                        </div>
+									</div>
+									<div class="btn-group wr-merge-action">
+										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=merge-tag-form)}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled">Merge</a>
+									</div>
 								</div>
 								<div class="pagination-group pull-right">
 									<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
@@ -87,28 +90,6 @@
 									</tbody>
 								</table>
 							</div>
-                                                     <!--#merge-tag-modal-->
-                                                        <div id="merge-tag-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-                                                            <div id="merge-tag-dialog" class="modal-dialog">
-                                                                <div th:fragment="merge-tag-form" class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                                                        <h4 class="modal-title" >Merge Tags</h4>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="form-group">
-                                                                            <p>Tag name of the merged</p>
-                                                                            <input type="text"  name="newTagName" placeholder="Enter a large new tag" class="form-control" />
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button class="btn btn-default" data-dismiss="modal" >Close</button>
-                                                                        <button class="btn btn-primary"  id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}" disabled="true"  >Merge</button> 
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!--/#merge-tag-modal-->
 							<!-- #bulk-delete-modal -->
 							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 								<div id="bulk-delete-dialog" class="modal-dialog">
@@ -128,6 +109,30 @@
 									</div>
 								</div>
 							</div>
+							<!--#merge-tag-modal-->
+							<div id="merge-tag-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="merge-tag-dialog" class="modal-dialog">
+									<div th:fragment="merge-tag-form" class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title">Merge Tags</h4>
+										</div>
+										<div class="modal-body">
+											<div class="form-group">
+												<p>Tag name of the merged</p>
+												<input type="text" name="newTagName" placeholder="Enter a large new tag" class="form-control"/>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal">Close</button>
+											<button class="btn btn-primary" id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}" disabled="true">
+												Merge
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/#merge-tag-modal-->
 							<!--/#bulk-delete-modal -->
 							<script th:inline="javascript">
 								// <![CDATA[
@@ -139,15 +144,14 @@
 										var confirmed = $(this);
 										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
 									});
-                                                                         $('#merge-tag-modal').on('keyup', ':input[name="newTagName"]', function() {
-                                                                            var newTagName = $(this);
-                                                                            if (newTagName.val() === '') {
-                                                                                $('#merge-tag-modal .btn-primary').prop('disabled', true);
-                                                                            } else {
-                                                                                $('#merge-tag-modal .btn-primary').prop('disabled', false);
-                                                                            }
-
-                                                                        });
+									$('#merge-tag-modal').on('keyup', ':input[name="newTagName"]', function () {
+										var newTagName = $(this);
+										if (newTagName.val() === '') {
+											$('#merge-tag-modal .btn-primary').prop('disabled', true);
+										} else {
+											$('#merge-tag-modal .btn-primary').prop('disabled', false);
+										}
+									});
 									$('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
 										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')){
 											window.location = $(e.target).closest('tr').data('href');
@@ -170,23 +174,18 @@
 										var checked = $(this).prop('checked');
 										if (checked) {
 											$(this).closest('tr').addClass('warning');
-										}
-										else {
+										} else {
 											$(this).closest('tr').removeClass('warning');
 										}
-										var checkedSomeone = false;
-										console.dir($(this));
-										$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
-											if ($(e).prop('checked')) {
-												checkedSomeone = true;
-												return;
-											}
-										});
-										if (checkedSomeone) {
+										var checkedCount = $('#wr-page-content .search-result td.wr-tr-checkbox :checkbox:checked').length;
+										if (checkedCount == 0) {
+											$('#wr-page-content .search-result .btn-toolbar .btn').addClass('disabled');
+										}
+										if (checkedCount >= 1) {
 											$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
 										}
-										else {
-											$('#wr-page-content .search-result .wr-bulk-action .btn').addClass('disabled');
+										if (checkedCount >= 2) {
+											$('#wr-page-content .search-result .wr-merge-action .btn').removeClass('disabled');
 										}
 									});
 								});
