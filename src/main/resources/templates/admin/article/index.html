@@ -1,333 +1,300 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="utf-8" th:replace="layout::head('WallRide')" />
-        <title>Articles | WallRide</title>
-    </head>
-    <body>
-        <header th:replace="layout::header">
-            <style>
-                .hide1{
-                    display: none;
-                }
-                .hide-public .published {
-                    display: none !important;
-                }
-            </style>
-        </header>
-        <div>
-            <div id="wr-page-header">
-                <div class="page-header container-fluid">
-                    <div class="pull-left">
-                        <h1 th:text="#{Articles}">Articles</h1>
-                    </div>
-                    <div class="pull-right">
-                        <a th:href="@{__${ADMIN_PATH}__/articles/create}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New</span></a>
-                    </div>
-                </div>
-            </div>
-            <div id="wr-page-content">
-                <section class="search-condition">
-                    <div class="navbar">
-                        <div class="container-fluid">
-                            <form id="search-form" class="navbar-form navbar-left" method="get" th:action="@{__${ADMIN_PATH}__/articles/index}" th:object="${form}">
-                                <select th:field="*{status}" class="select2" th:placeholder="#{Status}">
-                                    <option value=""></option>
-                                    <option th:value="PUBLISHED"><span th:text="#{Post.Status.PUBLISHED}">Published</span> <span th:text="${'(' + countPublished + ')'}">(0)</span></option>
-                                    <option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
-                                    <option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
-                                </select>
-                                <input type="hidden" class="select2" th:field="*{categoryId}" th:attr="data-url=@{__${ADMIN_PATH}__/categories/select}" th:placeholder="#{Categories}" />
-                                <input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}" />
-                                <input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}" />
-                                <input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
-                                <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-                            </form>
-                            <script th:inline="javascript">
-                                $(function() {
-                                    $('#search-form select.select2').each(function(index) {
-                                        var $self = $(this);
-                                        $self.select2({
-                                            allowClear: true,
-                                            dropdownAutoWidth: true,
-                                            dropdownCssClass: 'select2-drop-search-form',
-                                        });
-                                    });
-                                    $('#search-form input.select2').each(function(index) {
-                                        var $self = $(this);
-                                        $self.select2({
-                                            minimumInputLength: 1,
-                                            allowClear: true,
-                                            dropdownAutoWidth: true,
-                                            dropdownCssClass: 'select2-drop-search-form',
-                                            ajax: {
-                                                url: $self.attr('data-url'),
-                                                dataType: 'json',
-                                                data: function(term, page) {
-                                                    return {
-                                                        keyword: term
-                                                    };
-                                                },
-                                                results: function(data, page) {
-                                                    return {results: data};
-                                                }
-                                            },
-                                            initSelection: function(element, callback) {
-                                                var id = $(element).val();
-                                                if (id !== "") {
-                                                    $.ajax($self.attr('data-url') + '/' + id + ".json", {
-                                                        dataType: "json"
-                                                    }).done(function(data) {
-                                                        callback(data);
-                                                    });
-                                                }
-                                            }
-                                        });
-                                    });
-                                });
-                            </script>
-                        </div>
-                    </div>
-                </section>
+	<head>
+		<meta charset="utf-8" th:replace="layout::head('WallRide')"/>
+		<title>Articles | WallRide</title>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div id="wr-page-header">
+				<div class="page-header container-fluid">
+					<div class="pull-left">
+						<h1 th:text="#{Articles}">Articles</h1>
+					</div>
+					<div class="pull-right">
+						<a th:href="@{__${ADMIN_PATH}__/articles/create}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New</span></a>
+					</div>
+				</div>
+			</div>
+			<div id="wr-page-content">
+				<section class="search-condition">
+					<div class="navbar">
+						<div class="container-fluid">
+							<form id="search-form" class="navbar-form navbar-left" method="get" th:action="@{__${ADMIN_PATH}__/articles/index}" th:object="${form}">
+								<select th:field="*{status}" class="select2" th:placeholder="#{Status}">
+									<option value=""></option>
+									<option th:value="PUBLISHED"><span th:text="#{Post.Status.PUBLISHED}">Published</span> <span th:text="${'(' + countPublished + ')'}">(0)</span></option>
+									<option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
+									<option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
+								</select>
+								<input type="hidden" class="select2" th:field="*{categoryId}" th:attr="data-url=@{__${ADMIN_PATH}__/categories/select}" th:placeholder="#{Categories}"/>
+								<input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}"/>
+								<input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}"/>
+								<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}"/>
+								<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+							</form>
+							<script th:inline="javascript">
+								$(function () {
+									$('#search-form select.select2').each(function (index) {
+										var $self = $(this);
+										$self.select2({
+											allowClear: true,
+											dropdownAutoWidth: true,
+											dropdownCssClass: 'select2-drop-search-form',
+										});
+									});
+									$('#search-form input.select2').each(function (index) {
+										var $self = $(this);
+										$self.select2({
+											minimumInputLength: 1,
+											allowClear: true,
+											dropdownAutoWidth: true,
+											dropdownCssClass: 'select2-drop-search-form',
+											ajax: {
+												url: $self.attr('data-url'),
+												dataType: 'json',
+												data: function (term, page) {
+													return {
+														keyword: term
+													};
+												},
+												results: function (data, page) {
+													return {results: data};
+												}
+											},
+											initSelection: function (element, callback) {
+												var id = $(element).val();
+												if (id !== "") {
+													$.ajax($self.attr('data-url') + '/' + id + ".json", {
+														dataType: "json"
+													}).done(function (data) {
+														callback(data);
+													});
+												}
+											}
+										});
+									});
+								});
+							</script>
+						</div>
+					</div>
+				</section>
 
-                <div class="container-fluid">
-                    <div class="alert alert-success" th:if="${deletedArticle ne null}">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <span th:text="#{DeletedArticle}">Article Deleted.</span>
-                    </div>
-                    <div class="alert alert-success" th:if="${deletedArticles ne null}">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <span th:text="#{DeletedArticles}">Articles Deleted.</span>
-                    </div>
-                    <div class="alert alert-success" th:if="${changedStatus ne null}">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <span>Status Changed.</span>
-                    </div>
-                    <section class="search-result">
-                        <form method="post">
-                            <div class="search-result-header clearfix">
-                                <div class="btn-toolbar wr-bulk-action pull-left">
-                                    <div class="btn-group">
-                                        <a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
-                                        <a th:href="@{__${ADMIN_PATH}__/articles/index(part=change-status-form)}" class="btn btn-default disabled change-status">Change Status </a>
-                                    </div>
-                                </div>
-                                <div class="pagination-group pull-right">
-                                    <div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
-                                    <div class="pull-right">
-                                        <ul class="pagination paginateon-sm">
-                                            <li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{${pagination.url}(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
-                                            <li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{${pagination.url}(page=${p.pageNumber})}" th:text="${p.pageNumber + 1}"></a></li>
-                                            <li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{${pagination.url}(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th class="wr-tr-checkbox" style="width:40px"><input type="checkbox" /></th>
-                                            <th th:text="#{Status}">Status</th>
-                                            <th th:text="#{Title}">Title</th>
-                                            <th th:text="#{Categories}">Categories</th>
-                                            <th th:text="#{Author}">Author</th>
-                                            <th th:text="#{Date}">Date</th>
-                                            <th class="text-right" th:text="#{Views}">Views</th>
-                                            <th class="text-center"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr  th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
-                                            <td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${article.id}"  th:attr="data-status=${#messages.msg('Post.Status.' + article.status)}"/></td>
-                                            <td th:class="'wr-post-status-' + ${article.status}" th:text="${#messages.msg('Post.Status.' + article.status)}">Status</td>
-                                            <td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
-                                            <td th:text="${#strings.setJoin(article.categories, '&nbsp;|&nbsp;')}"></td>
-                                            <td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
-                                            <td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E)', #locale) : ''}">2013/10/24</td>
-                                            <td class="text-right" th:text="${article.views}">0</td>
-                                            <td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!--#Change-status-article-->
-                            <div id="change-status-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-                                <div id="change-status-dialog" class="modal-dialog">
-                                    <div th:fragment="change-status-form" class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title">Change Status</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Select a new status that you want to change.</p>
-                                            <div class="radio published">
-                                                <input type="radio" name="status"  value="PUBLISHED" /> Published
-                                            </div>
-                                            <div class="radio draft">
-                                                <input type="radio" name="status" value="DRAFT" checked="checked" /> Draft
-                                            </div>
-<!--                                            <div class="radio scheduled">
-                                                <input type="radio" name="status" value="SCHEDULED" /> Scheduled  -
-                                                Date: <input type="text" name="date-scheduled" value="" class="form-control" placeholder="yyyy/MM/dd"/>
-                                            </div>-->
-                                            <div class="container radio scheduled">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <input type="radio" name="status" value="SCHEDULED" /> Scheduled .
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <div class="form-group">
-                                                        Date: <input type="text" name="date-scheduled" value="" class="form-control" placeholder="yyyy/MM/dd" style="width:80%;"  disabled="true"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-                                            <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/change-status}"  >Change</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <script th:inline="javascript">
-                                 
-                                $(function() {
-                                   // <![CDATA[
-                                   
-                                   $("#change-status-modal .modal-body input[type='radio']").on("change",function(){
-                                       console.log("change");
-                                     var selectedStatus = $("#change-status-modal .modal-body input[type='radio']:checked").val();
-                                     console.log(selectedStatus);
-                                         if(selectedStatus === "SCHEDULED"){
-                                              $("#change-status-modal .modal-body input[type='text']").prop("disabled",false);
-                                         }else{
-                                             $("#change-status-modal .modal-body input[type='text']").prop("disabled",true);
-                                         }
-                                     });
-                                   
-                                    $('#change-status-modal').on('hidden.bs.modal', function() {
-                                        $(this).removeData('bs.modal');
-                                    });
-                                    $("#wr-page-content .search-result .search-result-header .change-status").on("click",function(e){
-                                        e.preventDefault();
-                                        var checkedBoxes =  $('#wr-page-content .search-result .table-responsive input[type="checkbox"]:checked');
-                                        var identical= true;
-                                        var firstStatus =  checkedBoxes.first().data("status");
-                                        checkedBoxes.each(function(){                                      
-                                            var nextStatus  = $(this).data("status");
-                                            if(nextStatus !== firstStatus){
-                                                 identical = false;
-                                                 return false;
-                                            }
-                                         });
-                                         if(identical){
-                                             switch(firstStatus){
-                                                 case 'Published':
-                                                        $("#change-status-modal .modal-body div.published").addClass("hide");
-                                                        $("#change-status-modal .modal-body div.draft").removeClass("hide");
-                                                      break;
-                                                 case 'Draft':
-                                                        $("#change-status-modal .modal-body div.published").removeClass("hide");
-                                                        $("#change-status-modal .modal-body div.draft").addClass("hide");
-                                                       break;
-                                             }
-                                             console.log("cùng phan tu");
-                                         }else{
-                                              $("#change-status-modal .modal-body div.published").removeClass("hide");
-                                              $("#change-status-modal .modal-body div.draft").removeClass("hide");
-                                             console.log("khac  phan tus");
-                                         }
-                                        $('#change-status-modal').modal("show");
-                                    });
-                                });
-                              // ]]>
-                            </script>
-                            <!--/#Change-status-article-->
-                            
-                            <!-- #bulk-delete-modal -->
-                            <div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-                                <div id="bulk-delete-dialog" class="modal-dialog">
-                                    <div th:fragment="bulk-delete-form" class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
-                                            <label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-                                            <button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--/#bulk-delete-modal -->
-                            <script th:inline="javascript">
-                                // <![CDATA[
-                                $(function() {
-                                    $('#bulk-delete-modal').on('hidden.bs.modal', function() {
-                                        $(this).removeData('bs.modal');
-                                    });
-                                    $('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
-                                        var confirmed = $(this);
-                                        $('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
-                                    });
-                                    $('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
-                                        if (!$(e.target).is(':checkbox') && !$(e.target).is('a')) {
-                                            window.location = $(e.target).closest('tr').data('href');
-                                        }
-                                        ;
-                                    });
-                                    $('#wr-page-content .search-result').on('click', '[data-action]', function(e) {
-                                        var form = $(this).closest('form');
-                                        form.attr('action', $(this).data('action'));
-                                        form.submit();
-                                        e.preventDefault();
-                                    });
-                                    $('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
-                                        checkboxSelector: ':checkbox',
-                                        selectAll: '.search-result th.wr-tr-checkbox'
-                                    });
-                                    $('#wr-page-content .search-result td.wr-tr-checkbox').closest('td').click(function(e) {
-                                        e.stopPropagation();
-                                    });
-                                    $('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').change(function(e) {
-                                        var checked = $(this).prop('checked');
-                                        if (checked) {
-                                            $(this).closest('tr').addClass('warning');
-                                        }
-                                        else {
-                                            $(this).closest('tr').removeClass('warning');
-                                        }
-                                        var checkedSomeone = false;
-                                        console.dir($(this));
-                                        $('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').each(function(i, e) {
-                                            if ($(e).prop('checked')) {
-                                                checkedSomeone = true;
-                                                return;
-                                            }
-                                        });
-                                        if (checkedSomeone) {
-                                            $('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
-                                        }
-                                        else {
-                                            $('#wr-page-content .search-result .wr-bulk-action .btn').addClass('disabled');
-                                        }
-                                    });
-                                });
-                                // ]]>
-                            </script>
-                        </form>
-                    </section>
-                </div>
-            </div>
-        </div>
-        <footer>
-        </footer>
-    </body>
+				<div class="container-fluid">
+					<div class="alert alert-success" th:if="${deletedArticle ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{DeletedArticle}">Article Deleted.</span>
+					</div>
+					<div class="alert alert-success" th:if="${publishedArticles ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{PublishedArticles}">Articles Published.</span>
+					</div>
+					<div class="alert alert-success" th:if="${unpublishedArticles ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{UnpublishedArticles}">Articles Unpublished.</span>
+					</div>
+					<div class="alert alert-success" th:if="${deletedArticles ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{DeletedArticles}">Articles Deleted.</span>
+					</div>
+					<section class="search-result">
+						<form method="post">
+							<div class="search-result-header clearfix">
+								<div class="btn-toolbar pull-left">
+									<div class="wr-bulk-action btn-group">
+										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+									</div>
+									<div class="wr-bulk-action btn-group">
+										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-publish-form)}" data-toggle="modal" data-target="#bulk-publish-modal" class="btn btn-default disabled" th:text="#{Publish}">Publish</a>
+										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-unpublish-form)}" data-toggle="modal" data-target="#bulk-unpublish-modal" class="btn btn-default disabled" th:text="#{Unpublish}">Unpublish</a>
+									</div>
+								</div>
+								<div class="pagination-group pull-right">
+									<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
+									<div class="pull-right">
+										<ul class="pagination paginateon-sm">
+											<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{${pagination.url}(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
+											<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{${pagination.url}(page=${p.pageNumber})}" th:text="${p.pageNumber + 1}"></a></li>
+											<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{${pagination.url}(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th class="wr-tr-checkbox" style="width:40px"><input type="checkbox"/></th>
+											<th th:text="#{Status}">Status</th>
+											<th th:text="#{Title}">Title</th>
+											<th th:text="#{Categories}">Categories</th>
+											<th th:text="#{Author}">Author</th>
+											<th th:text="#{Date}">Date</th>
+											<th class="text-right" th:text="#{Views}">Views</th>
+											<th class="text-center"></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
+											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${article.id}" th:attr="data-status=${#messages.msg('Post.Status.' + article.status)}"/></td>
+											<td th:class="'wr-post-status-' + ${article.status}" th:text="${#messages.msg('Post.Status.' + article.status)}">Status</td>
+											<td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
+											<td th:text="${#strings.setJoin(article.categories, '&nbsp;|&nbsp;')}"></td>
+											<td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
+											<td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E)', #locale) : ''}">2013/10/24</td>
+											<td class="text-right" th:text="${article.views}">0</td>
+											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function () {
+									$('#wr-page-content .search-result').on('click', '[data-href]', function (e) {
+										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')) {
+											window.location = $(e.target).closest('tr').data('href');
+										};
+									});
+									$('#wr-page-content .search-result').on('click', '[data-action]', function (e) {
+										var form = $(this).closest('form');
+										form.attr('action', $(this).data('action'));
+										form.submit();
+										e.preventDefault();
+									});
+									$('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
+										checkboxSelector: ':checkbox',
+										selectAll: '.search-result th.wr-tr-checkbox'
+									});
+									$('#wr-page-content .search-result td.wr-tr-checkbox').closest('td').click(function (e) {
+										e.stopPropagation();
+									});
+									$('#wr-page-content .search-result td.wr-tr-checkbox :checkbox').change(function (e) {
+										var checked = $(this).prop('checked');
+										if (checked) {
+											$(this).closest('tr').addClass('warning');
+										} else {
+											$(this).closest('tr').removeClass('warning');
+										}
+										var checkedCount = $('#wr-page-content .search-result td.wr-tr-checkbox :checkbox:checked').length;
+										if (checkedCount == 0) {
+											$('#wr-page-content .search-result .btn-toolbar .btn').addClass('disabled');
+										}
+										if (checkedCount >= 1) {
+											$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
+										}
+									});
+								});
+								// ]]>
+							</script>
+							<!-- #bulk-delete-modal -->
+							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="bulk-delete-dialog" class="modal-dialog">
+									<div th:fragment="bulk-delete-form" class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
+										</div>
+										<div class="modal-body">
+											<p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
+											<div class="checkbox">
+												<label><input type="checkbox" name="confirmed" value="true"/> <span th:text="#{Confirm}">Confirm</span></label>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/#bulk-delete-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function () {
+									$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function () {
+										var confirmed = $(this);
+										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
+									});
+									$('#bulk-delete-modal').on('hidden.bs.modal', function () {
+										$(this).removeData('bs.modal');
+									});
+								});
+								// ]]>
+							</script>
+							<!-- #bulk-publish-modal -->
+							<div id="bulk-publish-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="bulk-publish-dialog" class="modal-dialog">
+									<div th:fragment="bulk-publish-form" class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title" th:text="#{PublishArticle}">Publish Articles</h4>
+										</div>
+										<div class="modal-body">
+											<div class="form-group">
+												<label th:text="#{Date}">Date</label>
+												<input type="text" name="date" class="form-control" placeholder="YYYY/MM/DD" />
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-publish}" th:text="#{Publish}">Publish</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/#bulk-publish-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function () {
+									$('#bulk-publish-modal').on('hidden.bs.modal', function () {
+										$(this).removeData('bs.modal');
+									});
+								});
+								// ]]>
+							</script>
+							<!-- #bulk-unpublish-modal -->
+							<div id="bulk-unpublish-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="bulk-unpublish-dialog" class="modal-dialog">
+									<div th:fragment="bulk-unpublish-form" class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title" th:text="#{UnpublishArticle}">Unpublish Articles</h4>
+										</div>
+										<div class="modal-body">
+											<p th:text="#{MakeSureUnpublish}">Are you sure you want to unpublish?</p>
+											<div class="checkbox">
+												<label><input type="checkbox" name="confirmed" value="true"/> <span th:text="#{Confirm}">Confirm</span></label>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-unpublish}" disabled="true" th:text="#{Unpublish}">Unpublish</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/#bulk-unpublish-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function () {
+									$('#bulk-unpublish-modal').on('change', ':input[name="confirmed"]', function () {
+										var confirmed = $(this);
+										$('#bulk-unpublish-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
+									});
+									$('#bulk-unpublish-modal').on('hidden.bs.modal', function () {
+										$(this).removeData('bs.modal');
+									});
+								});
+								// ]]>
+							</script>
+						</form>
+					</section>
+				</div>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
 </html>

@@ -221,21 +221,46 @@ public class ArticleService {
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+//		article.setDrafted(null);
+//		article.setStatus(Post.Status.PUBLISHED);
+//		articleRepository.save(article);
+//		articleRepository.deleteByDrafted(article);
+		publishArticle(article);
+		return saveArticle(request, authorizedUser);
+	}
+
+	private Article publishArticle(Article article) {
+		if (!StringUtils.hasText(article.getTitle())) {
+			throw new NotNullException();
+		}
+		if (!StringUtils.hasText(article.getBody())) {
+			throw new NotNullException();
+		}
+
 		article.setDrafted(null);
 		article.setStatus(Post.Status.PUBLISHED);
-		articleRepository.save(article);
+		Article published = articleRepository.save(article);
 		articleRepository.deleteByDrafted(article);
-		return saveArticle(request, authorizedUser);
+		return published;
 	}
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+//		article.setDrafted(null);
+//		article.setStatus(Post.Status.DRAFT);
+//		articleRepository.save(article);
+//		articleRepository.deleteByDrafted(article);
+		unpublishArticle(article);
+		return saveArticle(request, authorizedUser);
+	}
+
+	private Article unpublishArticle(Article article) {
 		article.setDrafted(null);
 		article.setStatus(Post.Status.DRAFT);
-		articleRepository.save(article);
+		Article unpublished = articleRepository.save(article);
 		articleRepository.deleteByDrafted(article);
-		return saveArticle(request, authorizedUser);
+		return unpublished;
 	}
 
 	@CacheEvict(value = "articles", allEntries = true)
@@ -353,7 +378,53 @@ public class ArticleService {
 		articleRepository.delete(article);
 		return article;
 	}
-	
+
+	@CacheEvict(value = "articles", allEntries = true)
+	public List<Article> bulkPublishArticle(ArticleBulkPublishRequest request, AuthorizedUser authorizedUser) {
+		List<Article> articles = new ArrayList<>();
+		for (long id : request.getIds()) {
+			Article article = articleRepository.findByIdForUpdate(id, request.getLanguage());
+			if (article.getStatus() != Post.Status.DRAFT) {
+				continue;
+			}
+
+			LocalDateTime now = LocalDateTime.now();
+			LocalDateTime date = article.getDate();
+			if (request.getDate() != null) {
+				date = request.getDate();
+			}
+			if (date == null) {
+				date = now.withTime(0, 0, 0, 0);
+			}
+			article.setDate(date);
+			article.setUpdatedAt(now);
+			article.setUpdatedBy(authorizedUser.toString());
+
+			article = publishArticle(article);
+			articles.add(article);
+		}
+		return articles;
+	}
+
+	@CacheEvict(value = "articles", allEntries = true)
+	public List<Article> bulkUnpublishArticle(ArticleBulkUnpublishRequest request, AuthorizedUser authorizedUser) {
+		List<Article> articles = new ArrayList<>();
+		for (long id : request.getIds()) {
+			Article article = articleRepository.findByIdForUpdate(id, request.getLanguage());
+			if (article.getStatus() == Post.Status.DRAFT) {
+				continue;
+			}
+
+			LocalDateTime now = LocalDateTime.now();
+			article.setUpdatedAt(now);
+			article.setUpdatedBy(authorizedUser.toString());
+
+			article = unpublishArticle(article);
+			articles.add(article);
+		}
+		return articles;
+	}
+
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	@CacheEvict(value="articles", allEntries=true)
 	public List<Article> bulkDeleteArticle(ArticleBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
@@ -487,13 +558,5 @@ public class ArticleService {
 			counts.put((Long) row.get("tagId"), (Long) row.get("count"));
 		}
 		return counts;
-	}
-        
-	public void changeStatusArticle(Post.Status status, String language, List<Long> ids ){
-		for (Long articleId : ids) {
-			Article article = articleRepository.findByIdForUpdate(articleId, language);
-			article.setStatus(status);
-			articleRepository.saveAndFlush(article);
-		}
 	}
 }

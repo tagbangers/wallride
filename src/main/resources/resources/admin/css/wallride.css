@@ -67,6 +67,9 @@ pre {
 	padding-left: 30px;
 	padding-right: 30px;
 }
+.modal {
+	z-index: 1060;
+}
 /***** layout *****/
 #header {
 	margin-bottom: 0;

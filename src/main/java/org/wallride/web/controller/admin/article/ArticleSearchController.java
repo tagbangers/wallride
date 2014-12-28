@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.Application;
 import org.wallride.core.domain.Article;
+import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.support.Pagination;
@@ -80,8 +81,18 @@ public class ArticleSearchController {
         return "article/index";
     }
 
-//    @RequestMapping(params = "part=change-status-form")
-//    public String partChangeStatusDialog() {
-//        return "/article/index::change-status-form";
-//    }
+    @RequestMapping(method = RequestMethod.GET, params = "part=bulk-delete-form")
+    public String partBulkDeleteForm(@PathVariable String language) {
+        return "article/index::bulk-delete-form";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = "part=bulk-publish-form")
+    public String partBulkPublishForm(@PathVariable String language) {
+        return "article/index::bulk-publish-form";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = "part=bulk-unpublish-form")
+    public String partBulkUnpublishForm(@PathVariable String language) {
+        return "article/index::bulk-unpublish-form";
+    }
 }

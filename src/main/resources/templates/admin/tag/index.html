@@ -136,7 +136,9 @@
 										</div>
 										<div class="modal-body">
 											<p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
-											<label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
+											<div class="checkbox">
+												<label><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
+											</div>
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
