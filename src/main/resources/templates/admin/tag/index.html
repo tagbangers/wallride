@@ -56,7 +56,7 @@
 										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 									</div>
 									<div class="btn-group wr-merge-action">
-										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=merge-tag-form)}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled">Merge</a>
+										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-merge-form)}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled">Merge</a>
 									</div>
 								</div>
 								<div class="pagination-group pull-right">
@@ -112,7 +112,7 @@
 							<!--#merge-tag-modal-->
 							<div id="merge-tag-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 								<div id="merge-tag-dialog" class="modal-dialog">
-									<div th:fragment="merge-tag-form" class="modal-content">
+									<div th:fragment="tag-merge-form" class="modal-content">
 										<div class="modal-header">
 											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 											<h4 class="modal-title">Merge Tags</h4>
