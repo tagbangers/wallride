@@ -1,26 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.wallride.web.controller.admin.tag;
 
+import java.io.Serializable;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 
-/**
- *
- * @author hung132
- */
-public class TagMergeForm {
+public class TagMergeForm implements Serializable {
+
     @NotNull
     private List<Long> ids;
     @NotNull
-    private String language;
+    private String newName;
     @NotNull
-    private String newTagName;
-    
+    private String language;
+
     public TagMergeForm(){}
 
     public List<Long> getIds() {
@@ -39,12 +31,12 @@ public class TagMergeForm {
         this.language = language;
     }
 
-    public String getNewTagName() {
-        return newTagName;
+    public String getNewName() {
+        return newName;
     }
 
-    public void setNewTagName(String newTagName) {
-        this.newTagName = newTagName;
+    public void setNewName(String newName) {
+        this.newName = newName;
     }
     
     

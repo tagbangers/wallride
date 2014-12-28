@@ -9,9 +9,13 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.FlashMap;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
+import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.DuplicateNameException;
+import org.wallride.core.service.TagCreateRequest;
 import org.wallride.core.service.TagService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
@@ -22,12 +26,17 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 public class TagRestController {
 
 	@Inject
 	private TagService tagService;
+	@Inject
+	private ArticleService articleService;
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
@@ -90,5 +99,51 @@ public class TagRestController {
 		flashMap.put("savedTag", savedTag);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
 		return new DomainObjectUpdatedModel<>(savedTag);
+	}
+
+	@RequestMapping(value = "/{language}/tags/merge", method = RequestMethod.POST)
+	public @ResponseBody DomainObjectSavedModel merge(
+			@Valid TagMergeForm form,
+			BindingResult errors,
+			AuthorizedUser authorizeUser,
+			HttpServletRequest request,
+			HttpServletResponse response) throws BindException {
+		if (errors.hasErrors()) {
+			throw new BindException(errors);
+		}
+
+		List<Long> tagsForMerging = form.getIds();
+
+		TagCreateRequest requestCreate  = new TagCreateRequest.Builder()
+				.name(form.getNewName())
+				.language(form.getLanguage())
+				.build();
+		// create a new merged tag;
+		Tag mergedTag = tagService.createTag(requestCreate, authorizeUser);
+		// get all articles that have tag for merging;
+		List<Article> articles  = tagService.getArticles(tagsForMerging);
+
+		for (Article article : articles) {
+			SortedSet<Tag> tags = article.getTags();
+			Iterator<Tag> tagIterator = tags.iterator();
+			while(tagIterator.hasNext()){
+				Tag next = tagIterator.next();
+				for (Long tagId : tagsForMerging) {
+					if(next.getId() == tagId){
+						tagIterator.remove();
+					}
+				}
+			}
+			tags.add(mergedTag);
+			articleService.updateArticleForTagMerging(article);
+		}
+
+		// delete old tag after merging
+		tagService.deleteTagsAfterMerging(form, errors);
+
+		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
+		flashMap.put("mergedTag", mergedTag);
+		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
+		return new DomainObjectSavedModel<>(mergedTag);
 	}
 }

@@ -29,7 +29,7 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{DeletedTags}">Tags deleted.</span>
 					</div>
-					<div class="alert alert-success" th:if="${mergedTags ne null}">
+					<div class="alert alert-success" th:if="${mergedTag ne null}">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{MergedTags}">Tags merged.</span>
 					</div>
@@ -90,71 +90,13 @@
 									</tbody>
 								</table>
 							</div>
-							<!-- #bulk-delete-modal -->
-							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="bulk-delete-dialog" class="modal-dialog">
-									<div th:fragment="bulk-delete-form" class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-											<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
-										</div>
-										<div class="modal-body">
-											<p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
-											<label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
-										</div>
-										<div class="modal-footer">
-											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!--/#bulk-delete-modal -->
-							<!-- #merge-tag-modal -->
-							<div id="merge-tag-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="merge-tag-dialog" class="modal-dialog">
-									<div th:fragment="tag-merge-form" class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-											<h4 class="modal-title" th:text="#{MergeTags}">Merge Tags</h4>
-										</div>
-										<div class="modal-body">
-											<div class="form-group">
-												<label th:text="#{MergedTagName}">Tag name of the merged</label>
-												<input type="text" name="newTagName" class="form-control" th:placeholder="#{TagName}" />
-											</div>
-										</div>
-										<div class="modal-footer">
-											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" id="button1" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge-tags}" th:text="#{Merge}">Merge</button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!-- #merge-tag-modal -->
 							<script th:inline="javascript">
 								// <![CDATA[
 								$(function() {
-									$('#bulk-delete-modal').on('hidden.bs.modal', function() {
-										$(this).removeData('bs.modal');
-									});
-									$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
-										var confirmed = $(this);
-										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
-									});
-									$('#merge-tag-modal').on('hidden.bs.modal', function() {
-										$(this).removeData('bs.modal');
-									});
 									$('#wr-page-content .search-result').on('click', '[data-href]', function(e) {
 										if (!$(e.target).is(':checkbox') && !$(e.target).is('a')){
 											window.location = $(e.target).closest('tr').data('href');
 										};
-									});
-									$('#wr-page-content .search-result').on('click', '[data-action]', function(e) {
-										var form = $(this).closest('form');
-										form.attr('action', $(this).data('action'));
-										form.submit();
-										e.preventDefault();
 									});
 									$('#wr-page-content .search-result td.wr-tr-checkbox').shiftcheckbox({
 										checkboxSelector: ':checkbox',
@@ -180,6 +122,99 @@
 										if (checkedCount >= 2) {
 											$('#wr-page-content .search-result .wr-merge-action .btn').removeClass('disabled');
 										}
+									});
+								});
+								// ]]>
+							</script>
+							<!-- #bulk-delete-modal -->
+							<div id="bulk-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="bulk-delete-dialog" class="modal-dialog">
+									<div th:fragment="bulk-delete-form" class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Articles</h4>
+										</div>
+										<div class="modal-body">
+											<p th:text="#{MakeSureDelete}">Are you sure you want to delete?</p>
+											<label class="checkbox inline"><input type="checkbox" name="confirmed" value="true" /> <span th:text="#{Confirm}">Confirm</span></label>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+											<button class="btn btn-primary" id="delete-tag" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/#bulk-delete-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function() {
+									$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
+										var confirmed = $(this);
+										$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
+									});
+									$('#bulk-delete-modal').on('click', '#delete-tag', function(e) {
+										e.preventDefault();
+										var $form = $(this).closest('form');
+										$form.attr('action', $(this).data('action'));
+										$form.submit();
+									});
+									$('#bulk-delete-modal').on('hidden.bs.modal', function() {
+										$(this).removeData('bs.modal');
+									});
+								});
+								// ]]>
+							</script>
+							<!-- #merge-tag-modal -->
+							<div id="merge-tag-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div id="merge-tag-dialog" class="modal-dialog">
+									<div th:fragment="tag-merge-form" class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title" th:text="#{MergeTags}">Merge Tags</h4>
+										</div>
+										<div class="modal-body">
+											<div class="form-group">
+												<label th:text="#{MergedTagName}">Tag name of the merged</label>
+												<input type="text" name="newName" class="form-control" th:placeholder="#{TagName}" />
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+											<button class="btn btn-primary" id="merge-tag" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge}" th:text="#{Merge}">Merge</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- #merge-tag-modal -->
+							<script th:inline="javascript">
+								// <![CDATA[
+								$(function() {
+									$('#merge-tag-modal').on('click', '#merge-tag', function(e) {
+										e.preventDefault();
+										var $self = $(this);
+										$self.button('loading');
+										var $form = $self.closest('form');
+										$.ajax({
+											url: $self.data('action'),
+											type: 'post',
+											data: $form.serialize(),
+											success: function() {
+												location = /*[[@{__${ADMIN_PATH}__/tags/index?merged}]]*/ '#';
+											},
+											error: function(jqXHR) {
+												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+													var $field = $(':input[name="' + field + '"]', $form);
+													$field.closest('.form-group').addClass('has-error');
+													$field.closest('.form-group').find('.help-block.has-error').remove();
+													$field.after($('<span class="help-block has-error" />').text(message));
+												});
+												$self.button('reset');
+											}
+										});
+									});
+									$('#merge-tag-modal').on('hidden.bs.modal', function() {
+										$(this).removeData('bs.modal');
 									});
 								});
 								// ]]>
