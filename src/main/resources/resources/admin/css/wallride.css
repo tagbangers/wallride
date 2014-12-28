@@ -58,6 +58,7 @@ pre {
 	border: transparent;
 	background-color: transparent;
 }
+
 /***** bootstrap *****/
 .container {
 	width: 100%;
@@ -711,6 +712,9 @@ legend {
 }
 .wr-tool-panel .publish-date {
 	font-size: 15px;
+}
+.wr-post-body img {
+	max-width: 100%;
 }
 .wr-post-author {
 	text-align: center;
