@@ -221,24 +221,20 @@ public class ArticleService {
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-//		article.setDrafted(null);
-//		article.setStatus(Post.Status.PUBLISHED);
-//		articleRepository.save(article);
-//		articleRepository.deleteByDrafted(article);
 		publishArticle(article);
 		return saveArticle(request, authorizedUser);
 	}
 
 	private Article publishArticle(Article article) {
-		if (!StringUtils.hasText(article.getTitle())) {
-			throw new NotNullException();
-		}
-		if (!StringUtils.hasText(article.getBody())) {
-			throw new NotNullException();
+		article.setDrafted(null);
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime date = article.getDate();
+		if (date != null && date.isAfter(now)) {
+			article.setStatus(Post.Status.SCHEDULED);
+		} else {
+			article.setStatus(Post.Status.PUBLISHED);
 		}
 
-		article.setDrafted(null);
-		article.setStatus(Post.Status.PUBLISHED);
 		Article published = articleRepository.save(article);
 		articleRepository.deleteByDrafted(article);
 		return published;
@@ -247,10 +243,6 @@ public class ArticleService {
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-//		article.setDrafted(null);
-//		article.setStatus(Post.Status.DRAFT);
-//		articleRepository.save(article);
-//		articleRepository.deleteByDrafted(article);
 		unpublishArticle(article);
 		return saveArticle(request, authorizedUser);
 	}
@@ -305,12 +297,13 @@ public class ArticleService {
 //		article.setAuthor(author);
 
 		LocalDateTime date = request.getDate();
-		if (Post.Status.PUBLISHED.equals(article.getStatus())) {
+		if (!Post.Status.DRAFT.equals(article.getStatus())) {
 			if (date == null) {
 				date = now.withTime(0, 0, 0, 0);
-			}
-			else if (date.isAfter(now)) {
+			} else if (date.isAfter(now)) {
 				article.setStatus(Post.Status.SCHEDULED);
+			} else {
+				article.setStatus(Post.Status.PUBLISHED);
 			}
 		}
 		article.setDate(date);
@@ -386,6 +379,13 @@ public class ArticleService {
 			Article article = articleRepository.findByIdForUpdate(id, request.getLanguage());
 			if (article.getStatus() != Post.Status.DRAFT) {
 				continue;
+			}
+
+			if (!StringUtils.hasText(article.getTitle())) {
+				throw new NotNullException();
+			}
+			if (!StringUtils.hasText(article.getBody())) {
+				throw new NotNullException();
 			}
 
 			LocalDateTime now = LocalDateTime.now();

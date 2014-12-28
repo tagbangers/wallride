@@ -264,13 +264,10 @@
 										</div>
 										<div class="modal-body">
 											<p th:text="#{MakeSureUnpublish}">Are you sure you want to unpublish?</p>
-											<div class="checkbox">
-												<label><input type="checkbox" name="confirmed" value="true"/> <span th:text="#{Confirm}">Confirm</span></label>
-											</div>
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-unpublish}" disabled="true" th:text="#{Unpublish}">Unpublish</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-unpublish}" th:text="#{Unpublish}">Unpublish</button>
 										</div>
 									</div>
 								</div>
@@ -279,10 +276,6 @@
 							<script th:inline="javascript">
 								// <![CDATA[
 								$(function () {
-									$('#bulk-unpublish-modal').on('change', ':input[name="confirmed"]', function () {
-										var confirmed = $(this);
-										$('#bulk-unpublish-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
-									});
 									$('#bulk-unpublish-modal').on('hidden.bs.modal', function () {
 										$(this).removeData('bs.modal');
 									});
