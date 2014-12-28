@@ -19,6 +19,8 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.springframework.web.servlet.FlashMap;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.wallride.core.domain.Tag;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
@@ -26,11 +28,14 @@ import org.wallride.core.support.AuthorizedUser;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import org.wallride.core.domain.Article;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.web.controller.admin.tag.TagMergeForm;
+import org.wallride.web.support.DomainObjectSavedModel;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -40,13 +45,13 @@ public class TagService {
 
 	@Resource
 	private TagRepository tagRepository;
+	@Resource
+	private ArticleRepository articleRepository;
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
 	@Inject
 	private PlatformTransactionManager transactionManager;
-        @Inject
-        private ArticleRepository articleRepository;
-        
+
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag createTag(TagCreateRequest request, AuthorizedUser authorizedUser) {
 		Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
@@ -89,7 +94,33 @@ public class TagService {
 	}
 
 	@CacheEvict(value = "articles", allEntries = true)
-	public Tag deleteTag(TagDeleteRequest request, BindingResult result) throws BindException {
+	public Tag mergeTags(TagMergeRequest request, AuthorizedUser authorizedUser) {
+		TagCreateRequest createRequest  = new TagCreateRequest.Builder()
+				.name(request.getName())
+				.language(request.getLanguage())
+				.build();
+		Tag mergedTag = createTag(createRequest, authorizedUser);
+
+		// Get all articles that have tag for merging
+		ArticleSearchRequest searchRequest = new ArticleSearchRequest()
+				.withTagIds(request.getIds());
+		Page<Article> articles = articleRepository.search(searchRequest);
+
+		for (Article article : articles) {
+			article.getTags().add(mergedTag);
+			articleRepository.saveAndFlush(article);
+		}
+
+		// Delete old tag after merging
+		for (long id : request.getIds()) {
+			tagRepository.delete(id);
+		}
+
+		return mergedTag;
+	}
+
+	@CacheEvict(value = "articles", allEntries = true)
+	public Tag deleteTag(TagDeleteRequest request, BindingResult result) {
 		Tag tag = tagRepository.findByIdForUpdate(request.getId(), request.getLanguage());
 		tagRepository.delete(tag);
 		return tag;
@@ -114,11 +145,7 @@ public class TagService {
 			try {
 				tag = transactionTemplate.execute(new TransactionCallback<Tag>() {
 					public Tag doInTransaction(TransactionStatus status) {
-						try {
-							return deleteTag(deleteRequest, result);
-						} catch (BindException e) {
-							throw new RuntimeException(e);
-						}
+						return deleteTag(deleteRequest, result);
 					}
 				});
 				tags.add(tag);
@@ -146,23 +173,4 @@ public class TagService {
 	public Page<Tag> readTags(TagSearchRequest request, Pageable pageable) {
 		return tagRepository.search(request, pageable);
 	}
-        
-        public List<Article> getArticles(List<Long> listTagId){
-            return articleRepository.findByTagIds(listTagId);
-        }
-        
-        public void deleteTagsAfterMerging(TagMergeForm form, BindingResult result){
-            for(Long tagId : form.getIds()){
-                TagDeleteRequest request = new TagDeleteRequest.Builder()
-                        .id(tagId)
-                        .language(form.getLanguage())
-                        .build();
-                try {
-                    deleteTag(request, result);
-                } catch (BindException ex) {
-                    java.util.logging.Logger.getLogger(TagService.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-            }
-        }
 }

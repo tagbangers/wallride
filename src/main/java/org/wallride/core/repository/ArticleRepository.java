@@ -91,7 +91,4 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	@Modifying
 	@Query("delete from Article article where article.drafted = :drafted ")
 	void deleteByDrafted(@Param("drafted") Article dradted);
-        
-        @Query("SELECT  DISTINCT article  FROM Article article LEFT JOIN FETCH article.tags t WHERE t.id IN :ids")
-        List<Article> findByTagIds(@Param("ids") List<Long> ids);
 }

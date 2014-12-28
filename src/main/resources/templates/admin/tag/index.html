@@ -176,7 +176,7 @@
 										<div class="modal-body">
 											<div class="form-group">
 												<label th:text="#{MergedTagName}">Tag name of the merged</label>
-												<input type="text" name="newName" class="form-control" th:placeholder="#{TagName}" />
+												<input type="text" name="name" class="form-control" th:placeholder="#{TagName}" />
 											</div>
 										</div>
 										<div class="modal-footer">
@@ -219,125 +219,125 @@
 								});
 								// ]]>
 							</script>
-							<!-- #tag-create-modal -->
-							<div id="tag-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="tag-create-dialog" class="modal-dialog">
-									<div class="modal-content">
-										<form th:fragment="tag-create-form">
-											<div class="modal-header">
-												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-												<h4 class="modal-title" th:text="#{AddNewTag}">Add New Tag</h4>
-											</div>
-											<div class="modal-body">
-												<div class="form-group">
-													<input type="text" name="name" class="form-control" th:attr="placeholder=#{TagName}" />
-												</div>
-											</div>
-											<div class="modal-footer">
-												<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-												<button class="btn btn-primary" id="save-tag" th:text="#{Save}">Save</button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-							<!--/#tag-create-modal -->
-							<script th:inline="javascript">
-								$(function() {
-									$('#wr-page-content').on('click', '#save-tag', function(e) {
-										e.preventDefault();
-										var self = this;
-										$(self).button('loading');
-										var form = $(this).closest('form');
-										var data = {
-											name: $(':input[name="name"]', form).val()
-										};
-										$.ajax({
-											url: /*[[@{__${ADMIN_PATH}__/tags.json}]]*/ '#',
-											type: 'post',
-											data: data,
-											success: function() {
-												location = /*[[@{__${ADMIN_PATH}__/tags/index?created}]]*/ '#';
-											},
-											error: function(jqXHR) {
-												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-													var field = $(':input[name="' + field + '"]', form);
-													$(field).closest('.form-group').addClass('has-error');
-													$(field).closest('.form-group').find('.help-block.has-error').remove();
-													$(field).after($('<span class="help-block has-error" />').text(message));
-												});
-												$(self).button('reset');
-											}
-										});
-									});
-									$('#wr-page-content').on('hidden.bs.modal', '#tag-create-modal', function() {
-										$(this).removeData('bs.modal');
-									});
-								});
-							</script>
-							<!-- #tag-edit-modal -->
-							<div id="tag-edit-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-								<div id="tag-edit-dialog" class="modal-dialog">
-									<div class="modal-content">
-										<form th:fragment="tag-edit-form" th:if="${tag}">
-											<div class="modal-header">
-												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-												<h4 class="modal-title" th:text="#{EditTag}">Edit Tag</h4>
-											</div>
-											<div class="modal-body">
-												<div class="form-group">
-													<input type="text" name="name" th:value="${tag.name}" class="form-control" th:attr="placeholder=#{TagName}" placeholder="Tag Name" />
-												</div>
-											</div>
-											<div class="modal-footer">
-												<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-												<button id="update-tag" class="btn btn-primary" th:text="#{Save}" th:attr="data-id=${tag.id}">Save</button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</div>
-							<!--/#tag-edit-modal -->
-							<script th:inline="javascript">
-								$(function() {
-									$('#wr-page-content').on('click', '#update-tag', function(e) {
-										e.preventDefault();
-										var self = $(this);
-										self.button('loading');
-										var form = self.closest('form');
-										var data = {
-											name: $(':input[name="name"]', form).val()
-										};
-										/*[+
-										 var url = [[@{__${ADMIN_PATH}__/tags/}]] + self.data('id') + '.json';
-										 +]*/
-										$.ajax({
-											url: url,
-											type: 'post',
-											data: data,
-											success: function() {
-												location = /*[[@{__${ADMIN_PATH}__/tags/index?updated}]]*/ '#';
-											},
-											error: function(jqXHR) {
-												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-													var field = $(':input[name="' + field + '"]', form);
-													$(field).closest('.form-group').addClass('has-error');
-													$(field).closest('.form-group').find('.help-block.has-error').remove();
-													$(field).after($('<span class="help-block has-error" />').text(message));
-												});
-												$(self).button('reset');
-											}
-										});
-									});
-									$('#wr-page-content').on('hidden.bs.modal', '#tag-edit-modal', function() {
-										$(this).removeData('bs.modal');
-									});
-								});
-							</script>
 						</form>
 					</section>
 				</div>
 			</div>
 		</div>
+		<!-- #tag-create-modal -->
+		<div id="tag-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+			<div id="tag-create-dialog" class="modal-dialog">
+				<div class="modal-content">
+					<form th:fragment="tag-create-form">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" th:text="#{AddNewTag}">Add New Tag</h4>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<input type="text" name="name" class="form-control" th:attr="placeholder=#{TagName}" />
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+							<button class="btn btn-primary" id="save-tag" th:text="#{Save}">Save</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!--/#tag-create-modal -->
+		<script th:inline="javascript">
+			$(function() {
+				$('#tag-create-modal').on('click', '#save-tag', function(e) {
+					e.preventDefault();
+					var $self = $(this);
+					$self.button('loading');
+					var $form = $self.closest('form');
+					var data = {
+						name: $(':input[name="name"]', $form).val()
+					};
+					$.ajax({
+						url: /*[[@{__${ADMIN_PATH}__/tags.json}]]*/ '#',
+						type: 'post',
+						data: data,
+						success: function() {
+							location = /*[[@{__${ADMIN_PATH}__/tags/index?created}]]*/ '#';
+						},
+						error: function(jqXHR) {
+							$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+								var field = $(':input[name="' + field + '"]', $form);
+								$(field).closest('.form-group').addClass('has-error');
+								$(field).closest('.form-group').find('.help-block.has-error').remove();
+								$(field).after($('<span class="help-block has-error" />').text(message));
+							});
+							$self.button('reset');
+						}
+					});
+				});
+				$('#tag-create-modal').on('hidden.bs.modal', function() {
+					$(this).removeData('bs.modal');
+				});
+			});
+		</script>
+		<!-- #tag-edit-modal -->
+		<div id="tag-edit-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+			<div id="tag-edit-dialog" class="modal-dialog">
+				<div class="modal-content">
+					<form th:fragment="tag-edit-form" th:if="${tag}">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" th:text="#{EditTag}">Edit Tag</h4>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<input type="text" name="name" th:value="${tag.name}" class="form-control" th:attr="placeholder=#{TagName}" placeholder="Tag Name" />
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+							<button id="update-tag" class="btn btn-primary" th:text="#{Save}" th:attr="data-id=${tag.id}">Save</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!--/#tag-edit-modal -->
+		<script th:inline="javascript">
+			$(function() {
+				$('#tag-edit-modal').on('click', '#update-tag', function(e) {
+					e.preventDefault();
+					var self = $(this);
+					self.button('loading');
+					var form = self.closest('form');
+					var data = {
+						name: $(':input[name="name"]', form).val()
+					};
+					/*[+
+					 var url = [[@{__${ADMIN_PATH}__/tags/}]] + self.data('id') + '.json';
+					 +]*/
+					$.ajax({
+						url: url,
+						type: 'post',
+						data: data,
+						success: function() {
+							location = /*[[@{__${ADMIN_PATH}__/tags/index?updated}]]*/ '#';
+						},
+						error: function(jqXHR) {
+							$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+								var field = $(':input[name="' + field + '"]', form);
+								$(field).closest('.form-group').addClass('has-error');
+								$(field).closest('.form-group').find('.help-block.has-error').remove();
+								$(field).after($('<span class="help-block has-error" />').text(message));
+							});
+							$(self).button('reset');
+						}
+					});
+				});
+				$('#tag-edit-modal').on('hidden.bs.modal', function() {
+					$(this).removeData('bs.modal');
+				});
+			});
+		</script>
 	</body>
 </html>

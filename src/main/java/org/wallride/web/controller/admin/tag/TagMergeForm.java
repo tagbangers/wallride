@@ -1,5 +1,7 @@
 package org.wallride.web.controller.admin.tag;
 
+import org.wallride.core.service.TagMergeRequest;
+
 import java.io.Serializable;
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -9,7 +11,7 @@ public class TagMergeForm implements Serializable {
     @NotNull
     private List<Long> ids;
     @NotNull
-    private String newName;
+    private String name;
     @NotNull
     private String language;
 
@@ -31,13 +33,19 @@ public class TagMergeForm implements Serializable {
         this.language = language;
     }
 
-    public String getNewName() {
-        return newName;
+    public String getName() {
+        return name;
     }
 
-    public void setNewName(String newName) {
-        this.newName = newName;
+    public void setName(String name) {
+        this.name = name;
     }
-    
-    
+
+    public TagMergeRequest toTagMergeRequest() {
+        TagMergeRequest request = new TagMergeRequest();
+        request.setIds(getIds());
+        request.setName(getName());
+        request.setLanguage(getLanguage());
+        return request;
+    }
 }

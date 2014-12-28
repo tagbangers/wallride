@@ -13,10 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.DuplicateNameException;
-import org.wallride.core.service.TagCreateRequest;
-import org.wallride.core.service.TagService;
+import org.wallride.core.service.*;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.DomainObjectUpdatedModel;
@@ -105,41 +102,20 @@ public class TagRestController {
 	public @ResponseBody DomainObjectSavedModel merge(
 			@Valid TagMergeForm form,
 			BindingResult errors,
-			AuthorizedUser authorizeUser,
+			AuthorizedUser authorizedUser,
 			HttpServletRequest request,
 			HttpServletResponse response) throws BindException {
 		if (errors.hasErrors()) {
 			throw new BindException(errors);
 		}
 
-		List<Long> tagsForMerging = form.getIds();
-
-		TagCreateRequest requestCreate  = new TagCreateRequest.Builder()
-				.name(form.getNewName())
-				.language(form.getLanguage())
-				.build();
-		// create a new merged tag;
-		Tag mergedTag = tagService.createTag(requestCreate, authorizeUser);
-		// get all articles that have tag for merging;
-		List<Article> articles  = tagService.getArticles(tagsForMerging);
-
-		for (Article article : articles) {
-			SortedSet<Tag> tags = article.getTags();
-			Iterator<Tag> tagIterator = tags.iterator();
-			while(tagIterator.hasNext()){
-				Tag next = tagIterator.next();
-				for (Long tagId : tagsForMerging) {
-					if(next.getId() == tagId){
-						tagIterator.remove();
-					}
-				}
-			}
-			tags.add(mergedTag);
-			articleService.updateArticleForTagMerging(article);
+		Tag mergedTag;
+		try {
+			mergedTag = tagService.mergeTags(form.toTagMergeRequest(), authorizedUser);
+		} catch (DuplicateNameException e) {
+			errors.rejectValue("name", "NotDuplicate");
+			throw new BindException(errors);
 		}
-
-		// delete old tag after merging
-		tagService.deleteTagsAfterMerging(form, errors);
 
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("mergedTag", mergedTag);
