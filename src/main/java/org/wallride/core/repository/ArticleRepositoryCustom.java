@@ -7,5 +7,6 @@ import org.wallride.core.service.ArticleSearchRequest;
 
 public interface ArticleRepositoryCustom {
 
+	Page<Article> search(ArticleSearchRequest request);
 	Page<Article> search(ArticleSearchRequest request, Pageable pageable);
 }

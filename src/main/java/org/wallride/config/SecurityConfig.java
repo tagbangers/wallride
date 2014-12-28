@@ -76,6 +76,7 @@ public class SecurityConfig {
 			web
 				.ignoring()
 					.antMatchers("/_admin/resources/**")
+					.antMatchers("/_admin/webjars/**")
 					.antMatchers("/_admin/setup**")
 					.antMatchers("/_admin/signup**");
 			// @formatter:on
@@ -140,7 +141,8 @@ public class SecurityConfig {
 			// @formatter:off
 			web
 				.ignoring()
-					.antMatchers("/resources/**");
+					.antMatchers("/resources/**")
+					.antMatchers("/webjars/**");
 			// @formatter:on
 		}
 

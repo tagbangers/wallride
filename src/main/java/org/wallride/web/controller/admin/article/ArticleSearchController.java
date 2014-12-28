@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.Application;
 import org.wallride.core.domain.Article;
+import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.support.Pagination;
@@ -28,55 +29,70 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/{language}/articles/index")
 public class ArticleSearchController {
 
-	@Inject
-	private ArticleService articleService;
+    @Inject
+    private ArticleService articleService;
 
-	@ModelAttribute("countAll")
-	public long countAll(@PathVariable String language) {
-		return articleService.countArticles(language);
-	}
+    @ModelAttribute("countAll")
+    public long countAll(@PathVariable String language) {
+        return articleService.countArticles(language);
+    }
 
-	@ModelAttribute("countDraft")
-	public long countDraft(@PathVariable String language) {
-		return articleService.countArticlesByStatus(Post.Status.DRAFT, language);
-	}
+    @ModelAttribute("countDraft")
+    public long countDraft(@PathVariable String language) {
+        return articleService.countArticlesByStatus(Post.Status.DRAFT, language);
+    }
 
-	@ModelAttribute("countScheduled")
-	public long countScheduled(@PathVariable String language) {
-		return articleService.countArticlesByStatus(Post.Status.SCHEDULED, language);
-	}
+    @ModelAttribute("countScheduled")
+    public long countScheduled(@PathVariable String language) {
+        return articleService.countArticlesByStatus(Post.Status.SCHEDULED, language);
+    }
 
-	@ModelAttribute("countPublished")
-	public long countPublished(@PathVariable String language) {
-		return articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
-	}
+    @ModelAttribute("countPublished")
+    public long countPublished(@PathVariable String language) {
+        return articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
+    }
 
-	@ModelAttribute("form")
-	public ArticleSearchForm setupArticleSearchForm() {
-		return new ArticleSearchForm();
-	}
+    @ModelAttribute("form")
+    public ArticleSearchForm setupArticleSearchForm() {
+        return new ArticleSearchForm();
+    }
 
-	@RequestMapping(method = RequestMethod.GET)
-	public String search(
-			@PathVariable String language,
-			@Validated ArticleSearchForm form,
-			BindingResult result,
-			@PageableDefault(50) Pageable pageable,
-			Model model,
-			HttpSession session) {
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+    @RequestMapping(method = RequestMethod.GET)
+    public String search(
+            @PathVariable String language,
+            @Validated ArticleSearchForm form,
+            BindingResult result,
+            @PageableDefault(50) Pageable pageable,
+            Model model,
+            HttpSession session) {
+        Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 
-		new DomainObjectSearchCondition<>(session, form, pageable);
+        new DomainObjectSearchCondition<>(session, form, pageable);
 
-		model.addAttribute("form", form);
-		model.addAttribute("articles", articles);
-		model.addAttribute("pageable", pageable);
+        model.addAttribute("form", form);
+        model.addAttribute("articles", articles);
+        model.addAttribute("pageable", pageable);
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath(Application.ADMIN_SERVLET_PATH);
-		builder.path("/{language}/articles/index");
-		builder.queryParams(form.toQueryParams());
-		String url = builder.buildAndExpand(language).toString();
-		model.addAttribute("pagination", new Pagination<>(articles, url));
-		return "article/index";
-	}
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(Application.ADMIN_SERVLET_PATH);
+        builder.path("/{language}/articles/index");
+        builder.queryParams(form.toQueryParams());
+        String url = builder.buildAndExpand(language).toString();
+        model.addAttribute("pagination", new Pagination<>(articles, url));
+        return "article/index";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = "part=bulk-delete-form")
+    public String partBulkDeleteForm(@PathVariable String language) {
+        return "article/index::bulk-delete-form";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = "part=bulk-publish-form")
+    public String partBulkPublishForm(@PathVariable String language) {
+        return "article/index::bulk-publish-form";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = "part=bulk-unpublish-form")
+    public String partBulkUnpublishForm(@PathVariable String language) {
+        return "article/index::bulk-unpublish-form";
+    }
 }

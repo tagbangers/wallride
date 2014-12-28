@@ -58,6 +58,7 @@ pre {
 	border: transparent;
 	background-color: transparent;
 }
+
 /***** bootstrap *****/
 .container {
 	width: 100%;
@@ -65,6 +66,9 @@ pre {
 .container-fluid {
 	padding-left: 30px;
 	padding-right: 30px;
+}
+.modal {
+	z-index: 1060;
 }
 /***** layout *****/
 #header {
@@ -711,6 +715,9 @@ legend {
 }
 .wr-tool-panel .publish-date {
 	font-size: 15px;
+}
+.wr-post-body img {
+	max-width: 100%;
 }
 .wr-post-author {
 	text-align: center;

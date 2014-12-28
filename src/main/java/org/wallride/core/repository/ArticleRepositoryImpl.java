@@ -33,7 +33,12 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	@Override
+	public Page<Article> search(ArticleSearchRequest request) {
+		return search(request, null);
+	}
+
 	@Override
 	public Page<Article> search(ArticleSearchRequest request, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
@@ -85,25 +90,33 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		}
 
 		if (!CollectionUtils.isEmpty(request.getCategoryIds())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
 			for (long categoryId : request.getCategoryIds()) {
-				junction.must(qb.keyword().onField("categories.id").matching(categoryId).createQuery());
+				subJunction.should(qb.keyword().onField("categories.id").matching(categoryId).createQuery());
 			}
+			junction.must(subJunction.createQuery());
 		}
 		if (!CollectionUtils.isEmpty(request.getCategoryCodes())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
 			for (String categoryCode : request.getCategoryCodes()) {
-				junction.must(qb.keyword().onField("categories.code").matching(categoryCode).createQuery());
+				subJunction.should(qb.keyword().onField("categories.code").matching(categoryCode).createQuery());
 			}
+			junction.must(subJunction.createQuery());
 		}
 
 		if (!CollectionUtils.isEmpty(request.getTagIds())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
 			for (long tagId : request.getTagIds()) {
-				junction.must(qb.keyword().onField("tags.id").matching(tagId).createQuery());
+				subJunction.should(qb.keyword().onField("tags.id").matching(tagId).createQuery());
 			}
+			junction.must(subJunction.createQuery());
 		}
 		if (!CollectionUtils.isEmpty(request.getTagNames())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
 			for (String tagName : request.getTagNames()) {
-				junction.must(qb.keyword().onField("tags.name").matching(tagName).createQuery());
+				subJunction.should(qb.keyword().onField("tags.name").matching(tagName).createQuery());
 			}
+			junction.must(subJunction.createQuery());
 		}
 
 		if (request.getAuthorId() != null) {
@@ -127,8 +140,10 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 				.createFullTextQuery(searchQuery, Article.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		persistenceQuery.setFirstResult(pageable.getOffset());
-		persistenceQuery.setMaxResults(pageable.getPageSize());
+		if (pageable != null) {
+			persistenceQuery.setFirstResult(pageable.getOffset());
+			persistenceQuery.setMaxResults(pageable.getPageSize());
+		}
 
 		int resultSize = persistenceQuery.getResultSize();
 

@@ -77,4 +77,20 @@ public class PageSearchController {
 		model.addAttribute("pagination", new Pagination<>(pages, url));
 		return "page/index";
 	}
+
+
+	@RequestMapping(method = RequestMethod.GET, params = "part=bulk-delete-form")
+	public String partBulkDeleteForm(@PathVariable String language) {
+		return "page/index::bulk-delete-form";
+	}
+
+	@RequestMapping(method = RequestMethod.GET, params = "part=bulk-publish-form")
+	public String partBulkPublishForm(@PathVariable String language) {
+		return "page/index::bulk-publish-form";
+	}
+
+	@RequestMapping(method = RequestMethod.GET, params = "part=bulk-unpublish-form")
+	public String partBulkUnpublishForm(@PathVariable String language) {
+		return "page/index::bulk-unpublish-form";
+	}
 }

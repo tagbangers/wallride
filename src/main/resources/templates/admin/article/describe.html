@@ -49,7 +49,7 @@
 							<div>
 								<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
 							</div>
-							<div class="clearfix">
+							<div class="wr-post-body clearfix">
 								<p th:utext="${#posts.body(article)}"></p>
 							</div>
 							<hr/>
