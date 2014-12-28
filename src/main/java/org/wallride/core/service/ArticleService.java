@@ -488,4 +488,16 @@ public class ArticleService {
 		}
 		return counts;
 	}
+        
+        public void updateArticleForTagMerging(Article artilce){
+            articleRepository.saveAndFlush(artilce);
+        }
+        
+        public void changeStatusArticle(Post.Status status, String language, List<Long> ids ){
+            for (Long articleId : ids) {
+                Article article = articleRepository.findByIdForUpdate(articleId, language);
+                article.setStatus(status);
+                articleRepository.saveAndFlush(article);                
+            }            
+        }
 }

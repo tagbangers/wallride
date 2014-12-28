@@ -20,7 +20,7 @@
 	-moz-box-sizing: @box-model;
 	box-sizing: @box-model;
 }
-.striped(@color: rgba(255, 255, 255, .2); @angle: 45deg) {
+.striped(@color: rgba(255, 255, 255, .2), @angle: 45deg) {
 	background-image: -webkit-linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);
 	background-image: -o-linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);
 	background-image: linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);
@@ -456,7 +456,7 @@ body .redactor-box-fullscreen {
 	max-width: 100%;
 	display: inline-block;
 	line-height: 0;
-	outline: 1px dashed rgba(0, 0, 0, .6),
+	outline: 1px dashed rgba(0, 0, 0, .6)
 }
 #redactor-image-editter {
 	position: absolute;
