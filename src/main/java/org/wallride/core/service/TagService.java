@@ -95,25 +95,26 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag mergeTags(TagMergeRequest request, AuthorizedUser authorizedUser) {
+		// Get all articles that have tag for merging
+		ArticleSearchRequest searchRequest = new ArticleSearchRequest()
+				.withTagIds(request.getIds());
+		Page<Article> articles = articleRepository.search(searchRequest);
+
+		// Delete old tag after merging
+		for (long id : request.getIds()) {
+			tagRepository.delete(id);
+		}
+
+		// Create a new Tag
 		TagCreateRequest createRequest  = new TagCreateRequest.Builder()
 				.name(request.getName())
 				.language(request.getLanguage())
 				.build();
 		Tag mergedTag = createTag(createRequest, authorizedUser);
 
-		// Get all articles that have tag for merging
-		ArticleSearchRequest searchRequest = new ArticleSearchRequest()
-				.withTagIds(request.getIds());
-		Page<Article> articles = articleRepository.search(searchRequest);
-
 		for (Article article : articles) {
 			article.getTags().add(mergedTag);
 			articleRepository.saveAndFlush(article);
-		}
-
-		// Delete old tag after merging
-		for (long id : request.getIds()) {
-			tagRepository.delete(id);
 		}
 
 		return mergedTag;
