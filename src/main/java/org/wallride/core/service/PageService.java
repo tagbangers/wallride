@@ -56,7 +56,7 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page createPage(PageCreateRequest request, Post.Status status, AuthorizedUser authorizedUser) {
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
@@ -110,7 +110,7 @@ public class PageService {
 		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(status)) {
 			if (date == null) {
-				date = now.withTime(0, 0, 0, 0);
+				date = now;
 			}
 			else if (date.isAfter(now)) {
 				status = Post.Status.SCHEDULED;

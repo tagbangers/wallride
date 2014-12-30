@@ -2,7 +2,6 @@ package org.wallride.web.controller.admin.page;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.domain.Post;
 import org.wallride.core.service.PageCreateRequest;
 import org.wallride.web.support.DomainObjectCreateForm;
 
@@ -28,7 +27,7 @@ public class PageCreateForm extends DomainObjectCreateForm {
 	private Long authorId;
 	
 //	@NotNull
-	@DateTimeFormat(pattern="yyyy/MM/dd")
+	@DateTimeFormat(pattern="yyyy/MM/dd HH:mm")
 	private LocalDateTime date;
 	
 	private Long parentId;

@@ -38,7 +38,7 @@
 							</div>
 							<div class="col-sm-10">
 								<h1 class="wr-post-title"><a th:href="@{${#posts.link(post)}}" th:text="${post.title}?:'No Titled'" href="#"></a></h1>
-								<time th:text="${post.date.toString('yyyy/MM/dd')}"></time>
+								<time th:text="${post.date.toString('yyyy/MM/dd HH:mm')}"></time>
 							</div>
 						</article>
 					</div>

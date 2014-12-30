@@ -102,7 +102,7 @@ public class ArticleService {
 		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(status)) {
 			if (date == null) {
-				date = now.withTime(0, 0, 0, 0);
+				date = now;
 			}
 			else if (date.isAfter(now)) {
 				status = Post.Status.SCHEDULED;
@@ -258,7 +258,7 @@ public class ArticleService {
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
@@ -299,7 +299,7 @@ public class ArticleService {
 		LocalDateTime date = request.getDate();
 		if (!Post.Status.DRAFT.equals(article.getStatus())) {
 			if (date == null) {
-				date = now.withTime(0, 0, 0, 0);
+				date = now;
 			} else if (date.isAfter(now)) {
 				article.setStatus(Post.Status.SCHEDULED);
 			} else {
@@ -377,9 +377,9 @@ public class ArticleService {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
 			Article article = articleRepository.findByIdForUpdate(id, request.getLanguage());
-			if (article.getStatus() != Post.Status.DRAFT) {
-				continue;
-			}
+//			if (article.getStatus() != Post.Status.DRAFT) {
+//				continue;
+//			}
 
 			if (!StringUtils.hasText(article.getTitle())) {
 				throw new NotNullException();
@@ -392,9 +392,8 @@ public class ArticleService {
 			LocalDateTime date = article.getDate();
 			if (request.getDate() != null) {
 				date = request.getDate();
-			}
-			if (date == null) {
-				date = now.withTime(0, 0, 0, 0);
+			} else if (date == null) {
+				date = now;
 			}
 			article.setDate(date);
 			article.setUpdatedAt(now);
