@@ -142,7 +142,7 @@
 											<td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
 											<td th:text="${#strings.setJoin(article.categories, '&nbsp;|&nbsp;')}"></td>
 											<td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
-											<td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E)', #locale) : ''}">2013/10/24</td>
+											<td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E) HH:mm', #locale) : ''}">2013/10/24</td>
 											<td class="text-right" th:text="${article.views}">0</td>
 											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 										</tr>
@@ -234,13 +234,18 @@
 										<div class="modal-body">
 											<div class="form-group">
 												<label th:text="#{Date}">Date</label>
-												<input type="text" name="date" class="form-control" placeholder="YYYY/MM/DD" />
+												<input type="text" name="date" class="form-control" placeholder="YYYY/MM/DD HH:mm" />
 											</div>
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
 											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-publish}" th:text="#{Publish}">Publish</button>
 										</div>
+										<script>
+											$(function () {
+												$(':input[name="date"]').datetimepicker({});
+											});
+										</script>
 									</div>
 								</div>
 							</div>

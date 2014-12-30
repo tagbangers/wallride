@@ -37,7 +37,7 @@ public class ArticleEditForm extends DomainObjectEditForm {
 
 	private Long authorId;
 
-	@DateTimeFormat(pattern="yyyy/MM/dd")
+	@DateTimeFormat(pattern="yyyy/MM/dd HH:mm")
 	private LocalDateTime date;
 
 	private Set<Long> categoryIds = new HashSet<>();

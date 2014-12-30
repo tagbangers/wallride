@@ -8,6 +8,7 @@
 		<link rel="stylesheet" th:href="@{/_admin/webjars/bootstrap/3.3.1/css/bootstrap.min.css}" href="//netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
 		<link rel="stylesheet" th:href="@{/_admin/webjars/select2/3.5.2/select2.css}" />
 		<link rel="stylesheet" th:href="@{/_admin/webjars/jquery-file-upload/9.8.1/css/jquery.fileupload.css}" />
+		<link rel="stylesheet" th:href="@{/_admin/webjars/datetimepicker/2.3.4/jquery.datetimepicker.css}" />
 		<link rel="stylesheet" th:href="@{/_admin/resources/lib/pnotify/pnotify.custom.min.css}" />
 		<link rel="stylesheet" th:href="@{/_admin/resources/lib/redactor/redactor.css}" href="#"/>
 		<link rel="stylesheet" th:href="@{/_admin/resources/css/wallride.css}" />
@@ -21,6 +22,7 @@
 		<script th:src="@{/_admin/webjars/bootstrap/3.3.1/js/bootstrap.min.js}" src="//netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 		<script th:src="@{/_admin/webjars/select2/3.5.2/select2.js}"></script>
 		<script th:src="@{/_admin/webjars/jquery-file-upload/9.8.1/js/jquery.fileupload.js}"></script>
+		<script th:src="@{/_admin/webjars/datetimepicker/2.3.4/jquery.datetimepicker.js}"></script>
 		<script th:src="@{/_admin/resources/lib/jquery.mjs.nestedSortable.js}"></script>
 		<script th:src="@{/_admin/resources/lib/jquery.shiftcheckbox.js}"></script>
 		<script th:src="@{/_admin/resources/lib/pnotify/pnotify.custom.min.js}"></script>
@@ -129,7 +131,7 @@
 					<h2>New Posts</h2>
 					<dl th:each="article : ${recentPublishedArticles}" class="list-inline">
 						<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}">Title</a></dt>
-						<dd th:text="${article.date.toString('yyyy/MM/dd')}">yyyy/MM/dd</dd>
+						<dd th:text="${article.date.toString('yyyy/MM/dd HH:mm')}">yyyy/MM/dd</dd>
 					</dl>
 				</div>
 				<div class="col-sm-5">

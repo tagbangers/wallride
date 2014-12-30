@@ -11,7 +11,7 @@ import java.util.List;
 public class ArticleBulkPublishForm implements Serializable {
 
 	private List<Long> ids;
-	@DateTimeFormat(pattern="yyyy/MM/dd")
+	@DateTimeFormat(pattern="yyyy/MM/dd HH:mm")
 	private LocalDateTime date;
 	@NotNull
 	private String language;

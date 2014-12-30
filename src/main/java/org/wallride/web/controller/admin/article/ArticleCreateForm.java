@@ -27,7 +27,7 @@ public class ArticleCreateForm extends DomainObjectCreateForm {
 	private Long authorId;
 
 //	@NotNull
-	@DateTimeFormat(pattern="yyyy/MM/dd")
+	@DateTimeFormat(pattern="yyyy/MM/dd HH:mm")
 	private LocalDateTime date;
 
 	private Set<Long> categoryIds = new HashSet<>();

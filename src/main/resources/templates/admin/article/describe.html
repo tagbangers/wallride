@@ -69,7 +69,7 @@
 							</div>
 							<dl>
 								<dt th:text="#{Date}">Date</dt>
-								<dd th:if="${article.date ne null}" th:text="${article.date.toString('yyyy/MM/dd')}"></dd>
+								<dd th:if="${article.date ne null}" th:text="${article.date.toString('yyyy/MM/dd HH:mm')}"></dd>
 							</dl>
 							<dl>
 								<dt th:text="#{Categories}">Categories</dt>
