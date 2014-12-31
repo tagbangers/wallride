@@ -367,6 +367,10 @@ ul.sortable {
 	content: ' \2212 ';
 }
 /**** article-edit *****/
+#category-fieldset ul ul {
+	padding-left: 20px;
+}
+
 @media (min-width: 768px) {
 	#category-fieldset .category-list {
 		height: 350px;
