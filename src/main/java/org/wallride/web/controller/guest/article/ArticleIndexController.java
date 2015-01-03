@@ -17,6 +17,8 @@ import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class ArticleIndexController {
@@ -154,10 +156,14 @@ public class ArticleIndexController {
 			throw new HttpNotFoundException();
 		}
 
-		ArticleSearchRequest request = new ArticleSearchRequest()
-				.withLanguage(blogLanguage.getLanguage())
-				.withTagNames(name);
-		Page<Article> articles = articleService.readArticles(request, pageable);
+		List<String> tagNames = new ArrayList<>(1);
+		tagNames.add(name);
+
+		ArticleSearchForm form = new ArticleSearchForm() {};
+		form.setLanguage(blogLanguage.getLanguage());
+		form.setTagNames(tagNames);
+
+		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("tag", tag);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
