@@ -1,16 +1,12 @@
 package org.wallride.web.controller.admin;
 
-import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Post;
+import org.wallride.core.domain.*;
 import org.wallride.core.service.*;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
@@ -60,8 +56,8 @@ public class DashboardController {
 		return "dashboard";
 	}
 
-	private List<Post> popularPosts(String language) {
-		return postService.readPopularPosts(LocalDate.now().minusDays(POPULAR_POSTS_DAYS), language, POPULAR_POSTS_COUNT);
+	private List<PopularPost> popularPosts(String language) {
+		return postService.readPopularPosts(language, PopularPost.Type.DAILY);
 	}
 
 	private List<Article> recentPublishedArticles(String language) {

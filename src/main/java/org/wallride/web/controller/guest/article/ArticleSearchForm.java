@@ -15,16 +15,12 @@ import java.util.Collection;
 public class ArticleSearchForm extends DomainObjectSearchForm {
 
 	private String keyword;
-
 	private LocalDateTime dateFrom;
-
 	private LocalDateTime dateTo;
-
 	private Collection<Long> categoryIds = new ArrayList<>();
-
-	private String language;
-
+	private Collection<String> tagNames = new ArrayList<>();
 	private Long authorId;
+	private String language;
 
 	public String getKeyword() {
 		return keyword;
@@ -58,12 +54,12 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 		this.categoryIds = categoryIds;
 	}
 
-	public String getLanguage() {
-		return language;
+	public Collection<String> getTagNames() {
+		return tagNames;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setTagNames(Collection<String> tagNames) {
+		this.tagNames = tagNames;
 	}
 
 	public Long getAuthorId() {
@@ -72,6 +68,14 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 
 	public void setAuthorId(Long authorId) {
 		this.authorId = authorId;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	public boolean isEmpty() {
@@ -87,6 +91,7 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 		request.setDateFrom(getDateFrom());
 		request.setDateTo(getDateTo());
 		request.setCategoryIds(getCategoryIds());
+		request.setTagNames(getTagNames());
 		request.setAuthorId(getAuthorId());
 		request.setLanguage(getLanguage());
 		request.setStatus(Post.Status.PUBLISHED);
@@ -103,6 +108,8 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 				.append(getDateFrom(), that.getDateFrom())
 				.append(getDateTo(), that.getDateTo())
 				.append(getCategoryIds(), that.getCategoryIds())
+				.append(getTagNames(), that.getTagNames())
+				.append(getAuthorId(), that.getAuthorId())
 				.append(getLanguage(), that.getLanguage())
 				.isEquals();
 	}
@@ -114,6 +121,8 @@ public class ArticleSearchForm extends DomainObjectSearchForm {
 				.append(getDateFrom())
 				.append(getDateTo())
 				.append(getCategoryIds())
+				.append(getTagNames())
+				.append(getAuthorId())
 				.append(getLanguage())
 				.toHashCode();
 	}

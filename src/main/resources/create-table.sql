@@ -123,6 +123,20 @@ create table password_reset_token (
 	primary key (token)
 ) ENGINE=InnoDB;
 
+create table popular_post (
+	id bigint not null auto_increment,
+	language varchar(3) not null,
+	type varchar(50) not null,
+	rank integer not null,
+	views bigint not null,
+	post_id bigint not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (id)
+) ENGINE=InnoDB;
+
 create table post (
 	id bigint not null auto_increment,
 	code varchar(200),
@@ -225,6 +239,9 @@ alter table blog_language
 alter table category
 	add constraint UK_86l62kycx6uuh2dbgymn8i065  unique (code, language);
 
+alter table popular_post
+	add constraint UK_a5tm7yxs8io57gsrtb5tbrlcm  unique (language, type, rank);
+
 alter table post
 	add constraint UK_6khu2naokwmhyfq3lt8t8eehn  unique (code, language);
 
@@ -311,6 +328,11 @@ alter table password_reset_token
 	add constraint FK_f90ivichjaokvmovxpnlm5nin
 	foreign key (user_id)
 	references user (id);
+
+alter table popular_post
+	add constraint FK_mjlwh0t7235c0koq6y01jdo84
+	foreign key (post_id)
+	references post (id);
 
 alter table post
 	add constraint FK_ik65bluepv8oxdfvgbj5qdcsj

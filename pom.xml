@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201512312255</version>
+	<version>1.0.0.SNAPSHOT-201501050845</version>
 	<packaging>war</packaging>
 	
 	<properties>
@@ -367,7 +367,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
