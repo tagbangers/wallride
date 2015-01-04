@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en" th:lang="${#locale.language}">
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
 	<head>
 		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -24,6 +24,7 @@
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 		<script th:src="@{/resources/lib/jquery.lazyload.min.js}" src="#"></script>
 		<!--/*/ </th:block> /*/-->
+		<script th:replace="google-analytics::ga(null)"></script>
 	</head>
 	<body>
 		<div id="wrap">

@@ -57,6 +57,8 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		if (mv.getViewName().startsWith("redirect:")) return;
 
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		mv.addObject("BLOG", blog);
+
 		List<String> languages = new ArrayList<>();
 		if (blog != null) {
 			for (BlogLanguage blogLanguage : blog.getLanguages()) {

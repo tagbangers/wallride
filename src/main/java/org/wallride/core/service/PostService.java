@@ -117,9 +117,9 @@ public class PostService {
 				}
 
 				Analytics.Data.Ga.Get get = analytics.data().ga()
-						.get(googleAnalytics.getProfileId(), startDate.toString("yyyy-MM-dd"), now.toString("yyyy-MM-dd"), "ga:pageViews")
+						.get(googleAnalytics.getProfileId(), startDate.toString("yyyy-MM-dd"), now.toString("yyyy-MM-dd"), "ga:sessions")
 						.setDimensions(String.format("ga:pagePath", googleAnalytics.getCustomDimensionIndex()))
-						.setSort(String.format("-ga:pageViews", googleAnalytics.getCustomDimensionIndex()))
+						.setSort(String.format("-ga:sessions", googleAnalytics.getCustomDimensionIndex()))
 						.setStartIndex(startIndex)
 						.setMaxResults(GoogleAnalyticsUtils.MAX_RESULTS);
 				if (blogLanguage.getBlog().isMultiLanguage()) {
@@ -268,11 +268,11 @@ public class PostService {
 		do {
 			try {
 				Analytics.Data.Ga.Get request = analytics.data().ga()
-						.get(googleAnalytics.getProfileId(), "2005-01-01", LocalDate.now().toString("yyyy-MM-dd"), "ga:pageviews")
+						.get(googleAnalytics.getProfileId(), "2005-01-01", LocalDate.now().toString("yyyy-MM-dd"), "ga:sessions")
 //						.setDimensions(String.format("ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 //						.setSort(String.format("-ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 						.setDimensions(String.format("ga:pagePath", googleAnalytics.getCustomDimensionIndex()))
-						.setSort(String.format("-ga:pageViews", googleAnalytics.getCustomDimensionIndex()))
+						.setSort(String.format("-ga:sessions", googleAnalytics.getCustomDimensionIndex()))
 						.setStartIndex(startIndex)
 						.setMaxResults(GoogleAnalyticsUtils.MAX_RESULTS);
 
