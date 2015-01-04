@@ -15,11 +15,21 @@ import java.io.IOException;
 public class BlogLanguageRewriteMatch extends RewriteMatch {
 
 	private BlogLanguage blogLanguage;
+	private String matchingUrl;
 
 	private static Logger logger = LoggerFactory.getLogger(BlogLanguageRewriteMatch.class);
 
 	public BlogLanguageRewriteMatch(BlogLanguage blogLanguage) {
 		this.blogLanguage = blogLanguage;
+	}
+
+	public BlogLanguage getBlogLanguage() {
+		return blogLanguage;
+	}
+
+	@Override
+	public String getMatchingUrl() {
+		return matchingUrl;
 	}
 
 	@Override
@@ -28,6 +38,7 @@ public class BlogLanguageRewriteMatch extends RewriteMatch {
 		String originalPath = urlPathHelper.getLookupPathForRequest(request);
 
 		String rewritePath = originalPath.replaceAll("^/" + blogLanguage.getLanguage() + "/", "/");
+		matchingUrl = rewritePath;
 		logger.debug(originalPath + " => " + rewritePath);
 
 		request.setAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE, blogLanguage);

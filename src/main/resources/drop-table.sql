@@ -11,6 +11,7 @@ drop table if exists media;
 drop table if exists navigation_item;
 drop table if exists page;
 drop table if exists password_reset_token;
+drop table if exists popular_post;
 drop table if exists post;
 drop table if exists post_media;
 drop table if exists post_related_post;
