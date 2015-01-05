@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.PopularPost;
 import org.wallride.core.domain.Post;
 
-import java.util.List;
+import java.util.SortedSet;
 
 @Repository
 @Transactional
@@ -22,10 +22,10 @@ public interface PopularPostRepository extends JpaRepository<PopularPost, Long> 
 			"left join fetch post.author author ";
 
 //	@Query(DEFAULT_SELECT_QUERY + "where popularPost.language = :language and popularPost.type = :type ")
-//	List<PopularPost> findByType(@Param("language") String language, @Param("type") PopularPost.Type type);
+//	SortedSet<PopularPost> findByType(@Param("language") String language, @Param("type") PopularPost.Type type);
 
 	@Query(DEFAULT_SELECT_QUERY + "where popularPost.language = :language and popularPost.type = :type and post.status = :status ")
-	List<PopularPost> findByType(@Param("language") String language, @Param("type") PopularPost.Type type, @Param("status") Post.Status status);
+	SortedSet<PopularPost> findByType(@Param("language") String language, @Param("type") PopularPost.Type type, @Param("status") Post.Status status);
 
 	@Modifying
 	@Query("delete from PopularPost popularPost where popularPost.language = :language and popularPost.type = :type")

@@ -12,12 +12,10 @@ import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 public class DashboardController {
-
-	private static final int POPULAR_POSTS_DAYS = 7;
-	private static final int POPULAR_POSTS_COUNT = 10;
 
 	@Inject
 	private BlogService blogService;
@@ -56,7 +54,7 @@ public class DashboardController {
 		return "dashboard";
 	}
 
-	private List<PopularPost> popularPosts(String language) {
+	private SortedSet<PopularPost> popularPosts(String language) {
 		return postService.readPopularPosts(language, PopularPost.Type.DAILY);
 	}
 

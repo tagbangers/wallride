@@ -1,5 +1,6 @@
 package org.wallride.core.domain;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.annotations.Analyze;
@@ -8,13 +9,14 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.*;
+import java.util.Comparator;
 
 @Entity
 @Table(name = "popular_post", uniqueConstraints = @UniqueConstraint(columnNames = {"language", "type", "rank"}))
 @DynamicInsert
 @DynamicUpdate
 @Indexed
-public class PopularPost extends DomainObject<Long> {
+public class PopularPost extends DomainObject<Long> implements Comparable<PopularPost> {
 
 	public enum Type {
 		DAILY,
@@ -96,5 +98,15 @@ public class PopularPost extends DomainObject<Long> {
 
 	public void setPost(Post post) {
 		this.post = post;
+	}
+
+	@Override
+	public int compareTo(PopularPost o) {
+		return new CompareToBuilder()
+				.append(getLanguage(), o.getLanguage())
+				.append(getType(), o.getType())
+				.append(getRank(), o.getRank())
+				.append(getId(), o.getId())
+				.toComparison();
 	}
 }
