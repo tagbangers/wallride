@@ -185,6 +185,10 @@ public class PostService {
 					}
 				}
 
+				if (posts.size() >= maxRank) {
+					break;
+				}
+
 				startIndex += GoogleAnalyticsUtils.MAX_RESULTS;
 				totalResults = gaData.getTotalResults();
 			} catch (IOException e) {
