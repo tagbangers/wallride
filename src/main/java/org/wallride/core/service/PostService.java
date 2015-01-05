@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  *
@@ -379,7 +380,7 @@ public class PostService {
 	 * @see PostService#updatePopularPosts(BlogLanguage, PopularPost.Type, int)
 	 */
 	@Cacheable(value = "popularPosts", key = "'list.type.' + #language + '.' + #type")
-	public List<PopularPost> readPopularPosts(String language, PopularPost.Type type) {
+	public SortedSet<PopularPost> readPopularPosts(String language, PopularPost.Type type) {
 		return popularPostRepository.findByType(language, type, Post.Status.PUBLISHED);
 	}
 
