@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201501051051</version>
+	<version>1.0.0.SNAPSHOT-201501072246</version>
 	<packaging>war</packaging>
 	
 	<properties>
