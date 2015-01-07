@@ -2,6 +2,7 @@ package org.wallride;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
@@ -40,7 +41,12 @@ import java.net.URL;
 import java.util.EnumSet;
 
 @Configuration
-@EnableAutoConfiguration(exclude = {DispatcherServletAutoConfiguration.class, WebMvcAutoConfiguration.class, ThymeleafAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {
+		DispatcherServletAutoConfiguration.class,
+		WebMvcAutoConfiguration.class,
+		ThymeleafAutoConfiguration.class,
+		BatchAutoConfiguration.class,
+})
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {
 
