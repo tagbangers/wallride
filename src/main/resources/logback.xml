@@ -9,6 +9,7 @@
 	
 	<logger name="org.wallride" level="DEBUG" />
 
+	<logger name="org.springframework.batch" level="INFO" />
 	<logger name="org.hibernate.search" level="INFO" />
 	<logger name="org.infinispan" level="INFO" />
 	<logger name="org.jgroups" level="INFO" />
