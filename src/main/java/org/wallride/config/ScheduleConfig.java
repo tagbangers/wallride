@@ -28,8 +28,8 @@ public class ScheduleConfig {
 	}
 
 	@Scheduled(cron="0 0 3,15 * * *")
-	public void syncGoogleAnalytics() {
-		postService.syncGoogleAnalytics();
+	public void updatePostViews() {
+		postService.updatePostViews();
 	}
 
 	@Scheduled(cron="0 0 4,16 * * *")

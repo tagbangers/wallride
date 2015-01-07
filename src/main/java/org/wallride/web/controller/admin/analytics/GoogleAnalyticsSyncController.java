@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.service.BlogService;
 import org.wallride.core.service.PostService;
 
 import javax.inject.Inject;
@@ -21,7 +20,7 @@ public class GoogleAnalyticsSyncController {
 	public String sync(
 			@PathVariable String language,
 			RedirectAttributes redirectAttributes) {
-		postService.syncGoogleAnalytics();
+		postService.updatePostViews();
 		return "redirect:/_admin/{language}/analytics";
 	}
 }
