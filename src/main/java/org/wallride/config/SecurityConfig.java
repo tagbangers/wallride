@@ -17,6 +17,7 @@
 package org.wallride.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -63,6 +64,8 @@ public class SecurityConfig {
 
 	@Inject
 	private DataSource dataSource;
+	@Inject
+	private CacheManager cacheManager;
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

@@ -63,22 +63,8 @@ public class ExtendedUrlRewriteFilter extends UrlRewriteFilter {
 		logger.debug("Loaded urlrewrite.xml from " + resource.getFilename ());
 
 		InputStream inputStream = resource.getInputStream();
-
-		URL confUrl = null;
-
-		try {
-			confUrl = context.getResource(confPath);
-		} catch (MalformedURLException e) {
-			logger.debug("", e);
-		}
-
-		String confUrlStr = null;
-		if (confUrl != null) {
-			confUrlStr = confUrl.toString();
-		}
-
 		if (inputStream != null) {
-			Conf conf = new Conf(context, inputStream, confPath, confUrlStr, false);
+			Conf conf = new Conf(context, inputStream, confPath, resource.getFilename(), false);
 			checkConf(conf);
 		}
 	}

@@ -29,6 +29,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.infinispan.Cache;
 import org.infinispan.lucene.directory.DirectoryBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.io.IOException;
 import java.util.Properties;

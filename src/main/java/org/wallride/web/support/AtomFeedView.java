@@ -16,17 +16,16 @@
 
 package org.wallride.web.support;
 
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.feed.atom.Link;
+import com.rometools.rome.feed.atom.Content;
+import com.rometools.rome.feed.atom.Entry;
+import com.rometools.rome.feed.atom.Feed;
+import com.rometools.rome.feed.atom.Link;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.feed.AbstractAtomFeedView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +42,7 @@ public class AtomFeedView extends AbstractAtomFeedView {
 
 	protected void buildFeedMetadata(
 			Map<String, Object> model,
-			Feed feed, 
+			Feed feed,
 			HttpServletRequest request) {
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		String language = LocaleContextHolder.getLocale().getLanguage();

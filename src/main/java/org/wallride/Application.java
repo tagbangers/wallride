@@ -133,7 +133,7 @@ public class Application extends SpringBootServletInitializer {
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
 		registration.addUrlPatterns("/*");
 		registration.setOrder(3);
-		registration.getInitParameters().put("confPath", "classpath:urlrewrite.xml");
+		registration.getInitParameters().put("confPath", "classpath:/urlrewrite.xml");
 		return registration;
 	}
 

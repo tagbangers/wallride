@@ -16,22 +16,17 @@
 
 package org.wallride.web.support;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Item;
+import com.rometools.rome.feed.rss.Channel;
+import com.rometools.rome.feed.rss.Description;
+import com.rometools.rome.feed.rss.Item;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.feed.AbstractRssFeedView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.service.BlogService;
-import org.wallride.core.support.PostUtils;
-import org.wallride.core.support.Settings;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -47,7 +42,7 @@ public class RssFeedView extends AbstractRssFeedView {
 	@Override
 	protected void buildFeedMetadata(
 			Map<String, Object> model, 
-			Channel feed, 
+			Channel feed,
 			HttpServletRequest request) {
 		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		String language = LocaleContextHolder.getLocale().getLanguage();

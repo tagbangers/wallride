@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.1.9.RELEASE</version>
+		<version>1.2.1.RELEASE</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
@@ -303,17 +303,10 @@
 
 		<!-- RSS -->
 		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<!--
-		<dependency>
 			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
 			<version>1.5.0</version>
 		</dependency>
-		-->
 
 		<!-- Url Rewrite Filter -->
 		<dependency>
