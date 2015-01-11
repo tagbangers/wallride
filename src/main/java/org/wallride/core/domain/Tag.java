@@ -17,14 +17,14 @@
 package org.wallride.core.domain;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.SortedSet;
 import java.util.TreeSet;
 

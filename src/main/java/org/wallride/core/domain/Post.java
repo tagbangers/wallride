@@ -28,7 +28,10 @@ import javax.persistence.CascadeType;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 @Entity
 @Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))

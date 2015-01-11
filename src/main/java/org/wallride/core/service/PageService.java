@@ -40,6 +40,7 @@ import org.wallride.core.domain.*;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.PageRepository;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.WallRideProperties;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -64,6 +65,9 @@ public class PageService {
 	private PageRepository pageRepository;
 	@Resource
 	private MediaRepository mediaRepository;
+
+	@Inject
+	private WallRideProperties wallRideProperties;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -154,8 +158,8 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-			String mediaUrlPrefix = blog.getMediaUrlPrefix();
+//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -323,8 +327,8 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-			String mediaUrlPrefix = blog.getMediaUrlPrefix();
+//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {

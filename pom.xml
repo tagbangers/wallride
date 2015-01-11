@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -42,12 +42,14 @@
 
 	<repositories>
 		<repository>
-			<id>spring-releases</id>
-			<url>http://repo.springsource.org/libs-release</url>
+			<id>io.spring.repo.maven.release</id>
+			<url>http://repo.spring.io/release/</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 		<repository>
-			<id>spring-milestones</id>
-			<url>http://repo.springsource.org/libs-milestone/</url>
+			<id>io.spring.repo.maven.milestone</id>
+			<url>http://repo.spring.io/milestone/</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 	</repositories>
 
@@ -137,6 +139,11 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-context</artifactId>
+			<version>1.0.0.RC1</version>
 		</dependency>
 
 		<!-- Hibernate Search -->

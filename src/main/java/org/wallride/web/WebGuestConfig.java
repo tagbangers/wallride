@@ -17,6 +17,7 @@
 package org.wallride.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -55,7 +56,7 @@ import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
-import org.wallride.web.support.AuthorizedUserMethodArgumentResolver;
+import org.wallride.core.support.WallRideProperties;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
@@ -93,6 +94,11 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Inject
 	private Environment environment;
+
+	@Inject
+	private WallRideProperties wallRideProperties;
+	@Inject
+	private ThymeleafProperties thymeleafProperties;
 
 	@Resource
 	private MediaRepository mediaRepository;
@@ -176,7 +182,8 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
 		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
-		mediaHttpRequestHandler.setBlogService(blogService);
+		mediaHttpRequestHandler.setWallRideProperties(wallRideProperties);
+//		mediaHttpRequestHandler.setBlogService(blogService);
 		mediaHttpRequestHandler.setMediaRepository(mediaRepository);
 		mediaHttpRequestHandler.setResourceLoader(resourceLoader);
 		mediaHttpRequestHandler.setCacheSeconds(86400);
@@ -223,14 +230,12 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	public TemplateResolver templateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(springResourceResourceResolver);
-		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
-		resolver.setSuffix(".html");
-		resolver.setCharacterEncoding("UTF-8");
-		// NB, selecting HTML5 as the template mode.
-		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(environment.getRequiredProperty("template.guest.cache", Boolean.class));
+		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
+		resolver.setSuffix(this.thymeleafProperties.getSuffix());
+		resolver.setTemplateMode(this.thymeleafProperties.getMode());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		resolver.setCacheable(this.thymeleafProperties.isCache());
 		return resolver;
-
 	}
 
 	@Bean
@@ -256,11 +261,11 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	public ThymeleafViewResolver thymeleafViewResolver() {
 		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
 		viewResolver.setTemplateEngine(templateEngine());
-		viewResolver.setOrder(2);
-		viewResolver.setViewNames(new String[] { "*" });
+		viewResolver.setViewNames(this.thymeleafProperties.getViewNames());
+		viewResolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		viewResolver.setContentType(this.thymeleafProperties.getContentType() + ";charset=" + this.thymeleafProperties.getEncoding());
 		viewResolver.setCache(false);
-		viewResolver.setCharacterEncoding("UTF-8");
-		viewResolver.setContentType("text/html; charset=UTF-8");
+		viewResolver.setOrder(2);
 		return viewResolver;
 	}
 

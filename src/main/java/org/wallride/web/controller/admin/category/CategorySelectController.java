@@ -20,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.wallride.core.domain.Category;
-import org.wallride.core.domain.Tag;
 import org.wallride.core.service.CategoryService;
 import org.wallride.web.support.DomainObjectSelectModel;
 

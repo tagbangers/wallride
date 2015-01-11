@@ -22,12 +22,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.support.AmazonS3ResourceUtils;
-import org.wallride.core.support.Settings;
+import org.wallride.core.support.ExtendedResourceUtils;
+import org.wallride.core.support.WallRideProperties;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -37,11 +35,14 @@ import java.util.List;
 @Transactional(rollbackFor=Exception.class)
 public class MediaService {
 
-	@Inject
-	private BlogService blogService;
+//	@Inject
+//	private BlogService blogService;
 
 	@Inject
 	private ResourceLoader resourceLoader;
+
+	@Inject
+	private WallRideProperties wallRideProperties;
 
 	@javax.annotation.Resource
 	private MediaRepository mediaRepository;
@@ -52,11 +53,12 @@ public class MediaService {
 		media.setOriginalName(file.getOriginalFilename());
 		media = mediaRepository.saveAndFlush(media);
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		try {
-			Resource prefix = resourceLoader.getResource(blog.getMediaPath());
+			Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
 			Resource resource = prefix.createRelative(media.getId());
-			AmazonS3ResourceUtils.writeMultipartFile(file, resource);
+//			AmazonS3ResourceUtils.writeMultipartFile(file, resource);
+			ExtendedResourceUtils.write(resource, file);
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);

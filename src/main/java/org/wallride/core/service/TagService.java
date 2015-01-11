@@ -32,26 +32,18 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
-import org.springframework.web.servlet.FlashMap;
-import org.springframework.web.servlet.support.RequestContextUtils;
+import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.logging.Level;
-import org.wallride.core.domain.Article;
-import org.wallride.core.repository.ArticleRepository;
-import org.wallride.web.controller.admin.tag.TagMergeForm;
-import org.wallride.web.support.DomainObjectSavedModel;
 
 @Service
 @Transactional(rollbackFor = Exception.class)

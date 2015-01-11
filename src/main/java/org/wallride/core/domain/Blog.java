@@ -45,13 +45,13 @@ public class Blog extends DomainObject<Long> {
 	@Field
 	private String defaultLanguage;
 
-	@Column(name = "media_url_prefix", length = 300, nullable = false)
-	@Field
-	private String mediaUrlPrefix;
-
-	@Column(name = "media_path", length = 300, nullable = false)
-	@Field
-	private String mediaPath;
+//	@Column(name = "media_url_prefix", length = 300, nullable = false)
+//	@Field
+//	private String mediaUrlPrefix;
+//
+//	@Column(name = "media_path", length = 300, nullable = false)
+//	@Field
+//	private String mediaPath;
 
 	@Embedded
 	@IndexedEmbedded
@@ -85,21 +85,21 @@ public class Blog extends DomainObject<Long> {
 		this.defaultLanguage = defaultLanguage;
 	}
 
-	public String getMediaUrlPrefix() {
-		return mediaUrlPrefix;
-	}
-
-	public void setMediaUrlPrefix(String mediaUrlPrefix) {
-		this.mediaUrlPrefix = mediaUrlPrefix;
-	}
-
-	public String getMediaPath() {
-		return mediaPath;
-	}
-
-	public void setMediaPath(String mediaPath) {
-		this.mediaPath = mediaPath;
-	}
+//	public String getMediaUrlPrefix() {
+//		return mediaUrlPrefix;
+//	}
+//
+//	public void setMediaUrlPrefix(String mediaUrlPrefix) {
+//		this.mediaUrlPrefix = mediaUrlPrefix;
+//	}
+//
+//	public String getMediaPath() {
+//		return mediaPath;
+//	}
+//
+//	public void setMediaPath(String mediaPath) {
+//		this.mediaPath = mediaPath;
+//	}
 
 	public GoogleAnalytics getGoogleAnalytics() {
 		return googleAnalytics;

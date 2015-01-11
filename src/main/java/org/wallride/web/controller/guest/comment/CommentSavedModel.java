@@ -18,12 +18,9 @@ package org.wallride.web.controller.guest.comment;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.joda.time.LocalDateTime;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.support.LocalDateTimeSerializer;
 import org.wallride.web.support.DomainObjectSavedModel;
-
-import java.io.Serializable;
 
 public class CommentSavedModel extends DomainObjectSavedModel<Long> {
 

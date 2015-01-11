@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
-import org.wallride.core.service.BlogService;
 import org.wallride.core.service.MediaService;
+import org.wallride.core.support.WallRideProperties;
 
 import javax.inject.Inject;
 
@@ -34,15 +33,13 @@ import javax.inject.Inject;
 public class MediaCreateController {
 
 	@Inject
-	private BlogService blogService;
-	@Inject
 	private MediaService mediaService;
+	@Inject
+	private WallRideProperties wallRideProperties;
 
 	@RequestMapping(method=RequestMethod.POST)
 	public @ResponseBody MediaCreatedModel create(@RequestParam MultipartFile file) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-
 		Media media = mediaService.createMedia(file);
-		return new MediaCreatedModel(media, blog);
+		return new MediaCreatedModel(media, wallRideProperties);
 	}
 }

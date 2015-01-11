@@ -16,7 +16,6 @@
 
 package org.wallride.config;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
@@ -28,11 +27,12 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
@@ -43,9 +43,6 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.util.UriUtils;
 import org.wallride.core.domain.DomainObject;
 
 import javax.inject.Inject;
@@ -62,10 +59,9 @@ public class DataConfig implements BatchConfigurer {
 	private static Logger logger = LoggerFactory.getLogger(DataConfig.class);
 
 	@Inject
-	private ResourceLoader resourceLoader;
-
-	@Inject
 	private Environment environment;
+	@Inject
+	private DataSourceProperties properties;
 
 	@Value("classpath:create-table.sql")
 	private Resource createTableScript;
@@ -78,7 +74,7 @@ public class DataConfig implements BatchConfigurer {
 		factory.setIsolationLevelForCreate("ISOLATION_DEFAULT");
 		factory.setValidateTransactionState(false);
 		factory.afterPropertiesSet();
-		return (JobRepository) factory.getObject();
+		return factory.getObject();
 	}
 
 	@Override
@@ -109,24 +105,13 @@ public class DataConfig implements BatchConfigurer {
 	
 	@Bean
 	public DataSource dataSource() throws UnsupportedEncodingException {
-		String jdbcConnectionString = environment.getRequiredProperty("jdbc.connection.string");
-		UriComponents jdbcUriComponents = UriComponentsBuilder.fromUriString(jdbcConnectionString.substring("jdbc:".length())).build();
-
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driver"));
-		dataSource.setUsername(UriUtils.decode(jdbcUriComponents.getQueryParams().getFirst("user"), "UTF-8"));
-		dataSource.setPassword(UriUtils.decode(jdbcUriComponents.getQueryParams().getFirst("password"), "UTF-8"));
-		dataSource.setUrl(jdbcConnectionString.substring(0, jdbcConnectionString.indexOf("?")));
-
-		dataSource.setMaxActive(environment.getRequiredProperty("datasource.maxActive", Integer.class));
-		dataSource.setMaxIdle(environment.getRequiredProperty("datasource.maxIdle", Integer.class));
-		dataSource.setTimeBetweenEvictionRunsMillis(environment.getRequiredProperty("datasource.timeBetweenEvictionRunsMillis", Long.class));
-		dataSource.setTestWhileIdle(environment.getRequiredProperty("datasource.testWhileIdle", Boolean.class));
-		dataSource.setValidationQuery(environment.getRequiredProperty("datasource.validationQuery"));
-		dataSource.setMinEvictableIdleTimeMillis(environment.getRequiredProperty("datasource.minEvictableIdleTimeMillis", Long.class));
-		dataSource.setNumTestsPerEvictionRun(environment.getRequiredProperty("datasource.numTestsPerEvictionRun", Integer.class));
-		
-		return dataSource;
+		DataSourceBuilder factory = DataSourceBuilder
+				.create(this.properties.getClassLoader())
+				.driverClassName(this.properties.getDriverClassName())
+				.url(this.properties.getUrl())
+				.username(this.properties.getUsername())
+				.password(this.properties.getPassword());
+		return factory.build();
 	}
 
 	@Bean

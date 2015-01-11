@@ -29,7 +29,6 @@ import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.HttpForbiddenException;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 
 @Service
 @Transactional(rollbackFor=Exception.class)

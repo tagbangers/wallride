@@ -16,10 +16,8 @@
 
 package org.wallride.web.controller.admin.media;
 
-import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
-import org.wallride.core.domain.Setting;
-import org.wallride.core.support.Settings;
+import org.wallride.core.support.WallRideProperties;
 
 import java.io.Serializable;
 
@@ -33,9 +31,9 @@ public class MediaIndexModel implements Serializable {
 
 	private String folder;
 
-	public MediaIndexModel(Media media, Blog blog) {
-		this.thumb = blog.getMediaUrlPrefix() + media.getId() + "?w=100&h=100&m=1";
-		this.image = blog.getMediaUrlPrefix() + media.getId();
+	public MediaIndexModel(Media media, WallRideProperties wallRideProperties) {
+		this.thumb = wallRideProperties.getMediaUrlPrefix() + media.getId() + "?w=100&h=100&m=1";
+		this.image = wallRideProperties.getMediaUrlPrefix() + media.getId();
 		this.title = media.getOriginalName();
 		this.folder = media.getCreatedAt().toString("yyyy/MM");
 	}

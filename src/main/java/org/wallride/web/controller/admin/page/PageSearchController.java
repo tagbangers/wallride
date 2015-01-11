@@ -32,7 +32,6 @@ import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.Pagination;
-import org.wallride.web.controller.admin.article.ArticleSearchForm;
 import org.wallride.web.support.DomainObjectSearchCondition;
 
 import javax.inject.Inject;

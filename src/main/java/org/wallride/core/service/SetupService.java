@@ -65,8 +65,6 @@ public class SetupService {
 		Blog blog = new Blog();
 		blog.setCode("default");
 		blog.setDefaultLanguage(request.getDefaultLanguage());
-		blog.setMediaUrlPrefix(request.getMediaUrlPrefix());
-		blog.setMediaPath(request.getMediaPath());
 		blog.setCreatedAt(now);
 		blog.setCreatedBy(user.toString());
 		blog.setUpdatedAt(now);

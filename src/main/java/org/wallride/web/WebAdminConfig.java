@@ -17,6 +17,7 @@
 package org.wallride.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -49,11 +49,7 @@ import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
-import org.wallride.core.support.Settings;
-import org.wallride.web.support.AuthorizedUserMethodArgumentResolver;
-import org.wallride.web.support.DefaultModelAttributeInterceptor;
-import org.wallride.web.support.PathVariableLocaleResolver;
-import org.wallride.web.support.SetupRedirectInterceptor;
+import org.wallride.web.support.*;
 
 import javax.inject.Inject;
 import java.text.DateFormat;
@@ -88,10 +84,10 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	private PageService pageService;
 
 	@Inject
-	private Settings settings;
+	private Environment environment;
 
 	@Inject
-	private Environment environment;
+	private ThymeleafProperties properties;
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -176,12 +172,11 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	public TemplateResolver adminTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(springResourceResourceResolver);
-		resolver.setPrefix(environment.getRequiredProperty("template.admin.path"));
-		resolver.setSuffix(".html");
-		resolver.setCharacterEncoding("UTF-8");
-		// NB, selecting HTML5 as the template mode.
-		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(environment.getRequiredProperty("template.admin.cache", Boolean.class));
+		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.admin"));
+		resolver.setSuffix(this.properties.getSuffix());
+		resolver.setTemplateMode(this.properties.getMode());
+		resolver.setCharacterEncoding(this.properties.getEncoding());
+		resolver.setCacheable(this.properties.isCache());
 		resolver.setOrder(2);
 		return resolver;
 	}
@@ -190,11 +185,11 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	public TemplateResolver guestTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(springResourceResourceResolver);
-		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
-		resolver.setSuffix(".html");
-		resolver.setCharacterEncoding("UTF-8");
-		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(environment.getRequiredProperty("template.guest.cache", Boolean.class));
+		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
+		resolver.setSuffix(this.properties.getSuffix());
+		resolver.setTemplateMode(this.properties.getMode());
+		resolver.setCharacterEncoding(this.properties.getEncoding());
+		resolver.setCacheable(this.properties.isCache());
 		resolver.setOrder(2);
 		return resolver;
 	}
@@ -228,14 +223,14 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public ViewResolver viewResolver() {
-		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+	public ThymeleafViewResolver thymeleafViewResolver() {
+		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
 		viewResolver.setTemplateEngine(adminTemplateEngine());
-		viewResolver.setOrder(1);
-		viewResolver.setViewNames(new String[] { "*" });
+		viewResolver.setViewNames(this.properties.getViewNames());
+		viewResolver.setCharacterEncoding(this.properties.getEncoding());
+		viewResolver.setContentType(this.properties.getContentType() + ";charset=" + this.properties.getEncoding());
 		viewResolver.setCache(false);
-		viewResolver.setCharacterEncoding("UTF-8");
-		viewResolver.setContentType("text/html; charset=UTF-8");
+		viewResolver.setOrder(1);
 		return viewResolver;
 	}
 

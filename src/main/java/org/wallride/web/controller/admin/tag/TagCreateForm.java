@@ -18,7 +18,6 @@ package org.wallride.web.controller.admin.tag;
 
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
-import org.wallride.core.service.CategoryCreateRequest;
 import org.wallride.core.service.TagCreateRequest;
 import org.wallride.web.support.DomainObjectCreateForm;
 

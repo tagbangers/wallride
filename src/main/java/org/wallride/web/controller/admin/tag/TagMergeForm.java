@@ -18,9 +18,9 @@ package org.wallride.web.controller.admin.tag;
 
 import org.wallride.core.service.TagMergeRequest;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 
 public class TagMergeForm implements Serializable {
 

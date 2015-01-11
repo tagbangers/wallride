@@ -32,13 +32,15 @@ public class CustomThymeleafDialect extends AbstractDialect implements IExpressi
 
 	@Inject
 	private BlogService blogService;
+	@Inject
+	private WallRideProperties wallRideProperties;
 
 	@Override
 	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
 		Map<String, Object> objects = new HashMap<>();
-		objects.put("posts", new PostUtils(processingContext, blogService));
+		objects.put("posts", new PostUtils(processingContext, wallRideProperties, blogService));
 		objects.put("users", new UserUtils(processingContext, blogService));
-		objects.put("medias", new MediaUtils(blogService));
+		objects.put("medias", new MediaUtils(wallRideProperties));
 		return Collections.unmodifiableMap(objects);
 	}
 

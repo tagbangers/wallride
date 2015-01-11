@@ -36,13 +36,9 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Comment;
-import org.wallride.core.domain.Post;
 import org.wallride.core.service.CommentSearchRequest;
-import org.wallride.core.service.PostSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

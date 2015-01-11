@@ -16,6 +16,8 @@
 
 package org.wallride.config;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.internal.EC2MetadataClient;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -62,8 +64,9 @@ public class CacheConfig {
 			logger.info("jgroups.bind_addr -> {}", ipaddress);
 			System.setProperty("jgroups.bind_addr", ipaddress);
 
-			System.setProperty("jgroups.s3.access_key", environment.getRequiredProperty("aws.accessKey"));
-			System.setProperty("jgroups.s3.secret_access_key", environment.getRequiredProperty("aws.secretKey"));
+			AWSCredentials awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
+			System.setProperty("jgroups.s3.access_key", awsCredentials.getAWSAccessKeyId());
+			System.setProperty("jgroups.s3.secret_access_key", awsCredentials.getAWSSecretKey());
 			System.setProperty("jgroups.s3.bucket",  environment.getRequiredProperty("jgroups.s3.bucket"));
 		}
 
@@ -181,7 +184,7 @@ public class CacheConfig {
 		// @formatter:on
 
 		holder.getNamedConfigurationBuilders().put("blogs", cacheBuilder);
-		holder.getNamedConfigurationBuilders().put("settings", cacheBuilder);
+//		holder.getNamedConfigurationBuilders().put("settings", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("popularPosts", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("articles", cacheBuilder);
 		holder.getNamedConfigurationBuilders().put("categories", cacheBuilder);

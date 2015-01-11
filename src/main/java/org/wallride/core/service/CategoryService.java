@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Tag;
 import org.wallride.core.repository.CategoryRepository;
 import org.wallride.core.support.AuthorizedUser;
 

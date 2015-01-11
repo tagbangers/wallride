@@ -25,11 +25,11 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.FlashMap;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.*;
+import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.DuplicateNameException;
+import org.wallride.core.service.TagService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.DomainObjectUpdatedModel;
@@ -39,9 +39,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
 
 @Controller
 public class TagRestController {

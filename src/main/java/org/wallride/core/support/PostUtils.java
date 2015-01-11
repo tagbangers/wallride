@@ -35,10 +35,12 @@ import java.util.regex.Pattern;
 public class PostUtils {
 
 	private IProcessingContext processingContext;
+	private WallRideProperties wallRideProperties;
 	private BlogService blogService;
 
-	public PostUtils(IProcessingContext processingContext, BlogService blogService) {
+	public PostUtils(IProcessingContext processingContext, WallRideProperties wallRideProperties, BlogService blogService) {
 		this.processingContext = processingContext;
+		this.wallRideProperties = wallRideProperties;
 		this.blogService = blogService;
 	}
 
@@ -177,12 +179,12 @@ public class PostUtils {
 			return null;
 		}
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		Document document = Jsoup.parse(post.getBody());
 		Elements elements = document.select("img");
 		for (Element element : elements) {
 			String src = element.attr("src");
-			if (src.startsWith(blog.getMediaUrlPrefix())) {
+			if (src.startsWith(wallRideProperties.getMediaUrlPrefix())) {
 				String style = element.attr("style");
 				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
 				Matcher matcher = pattern.matcher(element.attr("style"));

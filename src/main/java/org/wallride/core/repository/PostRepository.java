@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Post;
 
 import javax.persistence.LockModeType;
-import java.util.Collection;
 import java.util.List;
 
 @Repository

@@ -19,8 +19,6 @@ package org.wallride.web.controller.guest.user;
 import org.hibernate.validator.constraints.Email;
 import org.wallride.core.domain.PersonalName;
 import org.wallride.core.service.ProfileUpdateRequest;
-import org.wallride.core.service.SignupRequest;
-import org.wallride.web.support.MaxSize;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

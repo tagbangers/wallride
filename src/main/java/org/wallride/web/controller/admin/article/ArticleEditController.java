@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.CategoryTree;
-import org.wallride.core.domain.Page;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.DuplicateCodeException;

@@ -16,16 +16,14 @@
 
 package org.wallride.core.support;
 
-import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
-import org.wallride.core.service.BlogService;
 
 public class MediaUtils {
 
-	private BlogService blogService;
+	private WallRideProperties wallRideProperties;
 
-	public MediaUtils(BlogService blogService) {
-		this.blogService = blogService;
+	public MediaUtils(WallRideProperties wallRideProperties) {
+		this.wallRideProperties = wallRideProperties;
 	}
 
 	public String link(Media media) {
@@ -33,7 +31,6 @@ public class MediaUtils {
 	}
 
 	public String link(String id) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-		return blog.getMediaUrlPrefix() + id;
+		return wallRideProperties.getMediaUrlPrefix() + id;
 	}
 }
