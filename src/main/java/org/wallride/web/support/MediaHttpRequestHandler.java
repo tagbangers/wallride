@@ -122,6 +122,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 //		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
 		final Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
 		final Resource resource = prefix.createRelative(media.getId());
+
 		if (!resource.exists()) {
 			return null;
 		}

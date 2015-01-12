@@ -23,7 +23,6 @@ import org.wallride.core.service.SetupRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -38,11 +37,11 @@ public class SetupForm implements Serializable {
 
 	private ArrayList<String> languages = new ArrayList<>();
 
-	@NotNull
-	private String mediaUrlPrefix = "/media/";
-
-	@NotNull
-	private String mediaPath = "file:" + System.getProperty("java.io.tmpdir") + File.separator + "wallride" + File.separator + "media" + File.separator;
+//	@NotNull
+//	private String mediaUrlPrefix = "/media/";
+//
+//	@NotNull
+//	private String mediaPath = "file:" + System.getProperty("java.io.tmpdir") + File.separator + "wallride" + File.separator + "media" + File.separator;
 
 //	@NotNull
 //	private String mailSmtpHost;
@@ -89,21 +88,21 @@ public class SetupForm implements Serializable {
 		this.languages = languages;
 	}
 
-	public String getMediaUrlPrefix() {
-		return mediaUrlPrefix;
-	}
-
-	public void setMediaUrlPrefix(String mediaUrlPrefix) {
-		this.mediaUrlPrefix = mediaUrlPrefix;
-	}
-
-	public String getMediaPath() {
-		return mediaPath;
-	}
-
-	public void setMediaPath(String mediaPath) {
-		this.mediaPath = mediaPath;
-	}
+//	public String getMediaUrlPrefix() {
+//		return mediaUrlPrefix;
+//	}
+//
+//	public void setMediaUrlPrefix(String mediaUrlPrefix) {
+//		this.mediaUrlPrefix = mediaUrlPrefix;
+//	}
+//
+//	public String getMediaPath() {
+//		return mediaPath;
+//	}
+//
+//	public void setMediaPath(String mediaPath) {
+//		this.mediaPath = mediaPath;
+//	}
 
 //	public String getMailSmtpHost() {
 //		return mailSmtpHost;
@@ -159,8 +158,8 @@ public class SetupForm implements Serializable {
 				.websiteTitle(websiteTitle)
 				.defaultLanguage(defaultLanguage)
 				.languages(languages)
-				.mediaUrlPrefix(mediaUrlPrefix)
-				.mediaPath(mediaPath)
+//				.mediaUrlPrefix(mediaUrlPrefix)
+//				.mediaPath(mediaPath)
 //				.mailSmtpHost(mailSmtpHost)
 //				.mailFrom(mailFrom)
 				.loginId(loginId)

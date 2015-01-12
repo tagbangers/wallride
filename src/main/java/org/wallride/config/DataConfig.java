@@ -27,7 +27,6 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +34,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
@@ -59,6 +56,8 @@ public class DataConfig implements BatchConfigurer {
 	private static Logger logger = LoggerFactory.getLogger(DataConfig.class);
 
 	@Inject
+	private DataSource dataSource;
+	@Inject
 	private Environment environment;
 	@Inject
 	private DataSourceProperties properties;
@@ -69,7 +68,7 @@ public class DataConfig implements BatchConfigurer {
 	@Override
 	public JobRepository getJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-		factory.setDataSource(dataSource());
+		factory.setDataSource(dataSource);
 		factory.setTransactionManager(getTransactionManager());
 		factory.setIsolationLevelForCreate("ISOLATION_DEFAULT");
 		factory.setValidateTransactionState(false);
@@ -89,7 +88,7 @@ public class DataConfig implements BatchConfigurer {
 	@Override
 	public JobExplorer getJobExplorer() throws Exception {
 		JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
-		factory.setDataSource(dataSource());
+		factory.setDataSource(dataSource);
 		factory.afterPropertiesSet();
 		return factory.getObject();
 	}
@@ -103,33 +102,33 @@ public class DataConfig implements BatchConfigurer {
 
 	// additional data-related beans
 	
-	@Bean
-	public DataSource dataSource() throws UnsupportedEncodingException {
-		DataSourceBuilder factory = DataSourceBuilder
-				.create(this.properties.getClassLoader())
-				.driverClassName(this.properties.getDriverClassName())
-				.url(this.properties.getUrl())
-				.username(this.properties.getUsername())
-				.password(this.properties.getPassword());
-		return factory.build();
-	}
+//	@Bean
+//	public DataSource dataSource() throws UnsupportedEncodingException {
+//		DataSourceBuilder factory = DataSourceBuilder
+//				.create(this.properties.getClassLoader())
+//				.driverClassName(this.properties.getDriverClassName())
+//				.url(this.properties.getUrl())
+//				.username(this.properties.getUsername())
+//				.password(this.properties.getPassword());
+//		return factory.build();
+//	}
 
-	@Bean
-	public DataSourceInitializer dataSourceInitializer() throws UnsupportedEncodingException {
-		final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		populator.addScript(createTableScript);
-		populator.setContinueOnError(true);
-
-		final DataSourceInitializer initializer = new DataSourceInitializer();
-		initializer.setDataSource(dataSource());
-		initializer.setDatabasePopulator(populator);
-		return initializer;
-	}
+//	@Bean
+//	public DataSourceInitializer dataSourceInitializer() throws UnsupportedEncodingException {
+//		final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+//		populator.addScript(createTableScript);
+//		populator.setContinueOnError(true);
+//
+//		final DataSourceInitializer initializer = new DataSourceInitializer();
+//		initializer.setDataSource(dataSource());
+//		initializer.setDatabasePopulator(populator);
+//		return initializer;
+//	}
 
 	@Bean
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws UnsupportedEncodingException {
 		LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
-		entityManager.setDataSource(dataSource());
+		entityManager.setDataSource(dataSource);
 		entityManager.setPackagesToScan(DomainObject.class.getPackage().getName());
 		
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

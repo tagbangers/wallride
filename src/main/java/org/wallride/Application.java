@@ -37,12 +37,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 import org.wallride.config.CoreConfig;
 import org.wallride.core.support.WallRideProperties;
@@ -65,8 +65,6 @@ import java.util.EnumSet;
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {
 
-	public static final String WALLRIDE_HOME_PROPERTY = "wallride.home";
-
 	public static final String GUEST_SERVLET_NAME = "guestServlet";
 	public static final String GUEST_SERVLET_PATH = "";
 
@@ -74,16 +72,30 @@ public class Application extends SpringBootServletInitializer {
 	public static final String ADMIN_SERVLET_PATH = "/_admin";
 
 	public static void main(String[] args) throws Exception {
+		initialize();
 		ResourceLoader resourceLoader = createResourceLoader();
-		String configLocation = UriComponentsBuilder.fromPath(System.getProperty(WALLRIDE_HOME_PROPERTY))
-				.path(WallRideProperties.CONFIG_PATH)
-				.buildAndExpand().toUriString();
-		System.setProperty(ConfigFileApplicationListener.CONFIG_LOCATION_PROPERTY, configLocation);
-
 		new SpringApplicationBuilder(Application.class)
 				.contextClass(AnnotationConfigEmbeddedWebApplicationContext.class)
 				.resourceLoader(resourceLoader)
 				.run(args);
+	}
+
+	public static void initialize() {
+		String home = System.getProperty(WallRideProperties.HOME_PROPERTY);
+		if (!StringUtils.hasText(home)) {
+			throw new IllegalStateException(WallRideProperties.HOME_PROPERTY + " is empty");
+		}
+		if (!home.endsWith("/")) {
+			home = home + "/";
+		}
+
+		String config = home + WallRideProperties.DEFAULT_CONFIG_PATH_NAME;
+		String media = home + WallRideProperties.DEFAULT_MEDIA_PATH_NAME;
+
+		System.setProperty(WallRideProperties.CONFIG_LOCATION_PROPERTY, config);
+		System.setProperty(WallRideProperties.MEDIA_LOCATION_PROPERTY, media);
+
+		System.setProperty(ConfigFileApplicationListener.CONFIG_LOCATION_PROPERTY, config);
 	}
 
 	public static ResourceLoader createResourceLoader() {
@@ -92,13 +104,20 @@ public class Application extends SpringBootServletInitializer {
 		AmazonS3 amazonS3 = new AmazonS3Client(configuration);
 
 		SimpleStorageResourceLoader resourceLoader = new SimpleStorageResourceLoader(amazonS3);
+		try {
+			resourceLoader.afterPropertiesSet();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader);
 	}
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		initialize();
+		ResourceLoader resourceLoader = createResourceLoader();
 		return application.sources(Application.class)
-				.resourceLoader(createResourceLoader());
+				.resourceLoader(resourceLoader);
 	}
 
 	@Override
@@ -155,8 +174,9 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	@Bean
-	public ServletRegistrationBean registerAdminServlet() {
+	public ServletRegistrationBean registerAdminServlet(ResourceLoader resourceLoader) {
 		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		context.setResourceLoader(resourceLoader);
 		context.register(WebAdminConfig.class);
 
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);
@@ -169,8 +189,9 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	@Bean
-	public ServletRegistrationBean registerGuestServlet() {
+	public ServletRegistrationBean registerGuestServlet(ResourceLoader resourceLoader) {
 		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		context.setResourceLoader(resourceLoader);
 		context.register(WebGuestConfig.class);
 
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(context);

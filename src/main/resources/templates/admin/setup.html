@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 	<head>
-		<meta charset="utf-8" />
+		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
-		<link href="#" th:href="@{/resources/lib/bootstrap-3.0.1/css/bootstrap.min.css}" rel="stylesheet" />
 	</head>
 	<body>
 		<div class="container">
@@ -56,42 +55,6 @@
 						</div>
 					</div>
 				</fieldset>
-				<fieldset>
-					<legend th:text="#{MediaFiles}">Media Files</legend>
-					<div class="form-group" th:classappend="${#fields.hasErrors('mediaUrlPrefix')}? has-error">
-						<label class="col-sm-2 control-label" th:text="#{MediaUrlPrefix}">URL Prefix</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{mediaUrlPrefix}" class="form-control" th:attr="placeholder=#{MediaUrlPrefix}" />
-							<span class="help-block" th:each="err : ${#fields.errors('mediaUrlPrefix')}" th:text="${err}" />
-						</div>
-					</div>
-					<div class="form-group" th:classappend="${#fields.hasErrors('mediaPath')}? has-error">
-						<label class="col-sm-2 control-label" th:text="#{MediaPath}">Location</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{mediaPath}" class="form-control" th:attr="placeholder=#{MediaPath}" />
-							<span class="help-block" th:each="err : ${#fields.errors('mediaPath')}" th:text="${err}" />
-						</div>
-					</div>
-				</fieldset>
-				<!--/*
-				<fieldset>
-					<legend th:text="#{MailServer}">Mail server</legend>
-					<div class="form-group" th:classappend="${#fields.hasErrors('mailSmtpHost')}? has-error">
-						<label class="col-sm-2 control-label" th:text="#{Hostname}">Hostname</label>
-						<div class="col-sm-5">
-							<input type="text" th:field="*{mailSmtpHost}" class="form-control" th:attr="placeholder=#{Hostname}" />
-							<span class="help-block" th:each="err : ${#fields.errors('mailSmtpHost')}" th:text="${err}" />
-						</div>
-					</div>
-					<div class="form-group" th:classappend="${#fields.hasErrors('mailFrom')}? has-error">
-						<label class="col-sm-2 control-label" th:text="#{EmailFrom}">Email from</label>
-						<div class="col-sm-5">
-							<input type="text" th:field="*{mailFrom}" class="form-control" th:attr="placeholder=#{EmailFrom}" />
-							<span class="help-block" th:each="err : ${#fields.errors('mailFrom')}" th:text="${err}" />
-						</div>
-					</div>
-				</fieldset>
-				*/-->
 				<fieldset>
 					<legend th:text="#{User}">User</legend>
 					<div class="form-group" th:classappend="${#fields.hasErrors('loginId')}? has-error">

@@ -85,8 +85,8 @@ public class SetupRequest implements Serializable {
 		private String websiteTitle;
 		private String defaultLanguage;
 		private List<String> languages;
-		private String mediaUrlPrefix;
-		private String mediaPath;
+//		private String mediaUrlPrefix;
+//		private String mediaPath;
 //		private String mailSmtpHost;
 //		private String mailFrom;
 		private String loginId;
@@ -112,15 +112,15 @@ public class SetupRequest implements Serializable {
 			return this;
 		}
 
-		public Builder mediaUrlPrefix(String mediaUrlPrefix) {
-			this.mediaUrlPrefix = mediaUrlPrefix;
-			return this;
-		}
-
-		public Builder mediaPath(String mediaPath) {
-			this.mediaPath = mediaPath;
-			return this;
-		}
+//		public Builder mediaUrlPrefix(String mediaUrlPrefix) {
+//			this.mediaUrlPrefix = mediaUrlPrefix;
+//			return this;
+//		}
+//
+//		public Builder mediaPath(String mediaPath) {
+//			this.mediaPath = mediaPath;
+//			return this;
+//		}
 
 //		public Builder mailSmtpHost(String mailSmtpHost) {
 //			this.mailSmtpHost = mailSmtpHost;
@@ -157,8 +157,8 @@ public class SetupRequest implements Serializable {
 			request.websiteTitle = websiteTitle;
 			request.defaultLanguage = defaultLanguage;
 			request.languages = languages;
-			request.mediaUrlPrefix = mediaUrlPrefix;
-			request.mediaPath = mediaPath;
+//			request.mediaUrlPrefix = mediaUrlPrefix;
+//			request.mediaPath = mediaPath;
 //			request.mailSmtpHost = mailSmtpHost;
 //			request.mailFrom = mailFrom;
 			request.loginId = loginId;
