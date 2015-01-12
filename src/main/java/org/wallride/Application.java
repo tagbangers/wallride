@@ -20,7 +20,6 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -59,8 +58,6 @@ import java.util.EnumSet;
 @EnableAutoConfiguration(exclude = {
 		DispatcherServletAutoConfiguration.class,
 		WebMvcAutoConfiguration.class,
-//		ThymeleafAutoConfiguration.class,
-		BatchAutoConfiguration.class,
 })
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {

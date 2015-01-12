@@ -43,6 +43,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.thymeleaf.dialect.IDialect;
@@ -71,6 +72,8 @@ import java.util.*;
 @Configuration
 @ComponentScan(basePackages= "org.wallride.web.controller.guest", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
 public class WebGuestConfig extends WebMvcConfigurationSupport {
+
+	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = { "classpath:/resources/guest/" };
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
@@ -135,7 +138,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/resources/guest/");
+		registry.addResourceHandler("/resources/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 		registry.setOrder(Integer.MIN_VALUE);
 	}
@@ -195,6 +198,21 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		handlerMapping.setOrder(0);
 		handlerMapping.setUrlMap(urlMap);
 		return handlerMapping;
+	}
+
+	@Bean
+	public SimpleUrlHandlerMapping faviconHandlerMapping() {
+		ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
+		List<org.springframework.core.io.Resource> locations = new ArrayList<>(CLASSPATH_RESOURCE_LOCATIONS.length);
+		for (String location : CLASSPATH_RESOURCE_LOCATIONS) {
+			locations.add(resourceLoader.getResource(location));
+		}
+		requestHandler.setLocations(locations);
+
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setOrder(Integer.MIN_VALUE + 1);
+		mapping.setUrlMap(Collections.singletonMap("**/favicon.ico", requestHandler));
+		return mapping;
 	}
 
 //	@Bean
