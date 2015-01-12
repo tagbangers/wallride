@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wallride.core.support;
 
 import org.jsoup.Jsoup;
@@ -19,10 +35,12 @@ import java.util.regex.Pattern;
 public class PostUtils {
 
 	private IProcessingContext processingContext;
+	private WallRideProperties wallRideProperties;
 	private BlogService blogService;
 
-	public PostUtils(IProcessingContext processingContext, BlogService blogService) {
+	public PostUtils(IProcessingContext processingContext, WallRideProperties wallRideProperties, BlogService blogService) {
 		this.processingContext = processingContext;
+		this.wallRideProperties = wallRideProperties;
 		this.blogService = blogService;
 	}
 
@@ -161,12 +179,12 @@ public class PostUtils {
 			return null;
 		}
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
 		Document document = Jsoup.parse(post.getBody());
 		Elements elements = document.select("img");
 		for (Element element : elements) {
 			String src = element.attr("src");
-			if (src.startsWith(blog.getMediaUrlPrefix())) {
+			if (src.startsWith(wallRideProperties.getMediaUrlPrefix())) {
 				String style = element.attr("style");
 				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
 				Matcher matcher = pattern.matcher(element.attr("style"));

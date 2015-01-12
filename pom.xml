@@ -1,16 +1,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.1.9.RELEASE</version>
+		<version>1.2.1.RELEASE</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.SNAPSHOT-201501072318</version>
-	<packaging>war</packaging>
-	
+	<version>1.0.0.SNAPSHOT-201501121622</version>
+	<packaging>${packaging.type}</packaging>
+
+	<profiles>
+		<profile>
+			<id>jar</id>
+			<properties>
+				<packaging.type>jar</packaging.type>
+			</properties>
+		</profile>
+		<profile>
+			<id>war</id>
+			<properties>
+				<packaging.type>war</packaging.type>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 	<properties>
 		<org.hibernate.version>4.3.5.Final</org.hibernate.version>
 		<org.hibernate.search.version>4.5.1.Final</org.hibernate.search.version>
@@ -20,12 +42,14 @@
 
 	<repositories>
 		<repository>
-			<id>spring-releases</id>
-			<url>http://repo.springsource.org/libs-release</url>
+			<id>io.spring.repo.maven.release</id>
+			<url>http://repo.spring.io/release/</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 		<repository>
-			<id>spring-milestones</id>
-			<url>http://repo.springsource.org/libs-milestone/</url>
+			<id>io.spring.repo.maven.milestone</id>
+			<url>http://repo.spring.io/milestone/</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 	</repositories>
 
@@ -81,10 +105,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>org.springframework.boot</groupId>-->
-			<!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -119,6 +139,11 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-context</artifactId>
+			<version>1.0.0.RC1</version>
 		</dependency>
 
 		<!-- Hibernate Search -->
@@ -285,17 +310,10 @@
 
 		<!-- RSS -->
 		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<!--
-		<dependency>
 			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
 			<version>1.5.0</version>
 		</dependency>
-		-->
 
 		<!-- Url Rewrite Filter -->
 		<dependency>

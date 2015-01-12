@@ -1,6 +1,21 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wallride.config;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
@@ -12,24 +27,19 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.util.UriUtils;
 import org.wallride.core.domain.DomainObject;
 
 import javax.inject.Inject;
@@ -46,10 +56,11 @@ public class DataConfig implements BatchConfigurer {
 	private static Logger logger = LoggerFactory.getLogger(DataConfig.class);
 
 	@Inject
-	private ResourceLoader resourceLoader;
-
+	private DataSource dataSource;
 	@Inject
 	private Environment environment;
+	@Inject
+	private DataSourceProperties properties;
 
 	@Value("classpath:create-table.sql")
 	private Resource createTableScript;
@@ -57,12 +68,12 @@ public class DataConfig implements BatchConfigurer {
 	@Override
 	public JobRepository getJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-		factory.setDataSource(dataSource());
+		factory.setDataSource(dataSource);
 		factory.setTransactionManager(getTransactionManager());
 		factory.setIsolationLevelForCreate("ISOLATION_DEFAULT");
 		factory.setValidateTransactionState(false);
 		factory.afterPropertiesSet();
-		return (JobRepository) factory.getObject();
+		return factory.getObject();
 	}
 
 	@Override
@@ -77,7 +88,7 @@ public class DataConfig implements BatchConfigurer {
 	@Override
 	public JobExplorer getJobExplorer() throws Exception {
 		JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
-		factory.setDataSource(dataSource());
+		factory.setDataSource(dataSource);
 		factory.afterPropertiesSet();
 		return factory.getObject();
 	}
@@ -91,44 +102,33 @@ public class DataConfig implements BatchConfigurer {
 
 	// additional data-related beans
 	
-	@Bean
-	public DataSource dataSource() throws UnsupportedEncodingException {
-		String jdbcConnectionString = environment.getRequiredProperty("jdbc.connection.string");
-		UriComponents jdbcUriComponents = UriComponentsBuilder.fromUriString(jdbcConnectionString.substring("jdbc:".length())).build();
+//	@Bean
+//	public DataSource dataSource() throws UnsupportedEncodingException {
+//		DataSourceBuilder factory = DataSourceBuilder
+//				.create(this.properties.getClassLoader())
+//				.driverClassName(this.properties.getDriverClassName())
+//				.url(this.properties.getUrl())
+//				.username(this.properties.getUsername())
+//				.password(this.properties.getPassword());
+//		return factory.build();
+//	}
 
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driver"));
-		dataSource.setUsername(UriUtils.decode(jdbcUriComponents.getQueryParams().getFirst("user"), "UTF-8"));
-		dataSource.setPassword(UriUtils.decode(jdbcUriComponents.getQueryParams().getFirst("password"), "UTF-8"));
-		dataSource.setUrl(jdbcConnectionString.substring(0, jdbcConnectionString.indexOf("?")));
-
-		dataSource.setMaxActive(environment.getRequiredProperty("datasource.maxActive", Integer.class));
-		dataSource.setMaxIdle(environment.getRequiredProperty("datasource.maxIdle", Integer.class));
-		dataSource.setTimeBetweenEvictionRunsMillis(environment.getRequiredProperty("datasource.timeBetweenEvictionRunsMillis", Long.class));
-		dataSource.setTestWhileIdle(environment.getRequiredProperty("datasource.testWhileIdle", Boolean.class));
-		dataSource.setValidationQuery(environment.getRequiredProperty("datasource.validationQuery"));
-		dataSource.setMinEvictableIdleTimeMillis(environment.getRequiredProperty("datasource.minEvictableIdleTimeMillis", Long.class));
-		dataSource.setNumTestsPerEvictionRun(environment.getRequiredProperty("datasource.numTestsPerEvictionRun", Integer.class));
-		
-		return dataSource;
-	}
-
-	@Bean
-	public DataSourceInitializer dataSourceInitializer() throws UnsupportedEncodingException {
-		final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-		populator.addScript(createTableScript);
-		populator.setContinueOnError(true);
-
-		final DataSourceInitializer initializer = new DataSourceInitializer();
-		initializer.setDataSource(dataSource());
-		initializer.setDatabasePopulator(populator);
-		return initializer;
-	}
+//	@Bean
+//	public DataSourceInitializer dataSourceInitializer() throws UnsupportedEncodingException {
+//		final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+//		populator.addScript(createTableScript);
+//		populator.setContinueOnError(true);
+//
+//		final DataSourceInitializer initializer = new DataSourceInitializer();
+//		initializer.setDataSource(dataSource());
+//		initializer.setDatabasePopulator(populator);
+//		return initializer;
+//	}
 
 	@Bean
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws UnsupportedEncodingException {
 		LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
-		entityManager.setDataSource(dataSource());
+		entityManager.setDataSource(dataSource);
 		entityManager.setPackagesToScan(DomainObject.class.getPackage().getName());
 		
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

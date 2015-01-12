@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wallride.core.service;
 
 import org.joda.time.LocalDateTime;
@@ -26,7 +42,7 @@ import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.Settings;
+import org.wallride.core.support.WallRideProperties;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -53,7 +69,7 @@ public class ArticleService {
 	@Inject
 	private PlatformTransactionManager transactionManager;
 	@Inject
-	private Settings settings;
+	private WallRideProperties wallRideProperties;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -151,8 +167,8 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-			String mediaUrlPrefix = blog.getMediaUrlPrefix();
+//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
@@ -341,8 +357,8 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-			String mediaUrlPrefix = blog.getMediaUrlPrefix();
+//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {

@@ -1,6 +1,23 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wallride.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +56,7 @@ import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.CustomThymeleafDialect;
-import org.wallride.web.support.AuthorizedUserMethodArgumentResolver;
+import org.wallride.core.support.WallRideProperties;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
@@ -77,6 +94,11 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Inject
 	private Environment environment;
+
+	@Inject
+	private WallRideProperties wallRideProperties;
+	@Inject
+	private ThymeleafProperties thymeleafProperties;
 
 	@Resource
 	private MediaRepository mediaRepository;
@@ -160,7 +182,8 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	@Bean
 	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
 		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
-		mediaHttpRequestHandler.setBlogService(blogService);
+		mediaHttpRequestHandler.setWallRideProperties(wallRideProperties);
+//		mediaHttpRequestHandler.setBlogService(blogService);
 		mediaHttpRequestHandler.setMediaRepository(mediaRepository);
 		mediaHttpRequestHandler.setResourceLoader(resourceLoader);
 		mediaHttpRequestHandler.setCacheSeconds(86400);
@@ -207,14 +230,12 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	public TemplateResolver templateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(springResourceResourceResolver);
-		resolver.setPrefix(environment.getRequiredProperty("template.guest.path"));
-		resolver.setSuffix(".html");
-		resolver.setCharacterEncoding("UTF-8");
-		// NB, selecting HTML5 as the template mode.
-		resolver.setTemplateMode("HTML5");
-		resolver.setCacheable(environment.getRequiredProperty("template.guest.cache", Boolean.class));
+		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
+		resolver.setSuffix(this.thymeleafProperties.getSuffix());
+		resolver.setTemplateMode(this.thymeleafProperties.getMode());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		resolver.setCacheable(this.thymeleafProperties.isCache());
 		return resolver;
-
 	}
 
 	@Bean
@@ -240,11 +261,11 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	public ThymeleafViewResolver thymeleafViewResolver() {
 		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
 		viewResolver.setTemplateEngine(templateEngine());
-		viewResolver.setOrder(2);
-		viewResolver.setViewNames(new String[] { "*" });
+		viewResolver.setViewNames(this.thymeleafProperties.getViewNames());
+		viewResolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		viewResolver.setContentType(this.thymeleafProperties.getContentType() + ";charset=" + this.thymeleafProperties.getEncoding());
 		viewResolver.setCache(false);
-		viewResolver.setCharacterEncoding("UTF-8");
-		viewResolver.setContentType("text/html; charset=UTF-8");
+		viewResolver.setOrder(2);
 		return viewResolver;
 	}
 

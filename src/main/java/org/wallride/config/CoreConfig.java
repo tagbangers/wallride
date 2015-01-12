@@ -1,48 +1,40 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wallride.config;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 
-import javax.inject.Inject;
-
 @Configuration
 @EnableAsync
 @ComponentScan(basePackages="org.wallride.core", excludeFilters={ @Filter(Configuration.class)} )
 public class CoreConfig {
-
-	@Inject
-	private Environment environment;
-
-//	@Configuration
-//	@Profile("default")
-//	@PropertySource("classpath:application-default.properties")
-//	static class Default extends PropertySourcesPlaceholderConfigurer {
-//	}
-//
-//
-//	@Configuration
-//	@Profile("develop")
-//	@PropertySource("classpath:application-develop.properties")
-//	static class Develop extends PropertySourcesPlaceholderConfigurer {
-//	}
-
-//	@Configuration
-//	@Profile("junit")
-//	@PropertySource("classpath:environment-junit.properties")
-//	static class Junit extends PropertySourcesPlaceholderConfigurer {
-//	}
 
 	@Bean
 	public MessageSource messageSource() {
@@ -75,12 +67,12 @@ public class CoreConfig {
 	}
 
 	@Bean
-	@Lazy
-	public AmazonS3Client amazonS3Client() {
-		final String accessKey = environment.getRequiredProperty("aws.accessKey");
-		final String secretKey = environment.getRequiredProperty("aws.secretKey");
+	public AmazonS3 amazonS3() {
+//		final String accessKey = environment.getRequiredProperty("aws.accessKey");
+//		final String secretKey = environment.getRequiredProperty("aws.secretKey");
 		ClientConfiguration configuration = new ClientConfiguration();
 		configuration.setMaxConnections(1000);
-		return new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey), configuration);
+//		return new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey), configuration);
+		return new AmazonS3Client(configuration);
 	}
 }

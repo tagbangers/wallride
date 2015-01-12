@@ -19,8 +19,6 @@ create table blog (
 	id bigint not null auto_increment,
 	code varchar(200) not null,
 	default_language varchar(3) not null,
-	media_url_prefix varchar(300) not null,
-	media_path varchar(300) not null,
 	ga_tracking_id varchar(100),
 	ga_profile_id varchar(100),
 	ga_custom_dimension_index integer,
@@ -171,16 +169,6 @@ create table post_related_post (
 	post_id bigint not null,
 	related_id bigint not null,
 	primary key (post_id, related_id)
-) ENGINE=InnoDB;
-
-create table setting (
-	`key` varchar(100) not null,
-	value varchar(500) not null,
-	created_at datetime not null,
-	created_by varchar(100),
-	updated_at datetime not null,
-	updated_by varchar(100),
-	primary key (`key`)
 ) ENGINE=InnoDB;
 
 create table tag (

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wallride.web.support;
 
 import org.apache.commons.io.FileUtils;
@@ -8,7 +24,6 @@ import org.im4java.process.Pipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
@@ -18,13 +33,10 @@ import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
-import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Media;
-import org.wallride.core.domain.Setting;
 import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.support.AmazonS3ResourceUtils;
-import org.wallride.core.support.Settings;
+import org.wallride.core.support.ExtendedResourceUtils;
+import org.wallride.core.support.WallRideProperties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,16 +49,22 @@ import java.util.Map;
 
 public class MediaHttpRequestHandler extends WebContentGenerator implements HttpRequestHandler, InitializingBean {
 
-	private BlogService blogService;
+	private WallRideProperties wallRideProperties;
+
+//	private BlogService blogService;
 
 	private MediaRepository mediaRepository;
 	private ResourceLoader resourceLoader;
 
 	private static Logger logger = LoggerFactory.getLogger(MediaHttpRequestHandler.class);
 
-	public void setBlogService(BlogService blogService) {
-		this.blogService = blogService;
+	public void setWallRideProperties(WallRideProperties wallRideProperties) {
+		this.wallRideProperties = wallRideProperties;
 	}
+
+//	public void setBlogService(BlogService blogService) {
+//		this.blogService = blogService;
+//	}
 
 	public void setMediaRepository(MediaRepository mediaRepository) {
 		this.mediaRepository = mediaRepository;
@@ -100,9 +118,11 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 //	}
 
 	private Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
-		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
+//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
+		final Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
 		final Resource resource = prefix.createRelative(media.getId());
+
 		if (!resource.exists()) {
 			return null;
 		}
@@ -120,7 +140,8 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 				temp.deleteOnExit();
 				resizeImage(resource, temp, width, height, mode);
 
-				AmazonS3ResourceUtils.writeFile(temp, resized);
+//				AmazonS3ResourceUtils.writeFile(temp, resized);
+				ExtendedResourceUtils.write(resized, temp);
 				FileUtils.deleteQuietly(temp);
 			}
 		}
