@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.aws.core.io.s3;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.BinaryUtils;
@@ -26,6 +27,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ExecutorServiceAdapter;
 
 import java.io.*;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -69,12 +71,21 @@ class SimpleStorageResource extends AbstractResource implements WritableResource
 
 	@Override
 	public InputStream getInputStream() throws IOException {
-		return this.amazonS3.getObject(this.bucketName, this.objectName).getObjectContent();
+		try {
+			return this.amazonS3.getObject(this.bucketName, this.objectName).getObjectContent();
+		} catch (AmazonClientException e) {
+			throw new IOException(e);
+		}
 	}
 
 	@Override
 	public boolean exists() {
 		return this.objectMetadata != null;
+	}
+
+	@Override
+	public URL getURL() throws IOException {
+		return new URL("s3://" + bucketName + "/" + objectName);
 	}
 
 	@Override
