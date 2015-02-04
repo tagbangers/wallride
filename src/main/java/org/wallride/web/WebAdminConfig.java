@@ -194,8 +194,8 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		return resolver;
 	}
 
-	@Bean(name="adminTemplateEngine")
-	public SpringTemplateEngine adminTemplateEngine() {
+	@Bean
+	public SpringTemplateEngine templateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
 		Set<TemplateResolver> resolvers = new HashSet<>();
 		resolvers.add(adminTemplateResolver());
@@ -208,24 +208,10 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		return engine;
 	}
 
-	@Bean(name="guestTemplateEngine")
-	public SpringTemplateEngine guestTemplateEngine() {
-		SpringTemplateEngine engine = new SpringTemplateEngine();
-		Set<TemplateResolver> resolvers = new HashSet<>();
-		resolvers.add(guestTemplateResolver());
-		engine.setTemplateResolvers(resolvers);
-
-		Set<IDialect> dialects = new HashSet<>();
-		dialects.add(new SpringSecurityDialect());
-		dialects.add(customThymeleafDialect);
-		engine.setAdditionalDialects(dialects);
-		return engine;
-	}
-
 	@Bean
 	public ThymeleafViewResolver thymeleafViewResolver() {
 		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
-		viewResolver.setTemplateEngine(adminTemplateEngine());
+		viewResolver.setTemplateEngine(templateEngine());
 		viewResolver.setViewNames(this.properties.getViewNames());
 		viewResolver.setCharacterEncoding(this.properties.getEncoding());
 		viewResolver.setContentType(this.properties.getContentType() + ";charset=" + this.properties.getEncoding());

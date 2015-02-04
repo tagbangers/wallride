@@ -17,22 +17,27 @@
 package org.wallride.web.controller.admin.article;
 
 import org.joda.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
+import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
 import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.BlogLanguage;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.service.MediaService;
+import org.wallride.core.service.ServiceException;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
 
 import javax.inject.Inject;
@@ -46,20 +51,13 @@ import javax.validation.Valid;
 public class ArticlePreviewController {
 
 	@Inject
+	private BlogService blogService;
+
+	@Inject
 	private MediaService mediaService;
 
 	@Inject
-	private DefaultModelAttributeInterceptor defaultModelAttributeInterceptor;
-
-	@Inject
-	@Qualifier("guestTemplateEngine")
-	private SpringTemplateEngine guestTemplateEngine;
-
-	@Inject
 	private ServletContext servletContext;
-
-	@Inject
-	private Environment environment;
 
 	@RequestMapping
 	public void preview(
@@ -77,8 +75,18 @@ public class ArticlePreviewController {
 		article.setDate(form.getDate() != null ? form.getDate() : new LocalDateTime());
 		article.setAuthor(authorizedUser);
 
+		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext, "org.springframework.web.servlet.FrameworkServlet.CONTEXT.guestServlet");
+		if (context == null) {
+			throw new ServiceException("GuestServlet is not ready yet");
+		}
+
+		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		BlogLanguage blogLanguage = blog.getLanguage(language);
+		request.setAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE, blogLanguage);
+
+		DefaultModelAttributeInterceptor interceptor = context.getBean(DefaultModelAttributeInterceptor.class);
 		ModelAndView mv = new ModelAndView("dummy");
-		defaultModelAttributeInterceptor.postHandle(request, response, this, mv);
+		interceptor.postHandle(request, response, this, mv);
 
 		final SpringWebContext ctx = new SpringWebContext(
 				request,
@@ -89,7 +97,11 @@ public class ArticlePreviewController {
 				WebApplicationContextUtils.getWebApplicationContext(servletContext));
 		ctx.setVariable("article", article);
 
-		String html = guestTemplateEngine.process("/article/describe", ctx);
+		ThymeleafEvaluationContext evaluationContext = new ThymeleafEvaluationContext(context, null);
+		ctx.getVariables().put(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME, evaluationContext);
+
+		SpringTemplateEngine templateEngine = context.getBean(SpringTemplateEngine.class);
+		String html = templateEngine.process("/article/describe", ctx);
 
 		response.setContentType("text/html;charset=UTF-8");
 		response.setContentLength(html.getBytes("UTF-8").length);
