@@ -64,7 +64,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 			String[] fields = new String[] {
 					"name"
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

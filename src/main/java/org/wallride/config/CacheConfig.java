@@ -18,6 +18,7 @@ package org.wallride.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
 import com.amazonaws.internal.EC2MetadataClient;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -64,7 +65,8 @@ public class CacheConfig {
 			logger.info("jgroups.tcp.address -> {}", ipaddress);
 			System.setProperty("jgroups.tcp.address", ipaddress);
 
-			AWSCredentials awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
+//			AWSCredentials awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
+			AWSCredentials awsCredentials = new SystemPropertiesCredentialsProvider().getCredentials(); // TODO
 			System.setProperty("jgroups.s3.access_key", awsCredentials.getAWSAccessKeyId());
 			System.setProperty("jgroups.s3.secret_access_key", awsCredentials.getAWSSecretKey());
 			System.setProperty("jgroups.s3.bucket",  environment.getRequiredProperty("jgroups.s3.bucket"));

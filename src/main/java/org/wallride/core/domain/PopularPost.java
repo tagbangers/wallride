@@ -58,7 +58,7 @@ public class PopularPost extends DomainObject<Long> implements Comparable<Popula
 	private long views;
 
 	@ManyToOne(optional = false)
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Post post;
 
 	@Override

@@ -66,7 +66,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 					"loginId",
 					"name.firstName", "name.lastName",
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

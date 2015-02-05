@@ -70,7 +70,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 					"title", "body",
 					"categories.name", "tags.name",
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

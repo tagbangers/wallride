@@ -43,7 +43,7 @@ public class Article extends Post implements Comparable<Article> {
 			joinColumns={@JoinColumn(name="article_id")},
 			inverseJoinColumns=@JoinColumn(name="category_id", referencedColumnName="id"))
 	@SortNatural
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Category> categories = new TreeSet<>();
 
 	@ManyToMany
@@ -52,7 +52,7 @@ public class Article extends Post implements Comparable<Article> {
 			joinColumns={@JoinColumn(name="article_id")},
 			inverseJoinColumns=@JoinColumn(name="tag_id", referencedColumnName="id"))
 	@SortNatural
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Tag> tags = new TreeSet<>();
 
 	public SortedSet<Category> getCategories() {
