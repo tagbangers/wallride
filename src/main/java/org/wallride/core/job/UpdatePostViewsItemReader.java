@@ -64,12 +64,13 @@ public class UpdatePostViewsItemReader extends AbstractPagingItemReader<List> {
 		Analytics analytics = GoogleAnalyticsUtils.buildClient(googleAnalytics);
 
 		try {
+			LocalDate now = LocalDate.now();
 			Analytics.Data.Ga.Get request = analytics.data().ga()
-					.get(googleAnalytics.getProfileId(), "2005-01-01", LocalDate.now().toString("yyyy-MM-dd"), "ga:sessions")
+					.get(googleAnalytics.getProfileId(), now.minusYears(1).toString("yyyy-MM-dd"), now.toString("yyyy-MM-dd"), "ga:pageViews")
 //						.setDimensions(String.format("ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 //						.setSort(String.format("-ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 					.setDimensions(String.format("ga:pagePath", googleAnalytics.getCustomDimensionIndex()))
-					.setSort(String.format("-ga:sessions", googleAnalytics.getCustomDimensionIndex()))
+					.setSort(String.format("-ga:pageViews", googleAnalytics.getCustomDimensionIndex()))
 					.setStartIndex(getPage() * getPageSize() + 1)
 					.setMaxResults(getPageSize());
 
