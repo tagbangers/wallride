@@ -85,7 +85,8 @@ class SimpleStorageResource extends AbstractResource implements WritableResource
 
 	@Override
 	public URL getURL() throws IOException {
-		return new URL("s3://" + bucketName + "/" + objectName);
+//		return new URL("s3://" + bucketName + "/" + objectName);
+		return new URL("https://" + bucketName + ".s3.amazonaws.com/" + objectName);
 	}
 
 	@Override

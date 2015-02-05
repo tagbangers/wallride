@@ -35,10 +35,13 @@ import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.context.support.StandardServletEnvironment;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -69,16 +72,18 @@ public class Application extends SpringBootServletInitializer {
 	public static final String ADMIN_SERVLET_PATH = "/_admin";
 
 	public static void main(String[] args) throws Exception {
-		initialize();
+		ConfigurableEnvironment environment = new StandardServletEnvironment();
+		initialize(environment);
 		ResourceLoader resourceLoader = createResourceLoader();
 		new SpringApplicationBuilder(Application.class)
 				.contextClass(AnnotationConfigEmbeddedWebApplicationContext.class)
+				.environment(environment)
 				.resourceLoader(resourceLoader)
 				.run(args);
 	}
 
-	public static void initialize() {
-		String home = System.getProperty(WallRideProperties.HOME_PROPERTY);
+	public static void initialize(ConfigurableEnvironment environment) {
+		String home = environment.getProperty(WallRideProperties.HOME_PROPERTY);
 		if (!StringUtils.hasText(home)) {
 			throw new IllegalStateException(WallRideProperties.HOME_PROPERTY + " is empty");
 		}
@@ -111,9 +116,11 @@ public class Application extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		initialize();
+		ConfigurableEnvironment environment = new StandardServletEnvironment();
+		initialize(environment);
 		ResourceLoader resourceLoader = createResourceLoader();
 		return application.sources(Application.class)
+				.environment(environment)
 				.resourceLoader(resourceLoader);
 	}
 
