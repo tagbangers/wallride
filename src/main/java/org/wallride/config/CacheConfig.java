@@ -16,17 +16,12 @@
 
 package org.wallride.config;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
 import com.amazonaws.internal.EC2MetadataClient;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.Index;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
-import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.lucene.LuceneKey2StringMapper;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -66,11 +61,9 @@ public class CacheConfig {
 			logger.info("jgroups.tcp.address -> {}", ipaddress);
 			System.setProperty("jgroups.tcp.address", ipaddress);
 
-//			AWSCredentials awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
-			AWSCredentials awsCredentials = new EnvironmentVariableCredentialsProvider().getCredentials(); // TODO
-			System.setProperty("jgroups.s3.access_key", awsCredentials.getAWSAccessKeyId());
-			System.setProperty("jgroups.s3.secret_access_key", awsCredentials.getAWSSecretKey());
-			System.setProperty("jgroups.s3.bucket",  environment.getRequiredProperty("jgroups.s3.bucket"));
+			System.setProperty("jgroups.s3.access_key", System.getProperty("AWS_ACCESS_KEY_ID"));
+			System.setProperty("jgroups.s3.secret_access_key", System.getProperty("AWS_SECRET_KEY"));
+			System.setProperty("jgroups.s3.bucket", environment.getRequiredProperty("jgroups.s3.bucket"));
 		}
 
 		ConfigurationBuilderHolder holder = new ConfigurationBuilderHolder();
