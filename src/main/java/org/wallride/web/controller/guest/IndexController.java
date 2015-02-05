@@ -49,7 +49,7 @@ public class IndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles));
-		return "article/index";
+		return "index";
 //
 //
 //		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
