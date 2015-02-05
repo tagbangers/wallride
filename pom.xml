@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT-201501121622</version>
+	<version>1.0.0.BUILD-SNAPSHOT-201502051741</version>
 	<packaging>${packaging.type}</packaging>
 
 	<profiles>
@@ -34,9 +34,9 @@
 	</profiles>
 
 	<properties>
-		<org.hibernate.version>4.3.5.Final</org.hibernate.version>
-		<org.hibernate.search.version>4.5.1.Final</org.hibernate.search.version>
-		<org.infinispan.version>6.0.2.Final</org.infinispan.version>
+		<org.hibernate.version>4.3.8.Final</org.hibernate.version>
+		<org.hibernate.search.version>5.0.1.Final</org.hibernate.search.version>
+		<org.infinispan.version>7.1.0.Final</org.infinispan.version>
 		<com.amazonaws.version>1.9.0</com.amazonaws.version>
 	</properties>
 
@@ -154,25 +154,33 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-search-analyzers</artifactId>
-			<version>${org.hibernate.search.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search-infinispan</artifactId>
 			<version>${org.hibernate.search.version}</version>
 		</dependency>
 
+		<!--
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 			<version>3.6.2</version>
 		</dependency>
+		-->
+
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>4.10.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers-kuromoji</artifactId>
+			<version>4.10.3</version>
+		</dependency>
 
 		<!-- Infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-core</artifactId>
+			<artifactId>infinispan-cachestore-jdbc</artifactId>
 			<version>${org.infinispan.version}</version>
 		</dependency>
 		<dependency>
@@ -180,11 +188,7 @@
 			<artifactId>infinispan-lucene-directory</artifactId>
 			<version>${org.infinispan.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-cachestore-jdbc</artifactId>
-			<version>${org.infinispan.version}</version>
-		</dependency>
+		<!--
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-query</artifactId>
@@ -204,6 +208,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-spring</artifactId>

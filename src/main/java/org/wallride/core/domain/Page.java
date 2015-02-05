@@ -51,7 +51,7 @@ public class Page extends Post implements Comparable<Page> {
 //	private int sort;
 
 	@ManyToOne
-//	@IndexedEmbedded //org.hibernate.search.SearchException: Circular reference.
+//	@IndexedEmbedded(includeEmbeddedObjectId = true) //org.hibernate.search.SearchException: Circular reference.
 	private Page parent;
 
 	@OneToMany(mappedBy="parent", cascade=CascadeType.ALL)

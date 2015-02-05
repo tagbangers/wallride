@@ -23,11 +23,10 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
 
-@Configuration
+//@Configuration
 public class UpdatePostViewsJobConfig {
 
 	@Inject

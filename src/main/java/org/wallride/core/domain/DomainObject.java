@@ -18,7 +18,12 @@ package org.wallride.core.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.solr.analysis.*;
+import org.apache.lucene.analysis.cjk.CJKWidthFilterFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.ja.JapaneseBaseFormFilterFactory;
+import org.apache.lucene.analysis.ja.JapaneseKatakanaStemFilterFactory;
+import org.apache.lucene.analysis.ja.JapaneseTokenizerFactory;
+import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
 import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.*;
 import org.joda.time.LocalDateTime;
@@ -38,7 +43,7 @@ filters = {
 		@Parameter(name="userDictionary", value="userdict.txt"),
 		@Parameter(name="ignoreCase", value="true"),
 		@Parameter(name="expand", value="true"),
-		@Parameter(name="tokenizerFactory", value="org.apache.solr.analysis.JapaneseTokenizerFactory")}),
+		@Parameter(name="tokenizerFactory", value="org.apache.lucene.analysis.ja.JapaneseTokenizerFactory")}),
 	@TokenFilterDef(factory=JapaneseBaseFormFilterFactory.class),
 	@TokenFilterDef(factory=CJKWidthFilterFactory.class),
 	@TokenFilterDef(factory=JapaneseKatakanaStemFilterFactory.class, params={

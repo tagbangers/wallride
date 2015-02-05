@@ -54,11 +54,11 @@ public class Blog extends DomainObject<Long> {
 //	private String mediaPath;
 
 	@Embedded
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private GoogleAnalytics googleAnalytics;
 
 	@OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Set<BlogLanguage> languages = new HashSet<>();
 
 	public Long getId() {

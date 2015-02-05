@@ -61,7 +61,7 @@ public class User extends DomainObject<Long> {
 			@AttributeOverride(name = "firstName", column = @Column(name = "name_first", length = 50, nullable = false)),
 			@AttributeOverride(name = "lastName", column = @Column(name = "name_last", length = 50, nullable = false)),
 	})
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private PersonalName name = new PersonalName();
 
 	@Column(length = 500)

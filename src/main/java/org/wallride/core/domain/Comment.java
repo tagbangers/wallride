@@ -40,11 +40,11 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Post post;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private User author;
 
 	@Column(name = "author_name", length = 200, nullable = false)

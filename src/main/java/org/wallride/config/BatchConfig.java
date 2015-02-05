@@ -16,14 +16,75 @@
 
 package org.wallride.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.wallride.core.job.UpdatePostViewsJobConfig;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 @Configuration
+@EnableBatchProcessing
 @Import({
 	UpdatePostViewsJobConfig.class,
 })
-public class BatchConfig {
-	
+public class BatchConfig implements BatchConfigurer {
+
+	private static Logger logger = LoggerFactory.getLogger(BatchConfig.class);
+
+	@Inject
+	private DataSource dataSource;
+	@Inject
+	private EntityManagerFactory entityManagerFactory;
+
+	@Bean
+	@Override
+	public JobRepository getJobRepository() throws Exception {
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(dataSource);
+		factory.setTransactionManager(getTransactionManager());
+		factory.setIsolationLevelForCreate("ISOLATION_DEFAULT");
+		factory.setValidateTransactionState(false);
+		factory.afterPropertiesSet();
+		return factory.getObject();
+	}
+
+	@Bean
+	@Override
+	public JobLauncher getJobLauncher() throws Exception {
+		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+		jobLauncher.setJobRepository(getJobRepository());
+		jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		jobLauncher.afterPropertiesSet();
+		return jobLauncher;
+	}
+
+	@Bean
+	@Override
+	public JobExplorer getJobExplorer() throws Exception {
+		JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
+		factory.setDataSource(dataSource);
+		factory.afterPropertiesSet();
+		return factory.getObject();
+	}
+
+	@Override
+	public PlatformTransactionManager getTransactionManager() {
+		return new JpaTransactionManager(entityManagerFactory);
+	}
 }

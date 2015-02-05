@@ -18,10 +18,7 @@ package org.wallride.core.domain;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.*;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
@@ -69,7 +66,7 @@ public class Post extends DomainObject<Long> {
 	private String body;
 
 	@Embedded
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Seo seo = new Seo();
 
 	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
@@ -78,7 +75,7 @@ public class Post extends DomainObject<Long> {
 	private LocalDateTime date;
 
 	@ManyToOne
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private User author;
 
 	@Enumerated(EnumType.STRING)
@@ -90,7 +87,7 @@ public class Post extends DomainObject<Long> {
 	private long views;
 
 	@ManyToOne
-	@IndexedEmbedded(depth = 1, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+	@IndexedEmbedded(includeEmbeddedObjectId = true, depth = 1, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private Post drafted;
 
 	@Column(name = "drafted_code", length = 200)
@@ -104,6 +101,7 @@ public class Post extends DomainObject<Long> {
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
 	@SortNatural
+	@ContainedIn
 	private SortedSet<Comment> comments;
 
 	@ManyToMany

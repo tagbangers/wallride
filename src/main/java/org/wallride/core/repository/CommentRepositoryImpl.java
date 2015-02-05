@@ -17,10 +17,9 @@
 package org.wallride.core.repository;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.QueryParser.Operator;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -66,8 +65,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 			String[] fields = new String[] {
 					"content"
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);
-			parser.setDefaultOperator(Operator.AND);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
+			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {
 				query = parser.parse(request.getKeyword());
@@ -99,8 +98,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 				.setFetchMode("author", FetchMode.JOIN);
 
 		Sort sort = new Sort(
-				new SortField("date", SortField.STRING),
-				new SortField("id", SortField.LONG));
+				new SortField("date", SortField.Type.STRING),
+				new SortField("id", SortField.Type.LONG));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Comment.class)

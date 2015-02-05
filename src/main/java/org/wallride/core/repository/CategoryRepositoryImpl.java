@@ -17,10 +17,9 @@
 package org.wallride.core.repository;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.QueryParser.Operator;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -65,8 +64,8 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 			String[] fields = new String[] {
 					"name"
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_36, fields, analyzer);
-			parser.setDefaultOperator(Operator.AND);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
+			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {
 				query = parser.parse(request.getKeyword());
@@ -91,7 +90,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(Category.class);
 
-		Sort sort = new Sort(new SortField("name", SortField.STRING));
+		Sort sort = new Sort(new SortField("name", SortField.Type.STRING));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Category.class)

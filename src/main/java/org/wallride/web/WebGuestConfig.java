@@ -43,6 +43,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.thymeleaf.dialect.IDialect;
@@ -71,6 +72,8 @@ import java.util.*;
 @Configuration
 @ComponentScan(basePackages= "org.wallride.web.controller.guest", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
 public class WebGuestConfig extends WebMvcConfigurationSupport {
+
+	private static final String CLASSPATH_RESOURCE_LOCATION = "classpath:/resources/guest/";
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
@@ -135,7 +138,9 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/resources/guest/");
+		registry.addResourceHandler("/resources/**").addResourceLocations(
+				wallRideProperties.getHome() + "themes/default/resources/",
+				CLASSPATH_RESOURCE_LOCATION);
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 		registry.setOrder(Integer.MIN_VALUE);
 	}
@@ -197,6 +202,20 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		return handlerMapping;
 	}
 
+	@Bean
+	public SimpleUrlHandlerMapping faviconHandlerMapping() {
+		ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
+		List<org.springframework.core.io.Resource> locations = new ArrayList<>();
+		locations.add(resourceLoader.getResource(wallRideProperties.getHome() + "themes/default/resources/"));
+		locations.add(resourceLoader.getResource(CLASSPATH_RESOURCE_LOCATION));
+		requestHandler.setLocations(locations);
+
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setOrder(Integer.MIN_VALUE + 1);
+		mapping.setUrlMap(Collections.singletonMap("**/favicon.ico", requestHandler));
+		return mapping;
+	}
+
 //	@Bean
 //	public SimpleUrlHandlerMapping pageUrlHandlerMapping() {
 //		PageHttpRequestHandler pageHttpRequestHandler = new PageHttpRequestHandler();
@@ -227,7 +246,20 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	public TemplateResolver templateResolver() {
+	public TemplateResolver homePathTemplateResolver() {
+		TemplateResolver resolver = new TemplateResolver();
+		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setPrefix(wallRideProperties.getHome() + "themes/default/templates/");
+		resolver.setSuffix(this.thymeleafProperties.getSuffix());
+		resolver.setTemplateMode(this.thymeleafProperties.getMode());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		resolver.setCacheable(this.thymeleafProperties.isCache());
+		resolver.setOrder(1);
+		return resolver;
+	}
+
+	@Bean
+	public TemplateResolver classPathTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(springResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
@@ -235,13 +267,18 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
 		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
 		resolver.setCacheable(this.thymeleafProperties.isCache());
+		resolver.setOrder(2);
 		return resolver;
 	}
 
 	@Bean
 	public SpringTemplateEngine templateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
-		engine.setTemplateResolver(templateResolver());
+//		engine.setTemplateResolver(templateResolver());
+		Set<TemplateResolver> templateResolvers = new LinkedHashSet<>();
+		templateResolvers.add(homePathTemplateResolver());
+		templateResolvers.add(classPathTemplateResolver());
+		engine.setTemplateResolvers(templateResolvers);
 
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(new SpringSecurityDialect());
