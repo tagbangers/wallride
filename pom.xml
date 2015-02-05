@@ -36,7 +36,7 @@
 	<properties>
 		<org.hibernate.version>4.3.8.Final</org.hibernate.version>
 		<org.hibernate.search.version>5.0.1.Final</org.hibernate.search.version>
-		<org.infinispan.version>7.0.2.Final</org.infinispan.version>
+		<org.infinispan.version>7.1.0.Final</org.infinispan.version>
 		<com.amazonaws.version>1.9.0</com.amazonaws.version>
 	</properties>
 
@@ -181,6 +181,11 @@
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-cachestore-jdbc</artifactId>
+			<version>${org.infinispan.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-lucene-directory</artifactId>
 			<version>${org.infinispan.version}</version>
 		</dependency>
 		<!--
