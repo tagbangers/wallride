@@ -20,6 +20,7 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -88,6 +89,9 @@ public class UserService {
 	@Inject
 	private Environment environment;
 
+	@Inject
+	private MailProperties mailProperties;
+
 	@Resource
 	private UserRepository userRepository;
 	@Resource
@@ -139,7 +143,7 @@ public class UserService {
 			message.setSubject(MessageFormat.format(
 					messageSourceAccessor.getMessage("PasswordResetSubject", LocaleContextHolder.getLocale()),
 					blogTitle));
-			message.setFrom(environment.getRequiredProperty("mail.from"));
+			message.setFrom(mailProperties.getProperties().get("mail.from"));
 			message.setTo(passwordResetToken.getEmail());
 
 			String htmlContent = templateEngine.process("password-reset", ctx);
@@ -232,7 +236,7 @@ public class UserService {
 			message.setSubject(MessageFormat.format(
 					messageSourceAccessor.getMessage("PasswordChangedSubject", LocaleContextHolder.getLocale()),
 					blogTitle));
-			message.setFrom(environment.getRequiredProperty("mail.from"));
+			message.setFrom(mailProperties.getProperties().get("mail.from"));
 			message.setTo(passwordResetToken.getEmail());
 
 			String htmlContent = templateEngine.process("password-changed", ctx);
