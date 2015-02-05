@@ -70,6 +70,7 @@ public class UpdatePostViewsItemWriter implements ItemWriter<List> {
 			UriComponents uriComponents = UriComponentsBuilder.fromUriString((String) item.get(0)).build();
 
 			MockHttpServletRequest request = new MockHttpServletRequest(servletContext);
+			request.setMethod("GET");
 			request.setRequestURI(uriComponents.getPath());
 			request.setQueryString(uriComponents.getQuery());
 			MockHttpServletResponse response = new MockHttpServletResponse();
