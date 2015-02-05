@@ -43,6 +43,34 @@
 											<th>User Locale</th>
 											<td><span th:text="${system['user.language']}">en</span>_<span th:text="${system['user.country']}">US</span></td>
 										</tr>
+										<tr>
+											<th>Clear Cache</th>
+											<td>
+												<form th:action="@{__${ADMIN_PATH}__/system/re-index}" class="form-horizontal" method="post">
+													<div class="col-sm-12">
+														<div class="alert alert-success" th:if="${reIndex}">
+															<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+															<span th:text="#{StartedReIndex}">Re-Index started</span>
+														</div>
+														<button class="btn btn-primary ok" th:text="#{ReIndex}">Re-Index</button>
+													</div>
+												</form>
+											</td>
+										</tr>
+										<tr>
+											<th>Re-index</th>
+											<td>
+												<form th:action="@{__${ADMIN_PATH}__/system/clear-cache}" class="form-horizontal" method="post">
+													<div class="col-sm-12">
+														<div class="alert alert-success" th:if="${clearCache}">
+															<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+															<span th:text="#{StartedClearCache}">Clearing caches...</span>
+														</div>
+														<button class="btn btn-primary ok" th:text="#{ClearCache}">Re-Index</button>
+													</div>
+												</form>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>
