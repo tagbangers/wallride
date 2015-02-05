@@ -21,6 +21,7 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.internal.EC2MetadataClient;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.cache.Index;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.eviction.EvictionStrategy;
@@ -28,7 +29,6 @@ import org.infinispan.lucene.LuceneKey2StringMapper;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.persistence.jdbc.configuration.JdbcStringBasedStoreConfigurationBuilder;
-import org.infinispan.query.indexmanager.InfinispanIndexManager;
 import org.infinispan.spring.provider.SpringEmbeddedCacheManagerFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +87,8 @@ public class CacheConfig {
 
 		Properties props = new Properties();
 		props.put("hibernate.search.default.directory_provider", "infinispan");
-		props.put("hibernate.search.default.indexmanager", InfinispanIndexManager.class.getCanonicalName());
+//		props.put("hibernate.search.default.indexmanager", InfinispanIndexManager.class.getCanonicalName());
+		props.put("hibernate.search.default.indexmanager", "near-real-time");
 		props.put("hibernate.search.default.exclusive_index_use", "false");
 
 		ConfigurationBuilder defaultBuilder = holder.getDefaultConfigurationBuilder();
@@ -120,41 +121,35 @@ public class CacheConfig {
 
 		// @formatter:off
 		defaultBuilder
-			.locking()
-				.lockAcquisitionTimeout(300000)
-				.writeSkewCheck(false)
-				.concurrencyLevel(500)
-				.useLockStriping(false)
 			.clustering()
 				.cacheMode(CacheMode.DIST_SYNC)
-			.stateTransfer()
-				.timeout(960000)
-				.fetchInMemoryState(true)
-			.sync()
-			.replTimeout(480000)
-				.jmxStatistics()
-				.enable()
-			.eviction()
-				.maxEntries(-1)
-				.strategy(EvictionStrategy.NONE)
-				.expiration()
-					.maxIdle(-1)
-					.reaperEnabled(false)
-			.indexing()
-				.enable()
-				.indexLocalOnly(false)
-				.withProperties(props)
+//			.locking()
+//				.lockAcquisitionTimeout(300000)
+//				.writeSkewCheck(false)
+//				.concurrencyLevel(500)
+//				.useLockStriping(false)
+//			.stateTransfer()
+//				.timeout(960000)
+//				.fetchInMemoryState(true)
+//			.sync()
+//			.replTimeout(480000)
+//				.jmxStatistics()
+//				.enable()
+//			.eviction()
+//				.maxEntries(-1)
+//				.strategy(EvictionStrategy.NONE)
+//				.expiration()
+//					.maxIdle(-1)
+//					.reaperEnabled(false)
+//			.indexing()
+//				.index(Index.LOCAL)
+//				.enable()
+//				.indexLocalOnly(false)
+//				.withProperties(props)
 			.persistence()
-			.addStore(jdbcBuilder)
-			.preload(true)
-			.shared(true);
-//			.loaders()
-//				.preload(true)
-//				.passivation(false)
-//				.shared(true)
-//				.addStore(jdbcBuilder);
-//				.preload(true)
-//				.shared(true);
+				.addStore(jdbcBuilder)
+				.preload(true)
+				.shared(true);
 		// @formatter:on
 
 //		ConfigurationBuilder luceneBuilder = new ConfigurationBuilder();
@@ -178,7 +173,7 @@ public class CacheConfig {
 			.clustering()
 				.cacheMode(CacheMode.INVALIDATION_SYNC)
 				.indexing()
-				.enabled(false);
+					.index(Index.NONE);
 //			.persistence()
 //				.clearStores();
 		// @formatter:on

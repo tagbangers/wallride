@@ -16,7 +16,7 @@
 
 package org.wallride.config;
 
-import org.infinispan.commons.CacheConfigurationException;
+import org.infinispan.configuration.global.GlobalConfiguration;
 import org.infinispan.persistence.jdbc.configuration.AbstractJdbcStoreConfigurationBuilder;
 import org.infinispan.persistence.jdbc.configuration.AbstractJdbcStoreConfigurationChildBuilder;
 import org.infinispan.persistence.jdbc.configuration.ConnectionFactoryConfigurationBuilder;
@@ -38,7 +38,12 @@ public class InfinispanDataSourceConnectionFactoryConfigurationBuilder<S extends
 
 	@Override
 	public void validate() {
-		throw new CacheConfigurationException("The dataSource has not been specified");
+
+	}
+
+	@Override
+	public void validate(GlobalConfiguration globalConfiguration) {
+
 	}
 
 	@Override

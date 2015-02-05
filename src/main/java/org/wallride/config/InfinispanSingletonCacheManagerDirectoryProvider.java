@@ -17,10 +17,10 @@
 package org.wallride.config;
 
 import org.apache.lucene.store.Directory;
-import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.InfinispanIntegration;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.logging.impl.Log;
+import org.hibernate.search.infinispan.spi.InfinispanIntegration;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;

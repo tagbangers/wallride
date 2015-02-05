@@ -17,8 +17,8 @@
 package org.wallride.core.domain;
 
 import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.exception.SearchException;
 import org.joda.time.LocalDate;
 
 public class LocalDateBridge implements TwoWayStringBridge {
