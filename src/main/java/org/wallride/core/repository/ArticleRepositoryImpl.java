@@ -129,7 +129,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		if (!CollectionUtils.isEmpty(request.getTagNames())) {
 			BooleanJunction<BooleanJunction> subJunction = qb.bool();
 			for (String tagName : request.getTagNames()) {
-				subJunction.should(qb.keyword().onField("tags.name").matching(tagName).createQuery());
+				subJunction.should(qb.phrase().onField("tags.name").sentence(tagName).createQuery());
 			}
 			junction.must(subJunction.createQuery());
 		}
