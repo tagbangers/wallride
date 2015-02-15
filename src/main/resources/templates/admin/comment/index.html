@@ -27,13 +27,17 @@
 				</section>
 
 				<div class="container-fluid">
-					<div class="alert alert-success" th:if="${deletedComment ne null}">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-						<span th:text="#{DeletedComment}">Comment Deleted.</span>
-					</div>
 					<div class="alert alert-success" th:if="${deletedComments ne null}">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{DeletedComments}">Comments Deleted.</span>
+					</div>
+					<div class="alert alert-success" th:if="${approvedComments ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{ApprovedComments}">Comments Approved.</span>
+					</div>
+					<div class="alert alert-success" th:if="${unapprovedComments ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{UnapprovedComments}">Comments Unapproved.</span>
 					</div>
 					<section class="search-result">
 						<form method="post">
@@ -70,7 +74,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr th:each="comment : ${comments}" class="clickable">
+										<tr th:each="comment : ${comments}" th:classappend="${!comment.approved}? 'active'">
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${comment.id}" /></td>
 											<td th:text="${comment.author}"></td>
 											<td th:text="${comment.content}"></td>
@@ -163,10 +167,7 @@
 											<h4 class="modal-title" th:text="#{ApproveComment}">Approve Comment</h4>
 										</div>
 										<div class="modal-body">
-											<div class="form-group">
-												<label th:text="#{Date}">Date</label>
-												<input type="text" name="date" class="form-control" placeholder="YYYY/MM/DD HH:mm" />
-											</div>
+											<p th:text="#{MakeSureApprove}">Are you sure you want to approve?</p>
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
@@ -199,7 +200,7 @@
 											<h4 class="modal-title" th:text="#{UnapproveComment}">Unapprove Comment</h4>
 										</div>
 										<div class="modal-body">
-											<p th:text="#{MakeSureUnpublish}">Are you sure you want to unpublish?</p>
+											<p th:text="#{MakeSureUnapprove}">Are you sure you want to unapprove?</p>
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>

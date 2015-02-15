@@ -66,7 +66,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
-					"content"
+					"authorName", "content"
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
@@ -91,6 +91,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 
 		if (request.getPostId() != null) {
 			junction.must(qb.keyword().onField("post.id").matching(request.getPostId()).createQuery());
+		}
+
+		if (request.getApproved() != null) {
+			junction.must(qb.keyword().onField("approved").matching(request.getApproved()).createQuery());
 		}
 
 		Query searchQuery = junction.createQuery();

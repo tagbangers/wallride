@@ -68,6 +68,7 @@ public class ArticleDescribeController {
 
 		CommentSearchRequest request = new CommentSearchRequest();
 		request.setPostId(article.getId());
+		request.setApproved(Boolean.TRUE);
 		Page<Comment> comments = commentService.readComments(request, new PageRequest(0, 1000));
 
 		model.addAttribute("article", article);

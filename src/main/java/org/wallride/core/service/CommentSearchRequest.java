@@ -20,6 +20,7 @@ public class CommentSearchRequest {
 
 	private Long postId;
 	private String keyword;
+	private Boolean approved;
 	private String language;
 
 	public Long getPostId() {
@@ -36,6 +37,14 @@ public class CommentSearchRequest {
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public Boolean getApproved() {
+		return approved;
+	}
+
+	public void setApproved(Boolean approved) {
+		this.approved = approved;
 	}
 
 	public String getLanguage() {
