@@ -3,4 +3,4 @@ target/
 .project
 .classpath
 .idea
-wallride.iml
+*.iml
