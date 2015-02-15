@@ -216,19 +216,6 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		return mapping;
 	}
 
-//	@Bean
-//	public SimpleUrlHandlerMapping pageUrlHandlerMapping() {
-//		PageHttpRequestHandler pageHttpRequestHandler = new PageHttpRequestHandler();
-//
-//		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
-//		urlMap.put("/{language}/{code}", pageHttpRequestHandler);
-//
-//		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
-//		handlerMapping.setOrder(2);
-//		handlerMapping.setUrlMap(urlMap);
-//		return handlerMapping;
-//	}
-
 	@Bean
 	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
 		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
