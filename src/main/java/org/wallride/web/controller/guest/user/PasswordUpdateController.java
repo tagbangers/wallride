@@ -58,7 +58,7 @@ public class PasswordUpdateController {
 
 	@RequestMapping(method = RequestMethod.GET, params = "step.edit")
 	public String edit(Model model) {
-		return "/user/password-update";
+		return "user/password-update";
 	}
 
 	@RequestMapping(method = RequestMethod.PUT)

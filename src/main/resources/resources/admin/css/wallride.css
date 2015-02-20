@@ -521,8 +521,10 @@ legend {
 
 .search-condition .navbar-form {
 	margin-top: 0;
-	margin-left: -8px;
 	padding: 0;
+}
+.search-condition .navbar-form > .select2:first-child {
+	margin-left: -8px;
 }
 .search-condition .select2-container .select2-choice {
 	border: 1px solid transparent;

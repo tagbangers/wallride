@@ -34,6 +34,8 @@ import org.wallride.core.repository.UserRepository;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -78,7 +80,7 @@ public class CommentService {
 		if (comment == null) {
 			throw new ServiceException();
 		}
-		if (!ObjectUtils.nullSafeEquals(comment.getAuthor(), updatedBy)) {
+		if (!updatedBy.getRoles().contains(User.Role.ADMIN) || !ObjectUtils.nullSafeEquals(comment.getAuthor(), updatedBy)) {
 			throw new ServiceException();
 		}
 
@@ -94,11 +96,68 @@ public class CommentService {
 		if (comment == null) {
 			throw new ServiceException();
 		}
-		if (!ObjectUtils.nullSafeEquals(comment.getAuthor(), deletedBy)) {
+		if (!deletedBy.getRoles().contains(User.Role.ADMIN) || !ObjectUtils.nullSafeEquals(comment.getAuthor(), deletedBy)) {
 			throw new ServiceException();
 		}
 		commentRepository.delete(comment);
 		return comment;
+	}
+
+	public List<Comment> bulkApproveComment(CommentBulkApproveRequest request, AuthorizedUser authorizedUser) {
+		if (!authorizedUser.getRoles().contains(User.Role.ADMIN)) {
+			throw new ServiceException();
+		}
+
+		List<Comment> comments = new ArrayList<>();
+		for (long id : request.getIds()) {
+			Comment comment = commentRepository.findByIdForUpdate(id);
+			if (comment.isApproved()) {
+				continue;
+			}
+
+			LocalDateTime now = LocalDateTime.now();
+			comment.setApproved(true);
+			comment.setUpdatedAt(now);
+			comment.setUpdatedBy(authorizedUser.toString());
+			comment = commentRepository.saveAndFlush(comment);
+
+			comments.add(comment);
+		}
+		return comments;
+	}
+
+	public List<Comment> bulkUnapproveComment(CommentBulkUnapproveRequest request, AuthorizedUser authorizedUser) {
+		if (!authorizedUser.getRoles().contains(User.Role.ADMIN)) {
+			throw new ServiceException();
+		}
+
+		List<Comment> comments = new ArrayList<>();
+		for (long id : request.getIds()) {
+			Comment comment = commentRepository.findByIdForUpdate(id);
+			if (!comment.isApproved()) {
+				continue;
+			}
+
+			LocalDateTime now = LocalDateTime.now();
+			comment.setApproved(false);
+			comment.setUpdatedAt(now);
+			comment.setUpdatedBy(authorizedUser.toString());
+			comment = commentRepository.saveAndFlush(comment);
+
+			comments.add(comment);
+		}
+		return comments;
+	}
+
+	public List<Comment> bulkDeleteComment(CommentBulkDeleteRequest bulkDeleteRequest, AuthorizedUser deletedBy) {
+		List<Comment> comments = new ArrayList<>();
+		for (long id : bulkDeleteRequest.getIds()) {
+			CommentDeleteRequest request = new CommentDeleteRequest();
+			request.setId(id);
+			Comment comment = deleteComment(request, deletedBy);
+			comments.add(comment);
+		}
+		return comments;
 	}
 
 	public Page<Comment> readComments(CommentSearchRequest request) {

@@ -57,12 +57,9 @@ public class CacheConfig {
 		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");
 		if ("jgroups-ec2.xml".equals(jgroupsConfigurationFile)) {
 			EC2MetadataClient metadataClient = new EC2MetadataClient();
-			String ipaddress = metadataClient.readResource("/latest/meta-data/local-ipv4");
-			logger.info("jgroups.tcp.address -> {}", ipaddress);
-			System.setProperty("jgroups.tcp.address", ipaddress);
-
-			System.setProperty("jgroups.s3.access_key", System.getProperty("AWS_ACCESS_KEY_ID"));
-			System.setProperty("jgroups.s3.secret_access_key", System.getProperty("AWS_SECRET_KEY"));
+			String ipAddress = metadataClient.readResource("/latest/meta-data/local-ipv4");
+			logger.info("jgroups.tcp.address -> {}", ipAddress);
+			System.setProperty("jgroups.tcp.address", ipAddress);
 			System.setProperty("jgroups.s3.bucket", environment.getRequiredProperty("jgroups.s3.bucket"));
 		}
 

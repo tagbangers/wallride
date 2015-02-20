@@ -16,35 +16,20 @@
 
 package org.wallride.core.service;
 
-public class CommentSearchRequest {
+import java.io.Serializable;
+import java.util.List;
 
-	private Long postId;
-	private String keyword;
-	private Boolean approved;
+public class CommentBulkApproveRequest implements Serializable {
+
+	private List<Long> ids;
 	private String language;
 
-	public Long getPostId() {
-		return postId;
+	public List<Long> getIds() {
+		return ids;
 	}
 
-	public void setPostId(Long postId) {
-		this.postId = postId;
-	}
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-
-	public Boolean getApproved() {
-		return approved;
-	}
-
-	public void setApproved(Boolean approved) {
-		this.approved = approved;
+	public void setIds(List<Long> ids) {
+		this.ids = ids;
 	}
 
 	public String getLanguage() {

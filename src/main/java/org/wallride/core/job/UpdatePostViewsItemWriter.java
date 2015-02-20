@@ -68,8 +68,10 @@ public class UpdatePostViewsItemWriter implements ItemWriter<List> {
 
 		for (List item : items) {
 			UriComponents uriComponents = UriComponentsBuilder.fromUriString((String) item.get(0)).build();
+			logger.info("Processing [{}]", uriComponents.toString());
 
 			MockHttpServletRequest request = new MockHttpServletRequest(servletContext);
+			request.setMethod("GET");
 			request.setRequestURI(uriComponents.getPath());
 			request.setQueryString(uriComponents.getQuery());
 			MockHttpServletResponse response = new MockHttpServletResponse();

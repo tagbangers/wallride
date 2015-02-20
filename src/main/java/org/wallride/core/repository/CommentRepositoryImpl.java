@@ -16,6 +16,8 @@
 
 package org.wallride.core.repository;
 
+import static org.springframework.data.domain.Sort.*;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -41,6 +43,7 @@ import org.wallride.core.service.CommentSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentRepositoryImpl implements CommentRepositoryCustom {
@@ -63,7 +66,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
-					"content"
+					"authorName", "content"
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
@@ -90,6 +93,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 			junction.must(qb.keyword().onField("post.id").matching(request.getPostId()).createQuery());
 		}
 
+		if (request.getApproved() != null) {
+			junction.must(qb.keyword().onField("approved").matching(request.getApproved()).createQuery());
+		}
+
 		Query searchQuery = junction.createQuery();
 
 		Session session = (Session) entityManager.getDelegate();
@@ -97,9 +104,21 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 				.setFetchMode("post", FetchMode.JOIN)
 				.setFetchMode("author", FetchMode.JOIN);
 
-		Sort sort = new Sort(
-				new SortField("date", SortField.Type.STRING),
-				new SortField("id", SortField.Type.LONG));
+		Sort sort = null;
+		if (pageable.getSort() != null) {
+			if (pageable.getSort().getOrderFor("date") != null) {
+				Order order = pageable.getSort().getOrderFor("date");
+				sort = new Sort(
+						new SortField("date", SortField.Type.STRING, order.getDirection().equals(Direction.DESC)),
+						new SortField("id", SortField.Type.LONG, order.getDirection().equals(Direction.DESC)));
+			}
+		}
+
+		if (sort == null) {
+			sort = new Sort(
+					new SortField("date", SortField.Type.STRING),
+					new SortField("id", SortField.Type.LONG));
+		}
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Comment.class)

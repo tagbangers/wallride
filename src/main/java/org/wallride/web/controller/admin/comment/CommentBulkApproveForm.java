@@ -14,37 +14,26 @@
  * limitations under the License.
  */
 
-package org.wallride.core.service;
+package org.wallride.web.controller.admin.comment;
 
-public class CommentSearchRequest {
+import org.wallride.core.service.CommentBulkApproveRequest;
 
-	private Long postId;
-	private String keyword;
-	private Boolean approved;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
+
+public class CommentBulkApproveForm implements Serializable {
+
+	private List<Long> ids;
+	@NotNull
 	private String language;
 
-	public Long getPostId() {
-		return postId;
+	public List<Long> getIds() {
+		return ids;
 	}
 
-	public void setPostId(Long postId) {
-		this.postId = postId;
-	}
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-
-	public Boolean getApproved() {
-		return approved;
-	}
-
-	public void setApproved(Boolean approved) {
-		this.approved = approved;
+	public void setIds(List<Long> ids) {
+		this.ids = ids;
 	}
 
 	public String getLanguage() {
@@ -53,5 +42,12 @@ public class CommentSearchRequest {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public CommentBulkApproveRequest toCommentBulkApproveRequest() {
+		CommentBulkApproveRequest request = new CommentBulkApproveRequest();
+		request.setIds(getIds());
+		request.setLanguage(getLanguage());
+		return request;
 	}
 }
