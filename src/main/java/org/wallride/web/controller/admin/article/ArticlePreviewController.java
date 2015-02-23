@@ -101,7 +101,7 @@ public class ArticlePreviewController {
 		ctx.getVariables().put(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME, evaluationContext);
 
 		SpringTemplateEngine templateEngine = context.getBean(SpringTemplateEngine.class);
-		String html = templateEngine.process("/article/describe", ctx);
+		String html = templateEngine.process("article/describe", ctx);
 
 		response.setContentType("text/html;charset=UTF-8");
 		response.setContentLength(html.getBytes("UTF-8").length);
