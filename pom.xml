@@ -36,7 +36,7 @@
 	<properties>
 		<org.hibernate.version>4.3.8.Final</org.hibernate.version>
 		<org.hibernate.search.version>5.0.1.Final</org.hibernate.search.version>
-		<org.infinispan.version>7.1.0.Final</org.infinispan.version>
+		<org.infinispan.version>7.1.1.Final</org.infinispan.version>
 		<com.amazonaws.version>1.9.0</com.amazonaws.version>
 	</properties>
 
