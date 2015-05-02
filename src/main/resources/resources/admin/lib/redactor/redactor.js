@@ -4825,7 +4825,7 @@
 				checkKeyEvents: function(key)
 				{
 					var k = this.keyCode;
-					var keys = [k.BACKSPACE, k.DELETE, k.ENTER, k.SPACE, k.ESC, k.TAB, k.CTRL, k.META, k.ALT, k.SHIFT];
+					var keys = [k.BACKSPACE, k.DELETE, k.ENTER, k.SPACE, k.ESC, k.TAB, k.CTRL, k.META, k.ALT, k.SHIFT, 229];
 
 					return ($.inArray(key, keys) == -1) ? true : false;
 
