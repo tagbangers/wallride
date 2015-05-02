@@ -150,6 +150,9 @@ public class PageTree implements Serializable {
 
 	public List<Page> getSiblingPagesByCode(String code, boolean includeSelf) {
 		Page page = getPageByCode(code);
+		if (page == null) {
+			return null;
+		}
 		List<Page> siblings = new ArrayList<>();
 		if (page.getParent() == null) {
 			return siblings;
