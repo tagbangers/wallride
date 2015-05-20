@@ -32,6 +32,7 @@ public class PageCreateRequest implements Serializable {
 	private Long authorId;
 	private LocalDateTime date;
 	private Long parentId;
+	private String tags;
 	private Set<Long> relatedPostIds = new HashSet<>();
 	private String seoTitle;
 	private String seoDescription;
@@ -67,6 +68,10 @@ public class PageCreateRequest implements Serializable {
 		return parentId;
 	}
 
+	public String getTags() {
+		return tags;
+	}
+
 	public Set<Long> getRelatedPostIds() {
 		return relatedPostIds;
 	}
@@ -100,6 +105,7 @@ public class PageCreateRequest implements Serializable {
 		private Long authorId;
 		private LocalDateTime date;
 		private Long parentId;
+		private String tags;
 		private Set<Long> relatedPostIds = new HashSet<>();
 		private String seoTitle;
 		private String seoDescription;
@@ -144,6 +150,11 @@ public class PageCreateRequest implements Serializable {
 			return this;
 		}
 
+		public Builder tags(String tags) {
+			this.tags = tags;
+			return this;
+		}
+
 		public Builder relatedPostIds(Set<Long> relatedPostIds) {
 			this.relatedPostIds = relatedPostIds;
 			return this;
@@ -178,6 +189,7 @@ public class PageCreateRequest implements Serializable {
 			request.authorId = authorId;
 			request.date = date;
 			request.parentId = parentId;
+			request.tags = tags;
 			request.relatedPostIds = relatedPostIds;
 			request.seoTitle = seoTitle;
 			request.seoDescription = seoDescription;

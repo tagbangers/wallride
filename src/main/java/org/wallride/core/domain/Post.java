@@ -25,10 +25,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 @Entity
 @Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
@@ -92,6 +89,15 @@ public class Post extends DomainObject<Long> {
 
 	@Column(name = "drafted_code", length = 200)
 	private String draftedCode;
+
+	@ManyToMany
+	@JoinTable(
+			name="post_tag",
+			joinColumns={@JoinColumn(name="post_id")},
+			inverseJoinColumns=@JoinColumn(name="tag_id", referencedColumnName="id"))
+	@SortNatural
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	private SortedSet<Tag> tags = new TreeSet<>();
 
 	@OneToMany(mappedBy = "drafted", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
@@ -210,6 +216,14 @@ public class Post extends DomainObject<Long> {
 
 	public void setViews(long views) {
 		this.views = views;
+	}
+
+	public SortedSet<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(SortedSet<Tag> tags) {
+		this.tags = tags;
 	}
 
 	public Post getDrafted() {

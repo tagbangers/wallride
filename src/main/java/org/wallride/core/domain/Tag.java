@@ -50,11 +50,11 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 
 	@ManyToMany
 	@JoinTable(
-			name = "article_tag",
+			name = "post_tag",
 			joinColumns = {@JoinColumn(name = "tag_id")},
-			inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"))
+			inverseJoinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"))
 	@SortNatural
-	private SortedSet<Article> articles = new TreeSet<>();
+	private SortedSet<Post> posts = new TreeSet<>();
 
 //	@Formula("(" +
 //			"select count(distinct article.id) from article article " +
@@ -89,12 +89,12 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 		this.language = language;
 	}
 
-	public SortedSet<Article> getArticles() {
-		return articles;
+	public SortedSet<Post> getPosts() {
+		return posts;
 	}
 
-	public void setArticles(SortedSet<Article> articles) {
-		this.articles = articles;
+	public void setPosts(SortedSet<Post> posts) {
+		this.posts = posts;
 	}
 
 //	public int getArticleCount() {

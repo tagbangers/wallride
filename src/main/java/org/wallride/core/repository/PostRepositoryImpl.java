@@ -37,7 +37,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PostSearchRequest;
 
@@ -55,7 +54,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
-				.forEntity(Article.class)
+				.forEntity(Post.class)
 				.get();
 
 		@SuppressWarnings("rawtypes")
@@ -68,7 +67,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
 					"title", "body",
-					"categories.name", "tags.name",
+					"tags.name",
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
@@ -100,6 +99,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			junction.must(qb.range().onField("date").below(request.getDateTo()).createQuery());
 		}
 
+		if (!CollectionUtils.isEmpty(request.getTagNames())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (String tagName : request.getTagNames()) {
+				subJunction.should(qb.phrase().onField("tags.name").sentence(tagName).createQuery());
+			}
+			junction.must(subJunction.createQuery());
+		}
+
 		if (!CollectionUtils.isEmpty(request.getPostIds())) {
 			BooleanJunction<BooleanJunction> bool = qb.bool();
 			for (long postId : request.getPostIds()) {
@@ -113,6 +120,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(Post.class)
 				.setFetchMode("cover", FetchMode.JOIN)
+				.setFetchMode("tags", FetchMode.JOIN)
 				.setFetchMode("author", FetchMode.JOIN);
 
 		Sort sort = new Sort(

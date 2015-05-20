@@ -27,6 +27,7 @@ public class PostSearchRequest {
 	private Collection<Long> postIds = new ArrayList<>();
 	private Post.Status status = Post.Status.PUBLISHED;
 	private String keyword;
+	private Collection<String> tagNames = new ArrayList<>();
 	private LocalDateTime dateFrom;
 	private LocalDateTime dateTo;
 	private String language;
@@ -76,6 +77,24 @@ public class PostSearchRequest {
 
 	public PostSearchRequest withKeyword(String keyword) {
 		this.keyword = keyword;
+		return this;
+	}
+
+	public Collection<String> getTagNames() {
+		return tagNames;
+	}
+
+	public void setTagNames(Collection<String> tagNames) {
+		this.tagNames = tagNames;
+	}
+
+	public PostSearchRequest withTagNames(String... tagNames) {
+		if (getTagNames() == null) {
+			setTagNames(new ArrayList<String>(tagNames.length));
+		}
+		for (String value : tagNames) {
+			getTagNames().add(value);
+		}
 		return this;
 	}
 
