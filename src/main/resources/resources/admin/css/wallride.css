@@ -267,6 +267,12 @@ pre {
 	background-color: #d9534f;
 	outline: 0;
 }
+@media (max-width: 767px) {
+	#wr-blog-nav .navbar-nav .open .dropdown-menu {
+		background-color: #f7f7f7;
+	}
+}
+
 /***** pagination *****/
 .pagination>.active>a,
 .pagination>.active>span,
