@@ -41,7 +41,7 @@
 		<header th:fragment="header" id="header" class="navbar">
 			<div id="wr-global-nav">
 				<div class="navbar-header">
-					<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+					<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#wr-blog-nav">
 						<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 					</button>
 					<p class="navbar-brand"><img th:src="@{/_admin/resources/img/wr-logo.png}"/></p>
@@ -70,8 +70,8 @@
 					</ul>
 				</div>
 			</div>
-			<div id="wr-blog-nav">
-				<div class="collapse navbar-collapse">
+			<div id="wr-blog-nav" class="collapse">
+				<div class="navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
 						<li><a th:href="@{__${ADMIN_PATH}__/}" href="articles.html"><span class="glyphicon glyphicon-home"></span></a></li>
 						<li><a th:href="@{__${ADMIN_PATH}__/articles/index?search}" href="articles.html"><span class="glyphicon glyphicon-file"></span> <span th:text="#{Articles}">Articles</span></a></li>

@@ -112,11 +112,14 @@ pre {
 	color: #819FAA;
 }
 #header .navbar-toggle {
-	background-color: #BBBBBB;
+	background-color: #fff;
 	border: transparent;
 }
 #header .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
-	background-color: #8A8888;
+	background-color: #fff;
+}
+#header .navbar-toggle .icon-bar {
+	background: #8a8888;
 }
 @media(min-width:768px) {
 	#header .navbar-collapse .navbar-nav.navbar-left:first-child {
@@ -164,11 +167,17 @@ pre {
 	background-color: transparent;
 }
 @media (max-width: 768px) {
-	#wr-blog-nav {
-		display: none;
-	}
+	/*#wr-blog-nav {*/
+		/*display: none;*/
+	/*}*/
 	#wr-page-content {
 		margin-left: 0;
+	}
+}
+@media (min-width: 767px) {
+	header .collapse {
+		display: block;
+		visibility: visible;
 	}
 }
 
@@ -258,6 +267,12 @@ pre {
 	background-color: #d9534f;
 	outline: 0;
 }
+@media (max-width: 767px) {
+	#wr-blog-nav .navbar-nav .open .dropdown-menu {
+		background-color: #f7f7f7;
+	}
+}
+
 /***** pagination *****/
 .pagination>.active>a,
 .pagination>.active>span,
