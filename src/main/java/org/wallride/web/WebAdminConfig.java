@@ -39,6 +39,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.mvc.WebContentInterceptor;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -141,6 +142,13 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		WebContentInterceptor webContentInterceptor = new WebContentInterceptor();
+		webContentInterceptor.setCacheSeconds(0);
+		webContentInterceptor.setUseExpiresHeader(true);
+		webContentInterceptor.setUseCacheControlHeader(true);
+		webContentInterceptor.setUseCacheControlNoStore(true);
+		registry.addInterceptor(webContentInterceptor);
+
 		registry.addInterceptor(defaultModelAttributeInterceptor());
 		registry.addInterceptor(setupRedirectInterceptor());
 	}
