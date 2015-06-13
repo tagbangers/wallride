@@ -16,7 +16,6 @@
 
 package org.wallride.core.domain;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.*;
 import org.joda.time.LocalDateTime;
@@ -259,8 +258,7 @@ public class Post extends DomainObject<Long> {
 	}
 
 	public Set<Post> getRelatedPosts() {
-		List<Post> relatedPostList = (List<Post>)CollectionUtils.union(getRelatedToPosts(), getRelatedByPosts());
-		return new HashSet<Post>(relatedPostList);
+		return getRelatedToPosts();
 	}
 
 	public Set<Post> getRelatedToPosts() {
