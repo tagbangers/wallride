@@ -1,4 +1,4 @@
-package org.wallride.web.controller.guest.post;
+package org.wallride.web.controller.guest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,27 +10,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.service.PostSearchRequest;
 import org.wallride.core.service.PostService;
+import org.wallride.core.service.TagSearchRequest;
 import org.wallride.core.service.TagService;
 import org.wallride.core.support.Pagination;
 import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
-public class PostIndexController {
+@RequestMapping("/tag")
+public class TagController {
 
 	@Inject
 	private TagService tagService;
 	@Inject
 	private PostService postService;
 
-	@RequestMapping("/tag/{name}")
-	public String tag(
+	@RequestMapping
+	public String index(
+			@PageableDefault Pageable pageable,
+			Model model) {
+		Page<Tag> tags = tagService.readTags(new TagSearchRequest(), pageable);
+		model.addAttribute("tags", tags);
+		model.addAttribute("pageable", pageable);
+		model.addAttribute("pagination", new Pagination<>(tags));
+		return "tag/index";
+	}
+
+	@RequestMapping("/{name}")
+	public String post(
 			@PathVariable String name,
-			@PageableDefault(10) Pageable pageable,
+			@PageableDefault Pageable pageable,
 			BlogLanguage blogLanguage,
 			Model model) {
 		Tag tag = tagService.readTagByName(name, blogLanguage.getLanguage());
@@ -38,21 +50,14 @@ public class PostIndexController {
 			throw new HttpNotFoundException();
 		}
 
-		List<String> tagNames = new ArrayList<>(1);
-		tagNames.add(name);
+		PostSearchRequest request = new PostSearchRequest(blogLanguage.getLanguage());
+		request.withTagNames(name);
 
-		PostSearchForm form = new PostSearchForm() {};
-		form.setTagNames(tagNames);
-
-		Page<Post> posts = postService.readPosts(form.toPostSearchRequest(blogLanguage.getLanguage()), pageable);
+		Page<Post> posts = postService.readPosts(request, pageable);
 		model.addAttribute("tag", tag);
 		model.addAttribute("posts", posts);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(posts));
-		return "post/index";
+		return "tag/post";
 	}
-
-
-
-
 }

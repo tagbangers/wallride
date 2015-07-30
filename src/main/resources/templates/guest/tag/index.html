@@ -1,4 +1,20 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<!--
+  ~ Copyright 2014 Tagbangers, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
 	<head>
 		<meta charset="utf-8" />
@@ -32,25 +48,9 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-md-9">
-						<post th:each="post : ${posts}" class="wr-post-summary row">
-							<div class="col-sm-2">
-								<img th:if="${post.cover ne null}" th:src="@{${#medias.link(post.cover)}(w=120,h=120,m=1)}" class="wr-post-cover" />
-							</div>
-							<div class="col-sm-10">
-								<h1 class="wr-post-title"><a th:href="@{${#posts.path(post)}}" th:text="${post.title}?:'No Titled'" href="#"></a></h1>
-								<time th:text="${post.date.toString('yyyy/MM/dd HH:mm')}"></time>
-							</div>
-						</post>
-					</div>
-					<div class="col-md-3">
-<!--
-						<div class="list-group" th:if="${category eq null}">
-							<a th:each="node : ${CATEGORY_TREE.rootNodes}" th:href="@{/category/__${node.category.code}__}" th:text="${node.category.name}" class="list-group-item">Link</a>
-						</div>
-						<div class="list-group" th:if="${category ne null}">
-							<a th:each="category : ${category.children}" th:href="@{/category/__${category.code}__}" th:text="${category.name}" class="list-group-item">Link</a>
-						</div>
--->
+						<ul>
+							<li th:each="tag : ${tags}"><a th:href="@{/tag/{name}(name=${tag.name})}" th:text="${tag.name}">Tag</a></li>
+						</ul>
 					</div>
 				</div>
 			</div>
