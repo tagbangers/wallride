@@ -261,6 +261,59 @@
 									</div>
 								</fieldset>
 								<fieldset>
+									<legend th:text="#{Tags}">Tags</legend>
+									<div class="form-group row" th:classappend="${#fields.hasErrors('tags')}? has-error">
+										<div class="col-sm-12">
+											<input id="tags-field" type="text" th:field="*{tags}" style="width: 100%" placeholder=""/>
+										</div>
+										<span class="help-block" th:each="err : ${#fields.errors('tags')}"  th:text="${err}" />
+									</div>
+								</fieldset>
+								<script th:inline="javascript">
+									/*<![CDATA[*/
+									$(function() {
+										$('#tags-field').select2({
+											minimumInputLength: 1,
+											multiple: true,
+											createSearchChoice:function(term, data) {
+												if ($(data).filter(function() {
+															return this.text.localeCompare(term)===0;
+														}).length===0) {
+													return {id: term, text:term};
+												}
+											},
+											ajax: {
+												url:  /*[[@{__${ADMIN_PATH}__/tags/select}]]*/ '#',
+												dataType: 'json',
+												data: function (term, page) {
+													return {
+														keyword: term
+													};
+												},
+												results: function (data, page) {
+													var results = [];
+													$.each(data, function() {
+														results.push({id: this.text, text: this.text});
+													});
+													return {results: results};
+												}
+											},
+											initSelection: function(element, callback) {
+												var data = [];
+												$(element.val().split(',')).each(function() {
+													var id = this;
+													if (id !== "") {
+														data.push({id: id, text: id});
+													}
+												});
+												element.val('');
+												callback(data);
+											}
+										});
+									});
+									/*]]>*/
+								</script>
+								<fieldset>
 									<legend th:text="#{RelatedPosts}">Related Posts</legend>
 									<div class="form-group row" th:classappend="${#fields.hasErrors('relatedPostIds')}? has-error">
 										<div class="col-sm-12">

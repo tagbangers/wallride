@@ -16,16 +16,20 @@
 
 package org.wallride.web.controller.admin.page;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
+import org.wallride.core.domain.Tag;
 import org.wallride.core.service.PageUpdateRequest;
 import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("serial")
@@ -45,7 +49,7 @@ public class PageEditForm extends DomainObjectEditForm {
 
 	@NotNull(groups=GroupPublish.class)
 	private String body;
-	
+
 	private Long authorId;
 	
 //	@NotNull
@@ -53,6 +57,7 @@ public class PageEditForm extends DomainObjectEditForm {
 	private LocalDateTime date;
 
 	private Long parentId;
+	private String tags;
 	private Set<Long> relatedPostIds = new HashSet<>();
 
 	private String seoTitle;
@@ -128,6 +133,14 @@ public class PageEditForm extends DomainObjectEditForm {
 		this.parentId = parentId;
 	}
 
+	public String getTags() {
+		return tags;
+	}
+
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+
 	public Set<Long> getRelatedPostIds() {
 		return relatedPostIds;
 	}
@@ -187,6 +200,7 @@ public class PageEditForm extends DomainObjectEditForm {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.tags(tags)
 				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
@@ -206,6 +220,12 @@ public class PageEditForm extends DomainObjectEditForm {
 
 		form.setCoverId(page.getCover() != null ? page.getCover().getId() : null);
 		form.setParentId(page.getParent() != null ? page.getParent().getId() : null);
+
+		List<String> tagNames = new ArrayList<>();
+		for (Tag tag : page.getTags()) {
+			tagNames.add(tag.getName());
+		}
+		form.setTags(StringUtils.join(tagNames, ","));
 
 		for (Post post : page.getRelatedToPosts()) {
 			form.getRelatedPostIds().add(post.getId());

@@ -47,6 +47,7 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 			"left join fetch page.author author " +
 			"left join fetch page.parent parent " +
 			"left join fetch page.children children " +
+			"left join fetch page.tags tag " +
 			"left join fetch page.relatedToPosts relatedToPosts " +
 			"left join fetch page.relatedByPosts relatedByPosts ";
 

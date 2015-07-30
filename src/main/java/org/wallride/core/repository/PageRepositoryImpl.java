@@ -34,6 +34,7 @@ import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Page;
 import org.wallride.core.service.PageSearchRequest;
@@ -64,7 +65,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
-					"title", "body",
+					"title", "body", "tags.name",
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
@@ -88,6 +89,21 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 		if (request.getStatus() != null) {
 			junction.must(qb.keyword().onField("status").matching(request.getStatus()).createQuery());
+		}
+
+		if (!CollectionUtils.isEmpty(request.getTagIds())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (long tagId : request.getTagIds()) {
+				subJunction.should(qb.keyword().onField("tags.id").matching(tagId).createQuery());
+			}
+			junction.must(subJunction.createQuery());
+		}
+		if (!CollectionUtils.isEmpty(request.getTagNames())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (String tagName : request.getTagNames()) {
+				subJunction.should(qb.phrase().onField("tags.name").sentence(tagName).createQuery());
+			}
+			junction.must(subJunction.createQuery());
 		}
 
 		if (request.getAuthorId() != null) {

@@ -28,6 +28,7 @@ import org.wallride.web.support.DomainObjectSearchForm;
 public class PageSearchForm extends DomainObjectSearchForm {
 	
 	private String keyword;
+	private Long tagId;
 	private Long authorId;
 	private Post.Status status;
 	private String language;
@@ -42,6 +43,14 @@ public class PageSearchForm extends DomainObjectSearchForm {
 	
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public Long getTagId() {
+		return tagId;
+	}
+
+	public void setTagId(Long tagId) {
+		this.tagId = tagId;
 	}
 
 	public Long getAuthorId() {
@@ -72,6 +81,9 @@ public class PageSearchForm extends DomainObjectSearchForm {
 		if (StringUtils.hasText(getKeyword())) {
 			return false;
 		}
+		if (getTagId() != null) {
+			return false;
+		}
 		if (getStatus() != null) {
 			return false;
 		}
@@ -86,17 +98,24 @@ public class PageSearchForm extends DomainObjectSearchForm {
 	}
 
 	public PageSearchRequest toPageSearchRequest() {
-		return new PageSearchRequest()
-				.withKeyword(getKeyword())
-				.withAuthorId(getAuthorId())
-				.withStatus(getStatus())
-				.withLanguage(getLanguage());
+		PageSearchRequest request = new PageSearchRequest();
+		request.withKeyword(getKeyword());
+		if (getTagId() != null) {
+			request.withTagIds(getTagId());
+		}
+		request.withAuthorId(getAuthorId());
+		request.withStatus(getStatus());
+		request.withLanguage(getLanguage());
+		return request;
 	}
 
 	public MultiValueMap<String, String> toQueryParams() {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		if (StringUtils.hasText(keyword)) {
 			params.add("keyword", keyword);
+		}
+		if (tagId != null) {
+			params.add("tagId", Long.toString(tagId));
 		}
 		if (authorId != null) {
 			params.add("authorId", Long.toString(authorId));

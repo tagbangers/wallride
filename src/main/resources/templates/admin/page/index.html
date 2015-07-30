@@ -34,6 +34,7 @@
 									<option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
 									<option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
 								</select>
+								<input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}"/>
 								<input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}" />
 								<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
 								<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>

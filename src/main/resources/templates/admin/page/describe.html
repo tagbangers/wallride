@@ -90,6 +90,14 @@
 								</ul>
 								</dd>
 							</dl>
+							<dl class="wr-tags">
+								<dt th:text="#{Tags}">Tags</dt>
+								<dd>
+									<ul class="list-unstyled list-inline list-inline-tag">
+										<li th:each="tag : ${page.tags}"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}"></span></span></li>
+									</ul>
+								</dd>
+							</dl>
 							<dl>
 								<dt th:text="#{RelatedPosts}">Related Posts</dt>
 								<dd>

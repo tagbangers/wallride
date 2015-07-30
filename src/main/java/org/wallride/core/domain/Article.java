@@ -46,14 +46,6 @@ public class Article extends Post implements Comparable<Article> {
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Category> categories = new TreeSet<>();
 
-	@ManyToMany
-	@JoinTable(
-			name="article_tag",
-			joinColumns={@JoinColumn(name="article_id")},
-			inverseJoinColumns=@JoinColumn(name="tag_id", referencedColumnName="id"))
-	@SortNatural
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
-	private SortedSet<Tag> tags = new TreeSet<>();
 
 	public SortedSet<Category> getCategories() {
 		return categories;
@@ -61,14 +53,6 @@ public class Article extends Post implements Comparable<Article> {
 
 	public void setCategories(SortedSet<Category> categories) {
 		this.categories = categories;
-	}
-
-	public SortedSet<Tag> getTags() {
-		return tags;
-	}
-
-	public void setTags(SortedSet<Tag> tags) {
-		this.tags = tags;
 	}
 
 	public int compareTo(Article article) {

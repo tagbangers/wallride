@@ -9,10 +9,10 @@ create table article_category (
 	primary key (article_id, category_id)
 ) ENGINE=InnoDB;
 
-create table article_tag (
-	article_id bigint not null,
-	tag_id bigint not null,
-	primary key (article_id, tag_id)
+create table post_tag (
+		tag_id bigint not null,
+		post_id bigint not null,
+		primary key (post_id, tag_id)
 ) ENGINE=InnoDB;
 
 create table blog (
@@ -257,13 +257,13 @@ alter table article_category
 	foreign key (category_id)
 	references category (id);
 
-alter table article_tag
-	add constraint FK_5ao70rbptu4cd93wbu7o38y1y
-	foreign key (article_id)
-	references article (id);
+alter table post_tag
+	add constraint FK_dt9gvgp3ws00wjmivks4hvavm
+	foreign key (post_id)
+	references post (id);
 
-alter table article_tag
-	add constraint FK_pkndl0ud6fkak73gdkls858a5
+alter table post_tag
+	add constraint FK_6xnftsvf7gg9wbir1lth8tce2
 	foreign key (tag_id)
 	references tag (id);
 

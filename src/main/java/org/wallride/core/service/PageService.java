@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -39,6 +40,7 @@ import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.PageRepository;
+import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.WallRideProperties;
 
@@ -63,6 +65,8 @@ public class PageService {
 
 	@Resource
 	private PageRepository pageRepository;
+	@Resource
+	private TagRepository tagRepository;
 	@Resource
 	private MediaRepository mediaRepository;
 
@@ -140,6 +144,25 @@ public class PageService {
 		page.setStatus(status);
 		page.setLanguage(request.getLanguage());
 
+		page.getTags().clear();
+		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
+		if (!CollectionUtils.isEmpty(tagNames)) {
+			for (String tagName : tagNames) {
+				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				if (tag == null) {
+					tag = new Tag();
+					tag.setName(tagName);
+					tag.setLanguage(request.getLanguage());
+					page.setCreatedAt(now);
+					page.setCreatedBy(authorizedUser.toString());
+					page.setUpdatedAt(now);
+					page.setUpdatedBy(authorizedUser.toString());
+					tag = tagRepository.saveAndFlush(tag);
+				}
+				page.getTags().add(tag);
+			}
+		}
+
 		page.getRelatedPosts().clear();
 		Set<Post> relatedPosts = new HashSet<>();
 		for (long relatedId : request.getRelatedPostIds()) {
@@ -191,6 +214,7 @@ public class PageService {
 						.authorId(request.getAuthorId())
 						.date(request.getDate())
 						.parentId(request.getParentId())
+						.tags(request.getTags())
 						.language(request.getLanguage())
 						.build();
 				draft = createPage(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -207,6 +231,7 @@ public class PageService {
 						.authorId(request.getAuthorId())
 						.date(request.getDate())
 						.parentId(request.getParentId())
+						.tags(request.getTags())
 						.language(request.getLanguage())
 						.build();
 				return savePage(updateRequest, authorizedUser);
@@ -311,6 +336,25 @@ public class PageService {
 		}
 		page.setDate(date);
 		page.setLanguage(request.getLanguage());
+
+		page.getTags().clear();
+		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
+		if (!CollectionUtils.isEmpty(tagNames)) {
+			for (String tagName : tagNames) {
+				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				if (tag == null) {
+					tag = new Tag();
+					tag.setName(tagName);
+					tag.setLanguage(request.getLanguage());
+					page.setCreatedAt(now);
+					page.setCreatedBy(authorizedUser.toString());
+					page.setUpdatedAt(now);
+					page.setUpdatedBy(authorizedUser.toString());
+					tag = tagRepository.saveAndFlush(tag);
+				}
+				page.getTags().add(tag);
+			}
+		}
 
 		page.getRelatedPosts().clear();
 		Set<Post> relatedPosts = new HashSet<>();
