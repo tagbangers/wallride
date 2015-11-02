@@ -67,7 +67,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 			String[] fields = new String[] {
 					"title", "body", "tags.name",
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

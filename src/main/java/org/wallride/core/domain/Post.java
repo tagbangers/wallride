@@ -18,7 +18,7 @@ package org.wallride.core.domain;
 
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.*;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.*;
@@ -65,9 +65,7 @@ public class Post extends DomainObject<Long> {
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Seo seo = new Seo();
 
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
 	@Field
-	@FieldBridge(impl=LocalDateTimeBridge.class)
 	private LocalDateTime date;
 
 	@ManyToOne

@@ -68,7 +68,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 			String[] fields = new String[] {
 					"authorName", "content"
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

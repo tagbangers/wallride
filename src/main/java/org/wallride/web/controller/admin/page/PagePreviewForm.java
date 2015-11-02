@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.page;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import java.io.Serializable;
 

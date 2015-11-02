@@ -18,7 +18,7 @@ package org.wallride.web.controller.guest.article;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleSearchRequest;

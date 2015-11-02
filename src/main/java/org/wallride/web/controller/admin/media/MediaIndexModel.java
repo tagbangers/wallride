@@ -20,6 +20,7 @@ import org.wallride.core.domain.Media;
 import org.wallride.core.support.WallRideProperties;
 
 import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
 
 public class MediaIndexModel implements Serializable {
 
@@ -35,7 +36,7 @@ public class MediaIndexModel implements Serializable {
 		this.thumb = wallRideProperties.getMediaUrlPrefix() + media.getId() + "?w=100&h=100&m=1";
 		this.image = wallRideProperties.getMediaUrlPrefix() + media.getId();
 		this.title = media.getOriginalName();
-		this.folder = media.getCreatedAt().toString("yyyy/MM");
+		this.folder = media.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM"));
 	}
 
 	public String getThumb() {

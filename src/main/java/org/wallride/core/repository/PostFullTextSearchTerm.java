@@ -16,7 +16,7 @@
 
 package org.wallride.core.repository;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.wallride.core.domain.Post;
 
 import java.io.Serializable;

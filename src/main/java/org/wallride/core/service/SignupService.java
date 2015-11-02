@@ -16,7 +16,7 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class SignupService {
 		if (invitation.isAccepted()) {
 			return false;
 		}
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 		if (now.isAfter(invitation.getExpiredAt())) {
 			return false;
 		}
@@ -85,7 +85,7 @@ public class SignupService {
 			throw new DuplicateEmailException(request.getEmail());
 		}
 
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 		if (invitation != null) {
 			invitation.setAccepted(true);
 			invitation.setAcceptedAt(now);

@@ -16,8 +16,8 @@
 		 internal_thread_pool.min_threads="${jgroups.internal_thread_pool.min_threads:5}"
 		 internal_thread_pool.max_threads="${jgroups.internal_thread_pool.max_threads:20}"
 		 internal_thread_pool.keep_alive_time="60000"
-		 internal_thread_pool.queue_enabled="false"
-		 internal_thread_pool.rejection_policy="Abort"
+		 internal_thread_pool.queue_enabled="true"
+		 internal_thread_pool.queue_max_size="500"
 
 		 oob_thread_pool.min_threads="${jgroups.oob_thread_pool.min_threads:20}"
 		 oob_thread_pool.max_threads="${jgroups.oob_thread_pool.max_threads:200}"
@@ -34,7 +34,7 @@
 			/>
 	-->
 
-	<org.wallride.core.support.S3_CLIENT_PING location="${jgroups.s3.bucket}" />
+	<jp.co.tagbangers.jgroups.S3_CLIENT_PING location="${jgroups.s3.bucket}" />
 
 	<MERGE3 min_interval="10000"
 			max_interval="30000"
@@ -64,7 +64,7 @@
 				   desired_avg_gossip="5000"
 				   max_bytes="1M"
 			/>
-	<pbcast.GMS print_local_addr="true"
+	<pbcast.GMS print_local_addr="false"
 				join_timeout="15000"
 			/>
 	<MFC max_credits="2m"

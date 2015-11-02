@@ -24,49 +24,47 @@ import org.apache.lucene.analysis.ja.JapaneseBaseFormFilterFactory;
 import org.apache.lucene.analysis.ja.JapaneseKatakanaStemFilterFactory;
 import org.apache.lucene.analysis.ja.JapaneseTokenizerFactory;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
-import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.*;
-import org.joda.time.LocalDateTime;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @MappedSuperclass
 @AnalyzerDef(name = "synonyms",
-tokenizer = 
-	@TokenizerDef(factory = JapaneseTokenizerFactory.class, params=
-		@Parameter(name="userDictionary", value="userdict.txt")),
-filters = {
-	@TokenFilterDef(factory=SynonymFilterFactory.class, params = {
-		@Parameter(name="synonyms", value="synonyms.txt"),
-		@Parameter(name="userDictionary", value="userdict.txt"),
-		@Parameter(name="ignoreCase", value="true"),
-		@Parameter(name="expand", value="true"),
-		@Parameter(name="tokenizerFactory", value="org.apache.lucene.analysis.ja.JapaneseTokenizerFactory")}),
-	@TokenFilterDef(factory=JapaneseBaseFormFilterFactory.class),
-	@TokenFilterDef(factory=CJKWidthFilterFactory.class),
-	@TokenFilterDef(factory=JapaneseKatakanaStemFilterFactory.class, params={
-		@Parameter(name="minimumLength", value="4")}),
-	@TokenFilterDef(factory=LowerCaseFilterFactory.class)
-})
+		tokenizer =
+		@TokenizerDef(factory = JapaneseTokenizerFactory.class, params =
+		@Parameter(name = "userDictionary", value = "userdict.txt")),
+		filters = {
+				@TokenFilterDef(factory = SynonymFilterFactory.class, params = {
+						@Parameter(name = "synonyms", value = "synonyms.txt"),
+						@Parameter(name = "userDictionary", value = "userdict.txt"),
+						@Parameter(name = "ignoreCase", value = "true"),
+						@Parameter(name = "expand", value = "true"),
+						@Parameter(name = "tokenizerFactory", value = "org.apache.lucene.analysis.ja.JapaneseTokenizerFactory")}),
+				@TokenFilterDef(factory = JapaneseBaseFormFilterFactory.class),
+				@TokenFilterDef(factory = CJKWidthFilterFactory.class),
+				@TokenFilterDef(factory = JapaneseKatakanaStemFilterFactory.class, params = {
+						@Parameter(name = "minimumLength", value = "4")}),
+				@TokenFilterDef(factory = LowerCaseFilterFactory.class)
+		})
 @SuppressWarnings("serial")
 public abstract class DomainObject<ID extends Serializable> implements Serializable {
 
-	@Column(name="created_at", nullable=false)
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
-	@FieldBridge(impl=LocalDateTimeBridge.class)
-	private LocalDateTime createdAt = new LocalDateTime();
-	
-	@Column(name="created_by", length=100)
+	@Column(name = "created_at", nullable = false)
+	private LocalDateTime createdAt = LocalDateTime.now();
+
+	@Column(name = "created_by", length = 100)
 	private String createdBy;
-	
-	@Column(name="updated_at", nullable=false)
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
-	@FieldBridge(impl=LocalDateTimeBridge.class)
-	private LocalDateTime updatedAt = new LocalDateTime();
-	
-	@Column(name="updated_by", length=100)
+
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt = LocalDateTime.now();
+
+	@Column(name = "updated_by", length = 100)
 	private String updatedBy;
 
 	public abstract ID getId();

@@ -70,7 +70,7 @@ public class MailConfig {
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.mail"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());
-		resolver.setCharacterEncoding(this.properties.getEncoding());
+		resolver.setCharacterEncoding(this.properties.getEncoding().name());
 		resolver.setCacheable(this.properties.isCache());
 		resolver.setOrder(1);
 		return resolver;

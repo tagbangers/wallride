@@ -19,11 +19,13 @@ package org.wallride;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import org.apache.lucene.analysis.util.ClasspathResourceLoader;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
+import org.springframework.boot.context.config.ConfigFileEnvironmentPostProcessor;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
@@ -36,11 +38,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 import org.springframework.web.context.support.StandardServletEnvironment;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
@@ -54,14 +57,18 @@ import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 import java.util.EnumSet;
 
 @Configuration
-@EnableConfigurationProperties(WallRideProperties.class)
 @EnableAutoConfiguration(exclude = {
 		DispatcherServletAutoConfiguration.class,
 		WebMvcAutoConfiguration.class,
+		SpringDataWebAutoConfiguration.class,
 })
+@EnableConfigurationProperties(WallRideProperties.class)
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {
 
@@ -97,7 +104,14 @@ public class Application extends SpringBootServletInitializer {
 		System.setProperty(WallRideProperties.CONFIG_LOCATION_PROPERTY, config);
 		System.setProperty(WallRideProperties.MEDIA_LOCATION_PROPERTY, media);
 
-		System.setProperty(ConfigFileApplicationListener.CONFIG_LOCATION_PROPERTY, config);
+		System.setProperty(ConfigFileEnvironmentPostProcessor.CONFIG_LOCATION_PROPERTY, config);
+
+		URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+			@Override
+			public URLStreamHandler createURLStreamHandler(String protocol) {
+				return null;
+			}
+		});
 	}
 
 	public static ResourceLoader createResourceLoader() {
@@ -111,7 +125,7 @@ public class Application extends SpringBootServletInitializer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader);
+		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader, new PathMatchingResourcePatternResolver());
 	}
 
 	@Override

@@ -16,7 +16,7 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -310,7 +310,7 @@ public class UserService {
 	public List<UserInvitation> inviteUsers(UserInvitationCreateRequest form, BindingResult result, AuthorizedUser authorizedUser) throws MessagingException {
 		String[] recipients = StringUtils.commaDelimitedListToStringArray(form.getInvitees());
 
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 
 		List<UserInvitation> invitations = new ArrayList<>();
 		for (String recipient : recipients) {
@@ -360,7 +360,7 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public UserInvitation inviteAgain(UserInvitationResendRequest form, BindingResult result, AuthorizedUser authorizedUser) throws MessagingException {
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 
 		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(form.getToken());
 		invitation.setExpiredAt(now.plusHours(72));

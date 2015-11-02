@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.guest.comment;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.CommentCreateRequest;

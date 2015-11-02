@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.article;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.service.ArticleBulkPublishRequest;
 

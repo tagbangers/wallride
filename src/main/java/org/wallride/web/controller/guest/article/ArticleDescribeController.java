@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.guest.article;
 
-import org.joda.time.LocalDate;
+import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -57,10 +57,10 @@ public class ArticleDescribeController {
 			throw new HttpNotFoundException();
 		}
 
-		LocalDate date = new LocalDate(year, month, day);
+		LocalDate date = LocalDate.of(year, month, day);
 		if (!article.getDate().toLocalDate().equals(date)) {
 			redirectAttributes.addAttribute("year", article.getDate().getYear());
-			redirectAttributes.addAttribute("month", article.getDate().getMonthOfYear());
+			redirectAttributes.addAttribute("month", article.getDate().getMonth().getValue());
 			redirectAttributes.addAttribute("day", article.getDate().getDayOfMonth());
 			redirectAttributes.addAttribute("code", code);
 			return "redirect:/{year}/{month}/{day}/{code}";

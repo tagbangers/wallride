@@ -88,7 +88,7 @@ public class PostUtils {
 		Map<String, Object> params = new HashMap<>();
 		builder.path("/{year}/{month}/{day}/{code}");
 		params.put("year", String.format("%04d", article.getDate().getYear()));
-		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
+		params.put("month", String.format("%02d", article.getDate().getMonth().getValue()));
 		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
 		params.put("code", article.getCode());
 

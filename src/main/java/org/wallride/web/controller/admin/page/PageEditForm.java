@@ -17,7 +17,7 @@
 package org.wallride.web.controller.admin.page;
 
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Page;

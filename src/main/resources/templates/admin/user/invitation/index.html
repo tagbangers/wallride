@@ -63,7 +63,7 @@
 										<tr th:each="invitation : ${invitations}">
 											<td th:text="${invitation.email}" style="font-weight: bold">send@tagbangers.co.jp</td>
 											<td th:text="${invitation.createdBy}">Ogatakex</td>
-											<td th:text="${invitation.createdAt.toString('yyyy/MM/dd HH:mm')}"></td>
+											<td th:text="${#temporals.format(invitation.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
 											<td th:text="${invitation.accepted ? 'Accepted' : 'Waiting'}">Waiting</td>
 											<td>
 												<ul class="list-inline">

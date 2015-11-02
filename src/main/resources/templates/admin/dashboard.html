@@ -38,14 +38,14 @@
 									<h2 th:text="#{NewPosts}">New Posts</h2>
 									<dl th:each="article : ${recentPublishedArticles}">
 										<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}">Title</a></dt>
-										<dd th:text="${article.date.toString('yyyy/MM/dd (E) HH:mm', #locale)}">yyyy/MM/dd</dd>
+										<dd th:text="${#temporals.format(article.date, 'yyyy/MM/dd (E) HH:mm', #locale)}">yyyy/MM/dd</dd>
 									</dl>
 								</div>
 								<div class="col-sm-6">
 									<h2 th:text="#{Drafts}">Drafts</h2>
 									<dl th:each="article : ${recentDraftArticles}">
 										<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}?:'(No Titled)'">Title</a></dt>
-										<dd th:text="${article.updatedAt.toString('yyyy/MM/dd (E) HH:mm', #locale) + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
+										<dd th:text="${#temporals.format(article.updatedAt, 'yyyy/MM/dd (E) HH:mm', #locale) + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
 									</dl>
 								</div>
 							</div>
@@ -54,7 +54,7 @@
 									<h2 th:text="#{PopularPosts}">Popular Posts</h2>
 									<dl th:each="popularPost : ${popularPosts}">
 										<dt><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${popularPost.post.id})}" th:text="${popularPost.post.title}">Title</a></dt>
-										<dd th:text="${popularPost.post.date.toString('yyyy/MM/dd (E) HH:mm', #locale)}">yyyy/MM/dd</dd>
+										<dd th:text="${#temporals.format(popularPost.post.date, 'yyyy/MM/dd (E) HH:mm', #locale)}">yyyy/MM/dd</dd>
 									</dl>
 								</div>
 							</div>

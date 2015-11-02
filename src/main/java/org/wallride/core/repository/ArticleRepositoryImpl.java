@@ -74,7 +74,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 					"title", "body",
 					"categories.name", "tags.name",
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

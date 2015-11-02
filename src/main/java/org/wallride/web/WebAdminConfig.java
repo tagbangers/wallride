@@ -41,7 +41,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
 import org.thymeleaf.dialect.IDialect;
-import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
@@ -183,7 +184,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.admin"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());
-		resolver.setCharacterEncoding(this.properties.getEncoding());
+		resolver.setCharacterEncoding(this.properties.getEncoding().name());
 		resolver.setCacheable(this.properties.isCache());
 		resolver.setOrder(2);
 		return resolver;
@@ -196,7 +197,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());
-		resolver.setCharacterEncoding(this.properties.getEncoding());
+		resolver.setCharacterEncoding(this.properties.getEncoding().name());
 		resolver.setCacheable(this.properties.isCache());
 		resolver.setOrder(2);
 		return resolver;
@@ -211,6 +212,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(new SpringSecurityDialect());
+		dialects.add(new Java8TimeDialect());
 		dialects.add(customThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
@@ -221,7 +223,7 @@ public class WebAdminConfig extends WebMvcConfigurerAdapter {
 		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
 		viewResolver.setTemplateEngine(templateEngine());
 		viewResolver.setViewNames(this.properties.getViewNames());
-		viewResolver.setCharacterEncoding(this.properties.getEncoding());
+		viewResolver.setCharacterEncoding(this.properties.getEncoding().name());
 		viewResolver.setContentType(this.properties.getContentType() + ";charset=" + this.properties.getEncoding());
 		viewResolver.setCache(false);
 		viewResolver.setOrder(1);

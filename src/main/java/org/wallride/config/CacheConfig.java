@@ -17,6 +17,7 @@
 package org.wallride.config;
 
 import com.amazonaws.internal.EC2MetadataClient;
+import jp.co.tagbangers.jgroups.S3_CLIENT_PING;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.cache.Index;
@@ -33,8 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.wallride.core.support.S3_CLIENT_PING;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -54,6 +55,7 @@ public class CacheConfig {
 	private static Logger logger = LoggerFactory.getLogger(CacheConfig.class);
 
 	@Bean
+	@Primary
 	public SpringEmbeddedCacheManagerFactoryBean cacheManagerFactoryBean() throws Exception {
 		// JGroups settings
 		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");

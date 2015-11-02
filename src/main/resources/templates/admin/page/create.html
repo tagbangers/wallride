@@ -241,7 +241,7 @@
 									<legend th:text="#{Date}">Date</legend>
 									<div class="form-group row" th:classappend="${#fields.hasErrors('date')}? has-error">
 										<div class="col-sm-12">
-											<input type="text" name="date" th:value="*{date ne null ? date.toString('yyyy/MM/dd HH:mm') : ''}" class="form-control" placeholder="YYYY/MM/DD HH:mm"/>
+											<input type="text" name="date" th:value="*{date ne null ? #temporals.format(date, 'yyyy/MM/dd HH:mm') : ''}" class="form-control" placeholder="YYYY/MM/DD HH:mm"/>
 										</div>
 										<script>
 											$(document).ready(function() {

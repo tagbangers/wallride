@@ -64,7 +64,7 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
 			String[] fields = new String[] {
 					"name"
 			};
-			MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LATEST, fields, analyzer);
+			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
 			Query query = null;
 			try {

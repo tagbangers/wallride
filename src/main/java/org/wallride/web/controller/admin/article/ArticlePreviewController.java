@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.article;
 
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -72,7 +72,7 @@ public class ArticlePreviewController {
 		article.setCover(form.getCoverId() != null ? mediaService.readMedia(form.getCoverId()) : null);
 		article.setTitle(form.getTitle());
 		article.setBody(form.getBody());
-		article.setDate(form.getDate() != null ? form.getDate() : new LocalDateTime());
+		article.setDate(form.getDate() != null ? form.getDate() : LocalDateTime.now());
 		article.setAuthor(authorizedUser);
 
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext, "org.springframework.web.servlet.FrameworkServlet.CONTEXT.guestServlet");
