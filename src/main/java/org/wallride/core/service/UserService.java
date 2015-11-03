@@ -16,7 +16,6 @@
 
 package org.wallride.core.service;
 
-import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,6 +60,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.ValidationException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service

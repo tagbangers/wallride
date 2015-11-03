@@ -19,7 +19,6 @@ package org.wallride;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import org.apache.lucene.analysis.util.ClasspathResourceLoader;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
@@ -43,7 +42,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
-import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 import org.springframework.web.context.support.StandardServletEnvironment;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
@@ -57,9 +55,6 @@ import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
-import java.net.URL;
-import java.net.URLStreamHandler;
-import java.net.URLStreamHandlerFactory;
 import java.util.EnumSet;
 
 @Configuration
@@ -105,13 +100,6 @@ public class Application extends SpringBootServletInitializer {
 		System.setProperty(WallRideProperties.MEDIA_LOCATION_PROPERTY, media);
 
 		System.setProperty(ConfigFileEnvironmentPostProcessor.CONFIG_LOCATION_PROPERTY, config);
-
-		URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
-			@Override
-			public URLStreamHandler createURLStreamHandler(String protocol) {
-				return null;
-			}
-		});
 	}
 
 	public static ResourceLoader createResourceLoader() {
@@ -226,36 +214,4 @@ public class Application extends SpringBootServletInitializer {
 	public RequestContextListener requestContextListener() {
 		return new RequestContextListener();
 	}
-
-//	public static class ExtendedAnnotationConfigEmbeddedWebApplicationContext extends AnnotationConfigEmbeddedWebApplicationContext {
-//
-//		@Override
-//		public Resource getResource(String location) {
-//			Assert.notNull(location, "Location must not be null");
-//			if (location.startsWith(AmazonS3ResourceLoader.S3_URL_PREFIX)) {
-//				String path = location.substring(AmazonS3ResourceLoader.S3_URL_PREFIX.length());
-//				int pos = path.indexOf('/');
-//				String bucketName = "";
-//				String key = "";
-//				if (pos != -1) {
-//					bucketName = path.substring(0, pos);
-//					key = path.substring(pos + 1);
-//				} else {
-//					bucketName = path;
-//				}
-//				return new AmazonS3Resource(getBean(AmazonS3Client.class), bucketName, key);
-//			} else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
-//				return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
-//			} else {
-//				try {
-//					// Try to parse the location as a URL...
-//					URL url = new URL(location);
-//					return new UrlResource(url);
-//				} catch (MalformedURLException ex) {
-//					// No URL -> resolve as resource path.
-//					return getResourceByPath(location);
-//				}
-//			}
-//		}
-//	}
 }

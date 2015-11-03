@@ -16,9 +16,9 @@
 
 package org.wallride.core.service;
 
-import java.time.LocalDateTime;
 import org.wallride.core.domain.Post;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 

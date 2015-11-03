@@ -16,12 +16,12 @@
 
 package org.wallride.web.controller.admin.article;
 
-import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.service.ArticleBulkPublishRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ArticleBulkPublishForm implements Serializable {

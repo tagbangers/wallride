@@ -17,10 +17,11 @@
 package org.wallride.web.controller.guest.comment;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.time.LocalDateTime;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.support.LocalDateTimeSerializer;
 import org.wallride.web.support.DomainObjectSavedModel;
+
+import java.time.LocalDateTime;
 
 public class CommentSavedModel extends DomainObjectSavedModel<Long> {
 

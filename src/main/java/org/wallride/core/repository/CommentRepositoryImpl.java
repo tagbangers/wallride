@@ -16,8 +16,6 @@
 
 package org.wallride.core.repository;
 
-import static org.springframework.data.domain.Sort.*;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -25,7 +23,6 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
@@ -43,8 +40,10 @@ import org.wallride.core.service.CommentSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction;
+import static org.springframework.data.domain.Sort.Order;
 
 public class CommentRepositoryImpl implements CommentRepositoryCustom {
 

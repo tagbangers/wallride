@@ -16,10 +16,10 @@
 
 package org.wallride.core.repository;
 
-import java.time.LocalDateTime;
 import org.wallride.core.domain.Post;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 

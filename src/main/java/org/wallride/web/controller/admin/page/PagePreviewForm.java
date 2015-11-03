@@ -16,9 +16,8 @@
 
 package org.wallride.web.controller.admin.page;
 
-import java.time.LocalDateTime;
-
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @SuppressWarnings("serial")
 public class PagePreviewForm implements Serializable {

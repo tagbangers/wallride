@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comment")
-@PrimaryKeyJoinColumn
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")

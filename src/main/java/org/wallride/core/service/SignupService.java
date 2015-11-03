@@ -16,7 +16,6 @@
 
 package org.wallride.core.service;
 
-import java.time.LocalDateTime;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,7 @@ import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.HttpForbiddenException;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(rollbackFor=Exception.class)

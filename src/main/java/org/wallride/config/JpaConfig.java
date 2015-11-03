@@ -19,9 +19,9 @@ package org.wallride.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.wallride.core.domain.DomainObject;
 
@@ -39,12 +39,10 @@ public class JpaConfig {
 	@Autowired
 	private JpaProperties properties;
 
-	@Autowired
-	private CacheManager cacheManager;
-
 	@Bean
+	@DependsOn("cacheManager")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
-		Map<String, Object> vendorProperties = new LinkedHashMap<String, Object>();
+		Map<String, Object> vendorProperties = new LinkedHashMap<>();
 		vendorProperties.putAll(this.properties.getHibernateProperties(this.dataSource));
 		return factoryBuilder.dataSource(this.dataSource)
 				.packages(DomainObject.class)

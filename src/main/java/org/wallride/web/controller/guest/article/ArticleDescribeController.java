@@ -16,7 +16,6 @@
 
 package org.wallride.web.controller.guest.article;
 
-import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -33,6 +32,7 @@ import org.wallride.core.service.CommentService;
 import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}/{code:.+}")

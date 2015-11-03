@@ -35,7 +35,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -78,11 +77,7 @@ import java.util.*;
 public class PostService {
 
 	@Inject
-	private BlogService blogService;
-	@Inject
 	private CacheManager cacheManager;
-	@Inject
-	private PlatformTransactionManager transactionManager;
 	@Inject
 	private ServletContext servletContext;
 

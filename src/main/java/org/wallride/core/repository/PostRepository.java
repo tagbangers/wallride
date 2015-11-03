@@ -16,7 +16,6 @@
 
 package org.wallride.core.repository;
 
-import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Post;
 
 import javax.persistence.LockModeType;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
