@@ -45,6 +45,7 @@
 		<thymeleaf-extras-java8time.version>2.1.0.RELEASE</thymeleaf-extras-java8time.version>
 		-->
 		<amazonaws-version>1.10.30</amazonaws-version>
+		<start-class>org.wallride.Application</start-class>
 	</properties>
 
 	<repositories>
@@ -62,18 +63,15 @@
 		</repository>
 	</repositories>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>1.2.7.RELEASE</version>
-				<configuration>
-					<mainClass>org.wallride.Application</mainClass>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-snapshots</id>
+			<url>http://repo.spring.io/libs-snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<reporting>
 		<plugins>
