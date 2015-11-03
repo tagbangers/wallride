@@ -16,7 +16,6 @@
 
 package org.wallride.web.controller.admin.page;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,6 +44,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/{language}/pages/preview")
@@ -72,7 +72,7 @@ public class PagePreviewController {
 		page.setCover(form.getCoverId() != null ? mediaService.readMedia(form.getCoverId()) : null);
 		page.setTitle(form.getTitle());
 		page.setBody(form.getBody());
-		page.setDate(form.getDate() != null ? form.getDate() : new LocalDateTime());
+		page.setDate(form.getDate() != null ? form.getDate() : LocalDateTime.now());
 		page.setAuthor(authorizedUser);
 
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext, "org.springframework.web.servlet.FrameworkServlet.CONTEXT.guestServlet");

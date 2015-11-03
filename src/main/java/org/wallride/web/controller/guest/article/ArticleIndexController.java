@@ -16,7 +16,6 @@
 
 package org.wallride.web.controller.guest.article;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -36,6 +35,7 @@ import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Controller
 public class ArticleIndexController {
@@ -77,8 +77,8 @@ public class ArticleIndexController {
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
-		form.setDateFrom(new LocalDateTime(year, 1, 1, 0, 0, 0));
-		form.setDateTo(new LocalDateTime(year, 12, 31, 0, 0, 0));
+		form.setDateFrom(LocalDateTime.of(year, 1, 1, 0, 0, 0));
+		form.setDateTo(LocalDateTime.of(year, 12, 31, 0, 0, 0));
 
 		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
@@ -96,9 +96,9 @@ public class ArticleIndexController {
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
-		LocalDateTime date = new LocalDateTime(year, month, 1, 0, 0, 0);
-		form.setDateFrom(new LocalDateTime(year, month, 1, 0, 0, 0));
-		form.setDateTo(new LocalDateTime(year, month, date.dayOfMonth().getMaximumValue(), 23, 59, 59));
+		LocalDateTime date = LocalDateTime.of(year, month, 1, 0, 0, 0);
+		form.setDateFrom(LocalDateTime.of(year, month, 1, 0, 0, 0));
+		form.setDateTo(LocalDateTime.of(year, month, date.getMonth().length(true), 23, 59, 59));
 
 		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
@@ -117,8 +117,8 @@ public class ArticleIndexController {
 			Model model) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
-		form.setDateFrom(new LocalDateTime(year, month, day, 0, 0, 0));
-		form.setDateTo(new LocalDateTime(year, month, day, 23, 59, 59));
+		form.setDateFrom(LocalDateTime.of(year, month, day, 0, 0, 0));
+		form.setDateTo(LocalDateTime.of(year, month, day, 23, 59, 59));
 
 		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);

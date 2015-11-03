@@ -16,7 +16,6 @@
 
 package org.wallride.web.controller.guest.comment;
 
-import org.joda.time.LocalDateTime;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.CommentCreateRequest;
@@ -24,6 +23,7 @@ import org.wallride.core.service.CommentUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class CommentForm implements Serializable {
 

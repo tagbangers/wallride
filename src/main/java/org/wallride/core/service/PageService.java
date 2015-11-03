@@ -16,7 +16,6 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -48,6 +47,8 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -265,7 +266,7 @@ public class PageService {
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePage(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		Page page = pageRepository.findByIdForUpdate(request.getId(), request.getLanguage());
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
 		if (!StringUtils.hasText(code)) {
@@ -328,7 +329,7 @@ public class PageService {
 		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(page.getStatus())) {
 			if (date == null) {
-				date = now.withTime(0, 0, 0, 0);
+				date = now.truncatedTo(ChronoUnit.HOURS);
 			}
 			else if (date.isAfter(now)) {
 				page.setStatus(Post.Status.SCHEDULED);

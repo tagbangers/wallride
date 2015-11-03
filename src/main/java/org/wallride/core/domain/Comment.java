@@ -19,15 +19,16 @@ package org.wallride.core.domain;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.*;
-import org.joda.time.LocalDateTime;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comment")
-@PrimaryKeyJoinColumn
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")
@@ -52,9 +53,7 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 	private String authorName;
 
 	@Column(nullable = false)
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
 	@Field
-	@FieldBridge(impl=LocalDateTimeBridge.class)
 	private LocalDateTime date;
 
 	@Lob

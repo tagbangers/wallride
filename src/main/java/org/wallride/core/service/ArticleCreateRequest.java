@@ -16,9 +16,8 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
-
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 

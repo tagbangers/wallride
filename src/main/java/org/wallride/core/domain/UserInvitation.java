@@ -19,11 +19,9 @@ package org.wallride.core.domain;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.FieldBridge;
-import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="user_invitation")
@@ -45,16 +43,12 @@ public class UserInvitation extends DomainObject<String> {
 	private String message;
 
 	@Column(name="expired_at", nullable=false)
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
-	@FieldBridge(impl=LocalDateTimeBridge.class)
 	private LocalDateTime expiredAt;
 
 	@Column(nullable=false)
 	private boolean accepted;
 
 	@Column(name="accepted_at")
-	@Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
-	@FieldBridge(impl=LocalDateTimeBridge.class)
 	private LocalDateTime acceptedAt;
 
 	@Override

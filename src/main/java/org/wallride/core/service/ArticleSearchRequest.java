@@ -16,7 +16,6 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -24,6 +23,7 @@ import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 

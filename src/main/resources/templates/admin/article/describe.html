@@ -61,7 +61,7 @@
 									<span th:if="${#strings.toString(article.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
 									<span th:if="${#strings.toString(article.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
 									<span th:if="${#strings.toString(article.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + article.status)}">Published</span>
-									<a th:href="@{__${WEBSITE_PATH}__/__${article.date.toString('yyyy/MM/dd')}__/__${article.code}__}" th:if="${#strings.toString(article.status) eq 'PUBLISHED'}" target="_blank">
+									<a th:href="@{__${WEBSITE_PATH}__/__${#temporals.format(article.date, 'yyyy/MM/dd')}__/__${article.code}__}" th:if="${#strings.toString(article.status) eq 'PUBLISHED'}" target="_blank">
 										<span class="glyphicon glyphicon-globe"></span>
 										<span th:text="${#messages.msg('Post.Status.' + article.status)}">Published</span>
 									</a>
@@ -69,7 +69,7 @@
 							</div>
 							<dl>
 								<dt th:text="#{Date}">Date</dt>
-								<dd th:if="${article.date ne null}" th:text="${article.date.toString('yyyy/MM/dd HH:mm')}"></dd>
+								<dd th:if="${article.date ne null}" th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></dd>
 							</dl>
 							<dl>
 								<dt th:text="#{Categories}">Categories</dt>

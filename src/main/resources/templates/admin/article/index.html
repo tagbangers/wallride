@@ -142,7 +142,7 @@
 											<td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
 											<td th:text="${#strings.setJoin(article.categories, '&nbsp;|&nbsp;')}"></td>
 											<td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
-											<td th:text="${article.date ne null ? article.date.toString('yyyy/MM/dd (E) HH:mm', #locale) : ''}">2013/10/24</td>
+											<td th:text="${article.date ne null ? #temporals.format(article.date, 'yyyy/MM/dd (E) HH:mm', #locale) : ''}">2013/10/24</td>
 											<td class="text-right" th:text="${article.views}">0</td>
 											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 										</tr>

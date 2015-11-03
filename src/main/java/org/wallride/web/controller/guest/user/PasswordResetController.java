@@ -16,7 +16,6 @@
 
 package org.wallride.web.controller.guest.user;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -35,6 +34,7 @@ import org.wallride.core.service.PasswordUpdateRequest;
 import org.wallride.core.service.UserService;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/password-reset")
@@ -103,7 +103,7 @@ public class PasswordResetController {
 			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
 		}
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 		if (now.isAfter(passwordResetToken.getExpiredAt())) {
 			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
@@ -127,7 +127,7 @@ public class PasswordResetController {
 			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
 		}
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 		if (now.isAfter(passwordResetToken.getExpiredAt())) {
 			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";

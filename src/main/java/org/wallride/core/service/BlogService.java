@@ -25,7 +25,6 @@ import com.google.api.client.util.SecurityUtils;
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.api.services.analytics.model.GaData;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -41,6 +40,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -86,7 +87,7 @@ public class BlogService {
 					.build();
 
 			GaData gaData = analytics.data().ga()
-					.get(request.getProfileId(), "2005-01-01", LocalDate.now().toString("yyyy-MM-dd"), "ga:pageviews")
+					.get(request.getProfileId(), "2005-01-01", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), "ga:pageviews")
 					.setDimensions(String.format("ga:dimension%d", request.getCustomDimensionIndex()))
 					.setMaxResults(1)
 					.execute();

@@ -19,10 +19,9 @@ package org.wallride.core.domain;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "password_reset_token")
@@ -44,7 +43,6 @@ public class PasswordResetToken extends DomainObject<String> {
 	private String email;
 
 	@Column(name = "expired_at", nullable = false)
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
 	private LocalDateTime expiredAt;
 
 	@Override

@@ -16,7 +16,6 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -42,6 +41,7 @@ import org.wallride.core.support.AuthorizedUser;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
