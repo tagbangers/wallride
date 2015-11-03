@@ -18,9 +18,6 @@ package org.wallride.core.service;
 
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.model.GaData;
-import org.joda.time.Duration;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -38,7 +35,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -65,6 +61,11 @@ import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -76,11 +77,7 @@ import java.util.*;
 public class PostService {
 
 	@Inject
-	private BlogService blogService;
-	@Inject
 	private CacheManager cacheManager;
-	@Inject
-	private PlatformTransactionManager transactionManager;
 	@Inject
 	private ServletContext servletContext;
 
@@ -101,7 +98,7 @@ public class PostService {
 	public List<Post> publishScheduledPosts() {
 		logger.info("Starting public posts of the scheduled");
 
-		LocalDateTime now = new LocalDateTime();
+		LocalDateTime now = LocalDateTime.now();
 		List<Post> posts = postRepository.findByStatusAndDateLessThanEqual(Post.Status.SCHEDULED, now);
 		for (Post post : posts) {
 			post.setStatus(Post.Status.PUBLISHED);
@@ -120,16 +117,16 @@ public class PostService {
 		LocalDateTime now = LocalDateTime.now();
 		Set<JobExecution> jobExecutions = jobExplorer.findRunningJobExecutions("updatePostViewsJob");
 		for (JobExecution jobExecution : jobExecutions) {
-			LocalDateTime startTime = LocalDateTime.fromDateFields(jobExecution.getStartTime());
-			Duration d = new Duration(now.toDateTime(), startTime.toDateTime());
-			if (Math.abs(d.getStandardMinutes()) == 0) {
+			LocalDateTime startTime = LocalDateTime.from(jobExecution.getStartTime().toInstant());
+			Duration d = Duration.between(now, startTime);
+			if (Math.abs(d.toMinutes()) == 0) {
 				logger.info("Skip processing because the job is running.");
 				return;
 			}
 		}
 
 		JobParameters params = new JobParametersBuilder()
-				.addDate("now", now.toDate())
+				.addDate("now", Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
 				.toJobParameters();
 		try {
 			jobLauncher.run(updatePostViewsJob, params);
@@ -182,8 +179,9 @@ public class PostService {
 					default: throw new ServiceException();
 				}
 
+				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 				Analytics.Data.Ga.Get get = analytics.data().ga()
-						.get(googleAnalytics.getProfileId(), startDate.toString("yyyy-MM-dd"), now.toString("yyyy-MM-dd"), "ga:sessions")
+						.get(googleAnalytics.getProfileId(), startDate.format(dateTimeFormatter), now.format(dateTimeFormatter), "ga:sessions")
 						.setDimensions(String.format("ga:pagePath", googleAnalytics.getCustomDimensionIndex()))
 						.setSort(String.format("-ga:sessions", googleAnalytics.getCustomDimensionIndex()))
 						.setStartIndex(startIndex)

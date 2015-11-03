@@ -18,7 +18,6 @@ package org.wallride.core.job;
 
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.model.GaData;
-import org.joda.time.LocalDate;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.AbstractPagingItemReader;
 import org.springframework.stereotype.Component;
@@ -31,6 +30,8 @@ import org.wallride.core.support.GoogleAnalyticsUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -65,8 +66,9 @@ public class UpdatePostViewsItemReader extends AbstractPagingItemReader<List> {
 
 		try {
 			LocalDate now = LocalDate.now();
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			Analytics.Data.Ga.Get request = analytics.data().ga()
-					.get(googleAnalytics.getProfileId(), now.minusYears(1).toString("yyyy-MM-dd"), now.toString("yyyy-MM-dd"), "ga:pageViews")
+					.get(googleAnalytics.getProfileId(), now.minusYears(1).format(dateTimeFormatter), now.format(dateTimeFormatter), "ga:pageViews")
 //						.setDimensions(String.format("ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 //						.setSort(String.format("-ga:dimension%d", googleAnalytics.getCustomDimensionIndex()))
 					.setDimensions(String.format("ga:pagePath", googleAnalytics.getCustomDimensionIndex()))

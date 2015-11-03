@@ -47,7 +47,8 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.thymeleaf.dialect.IDialect;
-import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
@@ -239,7 +240,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		resolver.setPrefix(wallRideProperties.getHome() + "themes/default/templates/");
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
-		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
 		resolver.setCacheable(this.thymeleafProperties.isCache());
 		resolver.setOrder(1);
 		return resolver;
@@ -252,7 +253,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
-		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
 		resolver.setCacheable(this.thymeleafProperties.isCache());
 		resolver.setOrder(2);
 		return resolver;
@@ -269,6 +270,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(new SpringSecurityDialect());
+		dialects.add(new Java8TimeDialect());
 		dialects.add(customThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
@@ -286,7 +288,7 @@ public class WebGuestConfig extends WebMvcConfigurationSupport {
 		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
 		viewResolver.setTemplateEngine(templateEngine());
 		viewResolver.setViewNames(this.thymeleafProperties.getViewNames());
-		viewResolver.setCharacterEncoding(this.thymeleafProperties.getEncoding());
+		viewResolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
 		viewResolver.setContentType(this.thymeleafProperties.getContentType() + ";charset=" + this.thymeleafProperties.getEncoding());
 		viewResolver.setCache(false);
 		viewResolver.setOrder(2);

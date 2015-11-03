@@ -29,7 +29,6 @@ import java.util.TreeSet;
 
 @Entity
 @Table(name="article")
-@PrimaryKeyJoinColumn
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition="synonyms")

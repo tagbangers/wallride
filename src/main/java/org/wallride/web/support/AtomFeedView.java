@@ -30,6 +30,7 @@ import org.wallride.core.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.ZoneId;
 import java.util.*;
 
 public class AtomFeedView extends AbstractAtomFeedView {
@@ -73,7 +74,7 @@ public class AtomFeedView extends AbstractAtomFeedView {
 		for (Article article : articles) {
 			Entry entry = new Entry();
 			entry.setTitle(article.getTitle());
-			entry.setPublished(article.getDate().toDate());
+			entry.setPublished(Date.from(article.getDate().atZone(ZoneId.systemDefault()).toInstant()));
 			Content content = new Content();
 			content.setValue(article.getBody());
 			entry.setSummary(content);
@@ -99,7 +100,7 @@ public class AtomFeedView extends AbstractAtomFeedView {
 		}
 		builder.path("/{year}/{month}/{day}/{code}");
 		params.put("year", String.format("%04d", article.getDate().getYear()));
-		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
+		params.put("month", String.format("%02d", article.getDate().getMonth().getValue()));
 		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
 		params.put("code", article.getCode());
 		return builder.buildAndExpand(params).encode().toUriString();

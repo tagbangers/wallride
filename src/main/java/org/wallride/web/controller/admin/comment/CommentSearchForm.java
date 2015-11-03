@@ -20,8 +20,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.Post;
-import org.wallride.core.service.ArticleSearchRequest;
 import org.wallride.core.service.CommentSearchRequest;
 import org.wallride.web.support.DomainObjectSearchForm;
 

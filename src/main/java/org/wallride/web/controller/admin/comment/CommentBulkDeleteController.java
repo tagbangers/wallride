@@ -31,7 +31,6 @@ import org.wallride.core.service.ServiceException;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Collection;
 

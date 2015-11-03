@@ -29,6 +29,7 @@ import org.wallride.core.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.ZoneId;
 import java.util.*;
 
 public class RssFeedView extends AbstractRssFeedView {
@@ -66,7 +67,7 @@ public class RssFeedView extends AbstractRssFeedView {
 		for (Article article : articles) {
 			Item item = new Item();
 			item.setTitle(article.getTitle());
-			item.setPubDate(article.getDate().toDate());
+			item.setPubDate(Date.from(article.getDate().atZone(ZoneId.systemDefault()).toInstant()));
 			Description description = new Description();
 			description.setType("text/html");
 			description.setValue(article.getBody());
@@ -88,7 +89,7 @@ public class RssFeedView extends AbstractRssFeedView {
 		}
 		builder.path("/{year}/{month}/{day}/{code}");
 		params.put("year", String.format("%04d", article.getDate().getYear()));
-		params.put("month", String.format("%02d", article.getDate().getMonthOfYear()));
+		params.put("month", String.format("%02d", article.getDate().getMonth().getValue()));
 		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
 		params.put("code", article.getCode());
 		return builder.buildAndExpand(params).encode().toUriString();

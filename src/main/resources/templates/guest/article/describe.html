@@ -55,7 +55,7 @@
 								</ul>
 							</div>
 							<span th:text="${comment.authorName}">User Name</span> |
-							<time th:text="${comment.createdAt.toString('yyyy/MM/dd HH:mm', #locale)}">2014-01-01 00:00</time>
+							<time th:text="${#temporals.format(comment.createdAt, 'yyyy/MM/dd HH:mm', #locale)}">2014-01-01 00:00</time>
 							<p class="comment-content" th:text="${comment.content}">Content</p>
 						</li>
 					</ul>

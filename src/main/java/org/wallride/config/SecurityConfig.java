@@ -17,7 +17,6 @@
 package org.wallride.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -64,8 +63,8 @@ public class SecurityConfig {
 
 	@Inject
 	private DataSource dataSource;
-	@Inject
-	private CacheManager cacheManager;
+//	@Inject
+//	private CacheManager cacheManager;
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -125,6 +124,7 @@ public class SecurityConfig {
 					.and()
 				.headers()
 					.frameOptions().disable()
+					.and()
 				.csrf()
 					.disable()
 				.exceptionHandling()
@@ -203,6 +203,7 @@ public class SecurityConfig {
 					.and()
 				.headers()
 					.frameOptions().disable()
+					.and()
 				.csrf()
 					.disable()
 				.exceptionHandling()
@@ -227,7 +228,7 @@ public class SecurityConfig {
 
 	@Bean
 	public AffirmativeBased accessDecisionManager() {
-		List<AccessDecisionVoter> accessDecisionVoters = new ArrayList<>();
+		List<AccessDecisionVoter<?>> accessDecisionVoters = new ArrayList<>();
 		accessDecisionVoters.add(roleVoter());
 		accessDecisionVoters.add(webExpressionVoter());
 

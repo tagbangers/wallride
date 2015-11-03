@@ -129,14 +129,14 @@
 					<h2>New Posts</h2>
 					<dl th:each="article : ${recentPublishedArticles}" class="list-inline">
 						<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}">Title</a></dt>
-						<dd th:text="${article.date.toString('yyyy/MM/dd HH:mm')}">yyyy/MM/dd</dd>
+						<dd th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}">yyyy/MM/dd</dd>
 					</dl>
 				</div>
 				<div class="col-sm-5">
 					<h2>Drafts</h2>
 					<dl th:each="article : ${recentDraftArticles}" class="list-inline">
 						<dt><a th:href="@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" th:text="${article.title}?:'(No Titled)'">Title</a></dt>
-						<dd th:text="${article.updatedAt.toString('yyyy/MM/dd HH:mm') + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
+						<dd th:text="${#temporals.format(article.updatedAt, 'yyyy/MM/dd HH:mm') + ' Last Modified'}">yyyy/MM/dd HH:mm Last Modified</dd>
 					</dl>
 				</div>
 			</div>

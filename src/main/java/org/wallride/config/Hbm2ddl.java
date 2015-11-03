@@ -16,9 +16,13 @@
 
 package org.wallride.config;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
-import org.hibernate.dialect.MySQL5InnoDBDialect;
+import org.hibernate.boot.MetadataBuilder;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -33,21 +37,28 @@ public class Hbm2ddl {
 	public static void main(String[] args) throws Exception {
 		String locationPattern = "classpath:/org/wallride/core/domain/*";
 
-		Configuration configuration = new Configuration()
-				.setProperty(Environment.DIALECT, MySQL5InnoDBDialect.class.getCanonicalName());
+		final BootstrapServiceRegistry registry = new BootstrapServiceRegistryBuilder().build();
+		final MetadataSources metadataSources = new MetadataSources(registry);
+		final StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder(registry);
 
-		PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		Resource[] resources = resourcePatternResolver.getResources(locationPattern);
-		SimpleMetadataReaderFactory metadataReaderFactory = new SimpleMetadataReaderFactory();
+		registryBuilder.applySetting("hibernate.dialect", ExtendedMySQL5InnoDBDialect.class.getCanonicalName());
+
+		final PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+		final Resource[] resources = resourcePatternResolver.getResources(locationPattern);
+		final SimpleMetadataReaderFactory metadataReaderFactory = new SimpleMetadataReaderFactory();
 		for (Resource resource : resources) {
 			MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
 			AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
 			if (metadata.hasAnnotation(Entity.class.getName())) {
-				configuration.addAnnotatedClass(Class.forName(metadata.getClassName()));
+				metadataSources.addAnnotatedClass(Class.forName(metadata.getClassName()));
 			}
 		}
 
-		new SchemaExport(configuration)
+		final StandardServiceRegistryImpl registryImpl = (StandardServiceRegistryImpl) registryBuilder.build();
+		final MetadataBuilder metadataBuilder = metadataSources.getMetadataBuilder(registryImpl);
+
+		new SchemaExport((MetadataImplementor) metadataBuilder.build())
+				.setHaltOnError(true)
 				.setDelimiter(";")
 				.create(true, false);
 	}

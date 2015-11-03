@@ -18,12 +18,12 @@ package org.wallride.web.controller.guest.article;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.joda.time.LocalDateTime;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleSearchRequest;
 import org.wallride.web.support.DomainObjectSearchForm;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 

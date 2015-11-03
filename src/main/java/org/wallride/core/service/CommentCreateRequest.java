@@ -16,10 +16,10 @@
 
 package org.wallride.core.service;
 
-import org.joda.time.LocalDateTime;
 import org.wallride.core.domain.BlogLanguage;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class CommentCreateRequest implements Serializable {
 

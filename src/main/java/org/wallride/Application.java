@@ -20,10 +20,11 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
+import org.springframework.boot.context.config.ConfigFileEnvironmentPostProcessor;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
@@ -36,8 +37,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
@@ -57,11 +58,12 @@ import javax.servlet.ServletContext;
 import java.util.EnumSet;
 
 @Configuration
-@EnableConfigurationProperties(WallRideProperties.class)
 @EnableAutoConfiguration(exclude = {
 		DispatcherServletAutoConfiguration.class,
 		WebMvcAutoConfiguration.class,
+		SpringDataWebAutoConfiguration.class,
 })
+@EnableConfigurationProperties(WallRideProperties.class)
 @ComponentScan(basePackageClasses = CoreConfig.class, includeFilters = @ComponentScan.Filter(Configuration.class))
 public class Application extends SpringBootServletInitializer {
 
@@ -97,7 +99,7 @@ public class Application extends SpringBootServletInitializer {
 		System.setProperty(WallRideProperties.CONFIG_LOCATION_PROPERTY, config);
 		System.setProperty(WallRideProperties.MEDIA_LOCATION_PROPERTY, media);
 
-		System.setProperty(ConfigFileApplicationListener.CONFIG_LOCATION_PROPERTY, config);
+		System.setProperty(ConfigFileEnvironmentPostProcessor.CONFIG_LOCATION_PROPERTY, config);
 	}
 
 	public static ResourceLoader createResourceLoader() {
@@ -111,7 +113,7 @@ public class Application extends SpringBootServletInitializer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader);
+		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader, new PathMatchingResourcePatternResolver());
 	}
 
 	@Override
@@ -212,36 +214,4 @@ public class Application extends SpringBootServletInitializer {
 	public RequestContextListener requestContextListener() {
 		return new RequestContextListener();
 	}
-
-//	public static class ExtendedAnnotationConfigEmbeddedWebApplicationContext extends AnnotationConfigEmbeddedWebApplicationContext {
-//
-//		@Override
-//		public Resource getResource(String location) {
-//			Assert.notNull(location, "Location must not be null");
-//			if (location.startsWith(AmazonS3ResourceLoader.S3_URL_PREFIX)) {
-//				String path = location.substring(AmazonS3ResourceLoader.S3_URL_PREFIX.length());
-//				int pos = path.indexOf('/');
-//				String bucketName = "";
-//				String key = "";
-//				if (pos != -1) {
-//					bucketName = path.substring(0, pos);
-//					key = path.substring(pos + 1);
-//				} else {
-//					bucketName = path;
-//				}
-//				return new AmazonS3Resource(getBean(AmazonS3Client.class), bucketName, key);
-//			} else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
-//				return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
-//			} else {
-//				try {
-//					// Try to parse the location as a URL...
-//					URL url = new URL(location);
-//					return new UrlResource(url);
-//				} catch (MalformedURLException ex) {
-//					// No URL -> resolve as resource path.
-//					return getResourceByPath(location);
-//				}
-//			}
-//		}
-//	}
 }

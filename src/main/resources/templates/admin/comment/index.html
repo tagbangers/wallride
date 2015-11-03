@@ -78,7 +78,7 @@
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${comment.id}" /></td>
 											<td th:text="${comment.author}"></td>
 											<td th:text="${comment.content}"></td>
-											<td th:text="${comment.date.toString('yyyy/MM/dd (E) HH:mm', #locale)}"></td>
+											<td th:text="${#temporals.format(comment.date, 'yyyy/MM/dd (E) HH:mm', #locale)}"></td>
 											<td><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${comment.post.id})}" th:text="${comment.post.title}">Post title</a></td>
 										</tr>
 									</tbody>

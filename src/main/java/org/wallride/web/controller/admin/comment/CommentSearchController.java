@@ -17,7 +17,6 @@
 package org.wallride.web.controller.admin.comment;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -32,11 +31,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.Application;
 import org.wallride.core.domain.Comment;
-import org.wallride.core.domain.Post;
-import org.wallride.core.service.CommentService;
 import org.wallride.core.service.CommentService;
 import org.wallride.core.support.Pagination;
-import org.wallride.web.controller.admin.comment.CommentSearchForm;
 import org.wallride.web.support.DomainObjectSearchCondition;
 
 import javax.inject.Inject;

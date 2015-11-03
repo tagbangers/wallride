@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.2.1.RELEASE</version>
+		<version>1.3.0.RC1</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT-201507310259</version>
+	<version>1.0.0.BUILD-SNAPSHOT-201511012336</version>
 	<packaging>${packaging.type}</packaging>
 
 	<profiles>
@@ -34,10 +34,17 @@
 	</profiles>
 
 	<properties>
-		<org.hibernate.version>4.3.8.Final</org.hibernate.version>
-		<org.hibernate.search.version>5.0.1.Final</org.hibernate.search.version>
-		<org.infinispan.version>7.1.1.Final</org.infinispan.version>
-		<com.amazonaws.version>1.9.0</com.amazonaws.version>
+		<java.version>1.8</java.version>
+		<spring-cloud-aws-context.verion>1.0.3.RELEASE</spring-cloud-aws-context.verion>
+		<hibernate.version>5.0.2.Final</hibernate.version>
+		<hibernate-search.version>5.5.0.Final</hibernate-search.version>
+		<infinispan-version>8.0.1.Final</infinispan-version>
+		<lucene.version>5.3.0</lucene.version>
+		<thymeleaf-extras-springsecurity4.version>2.1.2.RELEASE</thymeleaf-extras-springsecurity4.version>
+		<!-- Need 2.1.1
+		<thymeleaf-extras-java8time.version>2.1.0.RELEASE</thymeleaf-extras-java8time.version>
+		-->
+		<amazonaws-version>1.10.30</amazonaws-version>
 	</properties>
 
 	<repositories>
@@ -47,26 +54,20 @@
 			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 		<repository>
-			<id>io.spring.repo.maven.milestone</id>
-			<url>http://repo.spring.io/milestone/</url>
-			<snapshots><enabled>false</enabled></snapshots>
+			<id>spring-milestones</id>
+			<url>http://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>1.2.7.RELEASE</version>
 				<configuration>
 					<mainClass>org.wallride.Application</mainClass>
 				</configuration>
@@ -143,76 +144,43 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-aws-context</artifactId>
-			<version>1.0.0.RC1</version>
+			<version>${spring-cloud-aws-context.verion}</version>
+		</dependency>
+
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-java8</artifactId>
+			<version>${hibernate.version}</version>
 		</dependency>
 
 		<!-- Hibernate Search -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search-orm</artifactId>
-			<version>${org.hibernate.search.version}</version>
+			<version>${hibernate-search.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search-infinispan</artifactId>
-			<version>${org.hibernate.search.version}</version>
-		</dependency>
-
-		<!--
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-solrj</artifactId>
-			<version>3.6.2</version>
-		</dependency>
-		-->
-
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-queryparser</artifactId>
-			<version>4.10.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers-kuromoji</artifactId>
-			<version>4.10.3</version>
+			<version>${hibernate-search.version}</version>
 		</dependency>
 
 		<!-- Infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-cachestore-jdbc</artifactId>
-			<version>${org.infinispan.version}</version>
+			<version>${infinispan.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-lucene-directory</artifactId>
-			<version>${org.infinispan.version}</version>
+			<version>${infinispan.version}</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-query</artifactId>
-			<version>${org.infinispan.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>hibernate-jpa-2.0-api</artifactId>
-					<groupId>org.hibernate.javax.persistence</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>hibernate-search-engine</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>hibernate-search-infinispan</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		-->
-		<dependency>
-			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-spring</artifactId>
-			<version>${org.infinispan.version}</version>
+			<artifactId>infinispan-spring4</artifactId>
+			<version>${infinispan.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-logging</artifactId>
@@ -221,12 +189,38 @@
 			</exclusions>
 		</dependency>
 
+		<!-- Lucene -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers-kuromoji</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+
+		<!-- JGroups S3_CLIENT_PING -->
+		<dependency>
+			<groupId>jp.co.tagbangers</groupId>
+			<artifactId>jgroups-s3-client-ping</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
 		<!-- Thymeleaf -->
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
-			<artifactId>thymeleaf-extras-springsecurity3</artifactId>
-			<version>2.1.1.RELEASE</version>
+			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
+			<version>${thymeleaf-extras-springsecurity4.version}</version>
 		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-java8time</artifactId>
+			<version>${thymeleaf-extras-java8time.version}</version>
+		</dependency>
+		-->
 
 		<!-- WebJars -->
 		<dependency>
@@ -260,18 +254,6 @@
 			<version>2.3.4</version>
 		</dependency>
 
-		<!-- Joda Time -->
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jadira.usertype</groupId>
-			<artifactId>usertype.core</artifactId>
-			<version>3.0.0.GA</version>
-		</dependency>
-
 		<!-- @Inject -->
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -283,7 +265,7 @@
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>${com.amazonaws.version}</version>
+			<version>${amazonaws-version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-logging</artifactId>
@@ -296,7 +278,7 @@
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-analytics</artifactId>
-			<version>v3-rev100-1.19.0</version>
+			<version>v3-rev119-1.20.0</version>
 		</dependency>
 
 		<!-- im4java -->
@@ -317,7 +299,7 @@
 		<dependency>
 			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
-			<version>1.5.0</version>
+			<version>1.5.1</version>
 		</dependency>
 
 		<!-- Url Rewrite Filter -->
@@ -328,12 +310,6 @@
 		</dependency>
 
 		<!-- Commons -->
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-		</dependency>
-
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
@@ -362,12 +338,6 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.1</version>
 		</dependency>
 
 		<dependency>
