@@ -117,7 +117,7 @@ public class PostService {
 		LocalDateTime now = LocalDateTime.now();
 		Set<JobExecution> jobExecutions = jobExplorer.findRunningJobExecutions("updatePostViewsJob");
 		for (JobExecution jobExecution : jobExecutions) {
-			LocalDateTime startTime = LocalDateTime.from(jobExecution.getStartTime().toInstant());
+			LocalDateTime startTime = LocalDateTime.ofInstant(jobExecution.getStartTime().toInstant(), ZoneId.systemDefault());
 			Duration d = Duration.between(now, startTime);
 			if (Math.abs(d.toMinutes()) == 0) {
 				logger.info("Skip processing because the job is running.");
