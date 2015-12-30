@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfigur
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.config.ConfigFileEnvironmentPostProcessor;
+import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
@@ -99,7 +99,7 @@ public class Application extends SpringBootServletInitializer {
 		System.setProperty(WallRideProperties.CONFIG_LOCATION_PROPERTY, config);
 		System.setProperty(WallRideProperties.MEDIA_LOCATION_PROPERTY, media);
 
-		System.setProperty(ConfigFileEnvironmentPostProcessor.CONFIG_LOCATION_PROPERTY, config);
+		System.setProperty(ConfigFileApplicationListener.CONFIG_LOCATION_PROPERTY, config);
 	}
 
 	public static ResourceLoader createResourceLoader() {

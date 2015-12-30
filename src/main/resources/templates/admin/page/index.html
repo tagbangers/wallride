@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
@@ -14,11 +14,11 @@
 					</div>
 					<div class="pull-right">
 						<div class="btn-group">
-							<a th:href="@{__${ADMIN_PATH}__/pages/create}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New</span></a>
+							<a th:href="@{__${ADMIN_PATH}__/pages/create(query=${query})}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New</span></a>
 						</div>
 						<div class="btn-group">
 							<a th:attr="title=#{ListPage}" class="btn btn-default btn-sm active" style="padding:7px 12px;"><span class="glyphicon glyphicon-list"></span></a>
-							<a th:attr="title=#{TreePage}" title="ツリー表示" class="btn btn-default btn-sm" th:href="@{__${ADMIN_PATH}__/pages/tree}" style="height: 34px"><i class="flaticon-category"></i> </a>
+							<a th:attr="title=#{TreePage}" title="ツリー表示" class="btn btn-default btn-sm" th:href="@{__${ADMIN_PATH}__/pages/tree(query=${query})}" style="height: 34px"><i class="flaticon-category"></i> </a>
 						</div>
 					</div>
 				</div>
@@ -100,7 +100,7 @@
 							<div class="search-result-header clearfix">
 								<div class="btn-toolbar wr-bulk-action pull-left">
 									<div class="btn-group">
-										<a th:href="@{__${ADMIN_PATH}__/pages/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+										<a th:href="@{__${ADMIN_PATH}__/pages/index(part=bulk-delete-form,query=${query})}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 									</div>
 								</div>
 								<div class="pagination-group pull-right">
@@ -128,14 +128,14 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr th:each="page : ${pages}" th:attr="data-href=@{__${ADMIN_PATH}__/pages/describe(id=${page.id})}" class="clickable">
+										<tr th:each="page : ${pages}" th:attr="data-href=@{__${ADMIN_PATH}__/pages/describe(id=${page.id},query=${query})}" class="clickable">
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${page.id}" /></td>
 											<td th:class="'wr-post-status-' + ${page.status}" th:text="${#messages.msg('Post.Status.' + page.status)}">Status</td>
 											<td th:text="${page.title?:'(No Titled)'}" style="font-weight: bold;">事務所移転のお知らせ</td>
 											<td><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a></td>
 											<td th:text="${page.date ne null ? #temporals.format(page.date, 'yyyy/MM/dd (E) HH:mm', #locale) : ''}">yyyy/mm/dd (E)</td>
 											<td class="text-right" th:text="${page.views}">0</td>
-											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/pages/edit(id=${page.id},token=${token})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/pages/edit(id=${page.id},query=${query})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 										</tr>
 									</tbody>
 								</table>
@@ -156,7 +156,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/pages/bulk-delete}" disabled="true">Delete</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/pages/bulk-delete(query=${query})}" disabled="true">Delete</button>
 										</div>
 									</div>
 								</div>

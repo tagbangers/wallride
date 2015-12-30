@@ -17,11 +17,10 @@
 package org.wallride.web.controller.admin.article;
 
 import org.wallride.core.service.ArticleDeleteRequest;
-import org.wallride.web.support.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;
 
-public class ArticleDeleteForm extends DomainObjectDeleteForm {
+public class ArticleDeleteForm {
 
 	@NotNull
 	private Long id;

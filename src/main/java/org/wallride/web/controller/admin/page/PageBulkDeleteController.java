@@ -25,6 +25,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Page;
 import org.wallride.core.service.PageService;
@@ -48,11 +49,19 @@ public class PageBulkDeleteController {
 	
 	private static Logger logger = LoggerFactory.getLogger(PageBulkDeleteController.class);
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping
 	public String delete(
 			@Valid @ModelAttribute("form") PageBulkDeleteForm form,
 			BindingResult errors,
+			String query,
 			RedirectAttributes redirectAttributes) {
+		redirectAttributes.addAttribute("query", query);
+
 		if (!form.isConfirmed()) {
 			errors.rejectValue("confirmed", "Confirmed");
 		}

@@ -20,12 +20,12 @@ import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.PersonalName;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.UserUpdateRequest;
-import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class UserEditForm extends DomainObjectEditForm {
+public class UserEditForm implements Serializable {
 
 	@NotNull
 	private Long id;

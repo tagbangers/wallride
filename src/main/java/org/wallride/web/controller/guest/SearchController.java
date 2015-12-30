@@ -27,9 +27,10 @@ import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PostSearchRequest;
 import org.wallride.core.service.PostService;
-import org.wallride.core.support.Pagination;
+import org.wallride.web.support.Pagination;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/search")
@@ -43,13 +44,14 @@ public class SearchController {
 			@RequestParam String keyword,
 			@PageableDefault(50) Pageable pageable,
 			BlogLanguage blogLanguage,
-			Model model) {
+			Model model,
+			HttpServletRequest servletRequest) {
 		PostSearchRequest request = new PostSearchRequest(blogLanguage.getLanguage()).withKeyword(keyword);
 		Page<Post> posts = postService.readPosts(request, pageable);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("posts", posts);
 		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(posts));
+		model.addAttribute("pagination", new Pagination<>(posts, servletRequest));
 		return "search";
 	}
 }

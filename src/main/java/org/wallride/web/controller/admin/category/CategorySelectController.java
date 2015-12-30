@@ -21,7 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.wallride.core.domain.Category;
 import org.wallride.core.service.CategoryService;
-import org.wallride.web.support.DomainObjectSelectModel;
+import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +36,7 @@ public class CategorySelectController {
 	private CategoryService categoryService;
 
 	@RequestMapping(value="/{language}/categories/select")
-	public @ResponseBody List<DomainObjectSelectModel> select(
+	public @ResponseBody List<DomainObjectSelect2Model> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
 		CategorySearchForm form = new CategorySearchForm();
@@ -44,10 +44,10 @@ public class CategorySelectController {
 		form.setLanguage(language);
 		Page<Category> categories = categoryService.readCategories(form.toCategorySearchRequest());
 
-		List<DomainObjectSelectModel> results = new ArrayList<>();
+		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (categories.hasContent()) {
 			for (Category category : categories) {
-				DomainObjectSelectModel model = new DomainObjectSelectModel(category.getId(), category.getName());
+				DomainObjectSelect2Model model = new DomainObjectSelect2Model(category.getId(), category.getName());
 				results.add(model);
 			}
 		}
@@ -55,7 +55,8 @@ public class CategorySelectController {
 	}
 
 	@RequestMapping(value="/{language}/categories/select/{id}", method= RequestMethod.GET)
-	public @ResponseBody DomainObjectSelectModel select(
+	public @ResponseBody
+	DomainObjectSelect2Model select(
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
@@ -65,7 +66,7 @@ public class CategorySelectController {
 			return null;
 		}
 
-		DomainObjectSelectModel model = new DomainObjectSelectModel(category.getId(), category.getName());
+		DomainObjectSelect2Model model = new DomainObjectSelect2Model(category.getId(), category.getName());
 		return model;
 	}
 }

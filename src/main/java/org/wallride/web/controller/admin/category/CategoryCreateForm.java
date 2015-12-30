@@ -19,12 +19,12 @@ package org.wallride.web.controller.admin.category;
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.service.CategoryCreateRequest;
-import org.wallride.web.support.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class CategoryCreateForm extends DomainObjectCreateForm {
+public class CategoryCreateForm implements Serializable {
 
 	private Long parentId;
 

@@ -16,13 +16,14 @@
 
 package org.wallride.web.controller.admin.tag;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.wallride.core.service.TagSearchRequest;
-import org.wallride.web.support.DomainObjectSearchForm;
 
-public class TagSearchForm extends DomainObjectSearchForm {
+import java.io.Serializable;
+
+public class TagSearchForm implements Serializable {
 
 	private String keyword;
-	private String language;
 
 	public String getKeyword() {
 		return keyword;
@@ -32,20 +33,11 @@ public class TagSearchForm extends DomainObjectSearchForm {
 		this.keyword = keyword;
 	}
 
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	public TagSearchRequest buildTagSearchRequest() {
+	public TagSearchRequest toTagSearchRequest() {
 		TagSearchRequest.Builder builder = new TagSearchRequest.Builder();
 		return builder
 				.keyword(keyword)
-				.language(language)
+				.language(LocaleContextHolder.getLocale().getLanguage())
 				.build();
 	}
-
 }

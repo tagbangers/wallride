@@ -42,6 +42,7 @@ import org.wallride.core.service.ArticleSearchRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 	
@@ -55,12 +56,35 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
 	@Override
 	public Page<Article> search(ArticleSearchRequest request, Pageable pageable) {
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(Article.class)
+				.setFetchMode("cover", FetchMode.JOIN)
+				.setFetchMode("user", FetchMode.JOIN)
+				.setFetchMode("categories", FetchMode.JOIN);
+//				.setFetchMode("tags", FetchMode.JOIN);
+
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, pageable, criteria);
+		int resultSize = persistenceQuery.getResultSize();
+		List<Article> results = persistenceQuery.getResultList();
+		return new PageImpl<>(results, pageable, resultSize);
+	}
+
+	@Override
+	public List<Long> searchForId(ArticleSearchRequest request) {
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		persistenceQuery.setProjection("id");
+		List<Object[]> results = persistenceQuery.getResultList();
+		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
+		return nos;
+	}
+
+	private FullTextQuery buildFullTextQuery(ArticleSearchRequest request, Pageable pageable, Criteria criteria) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
 				.forEntity(Article.class)
 				.get();
-		
+
 		@SuppressWarnings("rawtypes")
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
@@ -138,13 +162,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		}
 
 		Query searchQuery = junction.createQuery();
-		
-		Session session = (Session) entityManager.getDelegate();
-		Criteria criteria = session.createCriteria(Article.class)
-				.setFetchMode("cover", FetchMode.JOIN)
-				.setFetchMode("user", FetchMode.JOIN)
-				.setFetchMode("categories", FetchMode.JOIN);
-//				.setFetchMode("tags", FetchMode.JOIN);
 
 		Sort sort = new Sort(
 				new SortField("date", SortField.Type.STRING, true),
@@ -158,11 +175,6 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 			persistenceQuery.setFirstResult(pageable.getOffset());
 			persistenceQuery.setMaxResults(pageable.getPageSize());
 		}
-
-		int resultSize = persistenceQuery.getResultSize();
-
-		@SuppressWarnings("unchecked")
-		List<Article> results = persistenceQuery.getResultList();
-		return new PageImpl<>(results, pageable, resultSize);
+		return persistenceQuery;
 	}
 }

@@ -24,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.service.CommentService;
@@ -43,13 +44,21 @@ public class CommentBulkApproveController {
 	
 	private static Logger logger = LoggerFactory.getLogger(CommentBulkApproveController.class);
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping
-	public String publish(
+	public String approve(
 			@Valid @ModelAttribute("form") CommentBulkApproveForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes,
 			Model model) {
+		redirectAttributes.addAttribute("query", query);
+
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
 			return "redirect:/_admin/{language}/comments/index";

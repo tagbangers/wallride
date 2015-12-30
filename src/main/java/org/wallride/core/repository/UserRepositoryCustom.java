@@ -21,7 +21,11 @@ import org.springframework.data.domain.Pageable;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.UserSearchRequest;
 
+import java.util.List;
+
 public interface UserRepositoryCustom {
 
+	Page<User> search(UserSearchRequest request);
 	Page<User> search(UserSearchRequest request, Pageable pageable);
+	List<Long> searchForId(UserSearchRequest request);
 }

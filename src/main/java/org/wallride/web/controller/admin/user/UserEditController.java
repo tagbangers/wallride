@@ -41,6 +41,11 @@ public class UserEditController {
 	@Inject
 	private UserService userService;
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping(method= RequestMethod.GET)
 	public String edit(
 			@PathVariable String language,
@@ -58,6 +63,7 @@ public class UserEditController {
 			@PathVariable String language,
 			@Valid @ModelAttribute("form") UserEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
@@ -80,14 +86,15 @@ public class UserEditController {
 		redirectAttributes.addFlashAttribute("savedUser", user);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", user.getId());
+		redirectAttributes.addAttribute("query", query);
 		return "redirect:/_admin/{language}/users/describe";
 	}
 
-	@RequestMapping(method= RequestMethod.POST, params="_step.cancel")
-	public String cancel(
-			@Valid @ModelAttribute("form") UserEditForm form,
-			RedirectAttributes redirectAttributes) {
-		redirectAttributes.addAttribute("id", form.getId());
-		return "redirect:/_admin/users/describe/{id}";
-	}
+//	@RequestMapping(method= RequestMethod.POST, params="_step.cancel")
+//	public String cancel(
+//			@Valid @ModelAttribute("form") UserEditForm form,
+//			RedirectAttributes redirectAttributes) {
+//		redirectAttributes.addAttribute("id", form.getId());
+//		return "redirect:/_admin/users/describe/{id}";
+//	}
 }

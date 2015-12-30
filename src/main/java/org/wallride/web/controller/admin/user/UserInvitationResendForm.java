@@ -17,9 +17,10 @@
 package org.wallride.web.controller.admin.user;
 
 import org.wallride.core.service.UserInvitationResendRequest;
-import org.wallride.web.support.DomainObjectEditForm;
 
-public class UserInvitationResendForm extends DomainObjectEditForm {
+import java.io.Serializable;
+
+public class UserInvitationResendForm implements Serializable {
 
 	private String token;
 

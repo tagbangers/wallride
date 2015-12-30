@@ -39,7 +39,6 @@ import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
@@ -67,6 +66,11 @@ public class ArticleEditController {
 	@ModelAttribute("categoryTree")
 	public CategoryTree setupCategoryTree(@PathVariable String language) {
 		return categoryService.readCategoryTree(language);
+	}
+
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
 	}
 
 	@ExceptionHandler(BindException.class)
@@ -102,11 +106,13 @@ public class ArticleEditController {
 	public String editDraft(
 			@PathVariable String language,
 			@RequestParam long id,
+			String query,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		Article article = (Article) model.asMap().get("article");
 		if (!language.equals(article.getLanguage())) {
 			redirectAttributes.addAttribute("language", language);
+			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/articles/index";
 		}
 
@@ -114,7 +120,8 @@ public class ArticleEditController {
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);
 			redirectAttributes.addAttribute("id", id);
-			return "redirect:/_admin/{language}/articles/edit?id={id}";
+			redirectAttributes.addAttribute("query", query);
+			return "redirect:/_admin/{language}/articles/edit";
 		}
 
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft);
@@ -162,6 +169,7 @@ public class ArticleEditController {
 			@PathVariable String language,
 			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -186,7 +194,8 @@ public class ArticleEditController {
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/articles/describe";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="unpublish")
@@ -194,6 +203,7 @@ public class ArticleEditController {
 			@PathVariable String language,
 			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -218,7 +228,8 @@ public class ArticleEditController {
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/articles/describe";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="update")
@@ -226,6 +237,7 @@ public class ArticleEditController {
 			@PathVariable String language,
 			@Validated({Default.class, ArticleEditForm.GroupPublish.class}) @ModelAttribute("form") ArticleEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -250,14 +262,15 @@ public class ArticleEditController {
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/articles/describe";
 	}
 
-	@RequestMapping(method=RequestMethod.POST, params="cancel")
-	public String cancel(
-			@Valid @ModelAttribute("form") ArticleEditForm form,
-			RedirectAttributes redirectAttributes) {
-		redirectAttributes.addAttribute("id", form.getId());
-		return "redirect:/_admin/articles/describe/{id}";
-	}
+//	@RequestMapping(method=RequestMethod.POST, params="cancel")
+//	public String cancel(
+//			@Valid @ModelAttribute("form") ArticleEditForm form,
+//			RedirectAttributes redirectAttributes) {
+//		redirectAttributes.addAttribute("id", form.getId());
+//		return "redirect:/_admin/articles/describe/{id}";
+//	}
 }

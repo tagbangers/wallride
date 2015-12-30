@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
@@ -7,7 +7,7 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form id="wr-post-form" th:include="page/create::form(title=#{EditPage},id=${form.id})" th:action="@{__${ADMIN_PATH}__/pages/edit}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:include="page/create::form(title=#{EditPage},id=${form.id})" th:action="@{__${ADMIN_PATH}__/pages/edit(query=${query})}" th:object="${form}" action="#" method="post">
 			</form>
 		</div>
 		<footer>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
@@ -7,12 +7,12 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form id="wr-post-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:fragment="form(title,article)" th:action="@{__${ADMIN_PATH}__/articles/create(query=${query})}" th:object="${form}" action="#" method="post">
 				<input type="hidden" name="id" th:value="${article}? ${article.id} : ''"  />
 				<div id="wr-page-header">
 					<div class="page-header container-fluid">
 						<div class="pull-left back">
-							<a class="btn btn-sm btn-default" th:href="${article} ? @{__${ADMIN_PATH}__/articles/describe(id=${article.id})} : @{__${ADMIN_PATH}__/articles/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+							<a class="btn btn-sm btn-default" th:href="${article} ? @{__${ADMIN_PATH}__/articles/describe(id=${article.id},query=${query})} : @{__${ADMIN_PATH}__/articles/index(query=${query})}"><span class="glyphicon glyphicon-arrow-left"></span></a>
 						</div>
 						<div class="pull-left">
 							<h1 th:text="${title}?:#{AddNewArticle}">Add New Article</h1>
@@ -53,7 +53,7 @@
 												data: data,
 												success: function(data) {
 													$form.children(':input[name="id"]').val(data.id);
-													$form.attr('action', [[@{__${ADMIN_PATH}__/articles/edit}]]);
+													$form.attr('action', [[@{__${ADMIN_PATH}__/articles/edit(query=${query})}]]);
 													var url = [[@{__${ADMIN_PATH}__/articles/edit?id=}]] + data.id;
 													history.replaceState(null, null, url);
 													new PNotify({

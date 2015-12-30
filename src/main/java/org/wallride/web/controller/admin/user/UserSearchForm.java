@@ -18,10 +18,11 @@ package org.wallride.web.controller.admin.user;
 
 import org.springframework.util.StringUtils;
 import org.wallride.core.service.UserSearchRequest;
-import org.wallride.web.support.DomainObjectSearchForm;
+
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class UserSearchForm extends DomainObjectSearchForm {
+public class UserSearchForm implements Serializable {
 	
 	private String keyword;
 

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PostSearchRequest;
 import org.wallride.core.service.PostService;
-import org.wallride.web.support.DomainObjectSelectModel;
+import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +41,7 @@ public class PostSelectController {
 	private PostService postService;
 
 	@RequestMapping(value="/{language}/posts/select")
-	public @ResponseBody List<DomainObjectSelectModel> select(
+	public @ResponseBody List<DomainObjectSelect2Model> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
 		PostSearchRequest request = new PostSearchRequest(language)
@@ -49,10 +49,10 @@ public class PostSelectController {
 				.withKeyword(keyword);
 		Page<Post> posts = postService.readPosts(request, new PageRequest(0, 30));
 
-		List<DomainObjectSelectModel> results = new ArrayList<>();
+		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (posts.hasContent()) {
 			for (Post post : posts) {
-				DomainObjectSelectModel model = new DomainObjectSelectModel(post);
+				DomainObjectSelect2Model model = new DomainObjectSelect2Model(post);
 				results.add(model);
 			}
 		}
@@ -60,7 +60,8 @@ public class PostSelectController {
 	}
 
 	@RequestMapping(value="/{language}/posts/select/{id}")
-	public @ResponseBody DomainObjectSelectModel select(
+	public @ResponseBody
+	DomainObjectSelect2Model select(
 			@PathVariable String language,
 			@RequestParam Long id,
 			HttpServletResponse response)
@@ -71,7 +72,7 @@ public class PostSelectController {
 			return null;
 		}
 
-		DomainObjectSelectModel model = new DomainObjectSelectModel(post);
+		DomainObjectSelect2Model model = new DomainObjectSelect2Model(post);
 		return model;
 	}
 }

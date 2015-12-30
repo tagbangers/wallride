@@ -18,10 +18,7 @@ package org.wallride.web.controller.admin.user;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.UserInvitation;
 import org.wallride.core.service.UserService;
@@ -39,11 +36,17 @@ public class UserInvitationCreateController {
 	@Inject
 	private UserService userService;
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping(method= RequestMethod.POST)
 	public String save(
 			@PathVariable String language,
 			@Valid @ModelAttribute("form") UserInvitationCreateForm form,
 			BindingResult result,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) throws MessagingException {
 		if (result.hasErrors()) {
@@ -51,6 +54,7 @@ public class UserInvitationCreateController {
 		}
 		List<UserInvitation> invitations = userService.inviteUsers(form.buildUserInvitationCreateRequest(), result, authorizedUser);
 		redirectAttributes.addFlashAttribute("savedInvitations", invitations);
+		redirectAttributes.addAttribute("query", query);
 		return "redirect:/_admin/{language}/users/invitations/index";
 	}
 }

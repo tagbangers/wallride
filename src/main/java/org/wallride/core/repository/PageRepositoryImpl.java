@@ -41,20 +41,49 @@ import org.wallride.core.service.PageSearchRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PageRepositoryImpl implements PageRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	@Override
+	public org.springframework.data.domain.Page<Page> search(PageSearchRequest request) {
+		return search(request, null);
+	}
+
 	@Override
 	public org.springframework.data.domain.Page<Page> search(PageSearchRequest request, Pageable pageable) {
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(Page.class)
+				.setFetchMode("cover", FetchMode.JOIN)
+				.setFetchMode("author", FetchMode.JOIN)
+				.setFetchMode("parent", FetchMode.JOIN)
+				.setFetchMode("children", FetchMode.JOIN);
+
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, pageable, criteria);
+		int resultSize = persistenceQuery.getResultSize();
+		List<Page> results = persistenceQuery.getResultList();
+		return new PageImpl<>(results, pageable, resultSize);
+	}
+
+	@Override
+	public List<Long> searchForId(PageSearchRequest request) {
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		persistenceQuery.setProjection("id");
+		List<Object[]> results = persistenceQuery.getResultList();
+		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
+		return nos;
+	}
+
+	private FullTextQuery buildFullTextQuery(PageSearchRequest request, Pageable pageable, Criteria criteria) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
 				.forEntity(Page.class)
 				.get();
-		
+
 		@SuppressWarnings("rawtypes")
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
@@ -110,13 +139,6 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 		}
 
 		Query searchQuery = junction.createQuery();
-		
-		Session session = (Session) entityManager.getDelegate();
-		Criteria criteria = session.createCriteria(Page.class)
-				.setFetchMode("cover", FetchMode.JOIN)
-				.setFetchMode("author", FetchMode.JOIN)
-				.setFetchMode("parent", FetchMode.JOIN)
-				.setFetchMode("children", FetchMode.JOIN);
 
 		Sort sort = new Sort(new SortField("lft", SortField.Type.INT));
 
@@ -124,13 +146,10 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 				.createFullTextQuery(searchQuery, Page.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		persistenceQuery.setFirstResult(pageable.getOffset());
-		persistenceQuery.setMaxResults(pageable.getPageSize());
-
-		int resultSize = persistenceQuery.getResultSize();
-
-		@SuppressWarnings("unchecked")
-		List<Page> results = persistenceQuery.getResultList();
-		return new PageImpl<>(results, pageable, resultSize);
+		if (pageable != null) {
+			persistenceQuery.setFirstResult(pageable.getOffset());
+			persistenceQuery.setMaxResults(pageable.getPageSize());
+		}
+		return persistenceQuery;
 	}
 }

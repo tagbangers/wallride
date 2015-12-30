@@ -17,11 +17,10 @@
 package org.wallride.web.controller.admin.page;
 
 import org.wallride.core.service.PageDeleteRequest;
-import org.wallride.web.support.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;
 
-public class PageDeleteForm extends DomainObjectDeleteForm {
+public class PageDeleteForm {
 
 	@NotNull
 	private Long id;

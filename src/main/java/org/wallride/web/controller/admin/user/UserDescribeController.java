@@ -16,25 +16,30 @@
 
 package org.wallride.web.controller.admin.user;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.User;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.UserService;
-import org.wallride.web.support.DomainObjectDescribeController;
+import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 @Controller
 @RequestMapping(value="/{language}/users/describe", method= RequestMethod.GET)
-public class UserDescribeController extends DomainObjectDescribeController<User, UserSearchForm> {
+public class UserDescribeController {
 
 	@Inject
 	private UserService userService;
@@ -42,50 +47,63 @@ public class UserDescribeController extends DomainObjectDescribeController<User,
 	@Inject
 	private ArticleService articleService;
 
+	@Inject
+	private ConversionService conversionService;
+
 	@ModelAttribute("articleCounts")
 	public Map<Long, Long> articleCounts(@PathVariable String language) {
 		return articleService.countArticlesByAuthorIdGrouped(Post.Status.PUBLISHED, language);
 	}
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping
 	public String describe(
+			@PathVariable String language,
 			@RequestParam long id,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, null, model, session);
-	}
+			String query,
+			Model model) {
+		User user = userService.readUserById(id);
+		if (user == null) {
+			throw new HttpNotFoundException();
+		}
 
-	@RequestMapping(params = "pageable")
-	public String describe(
-			@RequestParam long id,
-			@PageableDefault(50) Pageable pageable,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, pageable, model, session);
-	}
+		MutablePropertyValues mpvs = new MutablePropertyValues(UriComponentsBuilder.newInstance().query(query).build().getQueryParams());
+		for (Iterator<PropertyValue> i = mpvs.getPropertyValueList().iterator(); i.hasNext(); ) {
+			PropertyValue pv = i.next();
+			boolean hasValue = false;
+			for (String value : (List<String>) pv.getValue()) {
+				if (StringUtils.hasText(value)) {
+					hasValue = true;
+					break;
+				}
+			}
+			if (!hasValue) {
+				i.remove();
+			}
+		}
+		BeanWrapperImpl beanWrapper = new BeanWrapperImpl(new UserSearchForm());
+		beanWrapper.setConversionService(conversionService);
+		beanWrapper.setPropertyValues(mpvs, true, true);
+		UserSearchForm form = (UserSearchForm) beanWrapper.getWrappedInstance();
+		List<Long> ids = userService.readUserIds(form.toUserSearchRequest());
+		if (!CollectionUtils.isEmpty(ids)) {
+			int index = ids.indexOf(user.getId());
+			if (index < ids.size() - 1) {
+				Long next = ids.get(index + 1);
+				model.addAttribute("next", next);
+			}
+			if (index > 0) {
+				Long prev = ids.get(index - 1);
+				model.addAttribute("prev", prev);
+			}
+		}
 
-	@Override
-	protected Class<UserSearchForm> getDomainObjectSearchFormClass() {
-		return UserSearchForm.class;
-	}
-
-	@Override
-	protected String getModelAttributeName() {
-		return "user";
-	}
-
-	@Override
-	protected String getViewName() {
+		model.addAttribute("user", user);
+		model.addAttribute("query", query);
 		return "user/describe";
-	}
-
-	@Override
-	protected User readDomainObject(long id) {
-		return userService.readUserById(id);
-	}
-
-	@Override
-	protected Page<User> readDomainObjects(UserSearchForm form, Pageable pageable) {
-		return userService.readUsers(form.toUserSearchRequest(), pageable);
 	}
 }

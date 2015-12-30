@@ -21,7 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.wallride.core.domain.Tag;
 import org.wallride.core.service.TagService;
-import org.wallride.web.support.DomainObjectSelectModel;
+import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -30,24 +30,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-public class TagSelectController {
+public class TagSelect2Controller {
 
 	@Inject
 	private TagService tagService;
 
 	@RequestMapping(value="/{language}/tags/select")
-	public @ResponseBody List<DomainObjectSelectModel> select(
+	public @ResponseBody List<DomainObjectSelect2Model> select(
 			@PathVariable String language,
 			@RequestParam(required=false) String keyword) {
 		TagSearchForm form = new TagSearchForm();
 		form.setKeyword(keyword);
-		form.setLanguage(language);
-		Page<Tag> tags = tagService.readTags(form.buildTagSearchRequest());
+		Page<Tag> tags = tagService.readTags(form.toTagSearchRequest());
 
-		List<DomainObjectSelectModel> results = new ArrayList<>();
+		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (tags.hasContent()) {
 			for (Tag tag : tags) {
-				DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getId(), tag.getName());
+				DomainObjectSelect2Model model = new DomainObjectSelect2Model(tag.getId(), tag.getName());
 				results.add(model);
 			}
 		}
@@ -55,7 +54,8 @@ public class TagSelectController {
 	}
 
 	@RequestMapping(value="/{language}/tags/select/{id}", method= RequestMethod.GET)
-	public @ResponseBody DomainObjectSelectModel select(
+	public @ResponseBody
+	DomainObjectSelect2Model select(
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
@@ -65,7 +65,7 @@ public class TagSelectController {
 			return null;
 		}
 
-		DomainObjectSelectModel model = new DomainObjectSelectModel(tag.getName(), tag.getName());
+		DomainObjectSelect2Model model = new DomainObjectSelect2Model(tag.getName(), tag.getName());
 		return model;
 	}
 }

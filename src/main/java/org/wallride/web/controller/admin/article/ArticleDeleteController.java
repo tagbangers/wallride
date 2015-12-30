@@ -24,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.service.ArticleService;
@@ -39,11 +40,17 @@ public class ArticleDeleteController {
 	
 	@Inject
 	private ArticleService articleService;
-	
+
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping
 	public String delete(
 			@Valid @ModelAttribute("form") ArticleDeleteForm form,
 			BindingResult errors,
+			String query,
 			RedirectAttributes redirectAttributes) {
 //		if (!form.isConfirmed()) {
 //			errors.rejectValue("confirmed", "Confirmed");
@@ -66,6 +73,7 @@ public class ArticleDeleteController {
 		}
 
 		redirectAttributes.addFlashAttribute("deletedArticle", article);
+		redirectAttributes.addAttribute("query", query);
 		return "redirect:/_admin/{language}/articles/index";
 	}
 }

@@ -17,14 +17,15 @@
 package org.wallride.web.controller.admin.comment;
 
 import org.wallride.core.service.CommentBulkDeleteRequest;
-import org.wallride.web.support.DomainObjectBulkDeleteForm;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public class CommentBulkDeleteForm extends DomainObjectBulkDeleteForm {
+public class CommentBulkDeleteForm {
 
 	private List<Long> ids;
+
+	private boolean confirmed;
 
 	@NotNull
 	private String language;
@@ -35,6 +36,14 @@ public class CommentBulkDeleteForm extends DomainObjectBulkDeleteForm {
 
 	public void setIds(List<Long> ids) {
 		this.ids = ids;
+	}
+
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+
+	public void setConfirmed(boolean confirmed) {
+		this.confirmed = confirmed;
 	}
 
 	public String getLanguage() {

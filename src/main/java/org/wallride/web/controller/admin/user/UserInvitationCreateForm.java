@@ -17,11 +17,11 @@
 package org.wallride.web.controller.admin.user;
 
 import org.wallride.core.service.UserInvitationCreateRequest;
-import org.wallride.web.support.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-public class UserInvitationCreateForm extends DomainObjectCreateForm {
+public class UserInvitationCreateForm implements Serializable {
 
 	@NotNull
 	private String invitees;

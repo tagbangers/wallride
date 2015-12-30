@@ -39,7 +39,6 @@ import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
@@ -62,6 +61,11 @@ public class PageCreateController {
 	@ModelAttribute("pageTree")
 	public PageTree pageTree(@PathVariable String language) {
 		return pageService.readPageTree(language);
+	}
+
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
 	}
 
 	@ExceptionHandler(BindException.class)
@@ -122,6 +126,7 @@ public class PageCreateController {
 			@PathVariable String language,
 			@Validated({Default.class, PageCreateForm.GroupPublish.class}) @ModelAttribute("form") PageCreateForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -146,15 +151,16 @@ public class PageCreateController {
 		redirectAttributes.addFlashAttribute("savedPage", page);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", page.getId());
-		return "redirect:/_admin/{language}/pages/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/pages/describe";
 	}
 
-	@RequestMapping(method=RequestMethod.POST, params="cancel")
-	public String cancel(
-			@PathVariable String language,
-			@Valid @ModelAttribute("form") PageCreateForm form,
-			RedirectAttributes redirectAttributes) {
-		redirectAttributes.addAttribute("language", language);
-		return "redirect:/_admin/{language}/pages/";
-	}
+//	@RequestMapping(method=RequestMethod.POST, params="cancel")
+//	public String cancel(
+//			@PathVariable String language,
+//			@Valid @ModelAttribute("form") PageCreateForm form,
+//			RedirectAttributes redirectAttributes) {
+//		redirectAttributes.addAttribute("language", language);
+//		return "redirect:/_admin/{language}/pages/";
+//	}
 }

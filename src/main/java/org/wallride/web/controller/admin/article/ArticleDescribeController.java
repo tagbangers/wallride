@@ -16,45 +16,84 @@
 
 package org.wallride.web.controller.admin.article;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Article;
 import org.wallride.core.service.ArticleService;
-import org.wallride.web.support.DomainObjectDescribeController;
+import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
+import java.util.Iterator;
+import java.util.List;
 
 @Controller
 @RequestMapping(value="/{language}/articles/describe", method=RequestMethod.GET)
-public class ArticleDescribeController extends DomainObjectDescribeController<Article, ArticleSearchForm> {
+public class ArticleDescribeController {
 
 	@Inject
 	private ArticleService articleService;
 
-	@RequestMapping
-	public String describe(
-			@RequestParam long id,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, null, model, session);
+	@Inject
+	private ConversionService conversionService;
+
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
 	}
 
-	@RequestMapping(params = "pageable")
+	@RequestMapping
 	public String describe(
+			@PathVariable String language,
 			@RequestParam long id,
-			@PageableDefault(50) Pageable pageable,
-			Model model,
-			HttpSession session) {
-		return super.requestMappingDescribe(id, pageable, model, session);
+			String query,
+			Model model) {
+		Article article = articleService.readArticleById(id, language);
+		if (article == null) {
+			throw new HttpNotFoundException();
+		}
+
+		MutablePropertyValues mpvs = new MutablePropertyValues(UriComponentsBuilder.newInstance().query(query).build().getQueryParams());
+		for (Iterator<PropertyValue> i = mpvs.getPropertyValueList().iterator(); i.hasNext();) {
+			PropertyValue pv = i.next();
+			boolean hasValue = false;
+			for (String value : (List<String>) pv.getValue()) {
+				if (StringUtils.hasText(value)) {
+					hasValue = true;
+					break;
+				}
+			}
+			if (!hasValue) {
+				i.remove();
+			}
+		}
+		BeanWrapperImpl beanWrapper = new BeanWrapperImpl(new ArticleSearchForm());
+		beanWrapper.setConversionService(conversionService);
+		beanWrapper.setPropertyValues(mpvs, true, true);
+		ArticleSearchForm form = (ArticleSearchForm) beanWrapper.getWrappedInstance();
+		List<Long> ids = articleService.readArticleIds(form.toArticleSearchRequest());
+		if (!CollectionUtils.isEmpty(ids)) {
+			int index = ids.indexOf(article.getId());
+			if (index < ids.size() - 1) {
+				Long next = ids.get(index + 1);
+				model.addAttribute("next", next);
+			}
+			if (index > 0) {
+				Long prev = ids.get(index -1);
+				model.addAttribute("prev", prev);
+			}
+		}
+
+		model.addAttribute("article", article);
+		model.addAttribute("query", query);
+		return "article/describe";
 	}
 
 	@RequestMapping(params = "part=delete-form")
@@ -64,30 +103,5 @@ public class ArticleDescribeController extends DomainObjectDescribeController<Ar
 		Article article = articleService.readArticleById(id, language);
 		model.addAttribute("article", article);
 		return "article/describe::delete-form";
-	}
-
-	@Override
-	protected Class<ArticleSearchForm> getDomainObjectSearchFormClass() {
-		return ArticleSearchForm.class;
-	}
-
-	@Override
-	protected String getModelAttributeName() {
-		return "article";
-	}
-
-	@Override
-	protected String getViewName() {
-		return "article/describe";
-	}
-
-	@Override
-	protected Article readDomainObject(long id) {
-		return articleService.readArticleById(id, LocaleContextHolder.getLocale().getLanguage());
-	}
-
-	@Override
-	protected Page<Article> readDomainObjects(ArticleSearchForm form, Pageable pageable) {
-		return articleService.readArticles(form.toArticleSearchRequest(), pageable);
 	}
 }
