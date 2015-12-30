@@ -17,11 +17,10 @@
 package org.wallride.web.controller.admin.user;
 
 import org.wallride.core.service.UserInvitationDeleteRequest;
-import org.wallride.web.support.DomainObjectDeleteForm;
 
 import javax.validation.constraints.NotNull;
 
-public class UserInvitationDeleteForm extends DomainObjectDeleteForm {
+public class UserInvitationDeleteForm {
 
 	@NotNull
 	private String token;

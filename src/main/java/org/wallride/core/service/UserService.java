@@ -406,6 +406,10 @@ public class UserService {
 		return invitation;
 	}
 
+	public List<Long> readUserIds(UserSearchRequest request) {
+		return userRepository.searchForId(request);
+	}
+
 	public Page<User> readUsers(UserSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
 		return readUsers(request, pageable);

@@ -19,12 +19,12 @@ package org.wallride.web.controller.admin.category;
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.service.CategoryUpdateRequest;
-import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class CategoryEditForm extends DomainObjectEditForm {
+public class CategoryEditForm implements Serializable {
 
 	@NotNull
 	private Long id;

@@ -19,12 +19,12 @@ package org.wallride.web.controller.admin.tag;
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.service.TagUpdateRequest;
-import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class TagEditForm extends DomainObjectEditForm {
+public class TagEditForm implements Serializable {
 
 	@NotNull
 	private Long id;

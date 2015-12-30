@@ -40,6 +40,11 @@ public class PageTreeController {
 		return new PageCreateForm();
 	}
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping
 	public String index(@PathVariable String language, Model model) {
 		PageTree pageTree = pageService.readPageTree(language);

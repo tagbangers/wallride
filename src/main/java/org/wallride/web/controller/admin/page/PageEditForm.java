@@ -23,9 +23,9 @@ import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
 import org.wallride.core.service.PageUpdateRequest;
-import org.wallride.web.support.DomainObjectEditForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("serial")
-public class PageEditForm extends DomainObjectEditForm {
+public class PageEditForm implements Serializable {
 	
 	interface GroupPublish {}
 	

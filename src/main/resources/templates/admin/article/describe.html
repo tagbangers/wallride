@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
@@ -12,7 +12,7 @@
 					<div class="row">
 						<div class="col-sm-9">
 							<div class="pull-left back">
-								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/articles/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/articles/index(query=${query})}"><span class="glyphicon glyphicon-arrow-left"></span></a>
 							</div>
 							<div class="pull-left">
 								<h1 th:text="${article.title}?:'(No Titled)'">(No Titled)</h1>
@@ -21,17 +21,17 @@
 						<div class="col-sm-3">
 							<div class="pull-right">
 								<div class="btn-group">
-									<div th:classappend="${previousObject eq null}?'disabled'" class="previous">
-										<a class="btn btn-default" th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/articles/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+									<div th:classappend="${prev eq null}?'disabled'" class="previous">
+										<a class="btn btn-default" th:href="${prev ne null} ? @{__${ADMIN_PATH}__/articles/describe(id=${prev},query=${query})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
 									</div>
 								</div>
 								<div class="btn-group">
-									<div th:classappend="${nextObject eq null}?'disabled'" class="next">
-										<a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/articles/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+									<div th:classappend="${next eq null}?'disabled'" class="next">
+										<a class="btn btn-default" th:href="${next ne null} ? @{__${ADMIN_PATH}__/articles/describe(id=${next},query=${query})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
 									</div>
 								</div>
 								<div class="btn-group">
-									<a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}" type="button" class="btn btn-info" th:text="#{Edit}">Edit</a>
+									<a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${article.id},query=${query})}" type="button" class="btn btn-info" th:text="#{Edit}">Edit</a>
 								</div>
 							</div>
 						</div>
@@ -108,12 +108,12 @@
 									</dl>
 								</dd>
 							</dl>
-							<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-form,id=${article.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>
+							<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-form,id=${article.id},query=${query})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>
 							<!-- #delete-modal -->
 							<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 								<div id="delete-dialog" class="modal-dialog">
 									<div class="modal-content">
-										<form th:fragment="delete-form" th:action="@{__${ADMIN_PATH}__/articles/delete(id=${article.id})}" method="post">
+										<form th:fragment="delete-form" th:action="@{__${ADMIN_PATH}__/articles/delete(id=${article.id},query=${query})}" method="post">
 											<div class="modal-header">
 												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 												<h4 class="modal-title" th:text="#{DeleteArticle}">Delete Article</h4>

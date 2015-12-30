@@ -24,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Page;
 import org.wallride.core.service.PageService;
@@ -40,10 +41,16 @@ public class PageDeleteController {
 	@Inject
 	private PageService pageService;
 
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
+	}
+
 	@RequestMapping
 	public String delete(
 			@Valid @ModelAttribute("form") PageDeleteForm form,
 			BindingResult errors,
+			String query,
 			RedirectAttributes redirectAttributes) {
 //		if (!form.isConfirmed()) {
 //			errors.rejectValue("confirmed", "Confirmed");
@@ -66,6 +73,7 @@ public class PageDeleteController {
 		}
 
 		redirectAttributes.addFlashAttribute("deletedPage", page);
+		redirectAttributes.addAttribute("query", query);
 		return "redirect:/_admin/{language}/pages/index";
 	}
 }

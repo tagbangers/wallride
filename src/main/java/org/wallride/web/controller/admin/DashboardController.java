@@ -76,7 +76,6 @@ public class DashboardController {
 
 	private List<Article> recentPublishedArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
-		form.setLanguage(language);
 		form.setStatus(Post.Status.PUBLISHED);
 		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
 		return page.getContent();
@@ -84,7 +83,6 @@ public class DashboardController {
 
 	private List<Article> recentDraftArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
-		form.setLanguage(language);
 		form.setStatus(Post.Status.DRAFT);
 		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
 		return page.getContent();

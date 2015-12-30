@@ -38,7 +38,6 @@ import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
@@ -63,6 +62,11 @@ public class PageEditController {
 	@ModelAttribute("pageTree")
 	public PageTree setupPageTree(@PathVariable String language) {
 		return pageService.readPageTree(language);
+	}
+
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
 	}
 
 	@ExceptionHandler(BindException.class)
@@ -97,11 +101,13 @@ public class PageEditController {
 	public String editDraft(
 			@PathVariable String language,
 			@RequestParam long id,
+			String query,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		Page page = (Page) model.asMap().get("page");
 		if (!language.equals(page.getLanguage())) {
 			redirectAttributes.addAttribute("language", language);
+			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/pages/index";
 		}
 
@@ -109,7 +115,8 @@ public class PageEditController {
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);
 			redirectAttributes.addAttribute("id", id);
-			return "redirect:/_admin/{language}/pages/edit?id={id}";
+			redirectAttributes.addAttribute("query", query);
+			return "redirect:/_admin/{language}/pages/edit";
 		}
 
 		PageEditForm form = PageEditForm.fromDomainObject(draft);
@@ -157,6 +164,7 @@ public class PageEditController {
 			@PathVariable String language,
 			@Validated({Default.class, PageEditForm.GroupPublish.class}) @ModelAttribute("form") PageEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -181,7 +189,8 @@ public class PageEditController {
 		redirectAttributes.addFlashAttribute("savedPage", page);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", page.getId());
-		return "redirect:/_admin/{language}/pages/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/pages/describe";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="unpublish")
@@ -189,6 +198,7 @@ public class PageEditController {
 			@PathVariable String language,
 			@Validated({Default.class, PageEditForm.GroupPublish.class}) @ModelAttribute("form") PageEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -213,7 +223,8 @@ public class PageEditController {
 		redirectAttributes.addFlashAttribute("savedPage", page);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", page.getId());
-		return "redirect:/_admin/{language}/pages/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/pages/describe";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="update")
@@ -221,6 +232,7 @@ public class PageEditController {
 			@PathVariable String language,
 			@Validated({Default.class, PageEditForm.GroupPublish.class}) @ModelAttribute("form") PageEditForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
 			RedirectAttributes redirectAttributes) {
 		if (errors.hasErrors()) {
@@ -245,14 +257,15 @@ public class PageEditController {
 		redirectAttributes.addFlashAttribute("savedPage", page);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", page.getId());
-		return "redirect:/_admin/{language}/pages/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/pages/describe";
 	}
 	
-	@RequestMapping(method=RequestMethod.POST, params="cancel")
-	public String cancel(
-			@Valid @ModelAttribute("form") PageEditForm form,
-			RedirectAttributes redirectAttributes) {
-		redirectAttributes.addAttribute("id", form.getId());
-		return "redirect:/_admin/pages/describe/{id}";
-	}
+//	@RequestMapping(method=RequestMethod.POST, params="cancel")
+//	public String cancel(
+//			@Valid @ModelAttribute("form") PageEditForm form,
+//			RedirectAttributes redirectAttributes) {
+//		redirectAttributes.addAttribute("id", form.getId());
+//		return "redirect:/_admin/pages/describe/{id}";
+//	}
 }

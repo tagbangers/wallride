@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.wallride.core.support;
+package org.wallride.web.support;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,13 +32,14 @@ public class Pagination<T> {
 	private Page<T> page;
 	private String url;
 
-	public Pagination(Page<T> page) {
-		this.page = page;
-	}
-
 	public Pagination(Page<T> page, String url) {
 		this.page = page;
 		this.url = url;
+	}
+
+	public Pagination(Page<T> page, HttpServletRequest request) {
+		this.page = page;
+		this.url = ServletUriComponentsBuilder.fromRequest(request).replaceQueryParam("page").build().toUriString();
 	}
 
 	public String getUrl() {

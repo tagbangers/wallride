@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
@@ -12,7 +12,7 @@
 					<div class="row">
 						<div class="col-sm-9">
 							<div class="pull-left back">
-								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+								<a class="btn btn-sm btn-default" th:href="@{__${ADMIN_PATH}__/pages/index(query=${query})}"><span class="glyphicon glyphicon-arrow-left"></span></a>
 							</div>
 							<div class="pull-left">
 								<h1 th:text="${page.title?:'(No Titled)'}">Page Title</h1>
@@ -21,17 +21,17 @@
 						<div class="col-sm-3">
 							<div class="pull-right">
 								<div class="btn-group">
-									<div th:classappend="${previousObject eq null}?'disabled'" class="previous">
-										<a class="btn btn-default" th:href="${previousObject ne null} ? @{__${ADMIN_PATH}__/pages/describe?pageable(id=${previousObject.id},page=${previousPageable.pageNumber},size=${previousPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
+									<div th:classappend="${prev eq null}?'disabled'" class="previous">
+										<a class="btn btn-default" th:href="${prev ne null} ? @{__${ADMIN_PATH}__/pages/describe(id=${prev},query=${query})} : '#'"><span class="glyphicon glyphicon-chevron-left"></span></a>
 									</div>
 								</div>
 								<div class="btn-group">
-									<div th:classappend="${nextObject eq null}?'disabled'" class="next">
-										<a class="btn btn-default" th:href="${nextObject ne null} ? @{__${ADMIN_PATH}__/pages/describe?pageable(id=${nextObject.id},page=${nextPageable.pageNumber},size=${nextPageable.pageSize})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
+									<div th:classappend="${next eq null}?'disabled'" class="next">
+										<a class="btn btn-default" th:href="${next ne null} ? @{__${ADMIN_PATH}__/pages/describe(id=${next},query=${query})} : '#'"><span class="glyphicon glyphicon-chevron-right"></span></a>
 									</div>
 								</div>
 								<div class="btn-group">
-									<a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${page.id})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
+									<a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${page.id},query=${query})}" title="編集" type="button" class="btn btn-info" th:text="#{Edit}">編集</a>
 <!--
 									<a class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></a>
 									<ul class="dropdown-menu pull-right" role="menu">
@@ -62,7 +62,7 @@
 								<p th:utext="${#posts.body(page)}"></p>
 							</div>
 							<hr/>
-							<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a>
+							<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id},query=${query})}" th:text="${page.author}">Author</a>
 						</div>
 						<div class="col-sm-3 wr-tool-panel">
 							<div class="tools clearfix">
@@ -102,7 +102,7 @@
 								<dt th:text="#{RelatedPosts}">Related Posts</dt>
 								<dd>
 									<ul class="list-unstyled">
-										<li th:each="relatedPost : ${page.relatedToPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
+										<li th:each="relatedPost : ${page.relatedToPosts}"><a th:href="@{__${ADMIN_PATH}__/posts/describe(id=${relatedPost.id},query=${query})}"><span class="glyphicon glyphicon-link"></span> <span th:text="${relatedPost.title}"></span></a></li>
 									</ul>
 								</dd>
 							</dl>
@@ -119,11 +119,11 @@
 									</dl>
 								</dd>
 							</dl>
-							<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
+							<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id},query=${query})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
 							<!-- #delete-modal -->
 							<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
 								<div id="delete-dialog" class="modal-dialog">
-									<form th:action="@{__${ADMIN_PATH}__/pages/delete(id=${page.id})}" method="post">
+									<form th:action="@{__${ADMIN_PATH}__/pages/delete(id=${page.id},query=${query})}" method="post">
 										<div th:fragment="delete-form" class="modal-content">
 											<div class="modal-header">
 												<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

@@ -41,20 +41,45 @@ import org.wallride.core.service.UserSearchRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserRepositoryImpl implements UserRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	@Override
+	public Page<User> search(UserSearchRequest request) {
+		return search(request, null);
+	}
+
 	@Override
 	public Page<User> search(UserSearchRequest request, Pageable pageable) {
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(User.class);
+
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, pageable, criteria);
+		int resultSize = persistenceQuery.getResultSize();
+		List<User> results = persistenceQuery.getResultList();
+		return new PageImpl<>(results, pageable, resultSize);
+	}
+
+	@Override
+	public List<Long> searchForId(UserSearchRequest request) {
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		persistenceQuery.setProjection("id");
+		List<Object[]> results = persistenceQuery.getResultList();
+		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
+		return nos;
+	}
+
+	private FullTextQuery buildFullTextQuery(UserSearchRequest request, Pageable pageable, Criteria criteria) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
 				.forEntity(User.class)
 				.get();
-		
+
 		@SuppressWarnings("rawtypes")
 		BooleanJunction<BooleanJunction> junction = qb.bool();
 		junction.must(qb.all().createQuery());
@@ -89,9 +114,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		}
 
 		Query searchQuery = junction.createQuery();
-		
-		Session session = (Session) entityManager.getDelegate();
-		Criteria criteria = session.createCriteria(User.class);
 
 		Sort sort = new Sort(new SortField("id", SortField.Type.STRING, false));
 
@@ -100,13 +122,10 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				.setCriteriaQuery(criteria)
 //				.setProjection("id")
 				.setSort(sort);
-		persistenceQuery.setFirstResult(pageable.getOffset());
-		persistenceQuery.setMaxResults(pageable.getPageSize());
-
-		int resultSize = persistenceQuery.getResultSize();
-
-		@SuppressWarnings("unchecked")
-		List<User> results = persistenceQuery.getResultList();
-		return new PageImpl<>(results, pageable, resultSize);
+		if (pageable != null) {
+			persistenceQuery.setFirstResult(pageable.getOffset());
+			persistenceQuery.setMaxResults(pageable.getPageSize());
+		}
+		return persistenceQuery;
 	}
 }

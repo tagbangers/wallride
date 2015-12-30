@@ -21,17 +21,17 @@ import org.wallride.core.domain.DomainObject;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class DomainObjectSelectModel<ID extends Serializable> implements Serializable {
+public class DomainObjectSelect2Model<ID extends Serializable> implements Serializable {
 	
 	private ID id;
 	private String text;
 	
-	public DomainObjectSelectModel(DomainObject object) {
+	public DomainObjectSelect2Model(DomainObject object) {
 		setId((ID) object.getId());
 		setText(object.toString());
 	}
 	
-	public DomainObjectSelectModel(ID id, String text) {
+	public DomainObjectSelect2Model(ID id, String text) {
 		setId(id);
 		setText(text);
 	}
@@ -55,9 +55,9 @@ public class DomainObjectSelectModel<ID extends Serializable> implements Seriali
 	@Override
 	public boolean equals(Object other) {
 		if (this == other) return true;
-		if (other == null || !(other instanceof DomainObjectSelectModel)) return false;
+		if (other == null || !(other instanceof DomainObjectSelect2Model)) return false;
 		if (getId() == null) return false;
-		DomainObjectSelectModel that = (DomainObjectSelectModel) other;
+		DomainObjectSelect2Model that = (DomainObjectSelect2Model) other;
 		return getId().equals(that.getId());
 	}
 }

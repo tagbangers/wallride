@@ -14,7 +14,7 @@
 					</div>
 					<div class="pull-right">
 						<div class="btn-group">
-							<a th:href="@{__${ADMIN_PATH}__/tags/index?part=tag-create-form}" data-toggle="modal" data-target="#tag-create-modal" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewTag}">Add New Tag</span></a>
+							<a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-create-form,query=${query})}" data-toggle="modal" data-target="#tag-create-modal" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewTag}">Add New Tag</span></a>
 						</div>
 					</div>
 				</div>
@@ -35,7 +35,7 @@
 					</div>
 					<section class="search-condition">
 						<div class="search-condition-simple clearfix">
-							<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
+							<form class="form-inline" method="get" th:action="@{/_admin/__${language}__/tags/index}" th:object="${form}">
 								<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
 								<div class="form-group pull-left">
 									<div class="input-group keyword-search">
@@ -53,10 +53,10 @@
 							<div class="search-result-header clearfix">
 								<div class="btn-toolbar pull-left">
 									<div class="btn-group wr-bulk-action">
-										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=bulk-delete-form,query=${query})}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 									</div>
 									<div class="btn-group wr-merge-action">
-										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-merge-form)}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled" th:text="#{Merge}">Merge</a>
+										<a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-merge-form,query=${query})}" data-toggle="modal" data-target="#merge-tag-modal" class="btn btn-default disabled" th:text="#{Merge}">Merge</a>
 									</div>
 								</div>
 								<div class="pagination-group pull-right">
@@ -85,7 +85,7 @@
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${tag.id}" /></td>
 											<td th:text="${tag.name}"></td>
 											<td class="text-right"><span class="badge wr-tree-option" th:text="${articleCounts.get(tag.id)}?:0">16</span></td>
-											<td class="text-center"><a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-edit-form,id=${tag.id})}" data-toggle="modal" data-target="#tag-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+											<td class="text-center"><a th:href="@{__${ADMIN_PATH}__/tags/index(part=tag-edit-form,id=${tag.id},query=${query})}" data-toggle="modal" data-target="#tag-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 										</tr>
 									</tbody>
 								</table>
@@ -142,7 +142,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" id="delete-tag" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+											<button class="btn btn-primary" id="delete-tag" th:attr="data-action=@{__${ADMIN_PATH}__/tags/bulk-delete(query=${query})}" disabled="true" th:text="#{Delete}">Delete</button>
 										</div>
 									</div>
 								</div>
@@ -183,7 +183,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" id="merge-tag" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge}" th:text="#{Merge}">Merge</button>
+											<button class="btn btn-primary" id="merge-tag" th:attr="data-action=@{__${ADMIN_PATH}__/tags/merge(query=${query})}" th:text="#{Merge}">Merge</button>
 										</div>
 									</div>
 								</div>
@@ -202,7 +202,7 @@
 											type: 'post',
 											data: $form.serialize(),
 											success: function() {
-												location = /*[[@{__${ADMIN_PATH}__/tags/index?merged}]]*/ '#';
+												location = /*[[@{__${ADMIN_PATH}__/tags/index(merged,query=${query})}]]*/ '#';
 											},
 											error: function(jqXHR) {
 												$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
@@ -264,7 +264,7 @@
 						type: 'post',
 						data: data,
 						success: function() {
-							location = /*[[@{__${ADMIN_PATH}__/tags/index?created}]]*/ '#';
+							location = /*[[@{__${ADMIN_PATH}__/tags/index(created,query=${query})}]]*/ '#';
 						},
 						error: function(jqXHR) {
 							$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
@@ -323,7 +323,7 @@
 						type: 'post',
 						data: data,
 						success: function() {
-							location = /*[[@{__${ADMIN_PATH}__/tags/index?updated}]]*/ '#';
+							location = /*[[@{__${ADMIN_PATH}__/tags/index(updated,query=${query})}]]*/ '#';
 						},
 						error: function(jqXHR) {
 							$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {

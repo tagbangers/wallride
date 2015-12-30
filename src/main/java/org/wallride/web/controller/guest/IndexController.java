@@ -25,10 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.service.ArticleService;
-import org.wallride.core.support.Pagination;
 import org.wallride.web.controller.guest.article.ArticleSearchForm;
+import org.wallride.web.support.Pagination;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/")
@@ -41,14 +42,15 @@ public class IndexController {
 	public String index(
 			@PageableDefault(10) Pageable pageable,
 			BlogLanguage blogLanguage,
-			Model model) {
+			Model model,
+			HttpServletRequest servletRequest) {
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
 
 		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(articles));
+		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
 		return "index";
 //
 //

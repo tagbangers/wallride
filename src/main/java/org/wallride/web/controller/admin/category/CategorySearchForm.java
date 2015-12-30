@@ -17,9 +17,10 @@
 package org.wallride.web.controller.admin.category;
 
 import org.wallride.core.service.CategorySearchRequest;
-import org.wallride.web.support.DomainObjectSearchForm;
 
-public class CategorySearchForm extends DomainObjectSearchForm {
+import java.io.Serializable;
+
+public class CategorySearchForm implements Serializable {
 
 	private String keyword;
 	private String language;

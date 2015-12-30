@@ -22,20 +22,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PageSearchRequest;
-import org.wallride.web.support.DomainObjectSearchForm;
+
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class PageSearchForm extends DomainObjectSearchForm {
+public class PageSearchForm implements Serializable {
 	
 	private String keyword;
 	private Long tagId;
 	private Long authorId;
 	private Post.Status status;
-	private String language;
-
-	public PageSearchForm() {
-		this.language = LocaleContextHolder.getLocale().getLanguage();
-	}
 
 	public String getKeyword() {
 		return keyword;
@@ -69,14 +65,6 @@ public class PageSearchForm extends DomainObjectSearchForm {
 		this.status = status;
 	}
 	
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
 	public boolean isEmpty() {
 		if (StringUtils.hasText(getKeyword())) {
 			return false;
@@ -85,9 +73,6 @@ public class PageSearchForm extends DomainObjectSearchForm {
 			return false;
 		}
 		if (getStatus() != null) {
-			return false;
-		}
-		if (StringUtils.hasText(getLanguage())) {
 			return false;
 		}
 		return true;
@@ -105,7 +90,7 @@ public class PageSearchForm extends DomainObjectSearchForm {
 		}
 		request.withAuthorId(getAuthorId());
 		request.withStatus(getStatus());
-		request.withLanguage(getLanguage());
+		request.withLanguage(LocaleContextHolder.getLocale().getLanguage());
 		return request;
 	}
 

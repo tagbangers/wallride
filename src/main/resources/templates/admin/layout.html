@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head th:fragment="head(title)" th:remove="tag">
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -74,12 +74,12 @@
 				<div class="navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
 						<li><a th:href="@{__${ADMIN_PATH}__/}" href="articles.html"><span class="glyphicon glyphicon-home"></span></a></li>
-						<li><a th:href="@{__${ADMIN_PATH}__/articles/index?search}" href="articles.html"><span class="glyphicon glyphicon-file"></span> <span th:text="#{Articles}">Articles</span></a></li>
+						<li><a th:href="@{__${ADMIN_PATH}__/articles/index}" href="articles.html"><span class="glyphicon glyphicon-file"></span> <span th:text="#{Articles}">Articles</span></a></li>
 						<li><a th:href="@{__${ADMIN_PATH}__/categories/index}"><span class="glyphicon glyphicon-folder-open"></span> <span th:text="#{Categories}">Categories</span></a></li>
-						<li><a th:href="@{__${ADMIN_PATH}__/tags/index?clear}"><span class="glyphicon glyphicon-tag"></span> <span th:text="#{Tags}">Tags</span></a></li>
-						<li><a th:href="@{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-book"></span> <span th:text="#{Pages}">Pages</span></a></li>
-						<li><a th:href="@{__${ADMIN_PATH}__/comments/index?search}"><span class="glyphicon glyphicon-comment"></span> <span th:text="#{Comments}">Comments</span></a></li>
-						<li><a th:href="@{__${ADMIN_PATH}__/users/index?search}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Users}">Users</span></a></li>
+						<li><a th:href="@{__${ADMIN_PATH}__/tags/index}"><span class="glyphicon glyphicon-tag"></span> <span th:text="#{Tags}">Tags</span></a></li>
+						<li><a th:href="@{__${ADMIN_PATH}__/pages/index}"><span class="glyphicon glyphicon-book"></span> <span th:text="#{Pages}">Pages</span></a></li>
+						<li><a th:href="@{__${ADMIN_PATH}__/comments/index}"><span class="glyphicon glyphicon-comment"></span> <span th:text="#{Comments}">Comments</span></a></li>
+						<li><a th:href="@{__${ADMIN_PATH}__/users/index}"><span class="glyphicon glyphicon-user"></span> <span th:text="#{Users}">Users</span></a></li>
 						<li><a th:href="@{__${ADMIN_PATH}__/analytics}"><span class="glyphicon glyphicon-signal"></span> <span th:text="#{GoogleAnalytics}">Google Analytics</span></a></li>
 						<li><a th:href="@{__${ADMIN_PATH}__/system}"><span class="glyphicon glyphicon-cog"></span> <span th:text="#{System}">System</span></a></li>
 					</ul>

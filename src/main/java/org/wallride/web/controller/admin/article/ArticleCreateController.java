@@ -40,7 +40,6 @@ import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import javax.validation.groups.Default;
 
 @Controller
@@ -66,6 +65,11 @@ public class ArticleCreateController {
 	@ModelAttribute("categoryTree")
 	public CategoryTree categoryTree(@PathVariable String language) {
 		return categoryService.readCategoryTree(language);
+	}
+
+	@ModelAttribute("query")
+	public String query(@RequestParam(required = false) String query) {
+		return query;
 	}
 
 	@ExceptionHandler(BindException.class)
@@ -125,8 +129,10 @@ public class ArticleCreateController {
 			@PathVariable String language,
 			@Validated({Default.class, ArticleCreateForm.GroupPublish.class}) @ModelAttribute("form") ArticleCreateForm form,
 			BindingResult errors,
+			String query,
 			AuthorizedUser authorizedUser,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes,
+			Model model) {
 		if (errors.hasErrors()) {
 			return "article/create";
 		}
@@ -149,15 +155,16 @@ public class ArticleCreateController {
 		redirectAttributes.addFlashAttribute("savedArticle", article);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", article.getId());
-		return "redirect:/_admin/{language}/articles/describe?id={id}";
+		redirectAttributes.addAttribute("query", query);
+		return "redirect:/_admin/{language}/articles/describe";
 	}
 
-	@RequestMapping(method=RequestMethod.POST, params="cancel")
-	public String cancel(
-			@PathVariable String language,
-			@Valid @ModelAttribute("form") ArticleCreateForm form,
-			RedirectAttributes redirectAttributes) {
-		redirectAttributes.addAttribute("language", language);
-		return "redirect:/_admin/{language}/articles/";
-	}
+//	@RequestMapping(method=RequestMethod.POST, params="cancel")
+//	public String cancel(
+//			@PathVariable String language,
+//			@Valid @ModelAttribute("form") ArticleCreateForm form,
+//			RedirectAttributes redirectAttributes) {
+//		redirectAttributes.addAttribute("language", language);
+//		return "redirect:/_admin/{language}/articles/";
+//	}
 }

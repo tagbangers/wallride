@@ -14,10 +14,11 @@ import org.wallride.core.service.PostSearchRequest;
 import org.wallride.core.service.PostService;
 import org.wallride.core.service.TagSearchRequest;
 import org.wallride.core.service.TagService;
-import org.wallride.core.support.Pagination;
 import org.wallride.web.support.HttpNotFoundException;
+import org.wallride.web.support.Pagination;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/tag")
@@ -31,11 +32,12 @@ public class TagController {
 	@RequestMapping
 	public String index(
 			@PageableDefault Pageable pageable,
-			Model model) {
+			Model model,
+			HttpServletRequest servletRequest) {
 		Page<Tag> tags = tagService.readTags(new TagSearchRequest(), pageable);
 		model.addAttribute("tags", tags);
 		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(tags));
+		model.addAttribute("pagination", new Pagination<>(tags, servletRequest));
 		return "tag/index";
 	}
 
@@ -44,7 +46,8 @@ public class TagController {
 			@PathVariable String name,
 			@PageableDefault Pageable pageable,
 			BlogLanguage blogLanguage,
-			Model model) {
+			Model model,
+			HttpServletRequest servletRequest) {
 		Tag tag = tagService.readTagByName(name, blogLanguage.getLanguage());
 		if (tag == null) {
 			throw new HttpNotFoundException();
@@ -57,7 +60,7 @@ public class TagController {
 		model.addAttribute("tag", tag);
 		model.addAttribute("posts", posts);
 		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(posts));
+		model.addAttribute("pagination", new Pagination<>(posts, servletRequest));
 		return "tag/post";
 	}
 }

@@ -19,12 +19,12 @@ package org.wallride.web.controller.admin.tag;
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.service.TagCreateRequest;
-import org.wallride.web.support.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class TagCreateForm extends DomainObjectCreateForm {
+public class TagCreateForm implements Serializable {
 
 	@NotNull
 	private String name;

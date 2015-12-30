@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head(${WEBSITE_TITLE})" />
 		<title>WallRide</title>
@@ -13,7 +13,7 @@
 						<h1 th:text="#{Users}">Users</h1>
 					</div>
 					<div class="pull-right">
-						<a th:href="@{__${ADMIN_PATH}__/users/invitations/index}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{InviteNew}">ユーザーを招待</span></a>
+						<a th:href="@{__${ADMIN_PATH}__/users/invitations/index(query=${query})}" class="btn btn-primary btn-sm" style="margin-top: -3px;"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{InviteNew}">ユーザーを招待</span></a>
 					</div>
 				</div>
 			</div>
@@ -21,13 +21,13 @@
 				<div class="container-fluid">
 					<section class="search-condition">
 						<div class="search-condition-simple clearfix">
-							<form class="form-inline" method="post" th:action="@{/_admin/__${language}__/users/index}" th:object="${form}">
-								<input type="submit" name="search" style="visibility:hidden; width:0; height:0;"/>
+							<form class="form-inline" method="get" th:action="@{/_admin/__${language}__/users/index}" th:object="${form}">
+								<input type="submit" style="visibility:hidden; width:0; height:0;"/>
 								<div class="form-group pull-left">
 									<div class="input-group keyword-search">
 										<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
 										<span class="input-group-btn">
-											<button class="btn btn-default" type="submit" name="search"><span class="glyphicon glyphicon-search"></span>
+											<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span>
 											</button>
 										</span>
 									</div>
@@ -41,7 +41,7 @@
 							<div class="search-result-header clearfix">
 								<div class="btn-toolbar wr-bulk-action pull-left">
 									<div class="btn-group">
-										<a th:href="@{__${ADMIN_PATH}__/users/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+										<a th:href="@{__${ADMIN_PATH}__/users/index(part=bulk-delete-form,query=${query})}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 									</div>
 								</div>
 								<div class="pagination-group pull-right">
@@ -67,7 +67,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr th:each="user : ${users}" th:attr="data-href=@{__${ADMIN_PATH}__/users/describe(id=${user.id})}" class="clickable">
+										<tr th:each="user : ${users}" th:attr="data-href=@{__${ADMIN_PATH}__/users/describe(id=${user.id},query=${query})}" class="clickable">
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${user.id}" /></td>
 											<td th:text="${user.name}"></td>
 											<td th:text="${user.loginId}"></td>
@@ -93,7 +93,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/users/bulk-delete(query=${query})}" disabled="true" th:text="#{Delete}">Delete</button>
 										</div>
 									</div>
 								</div>

@@ -18,15 +18,15 @@ package org.wallride.web.controller.admin.article;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.service.ArticleCreateRequest;
-import org.wallride.web.support.DomainObjectCreateForm;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings("serial")
-public class ArticleCreateForm extends DomainObjectCreateForm {
+public class ArticleCreateForm implements Serializable {
 
 	interface GroupPublish {}
 

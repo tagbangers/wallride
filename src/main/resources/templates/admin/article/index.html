@@ -13,7 +13,7 @@
 						<h1 th:text="#{Articles}">Articles</h1>
 					</div>
 					<div class="pull-right">
-						<a th:href="@{__${ADMIN_PATH}__/articles/create}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New</span></a>
+						<a th:href="@{__${ADMIN_PATH}__/articles/create(query=${query})}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewArticle}">Add New</span></a>
 					</div>
 				</div>
 			</div>
@@ -103,11 +103,11 @@
 							<div class="search-result-header clearfix">
 								<div class="btn-toolbar pull-left">
 									<div class="wr-bulk-action btn-group">
-										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form)}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
+										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-delete-form,query=${query})}" data-toggle="modal" data-target="#bulk-delete-modal" class="btn btn-default disabled"><span class="glyphicon glyphicon-trash"></span></a>
 									</div>
 									<div class="wr-bulk-action btn-group">
-										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-publish-form)}" data-toggle="modal" data-target="#bulk-publish-modal" class="btn btn-default disabled" th:text="#{Publish}">Publish</a>
-										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-unpublish-form)}" data-toggle="modal" data-target="#bulk-unpublish-modal" class="btn btn-default disabled" th:text="#{Unpublish}">Unpublish</a>
+										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-publish-form,query=${query})}" data-toggle="modal" data-target="#bulk-publish-modal" class="btn btn-default disabled" th:text="#{Publish}">Publish</a>
+										<a th:href="@{__${ADMIN_PATH}__/articles/index(part=bulk-unpublish-form,query=${query})}" data-toggle="modal" data-target="#bulk-unpublish-modal" class="btn btn-default disabled" th:text="#{Unpublish}">Unpublish</a>
 									</div>
 								</div>
 								<div class="pagination-group pull-right">
@@ -136,7 +136,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id})}" class="clickable">
+										<tr th:each="article : ${articles}" th:attr="data-href=@{__${ADMIN_PATH}__/articles/describe(id=${article.id},query=${query})}" class="clickable">
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${article.id}" th:attr="data-status=${#messages.msg('Post.Status.' + article.status)}"/></td>
 											<td th:class="'wr-post-status-' + ${article.status}" th:text="${#messages.msg('Post.Status.' + article.status)}">Status</td>
 											<td th:text="${article.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
@@ -144,7 +144,7 @@
 											<td><a th:if="${article.author ne null}" th:href="@{__${ADMIN_PATH}__/users/describe(id=${article.author.id})}" th:text="${article.author.name}">Author</a></td>
 											<td th:text="${article.date ne null ? #temporals.format(article.date, 'yyyy/MM/dd (E) HH:mm', #locale) : ''}">2013/10/24</td>
 											<td class="text-right" th:text="${article.views}">0</td>
-											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
+											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/articles/edit(id=${article.id},query=${query})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
 										</tr>
 									</tbody>
 								</table>
@@ -204,7 +204,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-delete}" disabled="true" th:text="#{Delete}">Delete</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-delete(query=${query})}" disabled="true" th:text="#{Delete}">Delete</button>
 										</div>
 									</div>
 								</div>
@@ -239,7 +239,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-publish}" th:text="#{Publish}">Publish</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-publish(query=${query})}" th:text="#{Publish}">Publish</button>
 										</div>
 										<script>
 											$(function () {
@@ -272,7 +272,7 @@
 										</div>
 										<div class="modal-footer">
 											<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-unpublish}" th:text="#{Unpublish}">Unpublish</button>
+											<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/articles/bulk-unpublish(query=${query})}" th:text="#{Unpublish}">Unpublish</button>
 										</div>
 									</div>
 								</div>

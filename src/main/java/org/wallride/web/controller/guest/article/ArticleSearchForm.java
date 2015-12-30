@@ -21,14 +21,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleSearchRequest;
-import org.wallride.web.support.DomainObjectSearchForm;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @SuppressWarnings("serial")
-public class ArticleSearchForm extends DomainObjectSearchForm {
+public class ArticleSearchForm implements Serializable {
 
 	private String keyword;
 	private LocalDateTime dateFrom;

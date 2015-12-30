@@ -21,17 +21,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.wallride.core.service.CommentSearchRequest;
-import org.wallride.web.support.DomainObjectSearchForm;
+
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class CommentSearchForm extends DomainObjectSearchForm {
+public class CommentSearchForm implements Serializable {
 
 	private String keyword;
-	private String language;
-
-	public CommentSearchForm() {
-		this.language = LocaleContextHolder.getLocale().getLanguage();
-	}
 
 	public String getKeyword() {
 		return keyword;
@@ -41,19 +37,8 @@ public class CommentSearchForm extends DomainObjectSearchForm {
 		this.keyword = keyword;
 	}
 
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
 	public boolean isEmpty() {
 		if (StringUtils.hasText(getKeyword())) {
-			return false;
-		}
-		if (StringUtils.hasText(getLanguage())) {
 			return false;
 		}
 		return true;
@@ -66,7 +51,7 @@ public class CommentSearchForm extends DomainObjectSearchForm {
 	public CommentSearchRequest toCommentSearchRequest() {
 		CommentSearchRequest request = new CommentSearchRequest();
 		request.setKeyword(getKeyword());
-		request.setLanguage(getLanguage());
+		request.setLanguage(LocaleContextHolder.getLocale().getLanguage());
 		return request;
 	}
 

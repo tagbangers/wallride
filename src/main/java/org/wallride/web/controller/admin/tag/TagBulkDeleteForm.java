@@ -17,14 +17,16 @@
 package org.wallride.web.controller.admin.tag;
 
 import org.wallride.core.service.TagBulkDeleteRequest;
-import org.wallride.web.support.DomainObjectBulkDeleteForm;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public class TagBulkDeleteForm extends DomainObjectBulkDeleteForm {
+public class TagBulkDeleteForm {
 
 	private List<Long> ids;
+
+	private boolean confirmed;
+
 	@NotNull
 	private String language;
 
@@ -34,6 +36,14 @@ public class TagBulkDeleteForm extends DomainObjectBulkDeleteForm {
 
 	public void setIds(List<Long> ids) {
 		this.ids = ids;
+	}
+
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+
+	public void setConfirmed(boolean confirmed) {
+		this.confirmed = confirmed;
 	}
 
 	public String getLanguage() {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
 		<title>WallRide</title>
@@ -7,13 +7,13 @@
 	<body>
 		<header th:replace="layout::header"></header>
 		<div>
-			<form id="wr-post-form" th:fragment="form(title,id)" th:action="@{__${ADMIN_PATH}__/pages/create}" th:object="${form}" action="#" method="post">
+			<form id="wr-post-form" th:fragment="form(title,id)" th:action="@{__${ADMIN_PATH}__/pages/create(query=${query})}" th:object="${form}" action="#" method="post">
 				<input type="hidden" name="id" th:value="${page}? ${page.id} : ''"  />
 				<div id="wr-page-header">
 					<div class="page-header container-fluid">
 						<div class="pull-left">
 							<div class="btn-group back">
-								<a class="btn btn-sm btn-default" th:href="${page} ? @{__${ADMIN_PATH}__/pages/describe(id=${page.id})} : @{__${ADMIN_PATH}__/pages/index?search}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+								<a class="btn btn-sm btn-default" th:href="${page} ? @{__${ADMIN_PATH}__/pages/describe(id=${page.id},query=${query})} : @{__${ADMIN_PATH}__/pages/index(query=${query})}"><span class="glyphicon glyphicon-arrow-left"></span></a>
 							</div>
 						</div>
 						<div class="pull-left">
@@ -55,7 +55,7 @@
 												data: data,
 												success: function(data) {
 													$form.children(':input[name="id"]').val(data.id);
-													$form.attr('action', [[@{__${ADMIN_PATH}__/pages/edit}]]);
+													$form.attr('action', [[@{__${ADMIN_PATH}__/pages/edit(query=${query})}]]);
 													var url = [[@{__${ADMIN_PATH}__/pages/edit?id=}]] + data.id;
 													history.replaceState(null, null, url);
 													new PNotify({
@@ -117,7 +117,7 @@
 								</div>
 								<div class="alert alert-info" th:if="${draft} ne null">
 									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-									<span th:text="#{YouHaveDraft}">You have draft.</span><a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${draft.drafted.id},draft)}"><span th:text="#{CopyDraft}">Copy draft</span></a>
+									<span th:text="#{YouHaveDraft}">You have draft.</span><a th:href="@{__${ADMIN_PATH}__/pages/edit(id=${draft.drafted.id},draft,query=${query})}"><span th:text="#{CopyDraft}">Copy draft</span></a>
 								</div>
 								<fieldset>
 									<div class="form-group">
