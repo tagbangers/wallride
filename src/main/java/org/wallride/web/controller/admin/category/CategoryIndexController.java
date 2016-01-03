@@ -52,14 +52,14 @@ public class CategoryIndexController {
 
 	@RequestMapping
 	public String index(@PathVariable String language, Model model) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.getCategoryTree(language);
 		model.addAttribute("categoryTree", categoryTree);
 		return "category/index";
 	}
 
 	@RequestMapping(params="part=category-create-form")
 	public String partCategoryCreateForm(@PathVariable String language, @RequestParam(required = false) Long parentId, Model model) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.getCategoryTree(language);
 		model.addAttribute("parentId", parentId);
 		model.addAttribute("categoryTree", categoryTree);
 		return "category/index::category-create-form";
@@ -67,7 +67,7 @@ public class CategoryIndexController {
 
 	@RequestMapping(params="part=category-edit-form")
 	public String partCategoryEditForm(@PathVariable String language, @RequestParam long id, Model model) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.getCategoryTree(language);
 		Category category = categoryTree.getCategoryById(id);
 		model.addAttribute("categoryTree", categoryTree);
 		model.addAttribute("category", category);

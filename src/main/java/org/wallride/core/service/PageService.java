@@ -37,6 +37,9 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.PageRepository;
 import org.wallride.core.repository.TagRepository;
@@ -182,7 +185,7 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
@@ -372,7 +375,7 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
@@ -485,20 +488,20 @@ public class PageService {
 		return pages;
 	}
 
-	public List<Long> readPageIds(PageSearchRequest request) {
+	public List<Long> getPageIds(PageSearchRequest request) {
 		return pageRepository.searchForId(request);
 	}
 
-	public org.springframework.data.domain.Page<Page> readPages(PageSearchRequest request) {
+	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readPages(request, pageable);
+		return getPages(request, pageable);
 	}
 
-	public org.springframework.data.domain.Page<Page> readPages(PageSearchRequest request, Pageable pageable) {
+	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request, Pageable pageable) {
 		return pageRepository.search(request, pageable);
 	}
 	
-	public List<Page> readPages(Collection<Long> ids) {
+	public List<Page> getPages(Collection<Long> ids) {
 		Set<Page> results = new LinkedHashSet<Page>(pageRepository.findByIdIn(ids));
 		List<Page> pages = new ArrayList<>();
 		for (long id : ids) {
@@ -512,26 +515,26 @@ public class PageService {
 		return pages;
 	}
 	
-	public Page readPageById(long id, String language) {
+	public Page getPageById(long id, String language) {
 		return pageRepository.findById(id, language);
 	}
 
-	public Page readPageByCode(String code, String language) {
+	public Page getPageByCode(String code, String language) {
 		return pageRepository.findByCode(code, language);
 	}
 
-	public Page readDraftById(long id) {
+	public Page getDraftById(long id) {
 		return pageRepository.findDraft(entityManager.getReference(Page.class, id));
 	}
 
 	@Cacheable(value = "pages", key = "'tree.' + #language")
-	public PageTree readPageTree(String language) {
+	public PageTree getPageTree(String language) {
 		List<Page> pages = pageRepository.findByLanguage(language);
 		return new PageTree(pages);
 	}
 
 	@Cacheable(value = "pages", key = "'tree.' + #language + '.' + #status")
-	public PageTree readPageTree(String language, Post.Status status) {
+	public PageTree getPageTree(String language, Post.Status status) {
 		List<Page> pages = pageRepository.findByLanguageAndStatus(language, status);
 		return new PageTree(pages);
 	}

@@ -48,6 +48,9 @@ import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.GoogleAnalytics;
 import org.wallride.core.domain.PopularPost;
 import org.wallride.core.domain.Post;
+import org.wallride.core.exception.GoogleAnalyticsException;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.PostSearchRequest;
 import org.wallride.core.repository.PopularPostRepository;
 import org.wallride.core.repository.PostRepository;
 import org.wallride.core.support.GoogleAnalyticsUtils;
@@ -140,7 +143,7 @@ public class PostService {
 	 * @param blogLanguage
 	 * @param type
 	 * @param maxRank
-	 * @see PostService#readPopularPosts(String, PopularPost.Type)
+	 * @see PostService#getPopularPosts(String, PopularPost.Type)
 	 */
 	@CacheEvict(value = "popularPosts", key = "'list.type.' + #blogLanguage.language + '.' + #type")
 	public void updatePopularPosts(BlogLanguage blogLanguage, PopularPost.Type type, int maxRank) {
@@ -288,12 +291,12 @@ public class PostService {
 		logger.info("Complete the update of popular posts");
 	}
 
-	public Page<Post> readPosts(PostSearchRequest request) {
+	public Page<Post> getPosts(PostSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readPosts(request, pageable);
+		return getPosts(request, pageable);
 	}
 
-	public Page<Post> readPosts(PostSearchRequest request, Pageable pageable) {
+	public Page<Post> getPosts(PostSearchRequest request, Pageable pageable) {
 		return postRepository.search(request, pageable);
 	}
 
@@ -305,11 +308,11 @@ public class PostService {
 	 * @see PostService#updatePopularPosts(BlogLanguage, PopularPost.Type, int)
 	 */
 	@Cacheable(value = "popularPosts", key = "'list.type.' + #language + '.' + #type")
-	public SortedSet<PopularPost> readPopularPosts(String language, PopularPost.Type type) {
+	public SortedSet<PopularPost> getPopularPosts(String language, PopularPost.Type type) {
 		return popularPostRepository.findByType(language, type, Post.Status.PUBLISHED);
 	}
 
-	public Post readPostById(long id, String language) {
+	public Post getPostById(long id, String language) {
 		return postRepository.findById(id, language);
 	}
 }

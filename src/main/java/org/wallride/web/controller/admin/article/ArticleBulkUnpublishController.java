@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.ServiceException;
+import org.wallride.core.exception.ServiceException;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;

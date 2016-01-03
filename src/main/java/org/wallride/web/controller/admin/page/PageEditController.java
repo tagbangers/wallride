@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.PageTree;
-import org.wallride.core.service.DuplicateCodeException;
-import org.wallride.core.service.EmptyCodeException;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
@@ -56,12 +56,12 @@ public class PageEditController {
 	public Page setupPage(
 			@PathVariable String language,
 			@RequestParam long id) {
-		return pageService.readPageById(id, language);
+		return pageService.getPageById(id, language);
 	}
 	
 	@ModelAttribute("pageTree")
 	public PageTree setupPageTree(@PathVariable String language) {
-		return pageService.readPageTree(language);
+		return pageService.getPageTree(language);
 	}
 
 	@ModelAttribute("query")
@@ -82,7 +82,7 @@ public class PageEditController {
 			@RequestParam long id,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		Page page = pageService.readPageById(id, language);
+		Page page = pageService.getPageById(id, language);
 		if (!language.equals(page.getLanguage())) {
 			redirectAttributes.addAttribute("language", language);
 			return "redirect:/_admin/{language}/pages/index";
@@ -91,7 +91,7 @@ public class PageEditController {
 		PageEditForm form = PageEditForm.fromDomainObject(page);
 		model.addAttribute("form", form);
 
-		Page draft = pageService.readDraftById(id);
+		Page draft = pageService.getDraftById(id);
 		model.addAttribute("draft", draft);
 
 		return "page/edit";
@@ -111,7 +111,7 @@ public class PageEditController {
 			return "redirect:/_admin/{language}/pages/index";
 		}
 
-		Page draft = pageService.readDraftById(id);
+		Page draft = pageService.getDraftById(id);
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);
 			redirectAttributes.addAttribute("id", id);

@@ -66,7 +66,7 @@ public class UserDescribeController {
 			@RequestParam long id,
 			String query,
 			Model model) {
-		User user = userService.readUserById(id);
+		User user = userService.getUserById(id);
 		if (user == null) {
 			throw new HttpNotFoundException();
 		}
@@ -89,7 +89,7 @@ public class UserDescribeController {
 		beanWrapper.setConversionService(conversionService);
 		beanWrapper.setPropertyValues(mpvs, true, true);
 		UserSearchForm form = (UserSearchForm) beanWrapper.getWrappedInstance();
-		List<Long> ids = userService.readUserIds(form.toUserSearchRequest());
+		List<Long> ids = userService.getUserIds(form.toUserSearchRequest());
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(user.getId());
 			if (index < ids.size() - 1) {

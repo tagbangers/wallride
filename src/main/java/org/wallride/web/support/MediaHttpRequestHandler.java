@@ -118,7 +118,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 //	}
 
 	private Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException {
-//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 //		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
 		final Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
 		final Resource resource = prefix.createRelative(media.getId());

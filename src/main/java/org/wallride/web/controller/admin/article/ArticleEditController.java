@@ -32,8 +32,8 @@ import org.wallride.core.domain.Article;
 import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.DuplicateCodeException;
-import org.wallride.core.service.EmptyCodeException;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
@@ -60,12 +60,12 @@ public class ArticleEditController {
 	public Article setupArticle(
 			@PathVariable String language,
 			@RequestParam long id) {
-		return articleService.readArticleById(id, language);
+		return articleService.getArticleById(id, language);
 	}
 
 	@ModelAttribute("categoryTree")
 	public CategoryTree setupCategoryTree(@PathVariable String language) {
-		return categoryService.readCategoryTree(language);
+		return categoryService.getCategoryTree(language);
 	}
 
 	@ModelAttribute("query")
@@ -96,7 +96,7 @@ public class ArticleEditController {
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
 		model.addAttribute("form", form);
 
-		Article draft = articleService.readDraftById(id);
+		Article draft = articleService.getDraftById(id);
 		model.addAttribute("draft", draft);
 
 		return "article/edit";
@@ -116,7 +116,7 @@ public class ArticleEditController {
 			return "redirect:/_admin/{language}/articles/index";
 		}
 
-		Article draft = articleService.readDraftById(id);
+		Article draft = articleService.getDraftById(id);
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);
 			redirectAttributes.addAttribute("id", id);

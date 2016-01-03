@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.PostSearchRequest;
+import org.wallride.core.model.PostSearchRequest;
 import org.wallride.core.service.PostService;
-import org.wallride.core.service.TagSearchRequest;
+import org.wallride.core.model.TagSearchRequest;
 import org.wallride.core.service.TagService;
 import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.Pagination;
@@ -34,7 +34,7 @@ public class TagController {
 			@PageableDefault Pageable pageable,
 			Model model,
 			HttpServletRequest servletRequest) {
-		Page<Tag> tags = tagService.readTags(new TagSearchRequest(), pageable);
+		Page<Tag> tags = tagService.getTags(new TagSearchRequest(), pageable);
 		model.addAttribute("tags", tags);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(tags, servletRequest));
@@ -48,7 +48,7 @@ public class TagController {
 			BlogLanguage blogLanguage,
 			Model model,
 			HttpServletRequest servletRequest) {
-		Tag tag = tagService.readTagByName(name, blogLanguage.getLanguage());
+		Tag tag = tagService.getTagByName(name, blogLanguage.getLanguage());
 		if (tag == null) {
 			throw new HttpNotFoundException();
 		}
@@ -56,7 +56,7 @@ public class TagController {
 		PostSearchRequest request = new PostSearchRequest(blogLanguage.getLanguage());
 		request.withTagNames(name);
 
-		Page<Post> posts = postService.readPosts(request, pageable);
+		Page<Post> posts = postService.getPosts(request, pageable);
 		model.addAttribute("tag", tag);
 		model.addAttribute("posts", posts);
 		model.addAttribute("pageable", pageable);

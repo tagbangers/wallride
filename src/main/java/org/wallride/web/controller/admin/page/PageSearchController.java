@@ -90,7 +90,7 @@ public class PageSearchController {
 			@PageableDefault(50) Pageable pageable,
 			Model model,
 			HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-		org.springframework.data.domain.Page<Page> pages = pageService.readPages(form.toPageSearchRequest(), pageable);
+		org.springframework.data.domain.Page<Page> pages = pageService.getPages(form.toPageSearchRequest(), pageable);
 
 		model.addAttribute("pages", pages);
 		model.addAttribute("pageable", pageable);

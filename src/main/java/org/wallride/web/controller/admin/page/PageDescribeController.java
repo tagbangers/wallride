@@ -55,7 +55,7 @@ public class PageDescribeController {
 			@RequestParam long id,
 			String query,
 			Model model) {
-		Page page = pageService.readPageById(id, language);
+		Page page = pageService.getPageById(id, language);
 		if (page == null) {
 			throw new HttpNotFoundException();
 		}
@@ -78,7 +78,7 @@ public class PageDescribeController {
 		beanWrapper.setConversionService(conversionService);
 		beanWrapper.setPropertyValues(mpvs, true, true);
 		PageSearchForm form = (PageSearchForm) beanWrapper.getWrappedInstance();
-		List<Long> ids = pageService.readPageIds(form.toPageSearchRequest());
+		List<Long> ids = pageService.getPageIds(form.toPageSearchRequest());
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(page.getId());
 			if (index < ids.size() - 1) {
@@ -100,7 +100,7 @@ public class PageDescribeController {
 	public String partDeleteDialog(
 			@PathVariable String language,
 			@RequestParam long id, Model model) {
-		Page page = pageService.readPageById(id, language);
+		Page page = pageService.getPageById(id, language);
 		model.addAttribute("page", page);
 		return "page/describe::delete-form";
 	}

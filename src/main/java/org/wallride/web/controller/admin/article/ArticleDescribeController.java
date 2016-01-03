@@ -55,7 +55,7 @@ public class ArticleDescribeController {
 			@RequestParam long id,
 			String query,
 			Model model) {
-		Article article = articleService.readArticleById(id, language);
+		Article article = articleService.getArticleById(id, language);
 		if (article == null) {
 			throw new HttpNotFoundException();
 		}
@@ -78,7 +78,7 @@ public class ArticleDescribeController {
 		beanWrapper.setConversionService(conversionService);
 		beanWrapper.setPropertyValues(mpvs, true, true);
 		ArticleSearchForm form = (ArticleSearchForm) beanWrapper.getWrappedInstance();
-		List<Long> ids = articleService.readArticleIds(form.toArticleSearchRequest());
+		List<Long> ids = articleService.getArticleIds(form.toArticleSearchRequest());
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(article.getId());
 			if (index < ids.size() - 1) {
@@ -100,7 +100,7 @@ public class ArticleDescribeController {
 	public String partDeleteForm(
 			@PathVariable String language,
 			@RequestParam long id, Model model) {
-		Article article = articleService.readArticleById(id, language);
+		Article article = articleService.getArticleById(id, language);
 		model.addAttribute("article", article);
 		return "article/describe::delete-form";
 	}

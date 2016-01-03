@@ -25,7 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.GoogleAnalytics;
 import org.wallride.core.service.BlogService;
-import org.wallride.core.service.GoogleAnalyticsException;
+import org.wallride.core.exception.GoogleAnalyticsException;
 import org.wallride.core.support.GoogleAnalyticsUtils;
 
 import javax.inject.Inject;
@@ -55,7 +55,7 @@ public class UpdatePostViewsItemReader extends AbstractPagingItemReader<List> {
 			results.clear();
 		}
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
 		if (googleAnalytics == null) {
 			logger.warn("Configuration of Google Analytics can not be found");

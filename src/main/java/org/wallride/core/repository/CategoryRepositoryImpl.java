@@ -35,7 +35,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Category;
-import org.wallride.core.service.CategorySearchRequest;
+import org.wallride.core.model.CategorySearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

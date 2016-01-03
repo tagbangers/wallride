@@ -27,6 +27,8 @@ import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.User;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.CommentRepository;
 import org.wallride.core.repository.PostRepository;
 import org.wallride.core.repository.UserRepository;
@@ -160,12 +162,12 @@ public class CommentService {
 		return comments;
 	}
 
-	public Page<Comment> readComments(CommentSearchRequest request) {
+	public Page<Comment> getComments(CommentSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readComments(request, pageable);
+		return getComments(request, pageable);
 	}
 
-	public Page<Comment> readComments(CommentSearchRequest request, Pageable pageable) {
+	public Page<Comment> getComments(CommentSearchRequest request, Pageable pageable) {
 		return commentRepository.search(request, pageable);
 	}
 }

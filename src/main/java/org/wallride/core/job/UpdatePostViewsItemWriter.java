@@ -32,7 +32,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Post;
 import org.wallride.core.repository.PostRepository;
-import org.wallride.core.service.ServiceException;
+import org.wallride.core.exception.ServiceException;
 import org.wallride.web.controller.guest.article.ArticleDescribeController;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.BlogLanguageRewriteMatch;

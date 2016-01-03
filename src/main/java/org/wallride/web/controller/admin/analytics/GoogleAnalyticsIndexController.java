@@ -34,7 +34,7 @@ public class GoogleAnalyticsIndexController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String describe(Model model) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		model.addAttribute("googleAnalytics", blog.getGoogleAnalytics());
 		return "analytics/index";
 	}

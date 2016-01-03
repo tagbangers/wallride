@@ -37,7 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Article;
-import org.wallride.core.service.ArticleSearchRequest;
+import org.wallride.core.model.ArticleSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

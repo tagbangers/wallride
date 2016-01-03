@@ -29,7 +29,7 @@ import com.google.api.services.analytics.AnalyticsScopes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wallride.core.domain.GoogleAnalytics;
-import org.wallride.core.service.GoogleAnalyticsException;
+import org.wallride.core.exception.GoogleAnalyticsException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

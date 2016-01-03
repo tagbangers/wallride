@@ -72,7 +72,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		if (mv.getView() instanceof RedirectView) return;
 		if (mv.getViewName().startsWith("redirect:")) return;
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		mv.addObject("BLOG", blog);
 
 		List<String> languages = new ArrayList<>();
@@ -101,13 +101,13 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 		mv.addObject("ADMIN_LINK", buildAdminLink());
 		mv.addObject("ADMIN_PATH", buildAdminPath(currentLanguage));
 
-		CategoryTree categoryTreeHasArticle = categoryService.readCategoryTree(currentLanguage, true);
-		CategoryTree categoryTreeAll = categoryService.readCategoryTree(currentLanguage);
+		CategoryTree categoryTreeHasArticle = categoryService.getCategoryTree(currentLanguage, true);
+		CategoryTree categoryTreeAll = categoryService.getCategoryTree(currentLanguage);
 		mv.addObject("CATEGORY_TREE", categoryTreeHasArticle);
 		mv.addObject("CATEGORY_TREE_ALL", categoryTreeAll);
 
-		PageTree pageTreePublished = pageService.readPageTree(currentLanguage, Post.Status.PUBLISHED);
-		PageTree pageTreeAll = pageService.readPageTree(currentLanguage);
+		PageTree pageTreePublished = pageService.getPageTree(currentLanguage, Post.Status.PUBLISHED);
+		PageTree pageTreeAll = pageService.getPageTree(currentLanguage);
 		mv.addObject("PAGE_TREE", pageTreePublished);
 		mv.addObject("PAGE_TREE_ALL", pageTreeAll);
 

@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.category;
 
-import org.wallride.core.service.CategorySearchRequest;
+import org.wallride.core.model.CategorySearchRequest;
 
 import java.io.Serializable;
 

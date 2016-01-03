@@ -63,7 +63,7 @@ public class PageRestController {
 
 	@RequestMapping(value="/{language}/pages", method= RequestMethod.GET)
 	public @ResponseBody PageIndexModel index(@PathVariable String language) {
-		PageTree pageTree = pageService.readPageTree(language);
+		PageTree pageTree = pageService.getPageTree(language);
 		return new PageIndexModel(pageTree);
 	}
 
@@ -125,7 +125,7 @@ public class PageRestController {
 	@RequestMapping(value="/{language}/pages", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody PageIndexModel sort(@PathVariable String language, @RequestBody List<Map<String, Object>> data) {
 		pageService.updatePageHierarchy(data, language);
-		PageTree pageTree = pageService.readPageTree(language);
+		PageTree pageTree = pageService.getPageTree(language);
 		return new PageIndexModel(pageTree);
 	}
 }

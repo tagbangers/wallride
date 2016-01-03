@@ -33,8 +33,8 @@ import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.DuplicateCodeException;
-import org.wallride.core.service.EmptyCodeException;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
@@ -64,7 +64,7 @@ public class ArticleCreateController {
 
 	@ModelAttribute("categoryTree")
 	public CategoryTree categoryTree(@PathVariable String language) {
-		return categoryService.readCategoryTree(language);
+		return categoryService.getCategoryTree(language);
 	}
 
 	@ModelAttribute("query")
@@ -86,7 +86,7 @@ public class ArticleCreateController {
 
 	@RequestMapping(method=RequestMethod.GET, params="part=category-fieldset")
 	public String partCategoryFieldset(@PathVariable String language, Model model) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.getCategoryTree(language);
 		model.addAttribute("categoryTree", categoryTree);
 		return "article/create::#category-fieldset";
 	}

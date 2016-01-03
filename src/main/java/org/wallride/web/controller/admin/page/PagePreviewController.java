@@ -34,7 +34,7 @@ import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Page;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.MediaService;
-import org.wallride.core.service.ServiceException;
+import org.wallride.core.exception.ServiceException;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
@@ -69,7 +69,7 @@ public class PagePreviewController {
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		Page page = new Page();
-		page.setCover(form.getCoverId() != null ? mediaService.readMedia(form.getCoverId()) : null);
+		page.setCover(form.getCoverId() != null ? mediaService.getMedia(form.getCoverId()) : null);
 		page.setTitle(form.getTitle());
 		page.setBody(form.getBody());
 		page.setDate(form.getDate() != null ? form.getDate() : LocalDateTime.now());
@@ -80,7 +80,7 @@ public class PagePreviewController {
 			throw new ServiceException("GuestServlet is not ready yet");
 		}
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		BlogLanguage blogLanguage = blog.getLanguage(language);
 		request.setAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE, blogLanguage);
 

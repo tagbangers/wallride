@@ -52,7 +52,7 @@ public class UserEditController {
 			@RequestParam long id,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		User user = userService.readUserById(id);
+		User user = userService.getUserById(id);
 		UserEditForm form = UserEditForm.fromDomainObject(user);
 		model.addAttribute("form", form);
 		return "user/edit";

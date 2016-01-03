@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.user;
 
-import org.wallride.core.service.UserInvitationCreateRequest;
+import org.wallride.core.model.UserInvitationCreateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

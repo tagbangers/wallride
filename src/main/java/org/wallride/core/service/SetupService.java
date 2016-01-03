@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.User;
+import org.wallride.core.model.SetupRequest;
 import org.wallride.core.repository.BlogRepository;
 import org.wallride.core.repository.UserRepository;
 

@@ -37,6 +37,10 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.exception.NotNullException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.TagRepository;
@@ -167,7 +171,7 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
@@ -357,7 +361,7 @@ public class ArticleService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
@@ -482,20 +486,20 @@ public class ArticleService {
 		return articles;
 	}
 
-	public List<Long> readArticleIds(ArticleSearchRequest request) {
+	public List<Long> getArticleIds(ArticleSearchRequest request) {
 		return articleRepository.searchForId(request);
 	}
 
-	public Page<Article> readArticles(ArticleSearchRequest request) {
+	public Page<Article> getArticles(ArticleSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readArticles(request, pageable);
+		return getArticles(request, pageable);
 	}
 
-	public Page<Article> readArticles(ArticleSearchRequest request, Pageable pageable) {
+	public Page<Article> getArticles(ArticleSearchRequest request, Pageable pageable) {
 		return articleRepository.search(request, pageable);
 	}
 
-	public List<Article> readArticles(Collection<Long> ids) {
+	public List<Article> getArticles(Collection<Long> ids) {
 		Set<Article> results = new LinkedHashSet<Article>(articleRepository.findByIdIn(ids));
 		List<Article> articles = new ArrayList<>();
 		for (long id : ids) {
@@ -510,12 +514,12 @@ public class ArticleService {
 	}
 
 	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status")
-	public SortedSet<Article> readArticlesByCategoryCode(String language, String code, Post.Status status) {
-		return readArticlesByCategoryCode(language, code, status, 10);
+	public SortedSet<Article> getArticlesByCategoryCode(String language, String code, Post.Status status) {
+		return getArticlesByCategoryCode(language, code, status, 10);
 	}
 
 	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status + '.' + #size")
-	public SortedSet<Article> readArticlesByCategoryCode(String language, String code, Post.Status status, int size) {
+	public SortedSet<Article> getArticlesByCategoryCode(String language, String code, Post.Status status, int size) {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withLanguage(language)
 				.withCategoryCodes(code)
@@ -527,7 +531,7 @@ public class ArticleService {
 	}
 
 	@Cacheable(value = "articles", key = "'list.latest.' + #language + '.' + #status + '.' + #size")
-	public SortedSet<Article> readLatestArticles(String language, Post.Status status, int size) {
+	public SortedSet<Article> getLatestArticles(String language, Post.Status status, int size) {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withLanguage(language)
 				.withStatus(status);
@@ -537,15 +541,15 @@ public class ArticleService {
 		return new TreeSet<>(page.getContent());
 	}
 
-	public Article readArticleById(long id, String language) {
+	public Article getArticleById(long id, String language) {
 		return articleRepository.findById(id, language);
 	}
 
-	public Article readArticleByCode(String code, String language) {
+	public Article getArticleByCode(String code, String language) {
 		return articleRepository.findByCode(code, language);
 	}
 
-	public Article readDraftById(long id) {
+	public Article getDraftById(long id) {
 		return articleRepository.findDraft(entityManager.getReference(Article.class, id));
 	}
 

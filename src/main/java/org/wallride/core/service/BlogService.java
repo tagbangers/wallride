@@ -33,6 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.GoogleAnalytics;
+import org.wallride.core.exception.GoogleAnalyticsException;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.GoogleAnalyticsUpdateRequest;
 import org.wallride.core.repository.BlogRepository;
 
 import javax.annotation.Resource;
@@ -123,7 +126,7 @@ public class BlogService {
 	}
 
 	@Cacheable(value = "blogs")
-	public Blog readBlogById(long id) {
+	public Blog getBlogById(long id) {
 		return blogRepository.findById(id);
 	}
 }

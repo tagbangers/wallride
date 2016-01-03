@@ -36,7 +36,7 @@ public class UserInvitationIndexController {
 
 	@ModelAttribute("invitations")
 	public List<UserInvitation> userInvitations() {
-		return userService.readUserInvitations();
+		return userService.getUserInvitations();
 	}
 
 	@ModelAttribute("form")

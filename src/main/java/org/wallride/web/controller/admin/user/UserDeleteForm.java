@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.user;
 
-import org.wallride.core.service.UserDeleteRequest;
+import org.wallride.core.model.UserDeleteRequest;
 
 import javax.validation.constraints.NotNull;
 

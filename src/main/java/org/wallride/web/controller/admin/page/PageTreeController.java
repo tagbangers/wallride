@@ -47,14 +47,14 @@ public class PageTreeController {
 
 	@RequestMapping
 	public String index(@PathVariable String language, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
+		PageTree pageTree = pageService.getPageTree(language);
 		model.addAttribute("pageTree", pageTree);
 		return "page/tree";
 	}
 
 	@RequestMapping(params="part=page-create-form")
 	public String partPageCreateDialog(@PathVariable String language, @RequestParam(required=false) Long parentId, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
+		PageTree pageTree = pageService.getPageTree(language);
 		model.addAttribute("parentId", parentId);
 		model.addAttribute("pageTree", pageTree);
 		return "page/tree::page-create-form";
@@ -62,7 +62,7 @@ public class PageTreeController {
 
 	@RequestMapping(params="part=page-edit-form")
 	public String partPageEditDialog(@PathVariable String language, @RequestParam long id, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
+		PageTree pageTree = pageService.getPageTree(language);
 		Page page = pageTree.getPageById(id);
 		model.addAttribute("pageTree", pageTree);
 		model.addAttribute("page", page);

@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.PasswordResetToken;
-import org.wallride.core.service.EmailNotFoundException;
-import org.wallride.core.service.PasswordResetTokenCreateRequest;
-import org.wallride.core.service.PasswordUpdateRequest;
+import org.wallride.core.exception.EmailNotFoundException;
+import org.wallride.core.model.PasswordResetTokenCreateRequest;
+import org.wallride.core.model.PasswordUpdateRequest;
 import org.wallride.core.service.UserService;
 
 import javax.inject.Inject;
@@ -98,7 +98,7 @@ public class PasswordResetController {
 	public String edit(
 			@PathVariable String token,
 			RedirectAttributes redirectAttributes) {
-		PasswordResetToken passwordResetToken = userService.readPasswordResetToken(token);
+		PasswordResetToken passwordResetToken = userService.getPasswordResetToken(token);
 		if (passwordResetToken == null) {
 			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";
@@ -122,7 +122,7 @@ public class PasswordResetController {
 		redirectAttributes.addFlashAttribute(FORM_MODEL_KEY, form);
 		redirectAttributes.addFlashAttribute(ERRORS_MODEL_KEY, errors);
 
-		PasswordResetToken passwordResetToken = userService.readPasswordResetToken(token);
+		PasswordResetToken passwordResetToken = userService.getPasswordResetToken(token);
 		if (passwordResetToken == null) {
 			redirectAttributes.addFlashAttribute(INVALID_PASSOWRD_RESET_LINK_ATTR_NAME, true);
 			return "redirect:/password-reset";

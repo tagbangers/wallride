@@ -63,7 +63,7 @@ public class CategoryRestController {
 
 	@RequestMapping(value="/{language}/categories", method= RequestMethod.GET)
 	public @ResponseBody CategoryIndexModel index(@PathVariable String language) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.getCategoryTree(language);
 		return new CategoryIndexModel(categoryTree);
 	}
 
@@ -120,7 +120,7 @@ public class CategoryRestController {
 	@RequestMapping(value="/{language}/categories", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody CategoryIndexModel sort(@PathVariable String language, @RequestBody List<Map<String, Object>> data) {
 		categoryService.updateCategoryHierarchy(data, language);
-		CategoryTree categoryTree = categoryService.readCategoryTree(language);
+		CategoryTree categoryTree = categoryService.getCategoryTree(language);
 		return new CategoryIndexModel(categoryTree);
 	}
 }

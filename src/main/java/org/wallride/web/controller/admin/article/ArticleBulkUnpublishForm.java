@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.article;
 
-import org.wallride.core.service.ArticleBulkUnpublishRequest;
+import org.wallride.core.model.ArticleBulkUnpublishRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

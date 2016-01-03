@@ -70,7 +70,7 @@ public class UserUtils {
 	}
 
 	public String title(User user) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		return String.format("%s | %s",
 				user.getNickname(),
 				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));

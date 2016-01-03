@@ -49,6 +49,11 @@ import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.PasswordResetToken;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
+import org.wallride.core.exception.DuplicateEmailException;
+import org.wallride.core.exception.DuplicateLoginIdException;
+import org.wallride.core.exception.EmailNotFoundException;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.PasswordResetTokenRepository;
 import org.wallride.core.repository.UserInvitationRepository;
 import org.wallride.core.repository.UserRepository;
@@ -119,7 +124,7 @@ public class UserService {
 		passwordResetToken = passwordResetTokenRepository.saveAndFlush(passwordResetToken);
 
 		try {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
 
 			ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
@@ -213,7 +218,7 @@ public class UserService {
 		passwordResetTokenRepository.delete(passwordResetToken);
 
 		try {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String blogTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
 
 			ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
@@ -326,7 +331,7 @@ public class UserService {
 			invitations.add(invitation);
 		}
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		for (UserInvitation invitation : invitations) {
 			String websiteTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
 			String signupLink = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -368,7 +373,7 @@ public class UserService {
 		invitation.setUpdatedBy(authorizedUser.toString());
 		invitation = userInvitationRepository.saveAndFlush(invitation);
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		String websiteTitle = blog.getTitle(LocaleContextHolder.getLocale().getLanguage());
 		String signupLink = ServletUriComponentsBuilder.fromCurrentContextPath()
 				.path("/_admin/signup")
@@ -398,7 +403,6 @@ public class UserService {
 		return invitation;
 	}
 
-
 	@CacheEvict(value="users", allEntries=true)
 	public UserInvitation deleteUserInvitation(UserInvitationDeleteRequest request) {
 		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(request.getToken());
@@ -406,20 +410,20 @@ public class UserService {
 		return invitation;
 	}
 
-	public List<Long> readUserIds(UserSearchRequest request) {
+	public List<Long> getUserIds(UserSearchRequest request) {
 		return userRepository.searchForId(request);
 	}
 
-	public Page<User> readUsers(UserSearchRequest request) {
+	public Page<User> getUsers(UserSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readUsers(request, pageable);
+		return getUsers(request, pageable);
 	}
 
-	public Page<User> readUsers(UserSearchRequest request, Pageable pageable) {
+	public Page<User> getUsers(UserSearchRequest request, Pageable pageable) {
 		return userRepository.search(request, pageable);
 	}
 
-	private List<User> readUsers(Collection<Long> ids) {
+	private List<User> getUsers(Collection<Long> ids) {
 		Set<User> results = new LinkedHashSet<User>(userRepository.findByIdIn(ids));
 		List<User> users = new ArrayList<>();
 		for (long id : ids) {
@@ -434,20 +438,20 @@ public class UserService {
 	}
 
 //	@Cacheable(value="users", key="'id.'+#id")
-	public User readUserById(long id) {
+	public User getUserById(long id) {
 		return userRepository.findOne(id);
 	}
 
-	public User readUserByLoginId(String loginId) {
+	public User getUserByLoginId(String loginId) {
 		return userRepository.findByLoginId(loginId);
 	}
 
 //	@Cacheable(value="users", key="'invitations.list'")
-	public List<UserInvitation> readUserInvitations() {
+	public List<UserInvitation> getUserInvitations() {
 		return userInvitationRepository.findAll(new Sort(Sort.Direction.DESC, "createdAt"));
 	}
 
-	public PasswordResetToken readPasswordResetToken(String token) {
+	public PasswordResetToken getPasswordResetToken(String token) {
 		return passwordResetTokenRepository.findByToken(token);
 	}
 }

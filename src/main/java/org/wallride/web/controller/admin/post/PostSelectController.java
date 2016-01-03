@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.PostSearchRequest;
+import org.wallride.core.model.PostSearchRequest;
 import org.wallride.core.service.PostService;
 import org.wallride.web.support.DomainObjectSelect2Model;
 
@@ -47,7 +47,7 @@ public class PostSelectController {
 		PostSearchRequest request = new PostSearchRequest(language)
 				.withStatus(Post.Status.PUBLISHED)
 				.withKeyword(keyword);
-		Page<Post> posts = postService.readPosts(request, new PageRequest(0, 30));
+		Page<Post> posts = postService.getPosts(request, new PageRequest(0, 30));
 
 		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (posts.hasContent()) {
@@ -66,7 +66,7 @@ public class PostSelectController {
 			@RequestParam Long id,
 			HttpServletResponse response)
 			throws IOException {
-		Post post = postService.readPostById(id, language);
+		Post post = postService.getPostById(id, language);
 		if (post == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;

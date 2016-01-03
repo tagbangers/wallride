@@ -26,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.model.CategoryCreateRequest;
+import org.wallride.core.model.CategorySearchRequest;
+import org.wallride.core.model.CategoryUpdateRequest;
 import org.wallride.core.repository.CategoryRepository;
 import org.wallride.core.support.AuthorizedUser;
 
@@ -146,26 +149,26 @@ public class CategoryService {
 		return category;
 	}
 
-	public Category readCategoryById(long id, String language) {
+	public Category getCategoryById(long id, String language) {
 		return categoryRepository.findById(id, language);
 	}
 
-	public Page<Category> readCategories(CategorySearchRequest request) {
+	public Page<Category> getCategories(CategorySearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readCategories(request, pageable);
+		return getCategories(request, pageable);
 	}
 
-	public Page<Category> readCategories(CategorySearchRequest request, Pageable pageable) {
+	public Page<Category> getCategories(CategorySearchRequest request, Pageable pageable) {
 		return categoryRepository.search(request, pageable);
 	}
 
 	@Cacheable(value = "articles", key = "'category.tree.' + #language")
-	public CategoryTree readCategoryTree(String language) {
-		return readCategoryTree(language, false);
+	public CategoryTree getCategoryTree(String language) {
+		return getCategoryTree(language, false);
 	}
 
 	@Cacheable(value = "articles", key = "'category.tree.' + #language + '.' + #hasArticle")
-	public CategoryTree readCategoryTree(String language, boolean hasArticle) {
+	public CategoryTree getCategoryTree(String language, boolean hasArticle) {
 		List<Category> categories = null;
 		if (!hasArticle) {
 			categories = categoryRepository.findByLanguage(language);

@@ -62,7 +62,7 @@ public class ArticleIndexController {
 		form.setDateFrom(LocalDateTime.of(year, 1, 1, 0, 0, 0));
 		form.setDateTo(LocalDateTime.of(year, 12, 31, 0, 0, 0));
 
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
@@ -83,7 +83,7 @@ public class ArticleIndexController {
 		form.setDateFrom(LocalDateTime.of(year, month, 1, 0, 0, 0));
 		form.setDateTo(LocalDateTime.of(year, month, date.getMonth().length(true), 23, 59, 59));
 
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
@@ -104,7 +104,7 @@ public class ArticleIndexController {
 		form.setDateFrom(LocalDateTime.of(year, month, day, 0, 0, 0));
 		form.setDateTo(LocalDateTime.of(year, month, day, 23, 59, 59));
 
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
@@ -121,14 +121,14 @@ public class ArticleIndexController {
 		String[] codes = path.split("/");
 		String lastCode = codes[codes.length - 1];
 
-		CategoryTree categoryTree = categoryService.readCategoryTree(blogLanguage.getLanguage());
+		CategoryTree categoryTree = categoryService.getCategoryTree(blogLanguage.getLanguage());
 		Category category = categoryTree.getCategoryByCode(lastCode);
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
 		form.getCategoryIds().add(category.getId());
 
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("category", category);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
@@ -153,7 +153,7 @@ public class ArticleIndexController {
 			BlogLanguage blogLanguage,
 			HttpServletRequest servletRequest,
 			Model model) {
-		User author = userService.readUserByLoginId(loginId);
+		User author = userService.getUserByLoginId(loginId);
 		if (author == null) {
 			throw new HttpNotFoundException();
 		}
@@ -162,7 +162,7 @@ public class ArticleIndexController {
 		form.setLanguage(blogLanguage.getLanguage());
 		form.setAuthorId(author.getId());
 
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("author", author);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);

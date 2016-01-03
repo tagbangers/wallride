@@ -103,7 +103,7 @@ public class PostUtils {
 		Map<String, Object> params = new HashMap<>();
 
 		PageTree pageTree = (PageTree) processingContext.getContext().getVariables().get("PAGE_TREE_ALL");
-//		PageTree pageTree = defaultModelAttributeService.readPageTree(LocaleContextHolder.getLocale().getLanguage());
+//		PageTree pageTree = defaultModelAttributeService.getPageTree(LocaleContextHolder.getLocale().getLanguage());
 		List<String> codes = new LinkedList<>();
 		Page parent = page.getParent();
 		while (parent != null) {
@@ -140,7 +140,7 @@ public class PostUtils {
 	}
 
 	public String ogSiteName(Post post) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		return blog.getTitle(processingContext.getContext().getLocale().getLanguage());
 	}
 
@@ -168,7 +168,7 @@ public class PostUtils {
 		if (post.getSeo() != null && post.getSeo().getTitle() != null) {
 			return post.getSeo().getTitle();
 		}
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		return String.format("%s | %s",
 				post.getTitle(),
 				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
@@ -179,7 +179,7 @@ public class PostUtils {
 			return null;
 		}
 
-//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		Document document = Jsoup.parse(post.getBody());
 		Elements elements = document.select("img");
 		for (Element element : elements) {

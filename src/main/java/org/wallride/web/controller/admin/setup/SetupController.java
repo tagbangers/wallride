@@ -46,7 +46,7 @@ public class SetupController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String setup() {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		if (blog != null) {
 			throw new HttpForbiddenException();
 		}
@@ -58,7 +58,7 @@ public class SetupController {
 			@Valid @ModelAttribute("form") SetupForm form,
 			BindingResult result,
 			RedirectAttributes redirectAttributes) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		if (blog != null) {
 			throw new HttpForbiddenException();
 		}

@@ -46,7 +46,7 @@ public class DashboardController {
 	
 	@RequestMapping({"/","/dashboard"})
 	public String dashboard(RedirectAttributes redirectAttributes) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		String defaultLanguage = blog.getDefaultLanguage();
 		redirectAttributes.addAttribute("language", defaultLanguage);
 		return "redirect:/_admin/{language}/";
@@ -57,7 +57,7 @@ public class DashboardController {
 		long articleCount = articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
 		long pageCount = pageService.countPagesByStatus(Post.Status.PUBLISHED, language);
 
-		CategoryTree categoryTreeHasArticle = categoryService.readCategoryTree(language, true);
+		CategoryTree categoryTreeHasArticle = categoryService.getCategoryTree(language, true);
 		long categoryCount = categoryTreeHasArticle.getCategories().size();
 
 		model.addAttribute("articleCount", articleCount);
@@ -71,20 +71,20 @@ public class DashboardController {
 	}
 
 	private SortedSet<PopularPost> popularPosts(String language) {
-		return postService.readPopularPosts(language, PopularPost.Type.DAILY);
+		return postService.getPopularPosts(language, PopularPost.Type.DAILY);
 	}
 
 	private List<Article> recentPublishedArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setStatus(Post.Status.PUBLISHED);
-		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
+		Page<Article> page = articleService.getArticles(form.toArticleSearchRequest());
 		return page.getContent();
 	}
 
 	private List<Article> recentDraftArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setStatus(Post.Status.DRAFT);
-		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
+		Page<Article> page = articleService.getArticles(form.toArticleSearchRequest());
 		return page.getContent();
 	}
 }

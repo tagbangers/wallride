@@ -42,7 +42,7 @@ public class CategorySelectController {
 		CategorySearchForm form = new CategorySearchForm();
 		form.setKeyword(keyword);
 		form.setLanguage(language);
-		Page<Category> categories = categoryService.readCategories(form.toCategorySearchRequest());
+		Page<Category> categories = categoryService.getCategories(form.toCategorySearchRequest());
 
 		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (categories.hasContent()) {
@@ -60,7 +60,7 @@ public class CategorySelectController {
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
-		Category category = categoryService.readCategoryById(id, language);
+		Category category = categoryService.getCategoryById(id, language);
 		if (category == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;

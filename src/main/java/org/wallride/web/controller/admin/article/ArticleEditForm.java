@@ -23,7 +23,7 @@ import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.ArticleUpdateRequest;
+import org.wallride.core.model.ArticleUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

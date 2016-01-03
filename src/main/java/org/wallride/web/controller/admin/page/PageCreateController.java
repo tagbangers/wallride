@@ -31,8 +31,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.PageTree;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.DuplicateCodeException;
-import org.wallride.core.service.EmptyCodeException;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.web.support.DomainObjectSavedModel;
@@ -60,7 +60,7 @@ public class PageCreateController {
 
 	@ModelAttribute("pageTree")
 	public PageTree pageTree(@PathVariable String language) {
-		return pageService.readPageTree(language);
+		return pageService.getPageTree(language);
 	}
 
 	@ModelAttribute("query")
@@ -82,7 +82,7 @@ public class PageCreateController {
 
 	@RequestMapping(method=RequestMethod.GET, params="part=page-fieldset")
 	public String partPageFieldset(@PathVariable String language, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
+		PageTree pageTree = pageService.getPageTree(language);
 		model.addAttribute("pageTree", pageTree);
 		return "page/create::#page-fieldset";
 	}

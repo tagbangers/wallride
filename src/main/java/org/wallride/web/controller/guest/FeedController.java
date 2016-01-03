@@ -24,7 +24,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.wallride.core.domain.*;
-import org.wallride.core.service.ArticleSearchRequest;
+import org.wallride.core.model.ArticleSearchRequest;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 
@@ -52,7 +52,7 @@ public class FeedController {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withStatus(Post.Status.PUBLISHED)
 				.withLanguage(blogLanguage.getLanguage());
-		Page<Article> articles = articleService.readArticles(request, DEFAULT_PAGE_REQUEST);
+		Page<Article> articles = articleService.getArticles(request, DEFAULT_PAGE_REQUEST);
 		model.addAttribute("articles", new TreeSet<>(articles.getContent()));
 		return "rssFeedView";
 	}
@@ -70,7 +70,7 @@ public class FeedController {
 			@PathVariable String categoryCode,
 			BlogLanguage blogLanguage,
 			Model model) {
-		CategoryTree categoryTree = categoryService.readCategoryTree(blogLanguage.getLanguage());
+		CategoryTree categoryTree = categoryService.getCategoryTree(blogLanguage.getLanguage());
 		Category category = categoryTree.getCategoryByCode(categoryCode);
 		List<Long> categoryIds = new ArrayList<>();
 		categoryIds.add(category.getId());
@@ -80,7 +80,7 @@ public class FeedController {
 				.withLanguage(blogLanguage.getLanguage())
 				.withCategoryIds(categoryIds);
 
-		Page<Article> articles = articleService.readArticles(request, DEFAULT_PAGE_REQUEST);
+		Page<Article> articles = articleService.getArticles(request, DEFAULT_PAGE_REQUEST);
 		model.addAttribute("articles", new TreeSet<>(articles.getContent()));
 		return "rssFeedView";
 	}

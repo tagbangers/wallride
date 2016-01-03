@@ -35,6 +35,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.exception.DuplicateNameException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
@@ -166,20 +168,20 @@ public class TagService {
 		return tags;
 	}
 
-	public Tag readTagById(long id, String language) {
+	public Tag getTagById(long id, String language) {
 		return tagRepository.findById(id, language);
 	}
 
-	public Tag readTagByName(String name, String language) {
+	public Tag getTagByName(String name, String language) {
 		return tagRepository.findByName(name, language);
 	}
 
-	public Page<Tag> readTags(TagSearchRequest request) {
+	public Page<Tag> getTags(TagSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readTags(request, pageable);
+		return getTags(request, pageable);
 	}
 
-	public Page<Tag> readTags(TagSearchRequest request, Pageable pageable) {
+	public Page<Tag> getTags(TagSearchRequest request, Pageable pageable) {
 		return tagRepository.search(request, pageable);
 	}
 }
