@@ -16,10 +16,7 @@
 
 package org.wallride.core.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,36 +31,22 @@ import java.util.List;
 @Transactional
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 	
-	static final String DEFAULT_SELECT_QUERY = 
-			"from User user " +
-			"left join fetch user.roles role ";
+	@EntityGraph(value = User.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	User findOneById(Long id);
 
-	@Query("select user.id from User user order by user.id")
-	List<Long> findId();
-
-	@Query(DEFAULT_SELECT_QUERY + "where user.id in (:ids) ")
-	List<User> findByIdIn(@Param("ids") Collection<Long> ids);
-	
-	@Query(DEFAULT_SELECT_QUERY + "where user.id = :id ")
-	User findById(@Param("id") Long id);
-
-	@Query(DEFAULT_SELECT_QUERY + "where user.id = :id ")
+	@EntityGraph(value = User.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	User findByIdForUpdate(@Param("id")Long id);
+	User findOneForUpdateById(Long id);
+
+	@EntityGraph(value = User.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	User findOneByLoginId(String loginId);
+
+	@EntityGraph(value = User.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	User findOneByEmail(String email);
+
+	@EntityGraph(value = User.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	List<User> findAllByIdIn(Collection<Long> ids);
 	
-//	@Query(DEFAULT_SELECT_QUERY + "where user.code = :code ")
-//	User findByCode(@Param("code") String code);
-//	
-//	@Query(DEFAULT_SELECT_QUERY + "where user.code = :code ")
-//	@Lock(LockModeType.PESSIMISTIC_WRITE)
-//	User findByCodeForUpdate(@Param("code") String code);
-
-	@Query(DEFAULT_SELECT_QUERY + "where user.loginId = :loginId ")
-	User findByLoginId(@Param("loginId") String loginId);
-
-	@Query(DEFAULT_SELECT_QUERY + "where user.email = :email ")
-	User findByEmail(@Param("email") String email);
-
 	@Modifying
 	@Query("update User set lastLoginTime = :lastLoginTime where id = :id ")
 	int updateLastLoginTime(@Param("id") long id, @Param("lastLoginTime") Date lastLoginTime);

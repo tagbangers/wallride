@@ -31,9 +31,7 @@ public class PersonalName implements Serializable {
 	@Field
 	private String lastName;
 
-	public PersonalName() {
-
-	}
+	public PersonalName() {}
 
 	public PersonalName(String firstName, String lastName) {
 		this.firstName = firstName;

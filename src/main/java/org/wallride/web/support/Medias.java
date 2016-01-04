@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.wallride.core.support;
+package org.wallride.web.support;
 
+import org.thymeleaf.context.IProcessingContext;
 import org.wallride.core.domain.Media;
+import org.wallride.core.support.WallRideProperties;
 
-public class MediaUtils {
+public class Medias {
+
+	private IProcessingContext processingContext;
 
 	private WallRideProperties wallRideProperties;
 
-	public MediaUtils(WallRideProperties wallRideProperties) {
+	public Medias(IProcessingContext processingContext, WallRideProperties wallRideProperties) {
+		this.processingContext = processingContext;
 		this.wallRideProperties = wallRideProperties;
 	}
 

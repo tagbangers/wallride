@@ -17,19 +17,20 @@
 package org.wallride.core.service;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Category_;
 import org.wallride.core.model.CategoryCreateRequest;
 import org.wallride.core.model.CategorySearchRequest;
 import org.wallride.core.model.CategoryUpdateRequest;
 import org.wallride.core.repository.CategoryRepository;
+import org.wallride.core.repository.CategorySpecifications;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
@@ -49,7 +50,7 @@ public class CategoryService {
 
 		Category parent = null;
 		if (request.getParentId() != null) {
-			parent = categoryRepository.findById(request.getParentId(), request.getLanguage());
+			parent = categoryRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage());
 		}
 
 		int rgt = 0;
@@ -76,10 +77,10 @@ public class CategoryService {
 
 	@CacheEvict(value="articles", allEntries=true)
 	public Category updateCategory(CategoryUpdateRequest request, AuthorizedUser authorizedUser) {
-		Category category = categoryRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Category category = categoryRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		Category parent = null;
 		if (request.getParentId() != null) {
-			parent = categoryRepository.findById(request.getParentId(), request.getLanguage());
+			parent = categoryRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage());
 		}
 
 		if (!(category.getParent() == null && parent == null) && !ObjectUtils.nullSafeEquals(category.getParent(), parent)) {
@@ -115,11 +116,11 @@ public class CategoryService {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {
-				Category category = categoryRepository.findByIdForUpdate(Long.parseLong((String) map.get("item_id")), language);
+				Category category = categoryRepository.findOneForUpdateByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
 				if (category != null) {
 					Category parent = null;
 					if (map.get("parent_id") != null) {
-						parent = categoryRepository.findById(Long.parseLong((String) map.get("parent_id")), language);
+						parent = categoryRepository.findOneByIdAndLanguage(Long.parseLong((String) map.get("parent_id")), language);
 					}
 					category.setParent(parent);
 					category.setLft(((int) map.get("left")) - 1);
@@ -132,7 +133,7 @@ public class CategoryService {
 
 	@CacheEvict(value="articles", allEntries=true)
 	public Category deleteCategory(long id, String language) {
-		Category category = categoryRepository.findByIdForUpdate(id, language);
+		Category category = categoryRepository.findOneForUpdateByIdAndLanguage(id, language);
 		Category parent = category.getParent();
 		for (Category child : category.getChildren()) {
 			child.setParent(parent);
@@ -150,7 +151,23 @@ public class CategoryService {
 	}
 
 	public Category getCategoryById(long id, String language) {
-		return categoryRepository.findById(id, language);
+		return categoryRepository.findOneByIdAndLanguage(id, language);
+	}
+
+	public Category getCategoryByCode(String code, String language) {
+		return categoryRepository.findOneByCodeAndLanguage(code, language);
+	}
+
+	public List<Category> getCategories(String language) {
+		return getCategories(language, false);
+	}
+
+	public List<Category> getCategories(String language, boolean includeNoArticle) {
+		if (includeNoArticle) {
+			return categoryRepository.findAllByLanguageOrderByLftAsc(language);
+		} else {
+			return categoryRepository.findAll(CategorySpecifications.hasArticle(language), new Sort(Category_.lft.getName()));
+		}
 	}
 
 	public Page<Category> getCategories(CategorySearchRequest request) {
@@ -160,22 +177,5 @@ public class CategoryService {
 
 	public Page<Category> getCategories(CategorySearchRequest request, Pageable pageable) {
 		return categoryRepository.search(request, pageable);
-	}
-
-	@Cacheable(value = "articles", key = "'category.tree.' + #language")
-	public CategoryTree getCategoryTree(String language) {
-		return getCategoryTree(language, false);
-	}
-
-	@Cacheable(value = "articles", key = "'category.tree.' + #language + '.' + #hasArticle")
-	public CategoryTree getCategoryTree(String language, boolean hasArticle) {
-		List<Category> categories = null;
-		if (!hasArticle) {
-			categories = categoryRepository.findByLanguage(language);
-		}
-		else {
-			categories = categoryRepository.findByLanguageAndHasArticle(language);
-		}
-		return new CategoryTree(categories);
 	}
 }

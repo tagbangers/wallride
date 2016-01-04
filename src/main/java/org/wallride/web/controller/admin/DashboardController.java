@@ -22,7 +22,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.*;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.PopularPost;
+import org.wallride.core.domain.Post;
 import org.wallride.core.service.*;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
@@ -56,9 +59,7 @@ public class DashboardController {
 	public String dashboard(@PathVariable String language, Model model) {
 		long articleCount = articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
 		long pageCount = pageService.countPagesByStatus(Post.Status.PUBLISHED, language);
-
-		CategoryTree categoryTreeHasArticle = categoryService.getCategoryTree(language, true);
-		long categoryCount = categoryTreeHasArticle.getCategories().size();
+		long categoryCount = categoryService.getCategories(language).size();
 
 		model.addAttribute("articleCount", articleCount);
 		model.addAttribute("pageCount", pageCount);

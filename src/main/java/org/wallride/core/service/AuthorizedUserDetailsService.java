@@ -53,9 +53,9 @@ public class AuthorizedUserDetailsService extends SavedRequestAwareAuthenticatio
 
 		User user;
 		if (!username.contains("@")) {
-			user = userRepository.findByLoginId(username);
+			user = userRepository.findOneByLoginId(username);
 		} else {
-			user = userRepository.findByEmail(username);
+			user = userRepository.findOneByEmail(username);
 		}
 
 		if (user == null) {

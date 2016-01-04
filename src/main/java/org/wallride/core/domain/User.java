@@ -31,12 +31,24 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 @Entity
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = User.SHALLOW_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("roles")}
+		),
+		@NamedEntityGraph(name = User.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("roles")})
+})
 @Table(name = "user")
 @DynamicInsert
 @DynamicUpdate
 @Indexed
 @SuppressWarnings("serial")
 public class User extends DomainObject<Long> {
+
+	public static final String SHALLOW_GRAPH_NAME = "USER_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "USER_DEEP_GRAPH";
 
 	public enum Role {
 		ADMIN,

@@ -72,6 +72,6 @@ public class MediaService {
 	}
 
 	public Media getMedia(String id) {
-		return mediaRepository.findById(id);
+		return mediaRepository.findOneById(id);
 	}
 }

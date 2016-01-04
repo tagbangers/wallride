@@ -107,7 +107,7 @@ public class UserService {
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
 	public PasswordResetToken createPasswordResetToken(PasswordResetTokenCreateRequest request) {
-		User user = userRepository.findByEmail(request.getEmail());
+		User user = userRepository.findOneByEmail(request.getEmail());
 		if (user == null) {
 			throw new EmailNotFoundException();
 		}
@@ -164,7 +164,7 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public User updateUser(UserUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) throws ValidationException {
-		User user = userRepository.findByIdForUpdate(form.getId());
+		User user = userRepository.findOneForUpdateById(form.getId());
 		user.setName(form.getName());
 		user.setNickname(form.getNickname());
 		user.setEmail(form.getEmail());
@@ -176,20 +176,20 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public User updateProfile(ProfileUpdateRequest request, AuthorizedUser updatedBy) {
-		User user = userRepository.findByIdForUpdate(request.getUserId());
+		User user = userRepository.findOneForUpdateById(request.getUserId());
 		if (user == null) {
 			throw new IllegalArgumentException("The user does not exist");
 		}
 
 		User duplicate;
 		if (!ObjectUtils.nullSafeEquals(request.getEmail(), user.getEmail())) {
-			duplicate = userRepository.findByEmail(request.getEmail());
+			duplicate = userRepository.findOneByEmail(request.getEmail());
 			if (duplicate != null) {
 				throw new DuplicateEmailException(request.getEmail());
 			}
 		}
 		if (!ObjectUtils.nullSafeEquals(request.getLoginId(), user.getLoginId())) {
-			duplicate = userRepository.findByLoginId(request.getLoginId());
+			duplicate = userRepository.findOneByLoginId(request.getLoginId());
 			if (duplicate != null) {
 				throw new DuplicateLoginIdException(request.getLoginId());
 			}
@@ -205,7 +205,7 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public User updatePassword(PasswordUpdateRequest request, PasswordResetToken passwordResetToken) {
-		User user = userRepository.findByIdForUpdate(request.getUserId());
+		User user = userRepository.findOneForUpdateById(request.getUserId());
 		if (user == null) {
 			throw new IllegalArgumentException("The user does not exist");
 		}
@@ -257,7 +257,7 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public User updatePassword(PasswordUpdateRequest request, AuthorizedUser updatedBy) {
-		User user = userRepository.findByIdForUpdate(request.getUserId());
+		User user = userRepository.findOneForUpdateById(request.getUserId());
 		if (user == null) {
 			throw new IllegalArgumentException("The user does not exist");
 		}
@@ -270,7 +270,7 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public User deleteUser(UserDeleteRequest form, BindingResult result) throws BindException {
-		User user = userRepository.findByIdForUpdate(form.getId());
+		User user = userRepository.findOneForUpdateById(form.getId());
 		userRepository.delete(user);
 		return user;
 	}
@@ -367,7 +367,7 @@ public class UserService {
 	public UserInvitation inviteAgain(UserInvitationResendRequest form, BindingResult result, AuthorizedUser authorizedUser) throws MessagingException {
 		LocalDateTime now = LocalDateTime.now();
 
-		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(form.getToken());
+		UserInvitation invitation = userInvitationRepository.findOneForUpdateByToken(form.getToken());
 		invitation.setExpiredAt(now.plusHours(72));
 		invitation.setUpdatedAt(now);
 		invitation.setUpdatedBy(authorizedUser.toString());
@@ -405,7 +405,7 @@ public class UserService {
 
 	@CacheEvict(value="users", allEntries=true)
 	public UserInvitation deleteUserInvitation(UserInvitationDeleteRequest request) {
-		UserInvitation invitation = userInvitationRepository.findByTokenForUpdate(request.getToken());
+		UserInvitation invitation = userInvitationRepository.findOneForUpdateByToken(request.getToken());
 		userInvitationRepository.delete(invitation);
 		return invitation;
 	}
@@ -424,7 +424,7 @@ public class UserService {
 	}
 
 	private List<User> getUsers(Collection<Long> ids) {
-		Set<User> results = new LinkedHashSet<User>(userRepository.findByIdIn(ids));
+		Set<User> results = new LinkedHashSet<User>(userRepository.findAllByIdIn(ids));
 		List<User> users = new ArrayList<>();
 		for (long id : ids) {
 			for (User user : results) {
@@ -443,7 +443,7 @@ public class UserService {
 	}
 
 	public User getUserByLoginId(String loginId) {
-		return userRepository.findByLoginId(loginId);
+		return userRepository.findOneByLoginId(loginId);
 	}
 
 //	@Cacheable(value="users", key="'invitations.list'")
@@ -452,6 +452,6 @@ public class UserService {
 	}
 
 	public PasswordResetToken getPasswordResetToken(String token) {
-		return passwordResetTokenRepository.findByToken(token);
+		return passwordResetTokenRepository.findOneByToken(token);
 	}
 }

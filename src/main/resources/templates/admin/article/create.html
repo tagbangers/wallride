@@ -252,7 +252,7 @@
 								<fieldset id="category-fieldset">
 									<legend th:text="#{Categories}">Categories</legend>
 									<section>
-										<ul th:unless="${#lists.isEmpty(categoryTree.rootNodes)}" th:include="article/create::category-index(${categoryTree.rootNodes})" id="category-index" class="list-unstyled"></ul>
+										<ul th:unless="${#lists.isEmpty(categoryNodes)}" th:include="article/create::category-index(${categoryNodes})" id="category-index" class="list-unstyled"></ul>
 										<ul th:fragment="category-index(nodes)">
 											<li th:each="node : ${nodes}" class="checkbox">
 												<label><input type="checkbox" name="categoryIds" th:value="${node.category.id}" th:text="${node.category.name}" th:checked="${#sets.contains(form.categoryIds, node.category.id)}" /></label>

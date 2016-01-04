@@ -23,7 +23,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.wallride.core.domain.*;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.BlogLanguage;
+import org.wallride.core.domain.Category;
+import org.wallride.core.domain.Post;
 import org.wallride.core.model.ArticleSearchRequest;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
@@ -70,8 +73,7 @@ public class FeedController {
 			@PathVariable String categoryCode,
 			BlogLanguage blogLanguage,
 			Model model) {
-		CategoryTree categoryTree = categoryService.getCategoryTree(blogLanguage.getLanguage());
-		Category category = categoryTree.getCategoryByCode(categoryCode);
+		Category category = categoryService.getCategoryByCode(categoryCode, blogLanguage.getLanguage());
 		List<Long> categoryIds = new ArrayList<>();
 		categoryIds.add(category.getId());
 

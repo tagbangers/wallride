@@ -16,7 +16,8 @@
 
 package org.wallride.web.controller.admin.category;
 
-import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Category;
+import org.wallride.core.model.TreeNode;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,24 +26,24 @@ import java.util.Map;
 
 public class CategoryIndexModel extends ArrayList<Map<String, Object>> {
 
-	public CategoryIndexModel(CategoryTree categoryTree) {
+	public CategoryIndexModel(List<TreeNode<Category>> nodes) {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
-		for (CategoryTree.Node node : categoryTree.getRootNodes()) {
+		for (TreeNode<Category> node : nodes) {
 			result.add(createValue(node));
 		}
 		this.addAll(result);
 	}
 
-	private Map<String, Object> createValue(CategoryTree.Node node) {
+	private Map<String, Object> createValue(TreeNode<Category> node) {
 		Map<String, Object> parent = new LinkedHashMap<>();
-		parent.put("id", node.getCategory().getId());
-		parent.put("code", node.getCategory().getCode());
-		parent.put("name", node.getCategory().getName());
+		parent.put("id", node.getObject().getId());
+		parent.put("code", node.getObject().getCode());
+		parent.put("name", node.getObject().getName());
 //		parent.put("articleCount", category.getArticleCount());
 
 		List<Map<String, Object>> children = new ArrayList<Map<String, Object>>();
-		for (CategoryTree.Node child : node.getChildren()) {
+		for (TreeNode<Category> child : node.getChildren()) {
 			children.add(createValue(child));
 		}
 		parent.put("children", children);

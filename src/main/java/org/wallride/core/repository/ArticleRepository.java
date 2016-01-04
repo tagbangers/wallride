@@ -16,10 +16,8 @@
 
 package org.wallride.core.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,46 +33,21 @@ import java.util.Map;
 @Transactional
 public interface ArticleRepository extends JpaRepository<Article, Long>, ArticleRepositoryCustom {
 
-	static final String DEFAULT_LIST_SELECT_QUERY =
-			"from Article article " +
-			"left join fetch article.cover cover " +
-			"left join fetch article.author author " +
-			"left join fetch article.drafted drafted " +
-			"left join fetch article.categories category ";
+	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Article findOne(Specification<Article> spec);
 
-	static final String DEFAULT_OBJECT_SELECT_QUERY =
-			"from Article article " +
-			"left join fetch article.cover cover " +
-			"left join fetch article.author author " +
-			"left join fetch article.drafted drafted " +
-			"left join fetch article.categories category " +
-			"left join fetch article.tags tag " +
-			"left join fetch article.relatedToPosts relatedToPosts ";
+	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Article findOneByIdAndLanguage(Long id, String language);
 
-	@Query("select article.id from Article article order by article.date desc ")
-	List<Long> findId();
-
-	@Query(DEFAULT_LIST_SELECT_QUERY + "where article.id in (:ids) ")
-	List<Article> findByIdIn(@Param("ids") Collection<Long> ids);
-
-//	@Query(DEFAULT_SELECT_QUERY + "where article.drafted = :drafted order by article.id desc ")
-//	List<Article> findByDrafted(@Param("drafted") Article drafted);
-
-	@Query(DEFAULT_LIST_SELECT_QUERY + "where regexp(article.code, :regex) = 1 and article.language = :language ")
-	List<Article> findByCodeRegex(@Param("regex") String regex, @Param("language") String language);
-
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
-	Article findById(@Param("id") Long id, @Param("language") String language);
-	
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.id = :id and article.language = :language ")
+	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Article findByIdForUpdate(@Param("id") Long id, @Param("language") String language);
+	Article findOneForUpdateByIdAndLanguage(Long id, String language);
 
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.code = :code and article.language = :language ")
-	Article findByCode(@Param("code") String code, @Param("language") String language);
+	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Article findOneByCodeAndLanguage(String code, String language);
 
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where article.drafted = :drafted and article.id = (select max(article.id) from article where article.drafted = :drafted) ")
-	Article findDraft(@Param("drafted") Article drafted);
+	@EntityGraph(value = Article.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	List<Article> findAllByIdIn(Collection<Long> ids);
 
 	@Query("select count(article.id) from Article article where article.language = :language and article.drafted is null ")
 	long count(@Param("language") String language);

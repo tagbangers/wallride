@@ -28,7 +28,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UrlPathHelper;
 import org.wallride.Application;
-import org.wallride.core.domain.*;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.PageService;
@@ -100,17 +101,6 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 		mv.addObject("ADMIN_LINK", buildAdminLink());
 		mv.addObject("ADMIN_PATH", buildAdminPath(currentLanguage));
-
-		CategoryTree categoryTreeHasArticle = categoryService.getCategoryTree(currentLanguage, true);
-		CategoryTree categoryTreeAll = categoryService.getCategoryTree(currentLanguage);
-		mv.addObject("CATEGORY_TREE", categoryTreeHasArticle);
-		mv.addObject("CATEGORY_TREE_ALL", categoryTreeAll);
-
-		PageTree pageTreePublished = pageService.getPageTree(currentLanguage, Post.Status.PUBLISHED);
-		PageTree pageTreeAll = pageService.getPageTree(currentLanguage);
-		mv.addObject("PAGE_TREE", pageTreePublished);
-		mv.addObject("PAGE_TREE_ALL", pageTreeAll);
-
 	}
 
 	private String buildGuestLink() {

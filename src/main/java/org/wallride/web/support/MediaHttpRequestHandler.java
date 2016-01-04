@@ -86,7 +86,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		String key = (String) pathVariables.get("key");
 
-		Media media = mediaRepository.findById(key);
+		Media media = mediaRepository.findOneById(key);
 		int width = ServletRequestUtils.getIntParameter(request, "w", 0);
 		int height = ServletRequestUtils.getIntParameter(request, "h", 0);
 		int mode = ServletRequestUtils.getIntParameter(request, "m", 0);

@@ -29,18 +29,20 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
-import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.CategoryService;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.model.TreeNode;
+import org.wallride.core.service.ArticleService;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
+import java.util.List;
 
 @Controller
 @RequestMapping("/{language}/articles/create")
@@ -52,7 +54,7 @@ public class ArticleCreateController {
 	private ArticleService articleService;
 
 	@Inject
-	private CategoryService categoryService;
+	private CategoryUtils categoryUtils;
 
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
@@ -62,9 +64,9 @@ public class ArticleCreateController {
 		return new ArticleCreateForm();
 	}
 
-	@ModelAttribute("categoryTree")
-	public CategoryTree categoryTree(@PathVariable String language) {
-		return categoryService.getCategoryTree(language);
+	@ModelAttribute("categoryNodes")
+	public List<TreeNode<Category>> setupCategoryNodes(@PathVariable String language) {
+		return categoryUtils.getNodes();
 	}
 
 	@ModelAttribute("query")
@@ -85,9 +87,7 @@ public class ArticleCreateController {
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params="part=category-fieldset")
-	public String partCategoryFieldset(@PathVariable String language, Model model) {
-		CategoryTree categoryTree = categoryService.getCategoryTree(language);
-		model.addAttribute("categoryTree", categoryTree);
+	public String partCategoryFieldset(@PathVariable String language) {
 		return "article/create::#category-fieldset";
 	}
 

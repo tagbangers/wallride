@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.core.support;
+package org.wallride.web.support;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
@@ -22,19 +22,20 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.User;
-import org.wallride.core.service.BlogService;
+import org.wallride.core.support.WallRideProperties;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserUtils {
+public class Users {
 
 	private IProcessingContext processingContext;
-	private BlogService blogService;
 
-	public UserUtils(IProcessingContext processingContext, BlogService blogService) {
+	private WallRideProperties wallRideProperties;
+
+	public Users(IProcessingContext processingContext, WallRideProperties wallRideProperties) {
 		this.processingContext = processingContext;
-		this.blogService = blogService;
+		this.wallRideProperties = wallRideProperties;
 	}
 
 	public String link(User user) {
@@ -70,7 +71,7 @@ public class UserUtils {
 	}
 
 	public String title(User user) {
-		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
+		Blog blog = (Blog) processingContext.getContext().getVariables().get("BLOG");
 		return String.format("%s | %s",
 				user.getNickname(),
 				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));

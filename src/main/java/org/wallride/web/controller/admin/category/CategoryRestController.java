@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CategoryTree;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectDeletedModel;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.DomainObjectUpdatedModel;
@@ -50,6 +50,9 @@ public class CategoryRestController {
 	private CategoryService categoryService;
 
 	@Inject
+	private CategoryUtils categoryUtils;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	private static Logger logger = LoggerFactory.getLogger(CategoryRestController.class);
@@ -63,8 +66,7 @@ public class CategoryRestController {
 
 	@RequestMapping(value="/{language}/categories", method= RequestMethod.GET)
 	public @ResponseBody CategoryIndexModel index(@PathVariable String language) {
-		CategoryTree categoryTree = categoryService.getCategoryTree(language);
-		return new CategoryIndexModel(categoryTree);
+		return new CategoryIndexModel(categoryUtils.getNodes(true));
 	}
 
 	@RequestMapping(value="/{language}/categories", method=RequestMethod.POST)
@@ -81,7 +83,7 @@ public class CategoryRestController {
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("savedCategory", category);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectSavedModel<Long>(category);
+		return new DomainObjectSavedModel<>(category);
 	}
 
 	@RequestMapping(value="/{language}/categories/{id}", method=RequestMethod.POST)
@@ -100,7 +102,7 @@ public class CategoryRestController {
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("updatedCategory", category);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectUpdatedModel<Long>(category);
+		return new DomainObjectUpdatedModel<>(category);
 	}
 
 	@RequestMapping(value="/{language}/categories/{id}", method= RequestMethod.DELETE)
@@ -114,13 +116,12 @@ public class CategoryRestController {
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("deletedCategory", category);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectDeletedModel<Long>(category);
+		return new DomainObjectDeletedModel<>(category);
 	}
 
 	@RequestMapping(value="/{language}/categories", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody CategoryIndexModel sort(@PathVariable String language, @RequestBody List<Map<String, Object>> data) {
 		categoryService.updateCategoryHierarchy(data, language);
-		CategoryTree categoryTree = categoryService.getCategoryTree(language);
-		return new CategoryIndexModel(categoryTree);
+		return new CategoryIndexModel(categoryUtils.getNodes(true));
 	}
 }

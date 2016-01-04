@@ -42,6 +42,7 @@ import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.exception.NotNullException;
 import org.wallride.core.model.*;
 import org.wallride.core.repository.ArticleRepository;
+import org.wallride.core.repository.ArticleSpecifications;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
@@ -92,7 +93,7 @@ public class ArticleService {
 		}
 
 		if (!status.equals(Post.Status.DRAFT)) {
-			Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
+			Article duplicate = articleRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -141,7 +142,7 @@ public class ArticleService {
 		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
 		if (!CollectionUtils.isEmpty(tagNames)) {
 			for (String tagName : tagNames) {
-				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				Tag tag = tagRepository.findOneForUpdateByNameAndLanguage(tagName, request.getLanguage());
 				if (tag == null) {
 					tag = new Tag();
 					tag.setName(tagName);
@@ -176,7 +177,7 @@ public class ArticleService {
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
-				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
+				Media media = mediaRepository.findOneById(mediaUrlMatcher.group(1));
 				medias.add(media);
 			}
 		}
@@ -192,9 +193,9 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsDraft(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			Article draft = articleRepository.findDraft(article);
+			Article draft = articleRepository.findOne(ArticleSpecifications.draft(article));
 			if (draft == null) {
 				ArticleCreateRequest createRequest = new ArticleCreateRequest.Builder()
 						.code(request.getCode())
@@ -240,7 +241,7 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		publishArticle(article);
 		return saveArticle(request, authorizedUser);
 	}
@@ -255,7 +256,7 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		unpublishArticle(article);
 		return saveArticle(request, authorizedUser);
 	}
@@ -270,7 +271,7 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
@@ -280,7 +281,7 @@ public class ArticleService {
 			}
 		}
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			Article duplicate = articleRepository.findByCode(request.getCode(), request.getLanguage());
+			Article duplicate = articleRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null && !duplicate.equals(article)) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -331,7 +332,7 @@ public class ArticleService {
 		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
 		if (!CollectionUtils.isEmpty(tagNames)) {
 			for (String tagName : tagNames) {
-				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				Tag tag = tagRepository.findOneForUpdateByNameAndLanguage(tagName, request.getLanguage());
 				if (tag == null) {
 					tag = new Tag();
 					tag.setName(tagName);
@@ -366,7 +367,7 @@ public class ArticleService {
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
-				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
+				Media media = mediaRepository.findOneById(mediaUrlMatcher.group(1));
 				medias.add(media);
 			}
 		}
@@ -380,7 +381,7 @@ public class ArticleService {
 
 	@CacheEvict(value="articles", allEntries=true)
 	public Article deleteArticle(ArticleDeleteRequest request, BindingResult result) throws BindException {
-		Article article = articleRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		articleRepository.delete(article);
 		return article;
 	}
@@ -389,7 +390,7 @@ public class ArticleService {
 	public List<Article> bulkPublishArticle(ArticleBulkPublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
-			Article article = articleRepository.findByIdForUpdate(id, request.getLanguage());
+			Article article = articleRepository.findOneForUpdateByIdAndLanguage(id, request.getLanguage());
 			if (article.getStatus() != Post.Status.DRAFT && request.getDate() == null) {
 				continue;
 			}
@@ -434,7 +435,7 @@ public class ArticleService {
 	public List<Article> bulkUnpublishArticle(ArticleBulkUnpublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
-			Article article = articleRepository.findByIdForUpdate(id, request.getLanguage());
+			Article article = articleRepository.findOneForUpdateByIdAndLanguage(id, request.getLanguage());
 			if (article.getStatus() == Post.Status.DRAFT) {
 				continue;
 			}
@@ -500,7 +501,7 @@ public class ArticleService {
 	}
 
 	public List<Article> getArticles(Collection<Long> ids) {
-		Set<Article> results = new LinkedHashSet<Article>(articleRepository.findByIdIn(ids));
+		Set<Article> results = new LinkedHashSet<Article>(articleRepository.findAllByIdIn(ids));
 		List<Article> articles = new ArrayList<>();
 		for (long id : ids) {
 			for (Article article : results) {
@@ -542,15 +543,15 @@ public class ArticleService {
 	}
 
 	public Article getArticleById(long id, String language) {
-		return articleRepository.findById(id, language);
+		return articleRepository.findOneByIdAndLanguage(id, language);
 	}
 
 	public Article getArticleByCode(String code, String language) {
-		return articleRepository.findByCode(code, language);
+		return articleRepository.findOneByCodeAndLanguage(code, language);
 	}
 
 	public Article getDraftById(long id) {
-		return articleRepository.findDraft(entityManager.getReference(Article.class, id));
+		return articleRepository.findOne(ArticleSpecifications.draft(entityManager.getReference(Article.class, id)));
 	}
 
 	public long countArticles(String language) {

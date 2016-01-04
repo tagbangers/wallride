@@ -44,7 +44,7 @@ public class SignupService {
 	private UserInvitationRepository userInvitationRepository;
 
 	public UserInvitation readUserInvitation(String token) {
-		return userInvitationRepository.findByToken(token);
+		return userInvitationRepository.findOneByToken(token);
 	}
 
 	public boolean validateInvitation(UserInvitation invitation) {
@@ -70,7 +70,7 @@ public class SignupService {
 	public AuthorizedUser signup(SignupRequest request, User.Role role, String token) throws ServiceException {
 		UserInvitation invitation = null;
 		if (token != null) {
-			invitation = userInvitationRepository.findByTokenForUpdate(token);
+			invitation = userInvitationRepository.findOneForUpdateByToken(token);
 			if (invitation == null) {
 				throw new HttpForbiddenException();
 			}
@@ -80,11 +80,11 @@ public class SignupService {
 		}
 
 		User duplicate;
-		duplicate = userRepository.findByLoginId(request.getLoginId());
+		duplicate = userRepository.findOneByLoginId(request.getLoginId());
 		if (duplicate != null) {
 			throw new DuplicateLoginIdException(request.getLoginId());
 		}
-		duplicate = userRepository.findByEmail(request.getEmail());
+		duplicate = userRepository.findOneByEmail(request.getEmail());
 		if (duplicate != null) {
 			throw new DuplicateEmailException(request.getEmail());
 		}

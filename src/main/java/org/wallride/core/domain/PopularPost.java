@@ -57,7 +57,7 @@ public class PopularPost extends DomainObject<Long> implements Comparable<Popula
 	@Column(nullable = false)
 	private long views;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Post post;
 

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionEnhancingDialect;
-import org.wallride.core.service.BlogService;
+import org.wallride.web.support.*;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -31,16 +31,22 @@ import java.util.Map;
 public class CustomThymeleafDialect extends AbstractDialect implements IExpressionEnhancingDialect {
 
 	@Inject
-	private BlogService blogService;
+	private PageUtils pageUtils;
+
+	@Inject
+	private CategoryUtils categoryUtils;
+
 	@Inject
 	private WallRideProperties wallRideProperties;
 
 	@Override
 	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
 		Map<String, Object> objects = new HashMap<>();
-		objects.put("posts", new PostUtils(processingContext, wallRideProperties, blogService));
-		objects.put("users", new UserUtils(processingContext, blogService));
-		objects.put("medias", new MediaUtils(wallRideProperties));
+		objects.put("posts", new Posts(processingContext, wallRideProperties, pageUtils));
+		objects.put("pages", new Pages(processingContext, pageUtils));
+		objects.put("categorys", new Categorys(processingContext, categoryUtils));
+		objects.put("medias", new Medias(processingContext, wallRideProperties));
+		objects.put("users", new Users(processingContext, wallRideProperties));
 		return Collections.unmodifiableMap(objects);
 	}
 

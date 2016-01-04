@@ -16,6 +16,7 @@
 
 package org.wallride.core.repository;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,49 +30,26 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface PageRepository extends JpaRepository<Page, Long>, PageRepositoryCustom, JpaSpecificationExecutor<Page> {
+public interface PageRepository extends JpaRepository<Page, Long>, PageRepositoryCustom {
 
-	static final String DEFAULT_LIST_SELECT_QUERY =
-			"from Page page " +
-			"left join fetch page.cover cover "+
-			"left join fetch page.author author " +
-			"left join fetch page.parent parent " +
-			"left join fetch page.children children ";
+	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Page findOne(Specification<Page> spec);
 
-	static final String DEFAULT_OBJECT_SELECT_QUERY =
-			"from Page page " + 
-			"left join fetch page.cover cover "+
-			"left join fetch page.author author " +
-			"left join fetch page.parent parent " +
-			"left join fetch page.children children " +
-			"left join fetch page.tags tag " +
-			"left join fetch page.relatedToPosts relatedToPosts " +
-			"left join fetch page.relatedByPosts relatedByPosts ";
+	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Page findOneByIdAndLanguage(Long id, String language);
 
-	@Query("select page.id from Page page order by page.id")
-	List<Long> findId();
-	
-	@Query(DEFAULT_LIST_SELECT_QUERY + "where page.id in (:ids) ")
-	List<Page> findByIdIn(@Param("ids") Collection<Long> ids);
-	
-	@Query(DEFAULT_LIST_SELECT_QUERY + "where page.language = :language and page.drafted is null order by page.lft")
-	List<Page> findByLanguage(@Param("language") String language);
-
-	@Query(DEFAULT_LIST_SELECT_QUERY + "where page.language = :language and page.status = :status and page.drafted is null order by page.lft")
-	List<Page> findByLanguageAndStatus(@Param("language") String language, @Param("status") Post.Status status);
-
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
-	Page findById(@Param("id") Long id, @Param("language") String language);
-
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.id = :id and page.language = :language ")
+	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Page findByIdForUpdate(@Param("id")Long id, @Param("language") String language);
-	
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.code = :code and page.language = :language ")
-	Page findByCode(@Param("code") String code, @Param("language") String language);
+	Page findOneForUpdateByIdAndLanguage(Long id, String language);
 
-	@Query(DEFAULT_OBJECT_SELECT_QUERY + "where page.drafted = :drafted and page.id = (select max(page.id) from page where page.drafted = :drafted) ")
-	Page findDraft(@Param("drafted") Page drafted);
+	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Page findOneByCodeAndLanguage(String code, String language);
+
+	@EntityGraph(value = Page.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	List<Page> findAll(Specification<Page> spec);
+
+	@EntityGraph(value = Page.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	List<Page> findAllByIdIn(Collection<Long> ids);
 
 	@Query("select count(page.id) from Page page where page.language = :language and page.drafted is null ")
 	long count(@Param("language") String language);

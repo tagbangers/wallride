@@ -64,7 +64,7 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag createTag(TagCreateRequest request, AuthorizedUser authorizedUser) {
-		Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
+		Tag duplicate = tagRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
 		if (duplicate != null) {
 			throw new DuplicateNameException(request.getName());
 		}
@@ -84,11 +84,11 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag updateTag(TagUpdateRequest request, AuthorizedUser authorizedUser) {
-		Tag tag = tagRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Tag tag = tagRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
 		if (!ObjectUtils.nullSafeEquals(tag.getName(), request.getName())) {
-			Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
+			Tag duplicate = tagRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateNameException(request.getName());
 			}
@@ -132,7 +132,7 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag deleteTag(TagDeleteRequest request, BindingResult result) {
-		Tag tag = tagRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Tag tag = tagRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		tagRepository.delete(tag);
 		return tag;
 	}
@@ -169,11 +169,11 @@ public class TagService {
 	}
 
 	public Tag getTagById(long id, String language) {
-		return tagRepository.findById(id, language);
+		return tagRepository.findOneByIdAndLanguage(id, language);
 	}
 
 	public Tag getTagByName(String name, String language) {
-		return tagRepository.findByName(name, language);
+		return tagRepository.findOneByNameAndLanguage(name, language);
 	}
 
 	public Page<Tag> getTags(TagSearchRequest request) {

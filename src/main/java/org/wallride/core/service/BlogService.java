@@ -109,7 +109,7 @@ public class BlogService {
 		googleAnalytics.setServiceAccountP12FileName(request.getServiceAccountP12File().getOriginalFilename());
 		googleAnalytics.setServiceAccountP12FileContent(p12);
 
-		Blog blog = blogRepository.findByIdForUpdate(request.getBlogId());
+		Blog blog = blogRepository.findOneForUpdateById(request.getBlogId());
 		blog.setGoogleAnalytics(googleAnalytics);
 
 		blog = blogRepository.saveAndFlush(blog);
@@ -118,7 +118,7 @@ public class BlogService {
 
 	@CacheEvict(value = "blogs", allEntries = true)
 	public GoogleAnalytics deleteGoogleAnalytics(long blogId) {
-		Blog blog = blogRepository.findByIdForUpdate(blogId);
+		Blog blog = blogRepository.findOneForUpdateById(blogId);
 		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
 		blog.setGoogleAnalytics(null);
 		blogRepository.saveAndFlush(blog);
@@ -127,6 +127,6 @@ public class BlogService {
 
 	@Cacheable(value = "blogs")
 	public Blog getBlogById(long id) {
-		return blogRepository.findById(id);
+		return blogRepository.findOneById(id);
 	}
 }

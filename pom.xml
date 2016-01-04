@@ -164,6 +164,13 @@
 			<version>${hibernate-search.version}</version>
 		</dependency>
 
+		<!-- Hibernate Metamodel -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
 		<!-- Infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>

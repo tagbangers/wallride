@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.core.support;
+package org.wallride.web.support;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,23 +25,32 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
-import org.wallride.core.domain.*;
-import org.wallride.core.service.BlogService;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.Page;
+import org.wallride.core.domain.Post;
+import org.wallride.core.support.PageUtils;
+import org.wallride.core.support.WallRideProperties;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PostUtils {
+public class Posts {
 
 	private IProcessingContext processingContext;
-	private WallRideProperties wallRideProperties;
-	private BlogService blogService;
 
-	public PostUtils(IProcessingContext processingContext, WallRideProperties wallRideProperties, BlogService blogService) {
+	private WallRideProperties wallRideProperties;
+
+	private PageUtils pageUtils;
+
+	public Posts(IProcessingContext processingContext, WallRideProperties wallRideProperties, PageUtils pageUtils) {
 		this.processingContext = processingContext;
 		this.wallRideProperties = wallRideProperties;
-		this.blogService = blogService;
+		this.pageUtils = pageUtils;
 	}
 
 	public String link(Article article) {
@@ -102,17 +111,9 @@ public class PostUtils {
 	private String path(UriComponentsBuilder builder, Page page, boolean encode) {
 		Map<String, Object> params = new HashMap<>();
 
-		PageTree pageTree = (PageTree) processingContext.getContext().getVariables().get("PAGE_TREE_ALL");
-//		PageTree pageTree = defaultModelAttributeService.getPageTree(LocaleContextHolder.getLocale().getLanguage());
 		List<String> codes = new LinkedList<>();
-		Page parent = page.getParent();
-		while (parent != null) {
-			codes.add(parent.getCode());
-			parent = (parent.getParent() != null) ? pageTree.getPageByCode(parent.getParent().getCode()) : null;
-		}
-
-		Collections.reverse(codes);
-		codes.add(page.getCode());
+		Map<Page, String> paths = pageUtils.getPaths(page);
+		paths.keySet().stream().map(p -> p.getCode()).forEach(codes::add);
 
 		for (int i = 0; i < codes.size(); i++) {
 			String key = "code" + i;
@@ -140,7 +141,7 @@ public class PostUtils {
 	}
 
 	public String ogSiteName(Post post) {
-		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
+		Blog blog = (Blog) processingContext.getContext().getVariables().get("BLOG");
 		return blog.getTitle(processingContext.getContext().getLocale().getLanguage());
 	}
 
@@ -168,7 +169,7 @@ public class PostUtils {
 		if (post.getSeo() != null && post.getSeo().getTitle() != null) {
 			return post.getSeo().getTitle();
 		}
-		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
+		Blog blog = (Blog) processingContext.getContext().getVariables().get("BLOG");
 		return String.format("%s | %s",
 				post.getTitle(),
 				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));

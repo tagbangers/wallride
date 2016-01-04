@@ -32,6 +32,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Service;
@@ -44,10 +45,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.GoogleAnalytics;
-import org.wallride.core.domain.PopularPost;
-import org.wallride.core.domain.Post;
+import org.wallride.core.domain.*;
 import org.wallride.core.exception.GoogleAnalyticsException;
 import org.wallride.core.exception.ServiceException;
 import org.wallride.core.model.PostSearchRequest;
@@ -61,6 +59,8 @@ import org.wallride.web.support.BlogLanguageRewriteRule;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -102,7 +102,7 @@ public class PostService {
 		logger.info("Starting public posts of the scheduled");
 
 		LocalDateTime now = LocalDateTime.now();
-		List<Post> posts = postRepository.findByStatusAndDateLessThanEqual(Post.Status.SCHEDULED, now);
+		List<Post> posts = postRepository.findAllByStatusAndDateLessThanEqual(Post.Status.SCHEDULED, now);
 		for (Post post : posts) {
 			post.setStatus(Post.Status.PUBLISHED);
 			postRepository.saveAndFlush(post);
@@ -237,7 +237,7 @@ public class PostService {
 
 					// Last path mean code of post
 					String code = uriComponents.getPathSegments().get(uriComponents.getPathSegments().size() - 1);
-					Post post = postRepository.findByCode(code, rewriteMatch.getBlogLanguage().getLanguage());
+					Post post = postRepository.findOneByCodeAndLanguage(code, rewriteMatch.getBlogLanguage().getLanguage());
 					if (post == null) {
 						logger.debug("Post not found [{}]", code);
 						continue;
@@ -309,10 +309,21 @@ public class PostService {
 	 */
 	@Cacheable(value = "popularPosts", key = "'list.type.' + #language + '.' + #type")
 	public SortedSet<PopularPost> getPopularPosts(String language, PopularPost.Type type) {
-		return popularPostRepository.findByType(language, type, Post.Status.PUBLISHED);
+		Specification<PopularPost> spec = (root, query, cb) -> {
+			Join<PopularPost, Post> post = (Join<PopularPost, Post>) root.fetch(PopularPost_.post);
+			post.fetch(Post_.cover);
+			post.fetch(Post_.author);
+
+			List<Predicate> predicates = new ArrayList<>();
+			predicates.add(cb.equal(root.get(PopularPost_.language), language));
+			predicates.add(cb.equal(root.get(PopularPost_.type), type));
+			predicates.add(cb.equal(post.get(Post_.status), Post.Status.PUBLISHED));
+			return cb.and(predicates.toArray(new Predicate[0]));
+		};
+		return popularPostRepository.findAll(spec);
 	}
 
 	public Post getPostById(long id, String language) {
-		return postRepository.findById(id, language);
+		return postRepository.findOneByIdAndLanguage(id, language);
 	}
 }

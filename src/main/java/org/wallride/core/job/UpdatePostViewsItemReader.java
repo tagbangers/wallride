@@ -24,8 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.GoogleAnalytics;
-import org.wallride.core.service.BlogService;
 import org.wallride.core.exception.GoogleAnalyticsException;
+import org.wallride.core.service.BlogService;
 import org.wallride.core.support.GoogleAnalyticsUtils;
 
 import javax.inject.Inject;

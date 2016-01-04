@@ -25,35 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Tag;
 
 import javax.persistence.LockModeType;
-import java.util.Collection;
-import java.util.List;
 
 @Repository
 @Transactional
 public interface TagRepository extends JpaRepository<Tag, Long>, TagRepositoryCustom {
 	
-	static final String DEFAULT_SELECT_QUERY = 
-			"from Tag tag ";
-
-	@Query("select tag.id from Tag tag ")
-	List<Long> findId();
+	Tag findOneByIdAndLanguage(Long id, String language);
 	
-	@Query(DEFAULT_SELECT_QUERY + "where tag.id in (:ids) ")
-	List<Tag> findByIdIn(@Param("ids") Collection<Long> ids);
-	
-	@Query(DEFAULT_SELECT_QUERY + "where tag.id = :id and tag.language = :language ")
-	Tag findById(@Param("id") Long id, @Param("language") String language);
-	
-	@Query(DEFAULT_SELECT_QUERY + "where tag.id = :id and tag.language = :language ")
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Tag findByIdForUpdate(@Param("id") Long id, @Param("language") String language);
+	Tag findOneForUpdateByIdAndLanguage(Long id, String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where tag.name = :name and tag.language = :language ")
-	Tag findByName(@Param("name") String name, @Param("language") String language);
+	Tag findOneByNameAndLanguage(String name, String language);
 
-	@Query(DEFAULT_SELECT_QUERY + "where tag.name = :name and tag.language = :language ")
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Tag findByNameForUpdate(@Param("name") String name, @Param("language") String language);
+	Tag findOneForUpdateByNameAndLanguage(String name, String language);
 
 	@Query("select count(tag.id) from Tag tag where tag.language = :language ")
 	long count(@Param("language") String language);

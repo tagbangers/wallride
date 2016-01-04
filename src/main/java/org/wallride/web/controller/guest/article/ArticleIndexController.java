@@ -25,7 +25,10 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.HandlerMapping;
-import org.wallride.core.domain.*;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.BlogLanguage;
+import org.wallride.core.domain.Category;
+import org.wallride.core.domain.User;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CategoryService;
 import org.wallride.core.service.UserService;
@@ -121,8 +124,7 @@ public class ArticleIndexController {
 		String[] codes = path.split("/");
 		String lastCode = codes[codes.length - 1];
 
-		CategoryTree categoryTree = categoryService.getCategoryTree(blogLanguage.getLanguage());
-		Category category = categoryTree.getCategoryByCode(lastCode);
+		Category category = categoryService.getCategoryByCode(lastCode, blogLanguage.getLanguage());
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());

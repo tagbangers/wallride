@@ -17,7 +17,7 @@
 							<a th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-create-form,query=${query})}" data-toggle="modal" data-target="#page-create-modal" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewPage}">Add New</span></a>
 						</div>
 						<div class="btn-group">
-							<button id="update-page-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:if="!${pageTree.empty}" th:text="#{SaveOrder}">Save Order</button>
+							<button id="update-page-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:if="!${#lists.isEmpty(pageNodes)}" th:text="#{SaveOrder}">Save Order</button>
 						</div>
 						<script th:inline="javascript">
 							$(function() {
@@ -57,20 +57,20 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{DeletedPage}">Page deleted.</span>
 					</div>
-					<ul th:unless="${#lists.isEmpty(pageTree.rootNodes)}" th:replace="page/tree::page(${pageTree.rootNodes})"></ul>
+					<ul th:unless="${#lists.isEmpty(pageNodes)}" th:replace="page/tree::page(${pageNodes})"></ul>
 					<ul id="page-tree" class="sortable" th:fragment="page(nodes)">
-						<li th:each="node : ${nodes}" th:id="${'page-tree_' + node.page.id}">
-							<div class="category clearfix" th:classappend="${#strings.toString(node.page.status) ne 'PUBLISHED'} ? 'off'">
+						<li th:each="node : ${nodes}" th:id="${'page-tree_' + node.object.id}">
+							<div class="category clearfix" th:classappend="${#strings.toString(node.object.status) ne 'PUBLISHED'} ? 'off'">
 								<div class="wr-tree-options pull-left">
 									<span class="wr-tree-option disclose"><span class="glyphicon glyphicon-chevron-right"></span></span>
-									<span class="wr-tree-option title" th:text="${node.page.title}"></span>
-									<span class="wr-tree-option" th:if="${node.page.code}" th:text="${'/' + node.page.code}">/cate1</span>
-									<span class="wr-tree-option small" style="margin-left: 10px;" th:classappend="'wr-post-status-' + ${node.page.status}">● <span th:text="#{Post.Status. + ${node.page.status}}"></span></span>
+									<span class="wr-tree-option title" th:text="${node.object.title}"></span>
+									<span class="wr-tree-option" th:if="${node.object.code}" th:text="${'/' + node.object.code}">/cate1</span>
+									<span class="wr-tree-option small" style="margin-left: 10px;" th:classappend="'wr-post-status-' + ${node.object.status}">● <span th:text="#{Post.Status. + ${node.object.status}}"></span></span>
 								</div>
 								<div class="wr-tree-options pull-right">
-									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/edit(id=${node.page.id},query=${query})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
-									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-create-form,parentId=${node.page.id},query=${query})}" data-toggle="modal" data-target="#page-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
-									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-delete-form,id=${node.page.id},query=${query})}" data-toggle="modal" data-target="#page-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/edit(id=${node.object.id},query=${query})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-create-form,parentId=${node.object.id},query=${query})}" data-toggle="modal" data-target="#page-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/pages/tree(part=page-delete-form,id=${node.object.id},query=${query})}" data-toggle="modal" data-target="#page-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
 								</div>
 								<script>
 									$(function() {
@@ -96,7 +96,7 @@
 										<div class="form-group">
 											<select name="parentId" class="form-control">
 												<option value="" th:text="#{SelectParentPage}">Select Parent Page</option>
-												<option th:each="page : ${pageTree.pages}" th:value="${page.id}" th:text="${page.title}" th:selected="${page.id eq parentId}"></option>
+												<option th:each="page : ${#pages.getAllPages(true)}" th:value="${page.id}" th:text="${page.title}" th:selected="${page.id eq parentId}"></option>
 											</select>
 										</div>
 										<div class="form-group">

@@ -29,7 +29,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Page;
-import org.wallride.core.domain.PageTree;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.service.PageService;
@@ -59,11 +58,6 @@ public class PageEditController {
 		return pageService.getPageById(id, language);
 	}
 	
-	@ModelAttribute("pageTree")
-	public PageTree setupPageTree(@PathVariable String language) {
-		return pageService.getPageTree(language);
-	}
-
 	@ModelAttribute("query")
 	public String query(@RequestParam(required = false) String query) {
 		return query;

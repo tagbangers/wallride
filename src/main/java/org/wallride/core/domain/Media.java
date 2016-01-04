@@ -24,7 +24,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="media")
+@Table(name = "media")
 @DynamicInsert
 @DynamicUpdate
 @SuppressWarnings("serial")
@@ -37,17 +37,17 @@ public class Media extends DomainObject<String> {
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name="system-uuid", strategy="uuid2")
-	@Column(length=50)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
+	@Column(length = 50)
 	private String id;
 
-	@Column(name="mime_type", length=50, nullable=false)
+	@Column(name = "mime_type", length = 50, nullable = false)
 	private String mimeType;
 
-	@Column(name="original_name", length=500)
+	@Column(name = "original_name", length = 500)
 	private String originalName;
 
-	@ManyToMany(mappedBy="medias")
+	@ManyToMany(mappedBy = "medias")
 	private List<Post> posts;
 
 	@Override

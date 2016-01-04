@@ -26,6 +26,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = Blog.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("languages")})
+})
 @Table(name = "blog")
 @DynamicInsert
 @DynamicUpdate
@@ -33,8 +38,10 @@ public class Blog extends DomainObject<Long> {
 
 	public static final long DEFAULT_ID = 1;
 
+	public static final String DEEP_GRAPH_NAME = "BLOG_DEEP_GRAPH";
+
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	@Column(length = 200, nullable = false, unique = true)
