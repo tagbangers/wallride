@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT-201512301821</version>
+	<version>1.0.0.BUILD-SNAPSHOT-201601042344</version>
 	<packaging>${packaging.type}</packaging>
 
 	<profiles>
