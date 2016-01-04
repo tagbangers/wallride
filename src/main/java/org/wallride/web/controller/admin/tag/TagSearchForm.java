@@ -17,7 +17,7 @@
 package org.wallride.web.controller.admin.tag;
 
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.wallride.core.service.TagSearchRequest;
+import org.wallride.core.model.TagSearchRequest;
 
 import java.io.Serializable;
 

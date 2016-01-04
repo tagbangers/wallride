@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.PostSearchRequest;
+import org.wallride.core.model.PostSearchRequest;
 import org.wallride.core.service.PostService;
 import org.wallride.web.support.Pagination;
 
@@ -47,7 +47,7 @@ public class SearchController {
 			Model model,
 			HttpServletRequest servletRequest) {
 		PostSearchRequest request = new PostSearchRequest(blogLanguage.getLanguage()).withKeyword(keyword);
-		Page<Post> posts = postService.readPosts(request, pageable);
+		Page<Post> posts = postService.getPosts(request, pageable);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("posts", posts);
 		model.addAttribute("pageable", pageable);

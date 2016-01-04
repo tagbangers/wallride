@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.user;
 
-import org.wallride.core.service.UserInvitationResendRequest;
+import org.wallride.core.model.UserInvitationResendRequest;
 
 import java.io.Serializable;
 

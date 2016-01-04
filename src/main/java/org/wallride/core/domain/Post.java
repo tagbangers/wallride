@@ -30,6 +30,17 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = Post.SHALLOW_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("cover"),
+						@NamedAttributeNode("author")}
+		),
+		@NamedEntityGraph(name = Post.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("cover"),
+						@NamedAttributeNode("author")})
+})
 @Table(name = "post", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
 @Inheritance(strategy = InheritanceType.JOINED)
 @DynamicInsert
@@ -37,23 +48,26 @@ import java.util.*;
 @Indexed
 public class Post extends DomainObject<Long> {
 
+	public static final String SHALLOW_GRAPH_NAME = "POST_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "POST_DEEP_GRAPH";
+
 	public enum Status {
 		DRAFT, SCHEDULED, PUBLISHED
 	}
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(length=200)
+	@Column(length = 200)
 	@Field
 	private String code;
 
-	@Column(length=3, nullable=false)
+	@Column(length = 3, nullable = false)
 	@Field
 	private String language;
 
-	@Column(length=200)
+	@Column(length = 200)
 	@Field
 	private String title;
 
@@ -76,7 +90,7 @@ public class Post extends DomainObject<Long> {
 	private User author;
 
 	@Enumerated(EnumType.STRING)
-	@Column(length=50, nullable=false)
+	@Column(length = 50, nullable = false)
 	@Field
 	private Status status;
 
@@ -92,9 +106,9 @@ public class Post extends DomainObject<Long> {
 
 	@ManyToMany
 	@JoinTable(
-			name="post_tag",
-			joinColumns={@JoinColumn(name="post_id")},
-			inverseJoinColumns=@JoinColumn(name="tag_id", referencedColumnName="id"))
+			name = "post_tag",
+			joinColumns = {@JoinColumn(name = "post_id")},
+			inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
 	@SortNatural
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Tag> tags = new TreeSet<>();
@@ -112,21 +126,21 @@ public class Post extends DomainObject<Long> {
 
 	@ManyToMany
 	@JoinTable(
-			name="post_related_post",
-			joinColumns = { @JoinColumn(name="post_id")},
-			inverseJoinColumns = { @JoinColumn(name="related_id") })
+			name = "post_related_post",
+			joinColumns = {@JoinColumn(name = "post_id")},
+			inverseJoinColumns = {@JoinColumn(name = "related_id")})
 	private Set<Post> relatedToPosts = new HashSet<>();
 
 	@ManyToMany
 	@JoinTable(
-			name="post_related_post",
-			joinColumns = { @JoinColumn(name="related_id")},
-			inverseJoinColumns = { @JoinColumn(name="post_id") })
+			name = "post_related_post",
+			joinColumns = {@JoinColumn(name = "related_id")},
+			inverseJoinColumns = {@JoinColumn(name = "post_id")})
 	private Set<Post> relatedByPosts = new HashSet<>();
 
 	@ManyToMany
-	@JoinTable(name="post_media", joinColumns=@JoinColumn(name="post_id", referencedColumnName="id"), inverseJoinColumns=@JoinColumn(name="media_id", referencedColumnName="id"))
-	@OrderColumn(name="`index`")
+	@JoinTable(name = "post_media", joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"))
+	@OrderColumn(name = "`index`")
 	private List<Media> medias;
 
 	@Override

@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.User;
-import org.wallride.core.service.DuplicateEmailException;
-import org.wallride.core.service.DuplicateLoginIdException;
-import org.wallride.core.service.ProfileUpdateRequest;
+import org.wallride.core.exception.DuplicateEmailException;
+import org.wallride.core.exception.DuplicateLoginIdException;
+import org.wallride.core.model.ProfileUpdateRequest;
 import org.wallride.core.service.UserService;
 import org.wallride.core.support.AuthorizedUser;
 
@@ -52,7 +52,7 @@ public class ProfileUpdateController {
 	public String init(
 			AuthorizedUser authorizedUser,
 			Model model) {
-		User user = userService.readUserById(authorizedUser.getId());
+		User user = userService.getUserById(authorizedUser.getId());
 
 		ProfileUpdateForm form = new ProfileUpdateForm();
 		form.setEmail(user.getEmail());

@@ -35,6 +35,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.exception.DuplicateNameException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.ArticleRepository;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
@@ -62,7 +64,7 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag createTag(TagCreateRequest request, AuthorizedUser authorizedUser) {
-		Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
+		Tag duplicate = tagRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
 		if (duplicate != null) {
 			throw new DuplicateNameException(request.getName());
 		}
@@ -82,11 +84,11 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag updateTag(TagUpdateRequest request, AuthorizedUser authorizedUser) {
-		Tag tag = tagRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Tag tag = tagRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
 		if (!ObjectUtils.nullSafeEquals(tag.getName(), request.getName())) {
-			Tag duplicate = tagRepository.findByName(request.getName(), request.getLanguage());
+			Tag duplicate = tagRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateNameException(request.getName());
 			}
@@ -130,7 +132,7 @@ public class TagService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Tag deleteTag(TagDeleteRequest request, BindingResult result) {
-		Tag tag = tagRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Tag tag = tagRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		tagRepository.delete(tag);
 		return tag;
 	}
@@ -166,20 +168,20 @@ public class TagService {
 		return tags;
 	}
 
-	public Tag readTagById(long id, String language) {
-		return tagRepository.findById(id, language);
+	public Tag getTagById(long id, String language) {
+		return tagRepository.findOneByIdAndLanguage(id, language);
 	}
 
-	public Tag readTagByName(String name, String language) {
-		return tagRepository.findByName(name, language);
+	public Tag getTagByName(String name, String language) {
+		return tagRepository.findOneByNameAndLanguage(name, language);
 	}
 
-	public Page<Tag> readTags(TagSearchRequest request) {
+	public Page<Tag> getTags(TagSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readTags(request, pageable);
+		return getTags(request, pageable);
 	}
 
-	public Page<Tag> readTags(TagSearchRequest request, Pageable pageable) {
+	public Page<Tag> getTags(TagSearchRequest request, Pageable pageable) {
 		return tagRepository.search(request, pageable);
 	}
 }

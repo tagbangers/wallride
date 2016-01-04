@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.tag;
 
-import org.wallride.core.service.TagBulkDeleteRequest;
+import org.wallride.core.model.TagBulkDeleteRequest;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

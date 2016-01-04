@@ -27,6 +27,8 @@ import org.springframework.util.ObjectUtils;
 import org.wallride.core.domain.Comment;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.User;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.CommentRepository;
 import org.wallride.core.repository.PostRepository;
 import org.wallride.core.repository.UserRepository;
@@ -51,12 +53,12 @@ public class CommentService {
 	private static Logger logger = LoggerFactory.getLogger(CommentService.class);
 
 	public Comment createComment(CommentCreateRequest request, AuthorizedUser createdBy) {
-		Post post = postRepository.findById(request.getPostId(), request.getBlogLanguage().getLanguage());
+		Post post = postRepository.findOneByIdAndLanguage(request.getPostId(), request.getBlogLanguage().getLanguage());
 		if (post == null) {
 			throw new ServiceException("Post was not found [" + request.getPostId() + "]");
 		}
 
-		User author = userRepository.findById(request.getAuthorId());
+		User author = userRepository.findOneById(request.getAuthorId());
 
 		LocalDateTime now = LocalDateTime.now();
 		Comment comment = new Comment();
@@ -76,7 +78,7 @@ public class CommentService {
 	}
 
 	public Comment updateComment(CommentUpdateRequest request, AuthorizedUser updatedBy) {
-		Comment comment = commentRepository.findByIdForUpdate(request.getId());
+		Comment comment = commentRepository.findOneForUpdateById(request.getId());
 		if (comment == null) {
 			throw new ServiceException();
 		}
@@ -92,7 +94,7 @@ public class CommentService {
 	}
 
 	public Comment deleteComment(CommentDeleteRequest request, AuthorizedUser deletedBy) {
-		Comment comment = commentRepository.findByIdForUpdate(request.getId());
+		Comment comment = commentRepository.findOneForUpdateById(request.getId());
 		if (comment == null) {
 			throw new ServiceException();
 		}
@@ -110,7 +112,7 @@ public class CommentService {
 
 		List<Comment> comments = new ArrayList<>();
 		for (long id : request.getIds()) {
-			Comment comment = commentRepository.findByIdForUpdate(id);
+			Comment comment = commentRepository.findOneForUpdateById(id);
 			if (comment.isApproved()) {
 				continue;
 			}
@@ -133,7 +135,7 @@ public class CommentService {
 
 		List<Comment> comments = new ArrayList<>();
 		for (long id : request.getIds()) {
-			Comment comment = commentRepository.findByIdForUpdate(id);
+			Comment comment = commentRepository.findOneForUpdateById(id);
 			if (!comment.isApproved()) {
 				continue;
 			}
@@ -160,12 +162,12 @@ public class CommentService {
 		return comments;
 	}
 
-	public Page<Comment> readComments(CommentSearchRequest request) {
+	public Page<Comment> getComments(CommentSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
-		return readComments(request, pageable);
+		return getComments(request, pageable);
 	}
 
-	public Page<Comment> readComments(CommentSearchRequest request, Pageable pageable) {
+	public Page<Comment> getComments(CommentSearchRequest request, Pageable pageable) {
 		return commentRepository.search(request, pageable);
 	}
 }

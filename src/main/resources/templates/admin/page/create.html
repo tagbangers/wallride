@@ -256,7 +256,7 @@
 									<div class="form-group">
 										<select name="parentId" class="form-control" th:field="*{parentId}" >
 											<option value="">Select Parent Page</option>
-											<option th:each="page : ${pageTree.pages}" th:if="${page.id ne id}" th:value="${page.id}" th:text="${page.title}" th:selected="${page.id eq parentId}"></option>
+											<option th:each="page : ${#pages.getAllPages(true)}" th:if="${page.id ne id}" th:value="${page.id}" th:text="${page.title}" th:selected="${page.id eq parentId}"></option>
 										</select>
 									</div>
 								</fieldset>

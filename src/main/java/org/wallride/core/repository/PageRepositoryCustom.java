@@ -18,7 +18,7 @@ package org.wallride.core.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.wallride.core.domain.Page;
-import org.wallride.core.service.PageSearchRequest;
+import org.wallride.core.model.PageSearchRequest;
 
 import java.util.List;
 

@@ -36,7 +36,7 @@ public class SetupRedirectInterceptor extends HandlerInterceptorAdapter {
 
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		if (blog != null) {
             return true;
         }

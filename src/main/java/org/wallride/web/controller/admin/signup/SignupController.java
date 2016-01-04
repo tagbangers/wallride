@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.wallride.core.domain.User;
 import org.wallride.core.domain.UserInvitation;
-import org.wallride.core.service.DuplicateEmailException;
-import org.wallride.core.service.DuplicateLoginIdException;
+import org.wallride.core.exception.DuplicateEmailException;
+import org.wallride.core.exception.DuplicateLoginIdException;
 import org.wallride.core.service.SignupService;
 import org.wallride.web.support.HttpForbiddenException;
 

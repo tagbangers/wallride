@@ -70,10 +70,10 @@ public class CommentSearchController {
             @PageableDefault(value = 50, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
             Model model,
             HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-        Page<Comment> comments = commentService.readComments(form.toCommentSearchRequest(), pageable);
+        Page<Comment> comments = commentService.getComments(form.toCommentSearchRequest(), pageable);
 
         model.addAttribute("form", form);
-        model.addAttribute("articles", comments);
+        model.addAttribute("comments", comments);
         model.addAttribute("pageable", pageable);
         model.addAttribute("pagination", new org.wallride.web.support.Pagination<>(comments, servletRequest));
 

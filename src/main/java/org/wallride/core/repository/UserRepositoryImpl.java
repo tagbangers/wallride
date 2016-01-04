@@ -36,7 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.User;
-import org.wallride.core.service.UserSearchRequest;
+import org.wallride.core.model.UserSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

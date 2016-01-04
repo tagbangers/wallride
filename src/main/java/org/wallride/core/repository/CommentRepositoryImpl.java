@@ -36,7 +36,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Comment;
-import org.wallride.core.service.CommentSearchRequest;
+import org.wallride.core.model.CommentSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

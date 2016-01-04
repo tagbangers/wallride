@@ -41,7 +41,7 @@ public class PathVariableLocaleResolver implements LocaleResolver {
 
 	@Override
 	public Locale resolveLocale(HttpServletRequest request) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		String defaultLanguage = (blog != null) ? blog.getDefaultLanguage() : null;
 
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);

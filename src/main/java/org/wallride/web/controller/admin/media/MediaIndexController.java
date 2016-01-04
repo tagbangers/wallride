@@ -37,7 +37,7 @@ public class MediaIndexController {
 
 	@RequestMapping
 	public @ResponseBody MediaIndexModel[] index() {
-		List<Media> medias = mediaService.readAllMedias();
+		List<Media> medias = mediaService.getAllMedias();
 		MediaIndexModel[] models = new MediaIndexModel[medias.size()];
 		for (int i = 0; i < medias.size(); i++) {
 			models[i] = new MediaIndexModel(medias.get(i), wallRideProperties);

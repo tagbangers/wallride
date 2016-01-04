@@ -28,6 +28,15 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = Comment.SHALLOW_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("author")}
+		),
+		@NamedEntityGraph(name = Comment.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("author")})
+})
 @Table(name = "comment")
 @DynamicInsert
 @DynamicUpdate
@@ -36,8 +45,11 @@ import java.time.LocalDateTime;
 @SuppressWarnings("serial")
 public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 
+	public static final String SHALLOW_GRAPH_NAME = "COMMENT_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "COMMENT_DEEP_GRAPH";
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -19,9 +19,10 @@ package org.wallride.core.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.wallride.core.domain.Category;
-import org.wallride.core.service.CategorySearchRequest;
+import org.wallride.core.model.CategorySearchRequest;
 
 public interface CategoryRepositoryCustom {
 
+	Page<Category> search(CategorySearchRequest request);
 	Page<Category> search(CategorySearchRequest request, Pageable pageable);
 }

@@ -19,8 +19,6 @@ package org.wallride.core.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,8 +35,12 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.*;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.repository.PageRepository;
+import org.wallride.core.repository.PageSpecifications;
 import org.wallride.core.repository.TagRepository;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.WallRideProperties;
@@ -91,7 +93,7 @@ public class PageService {
 		}
 		
 		if (!status.equals(Post.Status.DRAFT)) {
-			Page duplicate = pageRepository.findByCode(request.getCode(), request.getLanguage());
+			Page duplicate = pageRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -108,7 +110,7 @@ public class PageService {
 			page.setDraftedCode(code);
 		}
 		
-		Page parent = (request.getParentId() != null) ? pageRepository.findById(request.getParentId(), request.getLanguage()) : null;
+		Page parent = (request.getParentId() != null) ? pageRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage()) : null;
 		int rgt = 0;
 		if (parent == null) {
 			rgt = pageRepository.findMaxRgt();
@@ -149,7 +151,7 @@ public class PageService {
 		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
 		if (!CollectionUtils.isEmpty(tagNames)) {
 			for (String tagName : tagNames) {
-				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				Tag tag = tagRepository.findOneForUpdateByNameAndLanguage(tagName, request.getLanguage());
 				if (tag == null) {
 					tag = new Tag();
 					tag.setName(tagName);
@@ -182,12 +184,12 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
-				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
+				Media media = mediaRepository.findOneById(mediaUrlMatcher.group(1));
 				medias.add(media);
 			}
 		}
@@ -203,9 +205,9 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePageAsDraft(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		if (!page.getStatus().equals(Post.Status.DRAFT)) {
-			Page draft = pageRepository.findDraft(page);
+			Page draft = pageRepository.findOne(PageSpecifications.draft(page));
 			if (draft == null) {
 				PageCreateRequest createRequest = new PageCreateRequest.Builder()
 						.code(request.getCode())
@@ -245,7 +247,7 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePageAsPublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		page.setDrafted(null);
 		page.setStatus(Post.Status.PUBLISHED);
 		pageRepository.save(page);
@@ -255,7 +257,7 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePageAsUnpublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		page.setDrafted(null);
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
@@ -265,7 +267,7 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePage(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
@@ -275,7 +277,7 @@ public class PageService {
 			}
 		}
 		if (!page.getStatus().equals(Post.Status.DRAFT)) {
-			Page duplicate = pageRepository.findByCode(request.getCode(), request.getLanguage());
+			Page duplicate = pageRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null && !duplicate.equals(page)) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -342,7 +344,7 @@ public class PageService {
 		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
 		if (!CollectionUtils.isEmpty(tagNames)) {
 			for (String tagName : tagNames) {
-				Tag tag = tagRepository.findByNameForUpdate(tagName, request.getLanguage());
+				Tag tag = tagRepository.findOneForUpdateByNameAndLanguage(tagName, request.getLanguage());
 				if (tag == null) {
 					tag = new Tag();
 					tag.setName(tagName);
@@ -372,12 +374,12 @@ public class PageService {
 
 		List<Media> medias = new ArrayList<>();
 		if (StringUtils.hasText(request.getBody())) {
-//			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			String mediaUrlPrefix = wallRideProperties.getMediaUrlPrefix();
 			Pattern mediaUrlPattern = Pattern.compile(String.format("%s([0-9a-zA-Z\\-]+)", mediaUrlPrefix));
 			Matcher mediaUrlMatcher = mediaUrlPattern.matcher(request.getBody());
 			while (mediaUrlMatcher.find()) {
-				Media media = mediaRepository.findById(mediaUrlMatcher.group(1));
+				Media media = mediaRepository.findOneById(mediaUrlMatcher.group(1));
 				medias.add(media);
 			}
 		}
@@ -394,11 +396,11 @@ public class PageService {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {
-				Page page = pageRepository.findByIdForUpdate(Long.parseLong((String) map.get("item_id")), language);
+				Page page = pageRepository.findOneForUpdateByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
 				if (page != null) {
 					Page parent = null;
 					if (map.get("parent_id") != null) {
-						parent = pageRepository.findById(Long.parseLong((String) map.get("parent_id")), language);
+						parent = pageRepository.findOneByIdAndLanguage(Long.parseLong((String) map.get("parent_id")), language);
 					}
 					page.setParent(parent);
 					page.setLft(((int) map.get("left")) - 1);
@@ -413,7 +415,7 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page deletePage(PageDeleteRequest request, BindingResult result) throws BindException {
-		Page page = pageRepository.findByIdForUpdate(request.getId(), request.getLanguage());
+		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		Page parent = page.getParent();
 		for (Page child : page.getChildren()) {
 			child.setParent(parent);
@@ -432,7 +434,7 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page deletePage(long id, String language) {
-		Page page = pageRepository.findByIdForUpdate(id, language);
+		Page page = pageRepository.findOneForUpdateByIdAndLanguage(id, language);
 		Page parent = page.getParent();
 		for (Page child : page.getChildren()) {
 			child.setParent(parent);
@@ -485,55 +487,52 @@ public class PageService {
 		return pages;
 	}
 
-	public List<Long> readPageIds(PageSearchRequest request) {
+	public List<Long> getPageIds(PageSearchRequest request) {
 		return pageRepository.searchForId(request);
 	}
 
-	public org.springframework.data.domain.Page<Page> readPages(PageSearchRequest request) {
-		Pageable pageable = new PageRequest(0, 10);
-		return readPages(request, pageable);
+	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request) {
+		return getPages(request, null);
 	}
 
-	public org.springframework.data.domain.Page<Page> readPages(PageSearchRequest request, Pageable pageable) {
+	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request, Pageable pageable) {
 		return pageRepository.search(request, pageable);
 	}
-	
-	public List<Page> readPages(Collection<Long> ids) {
-		Set<Page> results = new LinkedHashSet<Page>(pageRepository.findByIdIn(ids));
-		List<Page> pages = new ArrayList<>();
-		for (long id : ids) {
-			for (Page page : results) {
-				if (id == page.getId()) {
-					pages.add(page);
-					break;
-				}
-			}
-		}
-		return pages;
-	}
-	
-	public Page readPageById(long id, String language) {
-		return pageRepository.findById(id, language);
+
+	public List<Page> getPathPages(Page page) {
+		return getPathPages(page, false);
 	}
 
-	public Page readPageByCode(String code, String language) {
-		return pageRepository.findByCode(code, language);
+	public List<Page> getPathPages(Page page, boolean includeUnpublished) {
+		return pageRepository.findAll(PageSpecifications.path(page, includeUnpublished));
 	}
 
-	public Page readDraftById(long id) {
-		return pageRepository.findDraft(entityManager.getReference(Page.class, id));
+	public List<Page> getChildPages(Page page) {
+		return getChildPages(page, false);
 	}
 
-	@Cacheable(value = "pages", key = "'tree.' + #language")
-	public PageTree readPageTree(String language) {
-		List<Page> pages = pageRepository.findByLanguage(language);
-		return new PageTree(pages);
+	public List<Page> getChildPages(Page page, boolean includeUnpublished) {
+		return pageRepository.findAll(PageSpecifications.children(page, includeUnpublished));
 	}
 
-	@Cacheable(value = "pages", key = "'tree.' + #language + '.' + #status")
-	public PageTree readPageTree(String language, Post.Status status) {
-		List<Page> pages = pageRepository.findByLanguageAndStatus(language, status);
-		return new PageTree(pages);
+	public List<Page> getSiblingPages(Page page) {
+		return getSiblingPages(page, false);
+	}
+
+	public List<Page> getSiblingPages(Page page, boolean includeUnpublished) {
+		return pageRepository.findAll(PageSpecifications.siblings(page, includeUnpublished));
+	}
+
+	public Page getPageById(long id, String language) {
+		return pageRepository.findOneByIdAndLanguage(id, language);
+	}
+
+	public Page getPageByCode(String code, String language) {
+		return pageRepository.findOneByCodeAndLanguage(code, language);
+	}
+
+	public Page getDraftById(long id) {
+		return pageRepository.findOne(PageSpecifications.draft(entityManager.getReference(Page.class, id)));
 	}
 
 	public long countPages(String language) {

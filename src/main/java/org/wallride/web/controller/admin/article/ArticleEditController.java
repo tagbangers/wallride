@@ -29,17 +29,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
-import org.wallride.core.domain.CategoryTree;
+import org.wallride.core.domain.Category;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.model.TreeNode;
 import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.DuplicateCodeException;
-import org.wallride.core.service.EmptyCodeException;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
+import java.util.List;
 
 @Controller
 @RequestMapping("/{language}/articles/edit")
@@ -51,7 +53,7 @@ public class ArticleEditController {
 	private ArticleService articleService;
 
 	@Inject
-	private CategoryService categoryService;
+	private CategoryUtils categoryUtils;
 
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
@@ -60,12 +62,12 @@ public class ArticleEditController {
 	public Article setupArticle(
 			@PathVariable String language,
 			@RequestParam long id) {
-		return articleService.readArticleById(id, language);
+		return articleService.getArticleById(id, language);
 	}
 
-	@ModelAttribute("categoryTree")
-	public CategoryTree setupCategoryTree(@PathVariable String language) {
-		return categoryService.readCategoryTree(language);
+	@ModelAttribute("categoryNodes")
+	public List<TreeNode<Category>> setupCategoryNodes(@PathVariable String language) {
+		return categoryUtils.getNodes();
 	}
 
 	@ModelAttribute("query")
@@ -96,7 +98,7 @@ public class ArticleEditController {
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
 		model.addAttribute("form", form);
 
-		Article draft = articleService.readDraftById(id);
+		Article draft = articleService.getDraftById(id);
 		model.addAttribute("draft", draft);
 
 		return "article/edit";
@@ -116,7 +118,7 @@ public class ArticleEditController {
 			return "redirect:/_admin/{language}/articles/index";
 		}
 
-		Article draft = articleService.readDraftById(id);
+		Article draft = articleService.getDraftById(id);
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);
 			redirectAttributes.addAttribute("id", id);

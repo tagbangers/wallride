@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.user;
 
-import org.wallride.core.service.UserBulkDeleteRequest;
+import org.wallride.core.model.UserBulkDeleteRequest;
 
 import java.util.List;
 

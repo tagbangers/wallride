@@ -54,7 +54,7 @@ public class BlogLanguageRewriteRule extends RewriteRule {
 
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
 		BlogService blogService = context.getBean(BlogService.class);
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		if (blog == null) {
 			return null;
 		}

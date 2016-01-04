@@ -28,26 +28,40 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 @Entity
-@Table(name="category", uniqueConstraints=@UniqueConstraint(columnNames={"code", "language"}))
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = Category.SHALLOW_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("parent"),
+						@NamedAttributeNode("children")}
+		),
+		@NamedEntityGraph(name = Category.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("parent"),
+						@NamedAttributeNode("children")})
+})
+@Table(name = "category", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
 @DynamicInsert
 @DynamicUpdate
 @Indexed
 @SuppressWarnings("serial")
 public class Category extends DomainObject<Long> implements Comparable<Category> {
 
+	public static final String SHALLOW_GRAPH_NAME = "CATEGORY_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "CATEGORY_DEEP_GRAPH";
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(length=200, nullable=false)
+	@Column(length = 200, nullable = false)
 	@Field
 	private String code;
 
-	@Column(length=3, nullable=false)
+	@Column(length = 3, nullable = false)
 	@Field
 	private String language;
 
-	@Column(length=200, nullable=false)
+	@Column(length = 200, nullable = false)
 	@Field
 	private String name;
 
@@ -55,31 +69,25 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 	@Field
 	private String description;
 
-	@Column(name="lft", nullable=false)
+	@Column(name = "lft", nullable = false)
 	@Field
 	private int lft;
 
-	@Column(name="rgt", nullable=false)
+	@Column(name = "rgt", nullable = false)
 	@Field
 	private int rgt;
-
-//	@Column(nullable=false)
-//	private int depth;
-//
-//	@Column(nullable=false)
-//	private int sort;
 
 	@ManyToOne
 	private Category parent;
 
-	@OneToMany(mappedBy="parent", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
 	private List<Category> children;
 
 	@ManyToMany
 	@JoinTable(
-			name="article_category",
-			joinColumns={@JoinColumn(name="category_id")},
-			inverseJoinColumns=@JoinColumn(name="article_id", referencedColumnName="id"))
+			name = "article_category",
+			joinColumns = {@JoinColumn(name = "category_id")},
+			inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"))
 	@SortNatural
 	private SortedSet<Article> articles = new TreeSet<>();
 
@@ -147,22 +155,6 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 	public void setRgt(int rgt) {
 		this.rgt = rgt;
 	}
-
-	//	public int getDepth() {
-//		return depth;
-//	}
-//
-//	public void setDepth(int depth) {
-//		this.depth = depth;
-//	}
-//
-//	public int getSort() {
-//		return sort;
-//	}
-//
-//	public void setSort(int sort) {
-//		this.sort = sort;
-//	}
 
 	public Category getParent() {
 		return parent;

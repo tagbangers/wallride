@@ -35,7 +35,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Category;
-import org.wallride.core.service.CategorySearchRequest;
+import org.wallride.core.model.CategorySearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -45,7 +45,12 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	@Override
+	public Page<Category> search(CategorySearchRequest request) {
+		return search(request, null);
+	}
+
 	@Override
 	public Page<Category> search(CategorySearchRequest request, Pageable pageable) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
@@ -95,8 +100,10 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 				.createFullTextQuery(searchQuery, Category.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		persistenceQuery.setFirstResult(pageable.getOffset());
-		persistenceQuery.setMaxResults(pageable.getPageSize());
+		if (pageable != null) {
+			persistenceQuery.setFirstResult(pageable.getOffset());
+			persistenceQuery.setMaxResults(pageable.getPageSize());
+		}
 
 		int resultSize = persistenceQuery.getResultSize();
 

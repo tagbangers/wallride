@@ -82,7 +82,7 @@ public class TagSearchController {
 			@PageableDefault(50) Pageable pageable,
 			Model model,
 			HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-		Page<Tag> tags = tagService.readTags(form.toTagSearchRequest(), pageable);
+		Page<Tag> tags = tagService.getTags(form.toTagSearchRequest(), pageable);
 
 		model.addAttribute("tags", tags);
 		model.addAttribute("pageable", pageable);
@@ -131,7 +131,7 @@ public class TagSearchController {
 			@PathVariable String language,
 			@RequestParam long id,
 			Model model) {
-		Tag tag = tagService.readTagById(id, language);
+		Tag tag = tagService.getTagById(id, language);
 		model.addAttribute("tag", tag);
 		return "tag/index::tag-edit-form";
 	}

@@ -16,7 +16,8 @@
 
 package org.wallride.web.controller.admin.page;
 
-import org.wallride.core.domain.PageTree;
+import org.wallride.core.domain.Page;
+import org.wallride.core.model.TreeNode;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,24 +26,24 @@ import java.util.Map;
 
 public class PageIndexModel extends ArrayList<Map<String, Object>> {
 
-	public PageIndexModel(PageTree pageTree) {
+	public PageIndexModel(List<TreeNode<Page>> nodes) {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
-		for (PageTree.Node node : pageTree.getRootNodes()) {
+		for (TreeNode<Page> node : nodes) {
 			result.add(createValue(node));
 		}
 		this.addAll(result);
 	}
 
-	private Map<String, Object> createValue(PageTree.Node node) {
+	private Map<String, Object> createValue(TreeNode<Page> node) {
 		Map<String, Object> parent = new LinkedHashMap<>();
-		parent.put("id", node.getPage().getId());
-		parent.put("code", node.getPage().getCode());
-		parent.put("title", node.getPage().getTitle());
+		parent.put("id", node.getObject().getId());
+		parent.put("code", node.getObject().getCode());
+		parent.put("title", node.getObject().getTitle());
 //		parent.put("articleCount", page.getArticleCount());
 
 		List<Map<String, Object>> children = new ArrayList<Map<String, Object>>();
-		for (PageTree.Node child : node.getChildren()) {
+		for (TreeNode<Page> child : node.getChildren()) {
 			children.add(createValue(child));
 		}
 		parent.put("children", children);

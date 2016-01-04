@@ -42,7 +42,7 @@ public class PostDescribeController {
 			@PathVariable String language,
 			@RequestParam long id,
 			RedirectAttributes redirectAttributes) {
-		Post post = postService.readPostById(id, language);
+		Post post = postService.getPostById(id, language);
 		if (post == null) {
 			throw new HttpNotFoundException();
 		}

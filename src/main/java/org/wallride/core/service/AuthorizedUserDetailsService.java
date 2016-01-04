@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
-//@Service
 @Transactional(rollbackFor=Exception.class)
 public class AuthorizedUserDetailsService extends SavedRequestAwareAuthenticationSuccessHandler implements UserDetailsService {
 	
@@ -54,9 +53,9 @@ public class AuthorizedUserDetailsService extends SavedRequestAwareAuthenticatio
 
 		User user;
 		if (!username.contains("@")) {
-			user = userRepository.findByLoginId(username);
+			user = userRepository.findOneByLoginId(username);
 		} else {
-			user = userRepository.findByEmail(username);
+			user = userRepository.findOneByEmail(username);
 		}
 
 		if (user == null) {

@@ -22,7 +22,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.*;
+import org.wallride.core.domain.Article;
+import org.wallride.core.domain.Blog;
+import org.wallride.core.domain.PopularPost;
+import org.wallride.core.domain.Post;
 import org.wallride.core.service.*;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
@@ -46,7 +49,7 @@ public class DashboardController {
 	
 	@RequestMapping({"/","/dashboard"})
 	public String dashboard(RedirectAttributes redirectAttributes) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		String defaultLanguage = blog.getDefaultLanguage();
 		redirectAttributes.addAttribute("language", defaultLanguage);
 		return "redirect:/_admin/{language}/";
@@ -56,9 +59,7 @@ public class DashboardController {
 	public String dashboard(@PathVariable String language, Model model) {
 		long articleCount = articleService.countArticlesByStatus(Post.Status.PUBLISHED, language);
 		long pageCount = pageService.countPagesByStatus(Post.Status.PUBLISHED, language);
-
-		CategoryTree categoryTreeHasArticle = categoryService.readCategoryTree(language, true);
-		long categoryCount = categoryTreeHasArticle.getCategories().size();
+		long categoryCount = categoryService.getCategories(language).size();
 
 		model.addAttribute("articleCount", articleCount);
 		model.addAttribute("pageCount", pageCount);
@@ -71,20 +72,20 @@ public class DashboardController {
 	}
 
 	private SortedSet<PopularPost> popularPosts(String language) {
-		return postService.readPopularPosts(language, PopularPost.Type.DAILY);
+		return postService.getPopularPosts(language, PopularPost.Type.DAILY);
 	}
 
 	private List<Article> recentPublishedArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setStatus(Post.Status.PUBLISHED);
-		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
+		Page<Article> page = articleService.getArticles(form.toArticleSearchRequest());
 		return page.getContent();
 	}
 
 	private List<Article> recentDraftArticles(String language) {
 		ArticleSearchForm form = new ArticleSearchForm();
 		form.setStatus(Post.Status.DRAFT);
-		Page<Article> page = articleService.readArticles(form.toArticleSearchRequest());
+		Page<Article> page = articleService.getArticles(form.toArticleSearchRequest());
 		return page.getContent();
 	}
 }

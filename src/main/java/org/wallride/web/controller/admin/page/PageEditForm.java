@@ -22,7 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.PageUpdateRequest;
+import org.wallride.core.model.PageUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

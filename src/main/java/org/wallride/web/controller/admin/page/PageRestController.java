@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.wallride.core.domain.Page;
-import org.wallride.core.domain.PageTree;
 import org.wallride.core.domain.Post;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.PageUtils;
 import org.wallride.web.support.DomainObjectDeletedModel;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
@@ -50,6 +50,9 @@ public class PageRestController {
 	private PageService pageService;
 
 	@Inject
+	private PageUtils pageUtils;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	private static Logger logger = LoggerFactory.getLogger(PageRestController.class);
@@ -63,8 +66,7 @@ public class PageRestController {
 
 	@RequestMapping(value="/{language}/pages", method= RequestMethod.GET)
 	public @ResponseBody PageIndexModel index(@PathVariable String language) {
-		PageTree pageTree = pageService.readPageTree(language);
-		return new PageIndexModel(pageTree);
+		return new PageIndexModel(pageUtils.getNodes(true));
 	}
 
 //	@RequestMapping(value="/{language}/pages/{id}", method= RequestMethod.GET)
@@ -119,13 +121,12 @@ public class PageRestController {
 		FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 		flashMap.put("deletedPage", page);
 		RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-		return new DomainObjectDeletedModel<Long>(page);
+		return new DomainObjectDeletedModel<>(page);
 	}
 
 	@RequestMapping(value="/{language}/pages", method= RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody PageIndexModel sort(@PathVariable String language, @RequestBody List<Map<String, Object>> data) {
 		pageService.updatePageHierarchy(data, language);
-		PageTree pageTree = pageService.readPageTree(language);
-		return new PageIndexModel(pageTree);
+		return new PageIndexModel(pageUtils.getNodes(true));
 	}
 }

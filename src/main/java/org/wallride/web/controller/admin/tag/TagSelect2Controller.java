@@ -41,7 +41,7 @@ public class TagSelect2Controller {
 			@RequestParam(required=false) String keyword) {
 		TagSearchForm form = new TagSearchForm();
 		form.setKeyword(keyword);
-		Page<Tag> tags = tagService.readTags(form.toTagSearchRequest());
+		Page<Tag> tags = tagService.getTags(form.toTagSearchRequest());
 
 		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (tags.hasContent()) {
@@ -59,7 +59,7 @@ public class TagSelect2Controller {
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
-		Tag tag = tagService.readTagById(id, language);
+		Tag tag = tagService.getTagById(id, language);
 		if (tag == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;

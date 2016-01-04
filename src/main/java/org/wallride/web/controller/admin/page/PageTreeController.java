@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.core.domain.Page;
-import org.wallride.core.domain.PageTree;
 import org.wallride.core.service.PageService;
+import org.wallride.core.support.PageUtils;
 
 import javax.inject.Inject;
 
@@ -34,6 +33,9 @@ public class PageTreeController {
 
 	@Inject
 	private PageService pageService;
+
+	@Inject
+	private PageUtils pageUtils;
 
 	@ModelAttribute("form")
 	public PageCreateForm pageCreateForm() {
@@ -47,25 +49,21 @@ public class PageTreeController {
 
 	@RequestMapping
 	public String index(@PathVariable String language, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
-		model.addAttribute("pageTree", pageTree);
+		model.addAttribute("pageNodes", pageUtils.getNodes(true));
 		return "page/tree";
 	}
 
 	@RequestMapping(params="part=page-create-form")
 	public String partPageCreateDialog(@PathVariable String language, @RequestParam(required=false) Long parentId, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
 		model.addAttribute("parentId", parentId);
-		model.addAttribute("pageTree", pageTree);
+		model.addAttribute("pageNodes", pageUtils.getNodes(true));
 		return "page/tree::page-create-form";
 	}
 
 	@RequestMapping(params="part=page-edit-form")
 	public String partPageEditDialog(@PathVariable String language, @RequestParam long id, Model model) {
-		PageTree pageTree = pageService.readPageTree(language);
-		Page page = pageTree.getPageById(id);
-		model.addAttribute("pageTree", pageTree);
-		model.addAttribute("page", page);
+		model.addAttribute("pageNodes", pageUtils.getNodes(true));
+		model.addAttribute("page", pageService.getPageById(id, language));
 		return "page/tree::page-edit-form";
 	}
 

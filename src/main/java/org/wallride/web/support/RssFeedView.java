@@ -45,7 +45,7 @@ public class RssFeedView extends AbstractRssFeedView {
 			Map<String, Object> model, 
 			Channel feed,
 			HttpServletRequest request) {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		String language = LocaleContextHolder.getLocale().getLanguage();
 
 		feed.setTitle(blog.getTitle(language));
@@ -82,7 +82,7 @@ public class RssFeedView extends AbstractRssFeedView {
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
 		Map<String, Object> params = new HashMap<>();
 
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		if (blog.getLanguages().size() > 1) {
 			builder.path("/{language}");
 			params.put("language", LocaleContextHolder.getLocale().getLanguage());

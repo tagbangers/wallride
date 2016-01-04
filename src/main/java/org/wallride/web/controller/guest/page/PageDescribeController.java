@@ -53,7 +53,7 @@ public class PageDescribeController extends AbstractController {
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
 		if (blogLanguage == null) {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			blogLanguage = blog.getLanguage(blog.getDefaultLanguage());
 		}
 
@@ -67,7 +67,7 @@ public class PageDescribeController extends AbstractController {
 		Map<String, String> variables = pathMatcher.extractUriTemplateVariables(PATH_PATTERN, path);
 		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, variables);
 
-		Page page = pageService.readPageByCode(variables.get("code"), blogLanguage.getLanguage());
+		Page page = pageService.getPageByCode(variables.get("code"), blogLanguage.getLanguage());
 		if (page == null) {
 			throw new HttpNotFoundException();
 		}

@@ -18,7 +18,7 @@ package org.wallride.web.controller.admin.category;
 
 import org.springframework.beans.BeanUtils;
 import org.wallride.core.domain.Category;
-import org.wallride.core.service.CategoryUpdateRequest;
+import org.wallride.core.model.CategoryUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

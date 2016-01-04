@@ -18,8 +18,8 @@ package org.wallride.web.controller.guest.comment;
 
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.User;
-import org.wallride.core.service.CommentCreateRequest;
-import org.wallride.core.service.CommentUpdateRequest;
+import org.wallride.core.model.CommentCreateRequest;
+import org.wallride.core.model.CommentUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

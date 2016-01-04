@@ -32,11 +32,11 @@ public class PasswordResetToken extends DomainObject<String> {
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name="system-uuid", strategy="uuid2")
-	@Column(length=50)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
+	@Column(length = 50)
 	private String token;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	private User user;
 
 	@Column(length = 200, nullable = false)

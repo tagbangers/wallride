@@ -41,7 +41,7 @@ public class UserSelect2Controller {
 			@RequestParam(required=false) String keyword) {
 		UserSearchForm form = new UserSearchForm();
 		form.setKeyword(keyword);
-		Page<User> users = userService.readUsers(form.toUserSearchRequest());
+		Page<User> users = userService.getUsers(form.toUserSearchRequest());
 
 		List<DomainObjectSelect2Model> results = new ArrayList<>();
 		if (users.hasContent()) {
@@ -59,7 +59,7 @@ public class UserSelect2Controller {
 			@PathVariable String language,
 			@PathVariable Long id,
 			HttpServletResponse response) throws IOException {
-		User user = userService.readUserById(id);
+		User user = userService.getUserById(id);
 		if (user == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;

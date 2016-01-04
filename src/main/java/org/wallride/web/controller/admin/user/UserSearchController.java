@@ -80,7 +80,7 @@ public class UserSearchController {
 			@PageableDefault(50) Pageable pageable,
 			Model model,
 			HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-		Page<User> users = userService.readUsers(form.toUserSearchRequest(), pageable);
+		Page<User> users = userService.getUsers(form.toUserSearchRequest(), pageable);
 
 		model.addAttribute("users", users);
 		model.addAttribute("pageable", pageable);

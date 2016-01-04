@@ -50,7 +50,7 @@ public class ScheduleConfig {
 
 	@Scheduled(cron="0 0 4,16 * * *")
 	public void updatePopularPosts() {
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		for (BlogLanguage blogLanguage : blog.getLanguages()) {
 			for (PopularPost.Type type : PopularPost.Type.values()) {
 				postService.updatePopularPosts(blogLanguage, type, POPULAR_POST_MAX_RANK);

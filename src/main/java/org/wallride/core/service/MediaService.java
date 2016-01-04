@@ -53,7 +53,7 @@ public class MediaService {
 		media.setOriginalName(file.getOriginalFilename());
 		media = mediaRepository.saveAndFlush(media);
 
-//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		try {
 			Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
 			Resource resource = prefix.createRelative(media.getId());
@@ -67,11 +67,11 @@ public class MediaService {
 		return media;
 	}
 
-	public List<Media> readAllMedias() {
+	public List<Media> getAllMedias() {
 		return mediaRepository.findAll(new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt")));
 	}
 
-	public Media readMedia(String id) {
-		return mediaRepository.findById(id);
+	public Media getMedia(String id) {
+		return mediaRepository.findOneById(id);
 	}
 }

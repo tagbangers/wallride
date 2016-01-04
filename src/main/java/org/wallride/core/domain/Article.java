@@ -28,19 +28,39 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 @Entity
-@Table(name="article")
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = Article.SHALLOW_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("cover"),
+						@NamedAttributeNode("author"),
+						@NamedAttributeNode("drafted"),
+						@NamedAttributeNode("categories")}
+		),
+		@NamedEntityGraph(name = Article.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("cover"),
+						@NamedAttributeNode("author"),
+						@NamedAttributeNode("drafted"),
+						@NamedAttributeNode("categories"),
+						@NamedAttributeNode("tags"),
+						@NamedAttributeNode("relatedToPosts")})
+})
+@Table(name = "article")
 @DynamicInsert
 @DynamicUpdate
-@Analyzer(definition="synonyms")
+@Analyzer(definition = "synonyms")
 @Indexed
 @SuppressWarnings("serial")
 public class Article extends Post implements Comparable<Article> {
 
+	public static final String SHALLOW_GRAPH_NAME = "ARTICLE_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "ARTICLE_DEEP_GRAPH";
+
 	@ManyToMany
 	@JoinTable(
-			name="article_category",
-			joinColumns={@JoinColumn(name="article_id")},
-			inverseJoinColumns=@JoinColumn(name="category_id", referencedColumnName="id"))
+			name = "article_category",
+			joinColumns = {@JoinColumn(name = "article_id")},
+			inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
 	@SortNatural
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Category> categories = new TreeSet<>();

@@ -33,6 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.GoogleAnalytics;
+import org.wallride.core.exception.GoogleAnalyticsException;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.GoogleAnalyticsUpdateRequest;
 import org.wallride.core.repository.BlogRepository;
 
 import javax.annotation.Resource;
@@ -106,7 +109,7 @@ public class BlogService {
 		googleAnalytics.setServiceAccountP12FileName(request.getServiceAccountP12File().getOriginalFilename());
 		googleAnalytics.setServiceAccountP12FileContent(p12);
 
-		Blog blog = blogRepository.findByIdForUpdate(request.getBlogId());
+		Blog blog = blogRepository.findOneForUpdateById(request.getBlogId());
 		blog.setGoogleAnalytics(googleAnalytics);
 
 		blog = blogRepository.saveAndFlush(blog);
@@ -115,7 +118,7 @@ public class BlogService {
 
 	@CacheEvict(value = "blogs", allEntries = true)
 	public GoogleAnalytics deleteGoogleAnalytics(long blogId) {
-		Blog blog = blogRepository.findByIdForUpdate(blogId);
+		Blog blog = blogRepository.findOneForUpdateById(blogId);
 		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
 		blog.setGoogleAnalytics(null);
 		blogRepository.saveAndFlush(blog);
@@ -123,7 +126,7 @@ public class BlogService {
 	}
 
 	@Cacheable(value = "blogs")
-	public Blog readBlogById(long id) {
-		return blogRepository.findById(id);
+	public Blog getBlogById(long id) {
+		return blogRepository.findOneById(id);
 	}
 }

@@ -19,7 +19,7 @@ package org.wallride.core.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.wallride.core.domain.Tag;
-import org.wallride.core.service.TagSearchRequest;
+import org.wallride.core.model.TagSearchRequest;
 
 public interface TagRepositoryCustom {
 

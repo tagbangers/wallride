@@ -47,14 +47,14 @@ public class IndexController {
 		ArticleSearchForm form = new ArticleSearchForm() {};
 		form.setLanguage(blogLanguage.getLanguage());
 
-		Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
 		return "index";
 //
 //
-//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 //		String defaultLanguage = blog.getDefaultLanguage();
 //		redirectAttributes.addAttribute("language", defaultLanguage);
 //		return "redirect:/{language}/";

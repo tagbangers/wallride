@@ -41,7 +41,7 @@ public class BlogLanguageLocaleResolver implements LocaleResolver {
 	public Locale resolveLocale(HttpServletRequest request) {
 		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
 		if (blogLanguage == null) {
-			Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+			Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 			blogLanguage = blog.getLanguage(blog.getDefaultLanguage());
 		}
 

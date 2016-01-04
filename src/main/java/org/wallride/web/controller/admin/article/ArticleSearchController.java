@@ -91,7 +91,7 @@ public class ArticleSearchController {
             @PageableDefault(50) Pageable pageable,
             Model model,
             HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-        Page<Article> articles = articleService.readArticles(form.toArticleSearchRequest(), pageable);
+        Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
 
         model.addAttribute("articles", articles);
         model.addAttribute("pageable", pageable);

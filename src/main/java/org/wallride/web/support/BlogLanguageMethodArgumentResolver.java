@@ -52,7 +52,7 @@ public class BlogLanguageMethodArgumentResolver implements HandlerMethodArgument
 		if (blogLanguage != null) {
 			return blogLanguage;
 		}
-		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		return blog.getLanguage(blog.getDefaultLanguage());
 	}
 }

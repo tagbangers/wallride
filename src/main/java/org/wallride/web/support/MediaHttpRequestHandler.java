@@ -86,7 +86,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		String key = (String) pathVariables.get("key");
 
-		Media media = mediaRepository.findById(key);
+		Media media = mediaRepository.findOneById(key);
 		int width = ServletRequestUtils.getIntParameter(request, "w", 0);
 		int height = ServletRequestUtils.getIntParameter(request, "h", 0);
 		int mode = ServletRequestUtils.getIntParameter(request, "m", 0);
@@ -118,7 +118,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 //	}
 
 	private Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException {
-//		Blog blog = blogService.readBlogById(Blog.DEFAULT_ID);
+//		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 //		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
 		final Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
 		final Resource resource = prefix.createRelative(media.getId());

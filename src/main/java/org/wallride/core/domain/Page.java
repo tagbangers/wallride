@@ -26,6 +26,27 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@NamedEntityGraphs({
+	@NamedEntityGraph(name = Page.SHALLOW_GRAPH_NAME,
+			attributeNodes = {
+					@NamedAttributeNode("cover"),
+					@NamedAttributeNode("author"),
+					@NamedAttributeNode("parent"),
+					@NamedAttributeNode("children"),
+			}
+	),
+	@NamedEntityGraph(name = Page.DEEP_GRAPH_NAME,
+			attributeNodes = {
+					@NamedAttributeNode("cover"),
+					@NamedAttributeNode("author"),
+					@NamedAttributeNode("parent"),
+					@NamedAttributeNode("children"),
+					@NamedAttributeNode("tags"),
+					@NamedAttributeNode("relatedToPosts"),
+					@NamedAttributeNode("relatedByPosts"),
+			}
+	)
+})
 @Table(name="page")
 @DynamicInsert
 @DynamicUpdate
@@ -34,6 +55,9 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class Page extends Post implements Comparable<Page> {
 
+	public static final String SHALLOW_GRAPH_NAME = "PAGE_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "PAGE_DEEP_GRAPH";
+
 	@Column(name="lft", nullable=false)
 	@Field
 	private int lft;
@@ -41,14 +65,6 @@ public class Page extends Post implements Comparable<Page> {
 	@Column(name="rgt", nullable=false)
 	@Field
 	private int rgt;
-
-//	@Column(nullable=false)
-//	@Field
-//	private int depth;
-//
-//	@Column(nullable=false)
-//	@Field
-//	private int sort;
 
 	@ManyToOne
 //	@IndexedEmbedded(includeEmbeddedObjectId = true) //org.hibernate.search.SearchException: Circular reference.
@@ -72,22 +88,6 @@ public class Page extends Post implements Comparable<Page> {
 	public void setRgt(int rgt) {
 		this.rgt = rgt;
 	}
-
-	//	public int getDepth() {
-//		return depth;
-//	}
-//
-//	public void setDepth(int depth) {
-//		this.depth = depth;
-//	}
-//
-//	public int getSort() {
-//		return sort;
-//	}
-//
-//	public void setSort(int sort) {
-//		this.sort = sort;
-//	}
 
 	public Page getParent() {
 		return parent;

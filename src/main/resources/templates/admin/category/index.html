@@ -17,7 +17,7 @@
 							<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New</span></a>
 						</div>
 						<div class="btn-group">
-							<button id="update-category-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:if="!${categoryTree.empty}" th:text="#{SaveOrder}">Save Order</button>
+							<button id="update-category-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:if="!${#lists.isEmpty(categoryNodes)}" th:text="#{SaveOrder}">Save Order</button>
 						</div>
 						<script th:inline="javascript">
 							$(function() {
@@ -53,20 +53,20 @@
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<span th:text="#{DeletedCategory}">Category deleted.</span>
 					</div>
-					<ul th:unless="${#lists.isEmpty(categoryTree.rootNodes)}" th:replace="category/index::category(${categoryTree.rootNodes})"></ul>
+					<ul th:unless="${#lists.isEmpty(categoryNodes)}" th:replace="category/index::category(${categoryNodes})"></ul>
 					<ul id="category-tree" class="sortable tree" th:fragment="category(nodes)">
-						<li th:each="node : ${nodes}" th:id="${'category-tree_' + node.category.id}">
+						<li th:each="node : ${nodes}" th:id="${'category-tree_' + node.object.id}">
 							<div class="category clearfix">
 								<div class="wr-tree-options pull-left">
 									<span class="wr-tree-option disclose"><span class="glyphicon glyphicon-chevron-right"></span></span>
-									<span class="wr-tree-option title" th:text="${node.category.name}"></span>
-									<span class="wr-tree-option" th:text="${'/' + node.category.code}">/code</span>
+									<span class="wr-tree-option title" th:text="${node.object.name}"></span>
+									<span class="wr-tree-option" th:text="${'/' + node.object.code}">/code</span>
 								</div>
 								<div class="wr-tree-options pull-right">
-									<span class="badge wr-tree-option" th:text="${articleCounts.get(node.category.id)}?:0">16</span>
-									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-edit-form,id=${node.category.id})}" data-toggle="modal" data-target="#category-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
-									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-create-form,parentId=${node.category.id})}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
-									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-delete-form,id=${node.category.id})}" data-toggle="modal" data-target="#category-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
+									<span class="badge wr-tree-option" th:text="${articleCounts.get(node.object.id)}?:0">16</span>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-edit-form,id=${node.object.id})}" data-toggle="modal" data-target="#category-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-create-form,parentId=${node.object.id})}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-delete-form,id=${node.object.id})}" data-toggle="modal" data-target="#category-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
 								</div>
 							</div>
 							<ul th:unless="${#lists.isEmpty(node.children)}" th:include="category/index::category(${node.children})"></ul>
@@ -85,7 +85,7 @@
 										<div class="form-group">
 											<select name="parentId" class="form-control">
 												<option value="" th:text="#{SelectParentCategory}">Select Parent Category</option>
-												<option th:each="category : ${categoryTree.categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq parentId}"></option>
+												<option th:each="category : ${#categorys.getAllCategories(true)}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq parentId}"></option>
 											</select>
 										</div>
 										<div class="form-group">
@@ -155,7 +155,7 @@
 										<div class="form-group">
 											<select name="parentId" class="form-control">
 												<option value="" th:text="#{SelectParentCategory}">Select Parent Category</option>
-												<option th:each="parent : ${categoryTree.categories}" th:if="${parent ne category}" th:value="${parent.id}" th:text="${parent.name}" th:selected="${parent eq category.parent}"></option>
+												<option th:each="parent : ${#categorys.getAllCategories(true)}" th:if="${parent ne category}" th:value="${parent.id}" th:text="${parent.name}" th:selected="${parent eq category.parent}"></option>
 											</select>
 										</div>
 										<div class="form-group">

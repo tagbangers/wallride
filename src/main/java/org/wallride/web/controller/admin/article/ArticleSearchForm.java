@@ -21,7 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
-import org.wallride.core.service.ArticleSearchRequest;
+import org.wallride.core.model.ArticleSearchRequest;
 
 import java.io.Serializable;
 

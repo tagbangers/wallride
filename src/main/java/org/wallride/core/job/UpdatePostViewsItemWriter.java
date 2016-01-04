@@ -31,8 +31,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.core.domain.Post;
+import org.wallride.core.exception.ServiceException;
 import org.wallride.core.repository.PostRepository;
-import org.wallride.core.service.ServiceException;
 import org.wallride.web.controller.guest.article.ArticleDescribeController;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.BlogLanguageRewriteMatch;
@@ -106,7 +106,7 @@ public class UpdatePostViewsItemWriter implements ItemWriter<List> {
 
 			// Last path mean code of post
 			String code = uriComponents.getPathSegments().get(uriComponents.getPathSegments().size() - 1);
-			Post post = postRepository.findByCode(code, rewriteMatch.getBlogLanguage().getLanguage());
+			Post post = postRepository.findOneByCodeAndLanguage(code, rewriteMatch.getBlogLanguage().getLanguage());
 			if (post == null) {
 				logger.debug("Post not found [{}]", code);
 				continue;
