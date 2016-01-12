@@ -31,15 +31,15 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 @Entity
-@NamedEntityGraphs({
-		@NamedEntityGraph(name = User.SHALLOW_GRAPH_NAME,
-				attributeNodes = {
-						@NamedAttributeNode("roles")}
-		),
-		@NamedEntityGraph(name = User.DEEP_GRAPH_NAME,
-				attributeNodes = {
-						@NamedAttributeNode("roles")})
-})
+//@NamedEntityGraphs({
+//		@NamedEntityGraph(name = User.SHALLOW_GRAPH_NAME,
+//				attributeNodes = {
+//						@NamedAttributeNode("roles")}
+//		),
+//		@NamedEntityGraph(name = User.DEEP_GRAPH_NAME,
+//				attributeNodes = {
+//						@NamedAttributeNode("roles")})
+//})
 @Table(name = "user")
 @DynamicInsert
 @DynamicUpdate
@@ -47,8 +47,8 @@ import java.util.TreeSet;
 @SuppressWarnings("serial")
 public class User extends DomainObject<Long> {
 
-	public static final String SHALLOW_GRAPH_NAME = "USER_SHALLOW_GRAPH";
-	public static final String DEEP_GRAPH_NAME = "USER_DEEP_GRAPH";
+//	public static final String SHALLOW_GRAPH_NAME = "USER_SHALLOW_GRAPH";
+//	public static final String DEEP_GRAPH_NAME = "USER_DEEP_GRAPH";
 
 	public enum Role {
 		ADMIN,
@@ -87,7 +87,7 @@ public class User extends DomainObject<Long> {
 	@Column
 	private String description;
 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@SortNatural
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
