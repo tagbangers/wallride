@@ -34,24 +34,16 @@ import java.util.TreeSet;
 						@NamedAttributeNode("cover"),
 						@NamedAttributeNode("author"),
 						@NamedAttributeNode("drafted"),
-						@NamedAttributeNode("categories"),
-						@NamedAttributeNode(value = "author", subgraph = "user")},
-				subgraphs = {
-						@NamedSubgraph(name = "user", attributeNodes = {
-								@NamedAttributeNode("roles")})}
+						@NamedAttributeNode("categories")}
 		),
 		@NamedEntityGraph(name = Article.DEEP_GRAPH_NAME,
 				attributeNodes = {
 						@NamedAttributeNode("cover"),
+						@NamedAttributeNode("author"),
 						@NamedAttributeNode("drafted"),
 						@NamedAttributeNode("categories"),
 						@NamedAttributeNode("tags"),
-						@NamedAttributeNode("relatedToPosts"),
-						@NamedAttributeNode(value = "author", subgraph = "user")},
-				subgraphs = {
-						@NamedSubgraph(name = "user", attributeNodes = {
-								@NamedAttributeNode("roles")})}
-		)
+						@NamedAttributeNode("relatedToPosts")})
 })
 @Table(name = "article")
 @DynamicInsert

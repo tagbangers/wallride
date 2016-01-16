@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Comment;
+import org.wallride.core.domain.Post;
 import org.wallride.core.model.CommentSearchRequest;
 import org.wallride.core.service.ArticleService;
 import org.wallride.core.service.CommentService;
@@ -54,6 +55,9 @@ public class ArticleDescribeController {
 			RedirectAttributes redirectAttributes) {
 		Article article = articleService.getArticleByCode(code, blogLanguage.getLanguage());
 		if (article == null) {
+			throw new HttpNotFoundException();
+		}
+		if (article.getStatus() != Post.Status.PUBLISHED) {
 			throw new HttpNotFoundException();
 		}
 
