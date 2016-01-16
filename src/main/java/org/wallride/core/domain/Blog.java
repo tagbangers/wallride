@@ -48,7 +48,7 @@ public class Blog extends DomainObject<Long> {
 	@Field
 	private String code;
 
-	@Column(name = "default_language", length = 3, nullable = false)
+	@Column(length = 3, nullable = false)
 	@Field
 	private String defaultLanguage;
 

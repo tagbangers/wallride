@@ -58,11 +58,11 @@ public class Page extends Post implements Comparable<Page> {
 	public static final String SHALLOW_GRAPH_NAME = "PAGE_SHALLOW_GRAPH";
 	public static final String DEEP_GRAPH_NAME = "PAGE_DEEP_GRAPH";
 
-	@Column(name="lft", nullable=false)
+	@Column(nullable=false)
 	@Field
 	private int lft;
 
-	@Column(name="rgt", nullable=false)
+	@Column(nullable=false)
 	@Field
 	private int rgt;
 

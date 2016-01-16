@@ -69,11 +69,11 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 	@Field
 	private String description;
 
-	@Column(name = "lft", nullable = false)
+	@Column(nullable = false)
 	@Field
 	private int lft;
 
-	@Column(name = "rgt", nullable = false)
+	@Column(nullable = false)
 	@Field
 	private int rgt;
 
