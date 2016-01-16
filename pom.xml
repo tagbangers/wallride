@@ -8,8 +8,33 @@
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT-201601121741</version>
+	<version>1.0.0.BUILD-SNAPSHOT-201601162146</version>
 	<packaging>${packaging.type}</packaging>
+	<name>WallRide</name>
+	<description>CMS for developers of principles</description>
+	<url>http://wallride.org/</url>
+	<organization>
+		<name>Tagbangers, Inc.</name>
+		<url>https://www.tagbangers.co.jp/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/tagbangers/wallride</url>
+	</scm>
+	<developers>
+		<developer>
+			<name>OGAWA, Takeshi</name>
+			<email>ogawa@tagbangers.co.jp</email>
+			<organization>Tagbangers, Inc.</organization>
+			<organizationUrl>http://www.tagbangers.co.jp/</organizationUrl>
+			<timezone>-9</timezone>
+		</developer>
+	</developers>
 
 	<profiles>
 		<profile>
