@@ -40,7 +40,7 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(name = "name", length = 200, nullable = false)
+	@Column(length = 200, nullable = false)
 	@Field
 	private String name;
 

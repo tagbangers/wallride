@@ -42,13 +42,12 @@ public class UserInvitation extends DomainObject<String> {
 	@Lob
 	private String message;
 
-	@Column(name="expired_at", nullable=false)
+	@Column(nullable=false)
 	private LocalDateTime expiredAt;
 
 	@Column(nullable=false)
 	private boolean accepted;
 
-	@Column(name="accepted_at")
 	private LocalDateTime acceptedAt;
 
 	@Override

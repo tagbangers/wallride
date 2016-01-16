@@ -42,7 +42,7 @@ public class PasswordResetToken extends DomainObject<String> {
 	@Column(length = 200, nullable = false)
 	private String email;
 
-	@Column(name = "expired_at", nullable = false)
+	@Column(nullable = false)
 	private LocalDateTime expiredAt;
 
 	@Override

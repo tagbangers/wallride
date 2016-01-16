@@ -41,10 +41,10 @@ public class Media extends DomainObject<String> {
 	@Column(length = 50)
 	private String id;
 
-	@Column(name = "mime_type", length = 50, nullable = false)
+	@Column(length = 50, nullable = false)
 	private String mimeType;
 
-	@Column(name = "original_name", length = 500)
+	@Column(length = 500)
 	private String originalName;
 
 	@ManyToMany(mappedBy = "medias")

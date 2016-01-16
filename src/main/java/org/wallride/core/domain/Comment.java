@@ -60,7 +60,7 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private User author;
 
-	@Column(name = "author_name", length = 200, nullable = false)
+	@Column(length = 200, nullable = false)
 	@Field
 	private String authorName;
 

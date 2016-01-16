@@ -9,12 +9,6 @@ create table article_category (
 	primary key (article_id, category_id)
 ) ENGINE=InnoDB;
 
-create table post_tag (
-		tag_id bigint not null,
-		post_id bigint not null,
-		primary key (post_id, tag_id)
-) ENGINE=InnoDB;
-
 create table blog (
 	id bigint not null auto_increment,
 	code varchar(200) not null,
@@ -169,6 +163,12 @@ create table post_related_post (
 	post_id bigint not null,
 	related_id bigint not null,
 	primary key (post_id, related_id)
+) ENGINE=InnoDB;
+
+create table post_tag (
+	tag_id bigint not null,
+	post_id bigint not null,
+	primary key (post_id, tag_id)
 ) ENGINE=InnoDB;
 
 create table tag (

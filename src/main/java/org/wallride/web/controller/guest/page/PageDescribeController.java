@@ -25,6 +25,7 @@ import org.springframework.web.util.UrlPathHelper;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.domain.Page;
+import org.wallride.core.domain.Post;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.PageService;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
@@ -69,6 +70,9 @@ public class PageDescribeController extends AbstractController {
 
 		Page page = pageService.getPageByCode(variables.get("code"), blogLanguage.getLanguage());
 		if (page == null) {
+			throw new HttpNotFoundException();
+		}
+		if (page.getStatus() != Post.Status.PUBLISHED) {
 			throw new HttpNotFoundException();
 		}
 

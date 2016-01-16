@@ -38,10 +38,7 @@ import org.wallride.core.domain.*;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.*;
-import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.repository.PageRepository;
-import org.wallride.core.repository.PageSpecifications;
-import org.wallride.core.repository.TagRepository;
+import org.wallride.core.repository.*;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.WallRideProperties;
 
@@ -56,20 +53,27 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
+@Transactional(rollbackFor = Exception.class)
 public class PageService {
 
 	@Inject
 	private BlogService blogService;
+
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
+
 	@Inject
 	private PlatformTransactionManager transactionManager;
 
 	@Resource
+	private PostRepository postRepository;
+
+	@Resource
 	private PageRepository pageRepository;
+
 	@Resource
 	private TagRepository tagRepository;
+
 	@Resource
 	private MediaRepository mediaRepository;
 
@@ -91,9 +95,9 @@ public class PageService {
 				throw new EmptyCodeException();
 			}
 		}
-		
+
 		if (!status.equals(Post.Status.DRAFT)) {
-			Page duplicate = pageRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -104,19 +108,17 @@ public class PageService {
 		if (!status.equals(Post.Status.DRAFT)) {
 			page.setCode(code);
 			page.setDraftedCode(null);
-		}
-		else {
+		} else {
 			page.setCode(null);
 			page.setDraftedCode(code);
 		}
-		
+
 		Page parent = (request.getParentId() != null) ? pageRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage()) : null;
 		int rgt = 0;
 		if (parent == null) {
 			rgt = pageRepository.findMaxRgt();
 			rgt++;
-		}
-		else {
+		} else {
 			rgt = parent.getRgt();
 			pageRepository.unshiftRgt(rgt);
 			pageRepository.unshiftLft(rgt);
@@ -133,13 +135,12 @@ public class PageService {
 		page.setBody(request.getBody());
 
 		page.setAuthor(entityManager.getReference(User.class, authorizedUser.getId()));
-		
+
 		LocalDateTime date = request.getDate();
 		if (Post.Status.PUBLISHED.equals(status)) {
 			if (date == null) {
 				date = now;
-			}
-			else if (date.isAfter(now)) {
+			} else if (date.isAfter(now)) {
 				status = Post.Status.SCHEDULED;
 			}
 		}
@@ -223,8 +224,7 @@ public class PageService {
 				draft = createPage(createRequest, Post.Status.DRAFT, authorizedUser);
 				draft.setDrafted(page);
 				return pageRepository.save(draft);
-			}
-			else {
+			} else {
 				PageUpdateRequest updateRequest = new PageUpdateRequest.Builder()
 						.id(draft.getId())
 						.code(request.getCode())
@@ -239,8 +239,7 @@ public class PageService {
 						.build();
 				return savePage(updateRequest, authorizedUser);
 			}
-		}
-		else {
+		} else {
 			return savePage(request, authorizedUser);
 		}
 	}
@@ -277,7 +276,7 @@ public class PageService {
 			}
 		}
 		if (!page.getStatus().equals(Post.Status.DRAFT)) {
-			Page duplicate = pageRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null && !duplicate.equals(page)) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -286,12 +285,11 @@ public class PageService {
 		if (!page.getStatus().equals(Post.Status.DRAFT)) {
 			page.setCode(code);
 			page.setDraftedCode(null);
-		}
-		else {
+		} else {
 			page.setCode(null);
 			page.setDraftedCode(code);
 		}
-		
+
 		Page parent = (request.getParentId() != null) ? entityManager.getReference(Page.class, request.getParentId()) : null;
 		if (!(page.getParent() == null && parent == null) && !ObjectUtils.nullSafeEquals(page.getParent(), parent)) {
 			pageRepository.shiftLftRgt(page.getLft(), page.getRgt());
@@ -302,8 +300,7 @@ public class PageService {
 			if (parent == null) {
 				rgt = pageRepository.findMaxRgt();
 				rgt++;
-			}
-			else {
+			} else {
 				rgt = parent.getRgt();
 				pageRepository.unshiftRgt(rgt);
 				pageRepository.unshiftLft(rgt);
@@ -332,8 +329,7 @@ public class PageService {
 		if (Post.Status.PUBLISHED.equals(page.getStatus())) {
 			if (date == null) {
 				date = now.truncatedTo(ChronoUnit.HOURS);
-			}
-			else if (date.isAfter(now)) {
+			} else if (date.isAfter(now)) {
 				page.setStatus(Post.Status.SCHEDULED);
 			}
 		}
@@ -452,7 +448,7 @@ public class PageService {
 	}
 
 	@CacheEvict(value = "pages", allEntries = true)
-	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public List<Page> bulkDeletePage(PageBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
 		List<Page> pages = new ArrayList<>();
 		for (long id : bulkDeleteRequest.getIds()) {
@@ -478,8 +474,7 @@ public class PageService {
 					}
 				});
 				pages.add(page);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				logger.debug("Errors: {}", r);
 				result.addAllErrors(r);
 			}

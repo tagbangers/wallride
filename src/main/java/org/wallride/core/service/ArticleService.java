@@ -41,10 +41,7 @@ import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.exception.NotNullException;
 import org.wallride.core.model.*;
-import org.wallride.core.repository.ArticleRepository;
-import org.wallride.core.repository.ArticleSpecifications;
-import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.repository.TagRepository;
+import org.wallride.core.repository.*;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.WallRideProperties;
 
@@ -63,16 +60,25 @@ public class ArticleService {
 
 	@Resource
 	private BlogService blogService;
+
+	@Resource
+	private PostRepository postRepository;
+
 	@Resource
 	private ArticleRepository articleRepository;
+
 	@Resource
 	private TagRepository tagRepository;
+
 	@Resource
 	private MediaRepository mediaRepository;
+
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
+
 	@Inject
 	private PlatformTransactionManager transactionManager;
+
 	@Inject
 	private WallRideProperties wallRideProperties;
 
@@ -93,7 +99,7 @@ public class ArticleService {
 		}
 
 		if (!status.equals(Post.Status.DRAFT)) {
-			Article duplicate = articleRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -281,7 +287,7 @@ public class ArticleService {
 			}
 		}
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			Article duplicate = articleRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 			if (duplicate != null && !duplicate.equals(article)) {
 				throw new DuplicateCodeException(request.getCode());
 			}

@@ -55,16 +55,16 @@ import java.time.LocalDateTime;
 @SuppressWarnings("serial")
 public abstract class DomainObject<ID extends Serializable> implements Serializable {
 
-	@Column(name = "created_at", nullable = false)
+	@Column(nullable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
 
-	@Column(name = "created_by", length = 100)
+	@Column(length = 100)
 	private String createdBy;
 
-	@Column(name = "updated_at", nullable = false)
+	@Column(nullable = false)
 	private LocalDateTime updatedAt = LocalDateTime.now();
 
-	@Column(name = "updated_by", length = 100)
+	@Column(length = 100)
 	private String updatedBy;
 
 	public abstract ID getId();
