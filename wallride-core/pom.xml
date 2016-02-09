@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.wallride</groupId>
+		<artifactId>wallride-parent</artifactId>
+		<version>1.0.0.M2</version>
+		<relativePath>../wallride-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>wallride-core</artifactId>
+	<packaging>jar</packaging>
+	<name>WallRide Core</name>
+	<description>CMS for developers of principles</description>
+	<url>http://wallride.org/</url>
+	<organization>
+		<name>Tagbangers, Inc.</name>
+		<url>https://www.tagbangers.co.jp/</url>
+	</organization>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-batch</artifactId>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+
+		<!--
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		-->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-context</artifactId>
+			<version>${spring-cloud-aws-context.verion}</version>
+		</dependency>
+
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-java8</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
+		<!-- Hibernate Search -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-search-orm</artifactId>
+			<version>${hibernate-search.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-search-infinispan</artifactId>
+			<version>${hibernate-search.version}</version>
+		</dependency>
+
+		<!-- Hibernate Metamodel -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
+		<!-- Infinispan -->
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-cachestore-jdbc</artifactId>
+			<version>${infinispan.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-lucene-directory</artifactId>
+			<version>${infinispan.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-spring4</artifactId>
+			<version>${infinispan.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Lucene -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers-kuromoji</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+
+		<!-- JGroups S3_CLIENT_PING -->
+		<dependency>
+			<groupId>jp.co.tagbangers</groupId>
+			<artifactId>jgroups-s3-client-ping</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- Thymeleaf -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
+			<version>${thymeleaf-extras-springsecurity4.version}</version>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-java8time</artifactId>
+			<version>${thymeleaf-extras-java8time.version}</version>
+		</dependency>
+		-->
+
+		<!-- WebJars -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>2.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery-ui</artifactId>
+			<version>1.11.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery-file-upload</artifactId>
+			<version>9.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>select2</artifactId>
+			<version>3.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>datetimepicker</artifactId>
+			<version>2.3.4</version>
+		</dependency>
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<!-- Amazon AWS -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>${amazonaws-version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Google -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-analytics</artifactId>
+			<version>v3-rev119-1.20.0</version>
+		</dependency>
+
+		<!-- im4java -->
+		<dependency>
+			<groupId>org.im4java</groupId>
+			<artifactId>im4java</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+
+		<!-- Jsoup -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
+		<!-- RSS -->
+		<dependency>
+			<groupId>com.rometools</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.5.1</version>
+		</dependency>
+
+		<!-- Url Rewrite Filter -->
+		<dependency>
+			<groupId>org.tuckey</groupId>
+			<artifactId>urlrewritefilter</artifactId>
+			<version>4.0.4</version>
+		</dependency>
+
+		<!-- Commons -->
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
+		<!-- MySQL Driver -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.23</version>
+		</dependency>
+
+		<!-- JavaMail -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+	</dependencies>
+</project>
