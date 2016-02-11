@@ -117,81 +117,80 @@
 									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 									<span th:text="#{YouHaveDraft}">You have draft.</span><a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${draft.drafted.id},draft)}"><span th:text="#{CopyDraft}">Copy draft</span></a>
 								</div>
-                                <fieldset>
-                                    <div class="form-group">
-                                        <div id="post-cover-dropzone" class="wr-post-cover-dropzone col-sm-12" style="">
-                                            <p class="placeholder help-block" th:text="#{CoverImage}">Cover Image</p>
-                                            <div class="dragover hide"><span class="help-block">Drop files here</span></div>
-                                            <div th:classappend="${form.coverId}? '' : 'hide'" class="image-wrap">
-                                                <img th:if="${form.coverId ne null}" th:src="@{${#medias.link(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
-                                                <div class="remove"><a href="#"><span class="glyphicon glyphicon-remove"></span></a></div>
-                                            </div>
-                                            <div class="progress hide"><div class="progress-bar progress-bar-success"></div></div>
-                                            <input type="hidden" th:field="*{coverId}" />
-                                        </div>
-                                    </div>
-                                    <script th:inline="javascript">
-                                        $(function() {
-                                            $('#post-cover-dropzone').fileupload({
-                                                url: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-                                                paramName: 'file',
-                                                dropZone: $('#post-cover-dropzone'),
-                                                dragover: function(e) {
-                                                    var dropZone = $('#post-cover-dropzone');
-                                                    var timeout = window.dropZoneTimeout;
-                                                    if (!timeout) {
-                                                        $('#post-cover-dropzone .dragover').removeClass('hide');
-                                                    } else {
-                                                        clearTimeout(timeout);
-                                                    }
-                                                    var found = false;
-                                                    var node = e.target;
-                                                    do {
-                                                        if (node === dropZone[0]) {
-                                                            found = true;
-                                                            break;
-                                                        }
-                                                        node = node.parentNode;
-                                                    } while (node != null);
-                                                    if (found) {
-                                                        $('#post-cover-dropzone .dragover').removeClass('hide');
-                                                    }
-                                                    else {
-                                                        $('#post-cover-dropzone .dragover').addClass('hide');
-                                                    }
-                                                    window.dropZoneTimeout = setTimeout(function () {
-                                                        window.dropZoneTimeout = null;
-                                                        $('#post-cover-dropzone .dragover').addClass('hide');
-                                                    }, 100);
-                                                },
-                                                start: function(e) {
-                                                    $('#post-cover-dropzone .progress').removeClass('hide');
-                                                },
-                                                progressall: function (e, data) {
-                                                    var progress = parseInt(data.loaded / data.total * 100, 10);
-                                                    $('#post-cover-dropzone .progress-bar').css('width', progress + '%');
-                                                },
-                                                done: function(e, data) {
-                                                    $('#post-cover-dropzone :input[name="coverId"]').val(data.result.id);
-                                                    $('#post-cover-dropzone .progress').addClass('hide');
-                                                    $('#post-cover-dropzone .progress-bar').css('width', '0%');
-                                                    var img = $('<img class="wr-post-cover" />').attr('src', data.result.filelink + '?' + $.param({w: 1200, h: 500, m: 1}));
-                                                    $('#post-cover-dropzone img').remove();
-                                                    $('#post-cover-dropzone').append(img);
-                                                    $('#post-cover-dropzone .image-wrap').removeClass('hide');
-                                                }
-                                            });
-                                            $('#post-cover-dropzone .remove').click(function(e) {
-                                                $('#post-cover-dropzone :input[name="coverId"]').val('');
-                                                $('#post-cover-dropzone .image-wrap').addClass('hide');
-                                                $('#post-cover-dropzone img').remove();
-                                                e.preventDefault();
-                                            });
-                                        });
-                                    </script>
-                                </fieldset>
-
-                                <fieldset>
+								<fieldset>
+									<div class="form-group">
+										<div id="post-cover-dropzone" class="wr-post-cover-dropzone col-sm-12" style="">
+											<p class="placeholder help-block" th:text="#{CoverImage}">Cover Image</p>
+											<div class="dragover hide"><span class="help-block">Drop files here</span></div>
+											<div th:classappend="${form.coverId}? '' : 'hide'" class="image-wrap">
+												<img th:if="${form.coverId ne null}" th:src="@{${#medias.link(form.coverId)}(w=1200,h=500,m=1)}" class="wr-post-cover" />
+												<div class="remove"><a href="#"><span class="glyphicon glyphicon-remove"></span></a></div>
+											</div>
+											<div class="progress hide"><div class="progress-bar progress-bar-success"></div></div>
+											<input type="hidden" th:field="*{coverId}" />
+										</div>
+									</div>
+									<script th:inline="javascript">
+									$(function() {
+										$('#post-cover-dropzone').fileupload({
+											url: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+											paramName: 'file',
+											dropZone: $('#post-cover-dropzone'),
+											dragover: function(e) {
+												var dropZone = $('#post-cover-dropzone');
+												var timeout = window.dropZoneTimeout;
+												if (!timeout) {
+													$('#post-cover-dropzone .dragover').removeClass('hide');
+												} else {
+													clearTimeout(timeout);
+												}
+												var found = false;
+												var node = e.target;
+												do {
+													if (node === dropZone[0]) {
+														found = true;
+														break;
+													}
+													node = node.parentNode;
+												} while (node != null);
+												if (found) {
+													$('#post-cover-dropzone .dragover').removeClass('hide');
+												}
+												else {
+													$('#post-cover-dropzone .dragover').addClass('hide');
+												}
+												window.dropZoneTimeout = setTimeout(function () {
+													window.dropZoneTimeout = null;
+													$('#post-cover-dropzone .dragover').addClass('hide');
+												}, 100);
+											},
+											start: function(e) {
+												$('#post-cover-dropzone .progress').removeClass('hide');
+											},
+											progressall: function (e, data) {
+												var progress = parseInt(data.loaded / data.total * 100, 10);
+												$('#post-cover-dropzone .progress-bar').css('width', progress + '%');
+											},
+											done: function(e, data) {
+												$('#post-cover-dropzone :input[name="coverId"]').val(data.result.id);
+												$('#post-cover-dropzone .progress').addClass('hide');
+												$('#post-cover-dropzone .progress-bar').css('width', '0%');
+												var img = $('<img class="wr-post-cover" />').attr('src', data.result.filelink + '?' + $.param({w: 1200, h: 500, m: 1}));
+												$('#post-cover-dropzone img').remove();
+												$('#post-cover-dropzone').append(img);
+												$('#post-cover-dropzone .image-wrap').removeClass('hide');
+											}
+										});
+										$('#post-cover-dropzone .remove').click(function(e) {
+											$('#post-cover-dropzone :input[name="coverId"]').val('');
+											$('#post-cover-dropzone .image-wrap').addClass('hide');
+											$('#post-cover-dropzone img').remove();
+											e.preventDefault();
+										});
+									});
+									</script>
+								</fieldset>
+								<fieldset>
 									<div class="form-group" th:classappend="${#fields.hasErrors('title')}? has-error">
 										<input type="text" th:field="*{title}" class="form-control" th:attr="placeholder=#{EnterTitle}" placeholder="Enter title here" />
 										<span class="help-block" th:each="err : ${#fields.errors('title')}" th:text="${err}" />
