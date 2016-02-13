@@ -28,17 +28,21 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.model.TreeNode;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
+import java.util.List;
 
 @Controller
 @RequestMapping("/{language}/pages/create")
@@ -50,11 +54,19 @@ public class PageCreateController {
 	private PageService pageService;
 
 	@Inject
+	private CategoryUtils categoryUtils;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
 	public PageCreateForm pageCreateForm() {
 		return new PageCreateForm();
+	}
+
+	@ModelAttribute("categoryNodes")
+	public List<TreeNode<Category>> setupCategoryNodes(@PathVariable String language) {
+		return categoryUtils.getNodes(true);
 	}
 
 	@ModelAttribute("query")
@@ -77,6 +89,11 @@ public class PageCreateController {
 	@RequestMapping(method=RequestMethod.GET, params="part=page-fieldset")
 	public String partPageFieldset(@PathVariable String language, Model model) {
 		return "page/create::#page-fieldset";
+	}
+
+	@RequestMapping(method=RequestMethod.GET, params="part=category-fieldset")
+	public String partCategoryFieldset(@PathVariable String language) {
+		return "page/create::#category-fieldset";
 	}
 
 	@RequestMapping(method=RequestMethod.POST, params="draft")
