@@ -148,6 +148,13 @@ public class PageService {
 		page.setStatus(status);
 		page.setLanguage(request.getLanguage());
 
+		page.getCategories().clear();
+		SortedSet<Category> categories = new TreeSet<>();
+		for (long categoryId : request.getCategoryIds()) {
+			categories.add(entityManager.getReference(Category.class, categoryId));
+		}
+		page.setCategories(categories);
+
 		page.getTags().clear();
 		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());
 		if (!CollectionUtils.isEmpty(tagNames)) {
@@ -218,6 +225,7 @@ public class PageService {
 						.authorId(request.getAuthorId())
 						.date(request.getDate())
 						.parentId(request.getParentId())
+						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
 						.language(request.getLanguage())
 						.build();
@@ -234,6 +242,7 @@ public class PageService {
 						.authorId(request.getAuthorId())
 						.date(request.getDate())
 						.parentId(request.getParentId())
+						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
 						.language(request.getLanguage())
 						.build();
@@ -335,6 +344,13 @@ public class PageService {
 		}
 		page.setDate(date);
 		page.setLanguage(request.getLanguage());
+
+		page.getCategories().clear();
+		SortedSet<Category> categories = new TreeSet<>();
+		for (long categoryId : request.getCategoryIds()) {
+			categories.add(entityManager.getReference(Category.class, categoryId));
+		}
+		page.setCategories(categories);
 
 		page.getTags().clear();
 		Set<String> tagNames = StringUtils.commaDelimitedListToSet(request.getTags());

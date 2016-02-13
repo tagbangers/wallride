@@ -103,6 +103,15 @@ public class Post extends DomainObject<Long> {
 
 	@ManyToMany
 	@JoinTable(
+			name = "post_category",
+			joinColumns = {@JoinColumn(name = "post_id")},
+			inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
+	@SortNatural
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	private SortedSet<Category> categories = new TreeSet<>();
+
+	@ManyToMany
+	@JoinTable(
 			name = "post_tag",
 			joinColumns = {@JoinColumn(name = "post_id")},
 			inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
@@ -227,6 +236,14 @@ public class Post extends DomainObject<Long> {
 
 	public void setViews(long views) {
 		this.views = views;
+	}
+
+	public SortedSet<Category> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(SortedSet<Category> categories) {
+		this.categories = categories;
 	}
 
 	public SortedSet<Tag> getTags() {

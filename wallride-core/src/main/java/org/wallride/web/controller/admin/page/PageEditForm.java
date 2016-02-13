@@ -19,6 +19,7 @@ package org.wallride.web.controller.admin.page;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.domain.Tag;
@@ -57,6 +58,7 @@ public class PageEditForm implements Serializable {
 	private LocalDateTime date;
 
 	private Long parentId;
+	private Set<Long> categoryIds = new HashSet<>();
 	private String tags;
 	private Set<Long> relatedPostIds = new HashSet<>();
 
@@ -133,6 +135,14 @@ public class PageEditForm implements Serializable {
 		this.parentId = parentId;
 	}
 
+	public Set<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(Set<Long> categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
 	public String getTags() {
 		return tags;
 	}
@@ -200,6 +210,7 @@ public class PageEditForm implements Serializable {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.categoryIds(categoryIds)
 				.tags(tags)
 				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)
@@ -220,6 +231,10 @@ public class PageEditForm implements Serializable {
 
 		form.setCoverId(page.getCover() != null ? page.getCover().getId() : null);
 		form.setParentId(page.getParent() != null ? page.getParent().getId() : null);
+
+		for (Category category : page.getCategories()) {
+			form.getCategoryIds().add(category.getId());
+		}
 
 		List<String> tagNames = new ArrayList<>();
 		for (Tag tag : page.getTags()) {

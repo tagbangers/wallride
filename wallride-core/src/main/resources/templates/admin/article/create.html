@@ -315,15 +315,10 @@
 									});
 									/*]]>*/
 								</script>
-								<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-									<div class="modal-dialog">
-										<div class="modal-content"></div>
-									</div>
-								</div>
 								<script th:inline="javascript">
 									/*<![CDATA[*/
 									$(function() {
-										$('#wr-page-content').on('click', '#save-category', function(e) {
+										$(document).on('click', '#save-category', function(e) {
 											e.preventDefault();
 											var self = $(this);
 											self.button('loading');
@@ -451,5 +446,10 @@
 		</div>
 		<footer>
 		</footer>
+		<div id="category-create-modal" th:fragment="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content"></div>
+			</div>
+		</div>
 	</body>
 </html>

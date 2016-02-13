@@ -28,16 +28,20 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.core.domain.Category;
 import org.wallride.core.domain.Page;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
+import org.wallride.core.model.TreeNode;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
+import java.util.List;
 
 @Controller
 @RequestMapping("/{language}/pages/edit")
@@ -49,6 +53,9 @@ public class PageEditController {
 	private PageService pageService;
 
 	@Inject
+	private CategoryUtils categoryUtils;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("page")
@@ -57,7 +64,12 @@ public class PageEditController {
 			@RequestParam long id) {
 		return pageService.getPageById(id, language);
 	}
-	
+
+	@ModelAttribute("categoryNodes")
+	public List<TreeNode<Category>> setupCategoryNodes(@PathVariable String language) {
+		return categoryUtils.getNodes(true);
+	}
+
 	@ModelAttribute("query")
 	public String query(@RequestParam(required = false) String query) {
 		return query;

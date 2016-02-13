@@ -90,6 +90,14 @@
 								</ul>
 								</dd>
 							</dl>
+							<dl>
+								<dt th:text="#{Categories}">Categories</dt>
+								<dd>
+									<ul class="list-unstyled">
+										<li th:each="category : ${page.categories}" th:text="${category.name}">Category Name</li>
+									</ul>
+								</dd>
+							</dl>
 							<dl class="wr-tags">
 								<dt th:text="#{Tags}">Tags</dt>
 								<dd>

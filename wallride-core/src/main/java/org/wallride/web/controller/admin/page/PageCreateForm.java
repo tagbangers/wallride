@@ -47,6 +47,7 @@ public class PageCreateForm implements Serializable {
 	private LocalDateTime date;
 	
 	private Long parentId;
+	private Set<Long> categoryIds = new HashSet<>();
 	private String tags;
 	private Set<Long> relatedPostIds = new HashSet<>();
 
@@ -115,6 +116,14 @@ public class PageCreateForm implements Serializable {
 		this.parentId = parentId;
 	}
 
+	public Set<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(Set<Long> categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
 	public String getTags() {
 		return tags;
 	}
@@ -181,6 +190,7 @@ public class PageCreateForm implements Serializable {
 				.authorId(authorId)
 				.date(date)
 				.parentId(parentId)
+				.categoryIds(categoryIds)
 				.tags(tags)
 				.relatedPostIds(relatedPostIds)
 				.seoTitle(seoTitle)

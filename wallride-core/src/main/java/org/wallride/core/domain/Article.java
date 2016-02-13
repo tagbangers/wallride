@@ -56,24 +56,6 @@ public class Article extends Post implements Comparable<Article> {
 	public static final String SHALLOW_GRAPH_NAME = "ARTICLE_SHALLOW_GRAPH";
 	public static final String DEEP_GRAPH_NAME = "ARTICLE_DEEP_GRAPH";
 
-	@ManyToMany
-	@JoinTable(
-			name = "article_category",
-			joinColumns = {@JoinColumn(name = "article_id")},
-			inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
-	@SortNatural
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
-	private SortedSet<Category> categories = new TreeSet<>();
-
-
-	public SortedSet<Category> getCategories() {
-		return categories;
-	}
-
-	public void setCategories(SortedSet<Category> categories) {
-		this.categories = categories;
-	}
-
 	public int compareTo(Article article) {
 		if (getDate() != null && article.getDate() == null) return 1;
 		if (getDate() == null && article.getDate() != null) return -1;
