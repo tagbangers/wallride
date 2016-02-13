@@ -67,7 +67,7 @@ public class ArticleEditController {
 
 	@ModelAttribute("categoryNodes")
 	public List<TreeNode<Category>> setupCategoryNodes(@PathVariable String language) {
-		return categoryUtils.getNodes();
+		return categoryUtils.getNodes(true);
 	}
 
 	@ModelAttribute("query")
