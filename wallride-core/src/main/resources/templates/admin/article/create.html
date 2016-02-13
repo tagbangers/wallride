@@ -198,10 +198,28 @@
 								</fieldset>
 								<fieldset>
 									<div class="form-group" th:classappend="${#fields.hasErrors('code')}? has-error">
-										<span th:text="${WEBSITE_LINK + '/'}"></span> <input type="text" th:field="*{code}" name="path" class="form-control input-sm wr-code" th:attr="placeholder=#{URLPath}" placeholder="URLパス" />
+										<span class="url-path" th:text="${WEBSITE_LINK} + '/'"></span> <input type="text" th:field="*{code}" name="path" class="form-control input-sm wr-code" th:attr="placeholder=#{URLPath}" placeholder="URL繝代せ" />
 										<span class="help-block" th:each="err : ${#fields.errors('code')}" th:text="${err}" />
 									</div>
 								</fieldset>
+								<script th:inline="javascript">
+									/*<![CDATA[*/
+									$(function() {
+										var websiteLink = /*[[${WEBSITE_LINK} + '/']]*/ '/';
+										var today = moment().format('YYYY/MM/DD/');
+										$('#wr-page-content').on('change', 'input[name="date"]', function(e) {
+											var inputDate = $(this).val();
+											if (inputDate != "") {
+												var urlPath = moment(inputDate, 'YYYY/MM/DD hh:mm').format('YYYY/MM/DD/');
+												$('.url-path').text(websiteLink + urlPath);
+											} else {
+												$('.url-path').text(websiteLink + today);
+											}
+										});
+										$('input[name="date"]').trigger("change");
+									});
+									/*]]>*/
+								</script>
 								<fieldset>
 									<div class="form-group" th:classappend="${#fields.hasErrors('body')}? has-error">
 										<textarea th:field="*{body}" class="form-control" th:attr="placeholder=#{EnterBody}" placeholder="Enter body here"></textarea>
