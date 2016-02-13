@@ -3,12 +3,6 @@ create table article (
 	primary key (id)
 ) ENGINE=InnoDB;
 
-create table article_category (
-	article_id bigint not null,
-	category_id bigint not null,
-	primary key (article_id, category_id)
-) ENGINE=InnoDB;
-
 create table blog (
 	id bigint not null auto_increment,
 	code varchar(200) not null,
@@ -165,6 +159,12 @@ create table post_related_post (
 	primary key (post_id, related_id)
 ) ENGINE=InnoDB;
 
+create table post_category (
+	post_id bigint not null,
+	category_id bigint not null,
+	primary key (post_id, category_id)
+) ENGINE=InnoDB;
+
 create table post_tag (
 	tag_id bigint not null,
 	post_id bigint not null,
@@ -247,13 +247,13 @@ alter table article
 	foreign key (id)
 	references post (id);
 
-alter table article_category
-	add constraint FK_48nv4hxwx3mte5gferj9wlj46
-	foreign key (article_id)
-	references article (id);
+alter table post_category
+	add constraint FK_qr4dx4cx1lh4jfjchabytcakl
+	foreign key (post_id)
+	references post (id);
 
-alter table article_category
-	add constraint FK_aaq7a2c3e34qghxyh34ao8r6p
+alter table post_category
+	add constraint FK_qly0d5oc4npxdig2fjfoshhxg
 	foreign key (category_id)
 	references category (id);
 
