@@ -260,19 +260,19 @@
 										</select>
 									</div>
 								</fieldset>
-                                <fieldset id="category-fieldset">
-                                    <legend th:text="#{Categories}">Categories</legend>
-                                    <section>
-                                        <ul th:unless="${#lists.isEmpty(categoryNodes)}" th:include="page/create::category-index(${categoryNodes})" id="category-index" class="list-unstyled"></ul>
-                                        <ul th:fragment="category-index(nodes)">
-                                            <li th:each="node : ${nodes}" class="checkbox">
-                                                <label><input type="checkbox" name="categoryIds" th:value="${node.object.id}" th:text="${node.object.name}" th:checked="${#sets.contains(form.categoryIds, node.object.id)}" /></label>
-                                                <ul th:unless="${#lists.isEmpty(node.children)}" th:include="page/create::category-index(${node.children})" class="list-unstyled"></ul>
-                                            </li>
-                                        </ul>
-                                        <a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
-                                    </section>
-                                </fieldset>
+								<fieldset id="category-fieldset">
+									<legend th:text="#{Categories}">Categories</legend>
+									<section>
+										<ul th:unless="${#lists.isEmpty(categoryNodes)}" th:include="page/create::category-index(${categoryNodes})" id="category-index" class="list-unstyled"></ul>
+										<ul th:fragment="category-index(nodes)">
+											<li th:each="node : ${nodes}" class="checkbox">
+												<label><input type="checkbox" name="categoryIds" th:value="${node.object.id}" th:text="${node.object.name}" th:checked="${#sets.contains(form.categoryIds, node.object.id)}" /></label>
+												<ul th:unless="${#lists.isEmpty(node.children)}" th:include="page/create::category-index(${node.children})" class="list-unstyled"></ul>
+											</li>
+										</ul>
+										<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New Category</span></a>
+									</section>
+								</fieldset>
 								<fieldset>
 									<legend th:text="#{Tags}">Tags</legend>
 									<div class="form-group row" th:classappend="${#fields.hasErrors('tags')}? has-error">
@@ -373,56 +373,55 @@
 									});
 									/*]]>*/
 								</script>
-                                <script th:inline="javascript">
-                                    /*<![CDATA[*/
-                                    $(function() {
-                                        $(document).on('click', '#save-category', function(e) {
-                                            e.preventDefault();
-                                            var self = $(this);
-                                            self.button('loading');
-                                            var checked = [];
-                                            $('input[name="categoryIds"]:checked', '#wr-post-form').each(function(i, element) {
-                                                checked.push($(element).val());
-                                            });
-                                            var form = self.closest('form');
-                                            var data = {
-                                                parentId: $(':input[name="parentId"]', form).val(),
-                                                code: $(':input[name="code"]', form).val(),
-                                                name: $(':input[name="name"]', form).val(),
-                                                description: $(':input[name="description"]', form).val()
-                                            };
-                                            $.ajax({
-                                                url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
-                                                type: 'post',
-                                                data: data,
-                                                success: function(savedCategory) {
-                                                    checked.push(savedCategory.id.toString());
-                                                    $.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
-                                                        data = $(data);
-                                                        $(':input[name="categoryIds"]', data).each(function(i, element) {
-                                                            if ($.inArray($(element).val(), checked) != -1) {
-                                                                $(element).prop('checked', true);
-                                                            }
-                                                        });
-														form
-                                                        $('#category-fieldset').html(data);
-                                                    });
-                                                    self.closest('.modal').modal('hide');
-                                                },
-                                                error: function(jqXHR) {
-                                                    $.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-                                                        var field = $(':input[name="' + field + '"]', form);
-                                                        $(field).closest('.form-group').addClass('has-error');
-                                                    });
-                                                },
-                                                complete: function() {
-                                                    $(self).button('reset');
-                                                }
-                                            });
-                                        });
-                                    });
-                                    /*]]>*/
-                                </script>
+								<script th:inline="javascript">
+									/*<![CDATA[*/
+									$(function() {
+										$(document).on('click', '#save-category', function(e) {
+											e.preventDefault();
+											var self = $(this);
+											self.button('loading');
+											var checked = [];
+											$('input[name="categoryIds"]:checked', '#wr-post-form').each(function(i, element) {
+												checked.push($(element).val());
+											});
+											var form = self.closest('form');
+											var data = {
+												parentId: $(':input[name="parentId"]', form).val(),
+												code: $(':input[name="code"]', form).val(),
+												name: $(':input[name="name"]', form).val(),
+												description: $(':input[name="description"]', form).val()
+											};
+											$.ajax({
+												url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+												type: 'post',
+												data: data,
+												success: function(savedCategory) {
+													checked.push(savedCategory.id.toString());
+													$.get(/*[[@{__${ADMIN_PATH}__/articles/create?part=category-fieldset}]]*/ '#', function(data) {
+														data = $(data);
+														$(':input[name="categoryIds"]', data).each(function(i, element) {
+															if ($.inArray($(element).val(), checked) != -1) {
+																$(element).prop('checked', true);
+															}
+														});
+														$('#category-fieldset').html(data);
+													});
+													self.closest('.modal').modal('hide');
+												},
+												error: function(jqXHR) {
+													$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+														var field = $(':input[name="' + field + '"]', form);
+														$(field).closest('.form-group').addClass('has-error');
+													});
+												},
+												complete: function() {
+													$(self).button('reset');
+												}
+											});
+										});
+									});
+									/*]]>*/
+								</script>
 								<fieldset id="seo-fieldset">
 									<legend th:text="#{Seo}">SEO</legend>
 									<div class="form-group" th:classappend="${#fields.hasErrors('seoTitle')}? has-error">
