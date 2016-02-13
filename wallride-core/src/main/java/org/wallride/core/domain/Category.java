@@ -85,11 +85,11 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 
 	@ManyToMany
 	@JoinTable(
-			name = "article_category",
+			name = "post_category",
 			joinColumns = {@JoinColumn(name = "category_id")},
-			inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"))
+			inverseJoinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"))
 	@SortNatural
-	private SortedSet<Article> articles = new TreeSet<>();
+	private SortedSet<Post> posts = new TreeSet<>();
 
 //	@Formula("(" +
 //			"select count(distinct article.id) from article article " +
@@ -172,12 +172,12 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 		this.children = children;
 	}
 
-	public SortedSet<Article> getArticles() {
-		return articles;
+	public SortedSet<Post> getPosts() {
+		return posts;
 	}
 
-	public void setArticles(SortedSet<Article> articles) {
-		this.articles = articles;
+	public void setPosts(SortedSet<Post> posts) {
+		this.posts = posts;
 	}
 
 //	public int getArticleCount() {
