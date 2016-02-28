@@ -28,9 +28,6 @@ public class Bootstrap extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		builder.sources(WallRideApplication.DefaultSource.class);
-		builder.resourceLoader(WallRideApplication.createResourceLoader());
-		builder.environment(WallRideApplication.createEnvironment());
-		return builder;
+		return WallRideApplication.configure(builder);
 	}
 }
