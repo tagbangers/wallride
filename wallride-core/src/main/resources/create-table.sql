@@ -48,6 +48,47 @@ create table category (
 	primary key (id)
 ) ENGINE=InnoDB;
 
+create table custom_field (
+	id bigint not null auto_increment,
+	name varchar(200),
+	description longtext,
+	fieldType varchar(50) not null,
+	defaultValue varchar(200),
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (id)
+) ENGINE=InnoDB;
+
+create table custom_field_option (
+  custom_field_id bigint not null,
+  `index` integer not null,
+	name varchar(200) not null,
+	language varchar(3) not null,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+  primary key (custom_field_id , `index`)
+) ENGINE=InnoDB;
+
+create table custom_field_value (
+	id bigint not null auto_increment,
+  post_id bigint not null,
+  custom_field_id bigint not null,
+  string_value varchar(255),
+  text_value longtext,
+  number_value bigint,
+  datetime_value datetime,
+  date_value date,
+	created_at datetime not null,
+	created_by varchar(100),
+	updated_at datetime not null,
+	updated_by varchar(100),
+	primary key (id)
+) ENGINE=InnoDB;
+
 create table comment (
 	id bigint not null auto_increment,
 	post_id bigint not null,
@@ -276,6 +317,21 @@ alter table category
 	add constraint FK_81thrbnb8c08gua7tvqj7xdqk
 	foreign key (parent_id)
 	references category (id);
+
+alter table custom_field_option
+	add constraint FKlt17rtc1ae4xkdvb4wl2f52ok
+	foreign key (custom_field_id)
+	references custom_field (id);
+
+alter table custom_field_value
+	add constraint FK21ubkc63mbxa1axcbidvo0k3j
+	foreign key (custom_field_id)
+	references custom_field (id);
+
+alter table custom_field_value
+	add constraint FK2tygpm2w3nwsoenrm2tbitg0y
+	foreign key (post_id)
+	references post (id);
 
 alter table comment
 	add constraint FK_9aq5p2jgf17y6b38x5ayd90oc

@@ -1,0 +1,117 @@
+package org.wallride.core.domain;
+
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "custom_field_value")
+@DynamicInsert
+@DynamicUpdate
+@Analyzer(definition = "synonyms")
+@Indexed
+@SuppressWarnings("serial")
+public class CustomFieldValue extends DomainObject<Long> {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@JoinColumn(name="custom_field_id")
+	private CustomField customField;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@JoinColumn(name="custom_field_id")
+	private Post post;
+
+	@Column(name="string_value")
+	private String stringValue;
+
+	@Column(name="number_value")
+	private Long numberValue;
+
+	@Column(name="text_value")
+	@Lob
+	private String textValue;
+
+	@Column(name="date_value")
+	private LocalDate dateValue;
+
+	@Column(name="datetime_value")
+	private LocalDateTime dateTimeValue;
+
+	@Override
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public CustomField getCustomField() {
+		return customField;
+	}
+
+	public void setCustomField(CustomField customField) {
+		this.customField = customField;
+	}
+
+	public Post getPost() {
+		return post;
+	}
+
+	public void setPost(Post post) {
+		this.post = post;
+	}
+
+	public String getStringValue() {
+		return stringValue;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
+
+	public Long getNumberValue() {
+		return numberValue;
+	}
+
+	public void setNumberValue(Long numberValue) {
+		this.numberValue = numberValue;
+	}
+
+	public String getTextValue() {
+		return textValue;
+	}
+
+	public void setTextValue(String textValue) {
+		this.textValue = textValue;
+	}
+
+	public LocalDate getDateValue() {
+		return dateValue;
+	}
+
+	public void setDateValue(LocalDate dateValue) {
+		this.dateValue = dateValue;
+	}
+
+	public LocalDateTime getDateTimeValue() {
+		return dateTimeValue;
+	}
+
+	public void setDateTimeValue(LocalDateTime dateTimeValue) {
+		this.dateTimeValue = dateTimeValue;
+	}
+}

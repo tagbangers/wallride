@@ -119,6 +119,11 @@ public class Post extends DomainObject<Long> {
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Tag> tags = new TreeSet<>();
 
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	@SortNatural
+	private List<CustomFieldValue> customFieldValues = new ArrayList<>();
+
 	@OneToMany(mappedBy = "drafted", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
 	@SortNatural
@@ -252,6 +257,14 @@ public class Post extends DomainObject<Long> {
 
 	public void setTags(SortedSet<Tag> tags) {
 		this.tags = tags;
+	}
+
+	public List<CustomFieldValue> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(List<CustomFieldValue> customFieldValues) {
+		this.customFieldValues = customFieldValues;
 	}
 
 	public Post getDrafted() {
