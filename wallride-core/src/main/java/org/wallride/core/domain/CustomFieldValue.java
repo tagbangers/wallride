@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "custom_field_value")
+@Table
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")
@@ -26,7 +26,7 @@ public class CustomFieldValue extends DomainObject<Long> {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
-	@JoinColumn(name="custom_field_id")
+	@JoinColumn(name="custom_field_id", insertable = false, updatable = false)
 	private CustomField customField;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -34,20 +34,20 @@ public class CustomFieldValue extends DomainObject<Long> {
 	@JoinColumn(name="custom_field_id")
 	private Post post;
 
-	@Column(name="string_value")
+	@Column
 	private String stringValue;
 
-	@Column(name="number_value")
+	@Column
 	private Long numberValue;
 
-	@Column(name="text_value")
+	@Column
 	@Lob
 	private String textValue;
 
-	@Column(name="date_value")
+	@Column
 	private LocalDate dateValue;
 
-	@Column(name="datetime_value")
+	@Column
 	private LocalDateTime dateTimeValue;
 
 	@Override

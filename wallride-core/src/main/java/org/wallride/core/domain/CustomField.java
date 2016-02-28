@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "custom_field")
+@Table
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")
@@ -40,10 +40,10 @@ class CustomField extends DomainObject<Long> {
 
 	@Field
 	@Enumerated(EnumType.STRING)
-	@Column(name="field_type", length = 50, nullable = false)
+	@Column(length = 50, nullable = false)
 	private FieldType fieldType;
 
-	@Column(name="default_value", length = 200)
+	@Column(length = 200)
 	private String defaultValue;
 
 	@ElementCollection(fetch=FetchType.LAZY)

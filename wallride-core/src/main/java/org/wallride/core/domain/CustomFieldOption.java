@@ -12,9 +12,6 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class CustomFieldOption implements Serializable {
 
-	@Column(name="custom_field_id", nullable=false)
-	private long customFieldId;
-
 	@Column(length = 200, nullable = false)
 	@Field
 	private String name;
@@ -22,14 +19,6 @@ public class CustomFieldOption implements Serializable {
 	@Column(length = 3, nullable = false)
 	@Field
 	private String language;
-
-	public long getCustomFieldId() {
-		return customFieldId;
-	}
-
-	public void setCustomFieldId(long customFieldId) {
-		this.customFieldId = customFieldId;
-	}
 
 	public String getName() {
 		return name;
