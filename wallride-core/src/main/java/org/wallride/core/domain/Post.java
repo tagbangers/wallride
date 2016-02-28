@@ -17,7 +17,10 @@
 package org.wallride.core.domain;
 
 import org.hibernate.annotations.*;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.CascadeType;
 import javax.persistence.*;
