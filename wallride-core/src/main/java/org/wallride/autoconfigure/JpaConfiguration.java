@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -31,7 +31,7 @@ import java.util.Map;
 
 @Configuration
 //@EnableJpaAuditing
-public class JpaConfig {
+public class JpaConfiguration {
 
 	@Autowired
 	private DataSource dataSource;

@@ -17,8 +17,8 @@
 package org.wallride.web.support;
 
 import org.thymeleaf.context.IProcessingContext;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Media;
-import org.wallride.core.support.WallRideProperties;
 
 public class Medias {
 

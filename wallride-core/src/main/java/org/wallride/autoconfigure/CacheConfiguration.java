@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import com.amazonaws.internal.EC2MetadataClient;
 import jp.co.tagbangers.jgroups.S3_CLIENT_PING;
@@ -45,7 +45,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableCaching
-public class CacheConfig {
+public class CacheConfiguration {
 
 	@Autowired
 	private DataSource dataSource;
@@ -53,7 +53,7 @@ public class CacheConfig {
 	@Autowired
 	private Environment environment;
 
-	private static Logger logger = LoggerFactory.getLogger(CacheConfig.class);
+	private static Logger logger = LoggerFactory.getLogger(CacheConfiguration.class);
 
 	@Bean
 	public CacheManager cacheManager() throws Exception {

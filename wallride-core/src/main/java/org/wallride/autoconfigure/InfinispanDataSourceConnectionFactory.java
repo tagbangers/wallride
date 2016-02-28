@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import org.infinispan.persistence.jdbc.configuration.ConnectionFactoryConfiguration;
 import org.infinispan.persistence.jdbc.connectionfactory.ConnectionFactory;

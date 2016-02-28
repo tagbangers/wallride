@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockFactory;

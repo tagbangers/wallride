@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-package org.wallride.web.controller.admin.media;
+package org.wallride.bootstrap;
 
-import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.Media;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.wallride.WallRideApplication;
+import org.wallride.WallRideInitializer;
 
-import java.io.Serializable;
+public class Bootstrap extends SpringBootServletInitializer {
 
-public class MediaCreatedModel implements Serializable {
-
-	private String id;
-
-	private String filelink;
-
-	public MediaCreatedModel(Media media, WallRideProperties wallRideProperties) {
-		this.id = media.getId();
-		this.filelink = wallRideProperties.getMediaUrlPrefix() + media.getId();
+	public static void main(String[] args) {
+		WallRideApplication.run(Bootstrap.class, args);
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public String getFilelink() {
-		return filelink;
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		return WallRideInitializer.initialize(builder);
 	}
 }

@@ -1,29 +1,14 @@
-/*
- * Copyright 2014 Tagbangers, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -32,9 +17,19 @@ import org.springframework.validation.MessageCodesResolver;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 
 @Configuration
+@Import({
+		BatchConfiguration.class,
+		CacheConfiguration.class,
+		JpaConfiguration.class,
+		MailConfiguration.class,
+		ScheduleConfiguration.class,
+		SecurityConfiguration.class,
+		ServletConfiguration.class
+})
+@EnableConfigurationProperties(WallRideProperties.class)
 @EnableAsync
-@ComponentScan(basePackages="org.wallride.core", excludeFilters={ @Filter(Configuration.class)} )
-public class CoreConfig {
+@ComponentScan(basePackages="org.wallride.core", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
+public class WallRideAutoConfiguration {
 
 	@Bean
 	public MessageSource messageSource() {
@@ -47,7 +42,7 @@ public class CoreConfig {
 		);
 		return messageSource;
 	}
-	
+
 	@Bean
 	public MessageSourceAccessor messageSourceAccessor() {
 		MessageSourceAccessor messageSourceAccessor = new MessageSourceAccessor(messageSource());

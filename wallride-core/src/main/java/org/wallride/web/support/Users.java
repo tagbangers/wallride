@@ -20,9 +20,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.User;
-import org.wallride.core.support.WallRideProperties;
 
 import java.util.HashMap;
 import java.util.Map;

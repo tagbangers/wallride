@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Configuration
-public class MailConfig {
+public class MailConfiguration {
 
 	@Inject
 	private SpringResourceResourceResolver springResourceResourceResolver;
