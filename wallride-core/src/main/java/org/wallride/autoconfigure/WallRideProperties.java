@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.core.support;
+package org.wallride.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

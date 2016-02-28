@@ -16,8 +16,8 @@
 
 package org.wallride.web.controller.admin.media;
 
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Media;
-import org.wallride.core.support.WallRideProperties;
 
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;

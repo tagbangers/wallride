@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +43,9 @@ import javax.sql.DataSource;
 @Import({
 	UpdatePostViewsJobConfig.class,
 })
-public class BatchConfig implements BatchConfigurer {
+public class BatchConfiguration implements BatchConfigurer {
 
-	private static Logger logger = LoggerFactory.getLogger(BatchConfig.class);
+	private static Logger logger = LoggerFactory.getLogger(BatchConfiguration.class);
 
 	@Inject
 	private DataSource dataSource;

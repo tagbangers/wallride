@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.tools;
 
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
@@ -23,12 +23,15 @@ import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
+import org.wallride.autoconfigure.ExtendedMySQL5InnoDBDialect;
+import org.wallride.autoconfigure.PhysicalNamingStrategySnakeCaseImpl;
 
 import javax.persistence.Entity;
 
@@ -41,7 +44,8 @@ public class Hbm2ddl {
 		final MetadataSources metadataSources = new MetadataSources(registry);
 		final StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder(registry);
 
-		registryBuilder.applySetting("hibernate.dialect", ExtendedMySQL5InnoDBDialect.class.getCanonicalName());
+		registryBuilder.applySetting(AvailableSettings.DIALECT, ExtendedMySQL5InnoDBDialect.class.getCanonicalName());
+		registryBuilder.applySetting(AvailableSettings.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategySnakeCaseImpl.class);
 
 		final PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		final Resource[] resources = resourcePatternResolver.getResources(locationPattern);

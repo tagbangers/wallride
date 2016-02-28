@@ -34,13 +34,13 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.*;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.*;
 import org.wallride.core.repository.*;
 import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.WallRideProperties;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;

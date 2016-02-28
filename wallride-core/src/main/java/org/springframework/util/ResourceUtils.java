@@ -16,10 +16,6 @@
 
 package org.springframework.util;
 
-import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
-import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
-import org.wallride.Application;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;

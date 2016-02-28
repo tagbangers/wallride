@@ -33,10 +33,10 @@ import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Media;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.support.ExtendedResourceUtils;
-import org.wallride.core.support.WallRideProperties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

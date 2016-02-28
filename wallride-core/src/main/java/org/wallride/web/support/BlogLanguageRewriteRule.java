@@ -22,7 +22,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.UrlPathHelper;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteMatch;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteRule;
-import org.wallride.Application;
+import org.wallride.autoconfigure.ServletConfiguration;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.BlogLanguage;
 import org.wallride.core.service.BlogService;
@@ -46,7 +46,7 @@ public class BlogLanguageRewriteRule extends RewriteRule {
 		UrlPathHelper urlPathHelper = new UrlPathHelper();
 
 		String servletPath = urlPathHelper.getOriginatingServletPath(request);
-		if (ObjectUtils.nullSafeEquals(servletPath, Application.ADMIN_SERVLET_PATH)) {
+		if (ObjectUtils.nullSafeEquals(servletPath, ServletConfiguration.ADMIN_SERVLET_PATH)) {
 			return null;
 		}
 

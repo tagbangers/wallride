@@ -22,10 +22,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Media;
 import org.wallride.core.repository.MediaRepository;
 import org.wallride.core.support.ExtendedResourceUtils;
-import org.wallride.core.support.WallRideProperties;
 
 import javax.inject.Inject;
 import java.io.IOException;

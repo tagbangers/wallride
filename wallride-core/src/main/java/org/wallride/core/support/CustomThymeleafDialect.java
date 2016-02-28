@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionEnhancingDialect;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.web.support.*;
 
 import javax.inject.Inject;

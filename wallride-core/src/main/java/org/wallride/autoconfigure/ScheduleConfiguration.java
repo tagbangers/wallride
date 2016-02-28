@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.config;
+package org.wallride.autoconfigure;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -29,7 +29,7 @@ import javax.inject.Inject;
 
 @Configuration
 @EnableScheduling
-public class ScheduleConfig {
+public class ScheduleConfiguration {
 
 	private static final int POPULAR_POST_MAX_RANK = 5;
 

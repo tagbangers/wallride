@@ -25,12 +25,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Blog;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.support.PageUtils;
-import org.wallride.core.support.WallRideProperties;
 
 import java.util.HashMap;
 import java.util.LinkedList;

@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.core.domain.Media;
 import org.wallride.core.service.MediaService;
-import org.wallride.core.support.WallRideProperties;
 
 import javax.inject.Inject;
 
