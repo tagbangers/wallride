@@ -19,7 +19,6 @@ package org.wallride.bootstrap;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.wallride.WallRideApplication;
-import org.wallride.WallRideInitializer;
 
 public class Bootstrap extends SpringBootServletInitializer {
 
@@ -29,6 +28,9 @@ public class Bootstrap extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return WallRideInitializer.initialize(builder);
+		builder.sources(WallRideApplication.DefaultSource.class);
+		builder.resourceLoader(WallRideApplication.createResourceLoader());
+		builder.environment(WallRideApplication.createEnvironment());
+		return builder;
 	}
 }
