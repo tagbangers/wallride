@@ -50,6 +50,7 @@ create table category (
 
 create table custom_field (
 	id bigint not null auto_increment,
+  `idx` integer not null,
 	name varchar(200),
 	description longtext,
 	fieldType varchar(50) not null,
@@ -63,14 +64,10 @@ create table custom_field (
 
 create table custom_field_option (
   custom_field_id bigint not null,
-  `index` integer not null,
+  `idx` integer not null,
 	name varchar(200) not null,
 	language varchar(3) not null,
-	created_at datetime not null,
-	created_by varchar(100),
-	updated_at datetime not null,
-	updated_by varchar(100),
-  primary key (custom_field_id , `index`)
+  primary key (custom_field_id , `idx`)
 ) ENGINE=InnoDB;
 
 create table custom_field_value (

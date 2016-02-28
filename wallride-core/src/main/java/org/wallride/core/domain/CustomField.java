@@ -20,15 +20,18 @@ import java.util.List;
 @Analyzer(definition = "synonyms")
 @Indexed
 @SuppressWarnings("serial")
-class CustomField extends DomainObject<Long> {
+public class CustomField extends DomainObject<Long> {
 
 	public enum FieldType {
-		UNDEFINED, TEXT, TEXTAREA, HTML, SELECTBOX, CHECKBOX, RADIO,
+		UNDEFINED, TEXT, TEXTAREA, HTML, SELECTBOX, CHECKBOX, RADIO, NUMBER, DATE, DATETIME,
 	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
+	@Column
+	private long idx;
 
 	@Column(length = 200)
 	@Field
@@ -48,11 +51,11 @@ class CustomField extends DomainObject<Long> {
 
 	@ElementCollection(fetch=FetchType.LAZY)
 	@JoinTable(name="custom_field_option", joinColumns=@JoinColumn(name="custom_field_id"))
-	@OrderColumn(name="`index`")
+	@OrderColumn(name="`idx`")
 	private List<CustomFieldOption> customFieldOptions = new ArrayList<>();
 
-	@OneToMany(mappedBy = "customField", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<CustomFieldValue> customFieldValues = new ArrayList<>();
+//	@OneToMany(mappedBy = "customField", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	private List<CustomFieldValue> customFieldValues = new ArrayList<>();
 
 	@Override
 	public Long getId() {
@@ -103,11 +106,11 @@ class CustomField extends DomainObject<Long> {
 		this.customFieldOptions = customFieldOptions;
 	}
 
-	public List<CustomFieldValue> getCustomFieldValues() {
-		return customFieldValues;
-	}
-
-	public void setCustomFieldValues(List<CustomFieldValue> customFieldValues) {
-		this.customFieldValues = customFieldValues;
-	}
+//	public List<CustomFieldValue> getCustomFieldValues() {
+//		return customFieldValues;
+//	}
+//
+//	public void setCustomFieldValues(List<CustomFieldValue> customFieldValues) {
+//		this.customFieldValues = customFieldValues;
+//	}
 }

@@ -381,6 +381,42 @@ ul.sortable {
 	color: #819FAA;
 	content: ' \2212 ';
 }
+/*.sortable li button.remove {
+    float: right;
+}*/
+.field-option-group ul.sortable {
+    margin: 0;
+}
+.field-option-group ul li.option {
+    border-bottom: 1px solid #d2d2d2;
+}
+.field-option-group .field-option {
+    display: inline-block;
+}
+.field-option-group .field-option > .remove {
+    padding-top: 1px;
+}
+span.grippy {
+    content: '....';
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 5px;
+    padding: 3px 4px;
+    cursor: move;
+    vertical-align: middle;
+    margin-top: -.7em;
+    margin-right: .3em;
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    color: #d1d1d1;
+    text-shadow: 1px 0 1px black;
+}
+span.grippy::after {
+    content: '.. .. .. ..';
+}
 /**** article-edit *****/
 #category-fieldset ul ul {
 	padding-left: 20px;

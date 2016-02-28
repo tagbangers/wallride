@@ -248,5 +248,11 @@
 			<artifactId>mail</artifactId>
 			<version>1.4.1</version>
 		</dependency>
-	</dependencies>
+
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>jsrender</artifactId>
+            <version>1.0.0-rc.70</version>
+        </dependency>
+    </dependencies>
 </project>
