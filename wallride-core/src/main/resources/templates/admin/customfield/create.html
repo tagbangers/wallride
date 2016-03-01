@@ -111,14 +111,6 @@
 							});
 
 							$customFieldForm.on('submit', function(event) {
-/*
-								var $form = $(event.target);
-								$('.btn-save', $form).button('loading');
-
-								$('.form-group', $form).removeClass('has-error');
-								$('.form-group', $form).find('.help-block.has-error').remove();
-*/
-
 								$('.field-option').each(function(index) {
 									var option = $(this).data('name');
 									var postName = "options[" + index + "]";
@@ -126,46 +118,6 @@
 									$customFieldForm.append(field);
 									index++;
 								});
-
-								var replace = function(elements, index) {
-									$(elements).each(function(i, element) {
-										var name = $(element).attr("data-name");
-										if (name) {
-											var result = name.match(/\[.+?\]/g);
-											name = name.replace(result[0], "[" + index + "]");
-											$(element).attr("data-name", name);
-										}
-									});
-									index++;
-								};
-								console.log($customFieldForm);
-								$.post($customFieldForm.attr('action'), $customFieldForm.serialize())
-									.done(function(data) {
-										window.location.href = $customFieldForm.data('redirect');
-									})
-									.fail(function(jqXHR) {
-										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-											var $field = $(':input[name="' + field + '"]', $customFieldForm);
-											$field.closest('.form-group').addClass('has-error');
-											$field.closest('.form-group').append($('<span class="help-block has-error" />').text(message));
-										});
-										$('.btn-save', $customFieldForm).button('reset');
-									});
-/*
-								$.post($form.attr('action'), $form.serialize())
-										.done(function(data) {
-											window.location.href = $form.data('redirect');
-										})
-										.fail(function(jqXHR) {
-											$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
-												var $field = $(':input[name="' + field + '"]', $form);
-												$field.closest('.form-group').addClass('has-error');
-												$field.closest('.form-group').append($('<span class="help-block has-error" />').text(message));
-											});
-											$('.btn-save', $form).button('reset');
-										});
-								return false;
-*/
 							});
 						});
 					</script>	
