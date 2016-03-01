@@ -14,15 +14,14 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
-import org.wallride.web.WebAdminConfig;
-import org.wallride.web.WebGuestConfig;
+import org.wallride.web.WebAdminConfiguration;
+import org.wallride.web.WebGuestConfiguration;
 import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
 @Configuration
-@ConditionalOnMissingBean(ServletConfiguration.class)
 public class ServletConfiguration implements ResourceLoaderAware {
 
 	public static final String GUEST_SERVLET_NAME = "guestServlet";
@@ -32,6 +31,10 @@ public class ServletConfiguration implements ResourceLoaderAware {
 	public static final String ADMIN_SERVLET_PATH = "/_admin";
 
 	private ResourceLoader resourceLoader;
+
+	public ResourceLoader getResourceLoader() {
+		return resourceLoader;
+	}
 
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -81,6 +84,7 @@ public class ServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean(name = "adminServletRegistrationBean")
 	public ServletRegistrationBean adminServletRegistrationBean() {
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(createAdminServletContext());
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
@@ -91,6 +95,7 @@ public class ServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean(name = "guestServletRegistrationBean")
 	public ServletRegistrationBean guestServletRegistrationBean() {
 		DispatcherServlet dispatcherServlet = new DispatcherServlet(createGuestServletContext());
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
@@ -103,15 +108,15 @@ public class ServletConfiguration implements ResourceLoaderAware {
 
 	protected WebApplicationContext createAdminServletContext() {
 		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-		context.setResourceLoader(resourceLoader);
-		context.register(WebAdminConfig.class);
+		context.setResourceLoader(getResourceLoader());
+		context.register(WebAdminConfiguration.class);
 		return context;
 	}
 
 	protected WebApplicationContext createGuestServletContext() {
 		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-		context.setResourceLoader(resourceLoader);
-		context.register(WebGuestConfig.class);
+		context.setResourceLoader(getResourceLoader());
+		context.register(WebGuestConfiguration.class);
 		return context;
 	}
 

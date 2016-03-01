@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
@@ -35,6 +36,13 @@ public class WallRideApplication extends SpringApplication {
 
 	public static ConfigurableApplicationContext run(Object[] sources, String[] args) {
 		return new WallRideApplication(sources).run(args);
+	}
+
+	public static SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		builder.sources(WallRideApplication.DefaultSource.class);
+		builder.resourceLoader(WallRideApplication.createResourceLoader());
+		builder.environment(WallRideApplication.createEnvironment());
+		return builder;
 	}
 
 	@Override
