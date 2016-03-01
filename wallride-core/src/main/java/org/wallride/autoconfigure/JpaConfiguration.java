@@ -17,6 +17,7 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +32,7 @@ import java.util.Map;
 
 @Configuration
 //@EnableJpaAuditing
-public class JpaConfiguration {
+public class JpaConfiguration extends HibernateJpaAutoConfiguration {
 
 	@Autowired
 	private DataSource dataSource;
@@ -41,7 +42,9 @@ public class JpaConfiguration {
 
 	@Bean
 	@DependsOn("cacheManager")
+	@Override
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
+		super.entityManagerFactory(factoryBuilder);
 		Map<String, Object> vendorProperties = new LinkedHashMap<>();
 		vendorProperties.putAll(this.properties.getHibernateProperties(this.dataSource));
 		return factoryBuilder.dataSource(this.dataSource)

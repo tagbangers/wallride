@@ -8,7 +8,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -17,15 +16,6 @@ import org.springframework.validation.MessageCodesResolver;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 
 @Configuration
-@Import({
-		BatchConfiguration.class,
-		CacheConfiguration.class,
-		JpaConfiguration.class,
-		MailConfiguration.class,
-		ScheduleConfiguration.class,
-		SecurityConfiguration.class,
-		ServletConfiguration.class
-})
 @EnableConfigurationProperties(WallRideProperties.class)
 @EnableAsync
 @ComponentScan(basePackages="org.wallride.core", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )

@@ -33,6 +33,7 @@ import org.jgroups.conf.ClassConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +53,9 @@ public class CacheConfiguration {
 
 	@Autowired
 	private Environment environment;
+
+	@Autowired
+	private DataSourceProperties dataSourceProperties;
 
 	private static Logger logger = LoggerFactory.getLogger(CacheConfiguration.class);
 
@@ -86,29 +90,57 @@ public class CacheConfiguration {
 		// DefaultConfiguration
 		// @formatter:off
 		for (ConfigurationBuilder luceneIndexesBuilder : holder.getNamedConfigurationBuilders().values()) {
-			luceneIndexesBuilder
-				.persistence()
-					.addStore(JdbcStringBasedStoreConfigurationBuilder.class)
-						.preload(true)
-						.shared(true)
-						.key2StringMapper(LuceneKey2StringMapper.class)
-							.table()
-							.tableNamePrefix("ispn_string_table")
-							.idColumnName("id_column")
-							.idColumnType("varchar(255)")
-							.dataColumnName("data_column")
-							.dataColumnType("longblob")
-							.timestampColumnName("timestamp_column")
-							.timestampColumnType("bigint")
-							.dropOnExit(false)
-							.createOnStart(true)
-						.async()
-							.enable()
-							.threadPoolSize(10)
-						.fetchPersistentState(true)
-						.ignoreModifications(false)
-						.purgeOnStartup(false)
-						.connectionFactory(InfinispanDataSourceConnectionFactoryConfigurationBuilder.class).dataSource(dataSource);
+			if ("mysql".equals(dataSourceProperties.getPlatform())) {
+				luceneIndexesBuilder
+					.persistence()
+						.addStore(JdbcStringBasedStoreConfigurationBuilder.class)
+							.preload(true)
+							.shared(true)
+							.key2StringMapper(LuceneKey2StringMapper.class)
+								.table()
+								.tableNamePrefix("ispn_string_table")
+								.idColumnName("id_column")
+								.idColumnType("varchar(255)")
+								.dataColumnName("data_column")
+								.dataColumnType("longblob")
+								.timestampColumnName("timestamp_column")
+								.timestampColumnType("bigint")
+								.dropOnExit(false)
+								.createOnStart(true)
+							.async()
+								.enable()
+								.threadPoolSize(10)
+							.fetchPersistentState(true)
+							.ignoreModifications(false)
+							.purgeOnStartup(false)
+							.connectionFactory(InfinispanDataSourceConnectionFactoryConfigurationBuilder.class).dataSource(dataSource);
+			} else if ("postgresql".equals(dataSourceProperties.getPlatform())) {
+				luceneIndexesBuilder
+					.persistence()
+						.addStore(JdbcStringBasedStoreConfigurationBuilder.class)
+							.preload(true)
+							.shared(true)
+							.key2StringMapper(LuceneKey2StringMapper.class)
+								.table()
+								.tableNamePrefix("ispn_string_table")
+								.idColumnName("id_column")
+								.idColumnType("varchar(255)")
+								.dataColumnName("data_column")
+								.dataColumnType("bytea")
+								.timestampColumnName("timestamp_column")
+								.timestampColumnType("bigint")
+								.dropOnExit(false)
+								.createOnStart(true)
+							.async()
+								.enable()
+								.threadPoolSize(10)
+							.fetchPersistentState(true)
+							.ignoreModifications(false)
+							.purgeOnStartup(false)
+							.connectionFactory(InfinispanDataSourceConnectionFactoryConfigurationBuilder.class).dataSource(dataSource);
+			} else {
+				throw new IllegalStateException();
+			}
 		}
 		// @formatter:on
 

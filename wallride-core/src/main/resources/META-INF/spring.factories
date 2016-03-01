@@ -1,1 +1,9 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.wallride.autoconfigure.WallRideAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.wallride.autoconfigure.WallRideAutoConfiguration,\
+org.wallride.autoconfigure.CacheConfiguration,\
+org.wallride.autoconfigure.JobConfiguration,\
+org.wallride.autoconfigure.JpaConfiguration,\
+org.wallride.autoconfigure.MailConfiguration,\
+org.wallride.autoconfigure.ScheduleConfiguration,\
+org.wallride.autoconfigure.SecurityConfiguration,\
+org.wallride.autoconfigure.ServletConfiguration
