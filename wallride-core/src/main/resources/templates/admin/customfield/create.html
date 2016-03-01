@@ -33,7 +33,7 @@
 					<label class="col-sm-2 control-label" th:text="#{FieldType}">FieldType</label>
 					<div class="col-sm-6">
 						<select class="form-control" th:field="*{type}">
-							<option th:each="fieldType : ${fieldTypes}" th:value="${fieldType}" th:text="#{|CustomField.FieldType.${fieldType}|}">指定なし</option>
+							<option th:each="fieldType : ${fieldTypes}" th:value="${fieldType}" th:text="${#messages.msg('CustomField.FieldType.' + fieldType)}">指定なし</option>
 						</select>
 						<span class="help-block" th:each="err : ${#fields.errors('type')}" text="${err}" />
 					</div>

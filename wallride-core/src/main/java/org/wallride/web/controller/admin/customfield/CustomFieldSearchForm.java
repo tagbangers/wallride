@@ -21,7 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.Post;
-import org.wallride.core.model.ArticleSearchRequest;
+import org.wallride.core.model.CustomFieldSearchRequest;
 
 import java.io.Serializable;
 
@@ -48,19 +48,10 @@ public class CustomFieldSearchForm implements Serializable {
 	public boolean isAdvanced() {
 		return false;
 	}
-
-/*
-	public ArticleSearchRequest toArticleSearchRequest() {
-		ArticleSearchRequest request = new ArticleSearchRequest();
+	
+	public CustomFieldSearchRequest toCustomFieldSearchRequest() {
+		CustomFieldSearchRequest request = new CustomFieldSearchRequest();
 		request.setKeyword(getKeyword());
-		if (getCategoryId() != null) {
-			request.withCategoryIds(getCategoryId());
-		}
-		if (getTagId() != null) {
-			request.withTagIds(getTagId());
-		}
-		request.setAuthorId(getAuthorId());
-		request.setStatus(getStatus());
 		request.setLanguage(LocaleContextHolder.getLocale().getLanguage());
 		return request;
 	}
@@ -70,19 +61,7 @@ public class CustomFieldSearchForm implements Serializable {
 		if (StringUtils.hasText(keyword)) {
 			params.add("keyword", keyword);
 		}
-		if (categoryId != null) {
-			params.add("categoryId", Long.toString(categoryId));
-		}
-		if (tagId != null) {
-			params.add("tagId", Long.toString(tagId));
-		}
-		if (authorId != null) {
-			params.add("authorId", Long.toString(authorId));
-		}
-		if (status != null) {
-			params.add("status", status.toString());
-		}
 		return params;
 	}
-*/
+
 }

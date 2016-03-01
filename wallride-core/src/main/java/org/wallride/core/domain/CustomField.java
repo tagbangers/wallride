@@ -5,9 +5,9 @@ import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.SortableField;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.ArrayList;
@@ -31,6 +31,8 @@ public class CustomField extends DomainObject<Long> {
 	private long id;
 
 	@Column
+	@Field
+	@SortableField
 	private long idx;
 
 	@Column(length = 200)
@@ -49,10 +51,14 @@ public class CustomField extends DomainObject<Long> {
 	@Column(length = 200)
 	private String defaultValue;
 
+	@Column(length = 3, nullable = false)
+	@Field
+	private String language;
+
 	@ElementCollection(fetch=FetchType.LAZY)
 	@JoinTable(name="custom_field_option", joinColumns=@JoinColumn(name="custom_field_id"))
 	@OrderColumn(name="`idx`")
-	private List<CustomFieldOption> customFieldOptions = new ArrayList<>();
+	private List<CustomFieldOption> options = new ArrayList<>();
 
 //	@OneToMany(mappedBy = "customField", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //	private List<CustomFieldValue> customFieldValues = new ArrayList<>();
@@ -64,6 +70,14 @@ public class CustomField extends DomainObject<Long> {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getIdx() {
+		return idx;
+	}
+
+	public void setIdx(long idx) {
+		this.idx = idx;
 	}
 
 	public String getName() {
@@ -98,12 +112,20 @@ public class CustomField extends DomainObject<Long> {
 		this.defaultValue = defaultValue;
 	}
 
-	public List<CustomFieldOption> getCustomFieldOptions() {
-		return customFieldOptions;
+	public String getLanguage() {
+		return language;
 	}
 
-	public void setCustomFieldOptions(List<CustomFieldOption> customFieldOptions) {
-		this.customFieldOptions = customFieldOptions;
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public List<CustomFieldOption> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<CustomFieldOption> options) {
+		this.options = options;
 	}
 
 //	public List<CustomFieldValue> getCustomFieldValues() {

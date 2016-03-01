@@ -114,7 +114,6 @@ public class CustomFieldCreateController {
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", customfield.getId());
 		redirectAttributes.addAttribute("query", query);
-		return "redirect:/_admin/{language}/customfield/describe";
-
+		return "redirect:/_admin/{language}/customfields/index";
 	}
 }

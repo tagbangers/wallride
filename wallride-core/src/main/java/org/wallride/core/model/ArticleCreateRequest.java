@@ -16,6 +16,8 @@
 
 package org.wallride.core.model;
 
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -35,6 +37,7 @@ public class ArticleCreateRequest implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+	private Set<CustomFieldValueEditForm> customFieldValues = new HashSet<>();
 	private String language;
 
 	public String getCode() {
@@ -85,6 +88,10 @@ public class ArticleCreateRequest implements Serializable {
 		return seoKeywords;
 	}
 
+	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
 	public String getLanguage() {
 		return language;
 	}
@@ -103,6 +110,7 @@ public class ArticleCreateRequest implements Serializable {
 		private String seoTitle;
 		private String seoDescription;
 		private String seoKeywords;
+		private Set<CustomFieldValueEditForm> customFieldValues = new HashSet<>();
 		private String language;
 
 		public Builder() {
@@ -168,6 +176,11 @@ public class ArticleCreateRequest implements Serializable {
 			return this;
 		}
 
+		public Builder customFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+			this.customFieldValues = customFieldValues;
+			return this;
+		}
+
 		public Builder language(String language) {
 			this.language = language;
 			return this;
@@ -187,6 +200,7 @@ public class ArticleCreateRequest implements Serializable {
 			request.seoTitle = seoTitle;
 			request.seoDescription = seoDescription;
 			request.seoKeywords = seoKeywords;
+			request.customFieldValues = customFieldValues;
 			request.language = language;
 			return request;
 		}

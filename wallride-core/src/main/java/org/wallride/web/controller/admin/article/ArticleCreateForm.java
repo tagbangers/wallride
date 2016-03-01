@@ -17,16 +17,33 @@
 package org.wallride.web.controller.admin.article;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.wallride.core.domain.CustomField;
 import org.wallride.core.model.ArticleCreateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("serial")
 public class ArticleCreateForm implements Serializable {
+
+	public ArticleCreateForm() {
+	}
+
+	public ArticleCreateForm(List<CustomField> customFields) {
+		for (CustomField field : customFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(field.getId());
+			valueForm.setName(field.getName());
+			valueForm.setDescription(field.getDescription());
+			valueForm.setFieldType(field.getFieldType());
+			valueForm.setOptions(field.getOptions());
+			customFieldValues.add(valueForm);
+		}
+	}
 
 	interface GroupPublish {}
 
@@ -53,6 +70,8 @@ public class ArticleCreateForm implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+
+	private Set<CustomFieldValueEditForm> customFieldValues = new HashSet<>();
 
 	@NotNull
 	private String language;
@@ -153,6 +172,14 @@ public class ArticleCreateForm implements Serializable {
 		this.seoKeywords = seoKeywords;
 	}
 
+	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
+	}
+
 	public String getLanguage() {
 		return language;
 	}
@@ -162,6 +189,20 @@ public class ArticleCreateForm implements Serializable {
 	}
 
 	public ArticleCreateRequest buildArticleCreateRequest() {
+//		Set<CustomFieldValue> customFieldValues_ = null;
+//		if (!CollectionUtils.isEmpty(customFieldValues)) {
+//			customFieldValues_ = new HashSet<>();
+//			for (CustomFieldValueForm valueForm : customFieldValues) {
+//				CustomFieldValue value = new CustomFieldValue();
+//				value.setCustomFieldId(valueForm.getCustomFieldId());
+//				value.setStringValue(valueForm.getStringValue());
+//				value.setNumberValue(valueForm.getNumberValue());
+//				value.setDatetimeValue(valueForm.getDatetimeValue());
+//				value.setDateValue(valueForm.getDateValue());
+//				customFieldValues_.add(value);
+//			}
+//		}
+
 		ArticleCreateRequest.Builder builder = new ArticleCreateRequest.Builder();
 		return builder
 				.code(code)
@@ -176,6 +217,7 @@ public class ArticleCreateForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
+				.customFieldValues(customFieldValues)
 				.language(language)
 				.build();
 	}

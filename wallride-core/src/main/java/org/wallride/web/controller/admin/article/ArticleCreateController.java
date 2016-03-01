@@ -30,11 +30,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Category;
+import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.Post;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.TreeNode;
 import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.CustomFieldService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
@@ -57,11 +59,16 @@ public class ArticleCreateController {
 	private CategoryUtils categoryUtils;
 
 	@Inject
+	private CustomFieldService customFieldService;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
 	public ArticleCreateForm articleCreateForm() {
-		return new ArticleCreateForm();
+		List<CustomField> customFields = customFieldService.getAllCustomFields();
+		ArticleCreateForm form = new ArticleCreateForm(customFields);
+		return  form;
 	}
 
 	@ModelAttribute("categoryNodes")

@@ -48,7 +48,7 @@ public class CustomFieldValue extends DomainObject<Long> {
 	private LocalDate dateValue;
 
 	@Column
-	private LocalDateTime dateTimeValue;
+	private LocalDateTime datetimeValue;
 
 	@Override
 	public Long getId() {
@@ -107,11 +107,11 @@ public class CustomFieldValue extends DomainObject<Long> {
 		this.dateValue = dateValue;
 	}
 
-	public LocalDateTime getDateTimeValue() {
-		return dateTimeValue;
+	public LocalDateTime getDatetimeValue() {
+		return datetimeValue;
 	}
 
-	public void setDateTimeValue(LocalDateTime dateTimeValue) {
-		this.dateTimeValue = dateTimeValue;
+	public void setDatetimeValue(LocalDateTime datetimeValue) {
+		this.datetimeValue = datetimeValue;
 	}
 }

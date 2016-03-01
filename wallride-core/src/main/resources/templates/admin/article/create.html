@@ -444,6 +444,40 @@
 										<span th:if="${#fields.hasErrors('seoKeywords')}" class="help-block" th:text="${#fields.errors('seoKeywords')}" />
 									</div>
 								</fieldset>
+								<fieldset th:each="field : *{customFieldValues}">
+									<legend th:text="${field.name}"></legend>
+									<div class="form-group" th:switch="${#strings.toString(field.fieldType)}">
+										<div th:case="'TEXT'" class="form-group row">
+											<!--<div class="col-sm-12">
+												<input type="text" th:field="*{|customFieldValues[${index}].stringValue|}" style="width: 100%" placeholder=""/>
+											</div>
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[index].stringValue')}" th:text="${err}" />
+											<input type="hidden" th:field="*{|customFieldValues[${index}].customFieldId|}" th:value="${field.customFieldId}" />
+											<input type="hidden" th:field="*{|customFieldValues[${index}].name|}" th:value="${field.name}" />
+											<input type="hidden" th:field="*{|customFieldValues[${index}].fieldType|}" th:value="${field.fieldType}" />-->
+										</div>
+										<div th:case="'TEXTAREA'" class="form-group row" classappend="${#fields.hasErrors('stringValue')}? has-error">
+											<div class="col-sm-12">
+												<textarea type="text" field="*{description}" class="form-control" style="min-height: 150px"></textarea>
+											</div>
+											<span class="help-block" each="err : ${#fields.errors('stringValue')}"  th:text="${err}" />
+										</div>
+										<div th:case="'SELECTBOX'" class="form-group row" classappend="${#fields.hasErrors('stringValue')}? has-error">
+											<div class="col-sm-12">
+												<select type="text" field="" class="form-control">
+													<option th:each="option : ${field.options}" th:value="${option}" th:text="${option}">wrtwetwet</option>
+												</select>
+											</div>
+											<span class="help-block" each="err : ${#fields.errors('stringValue')}"  th:text="${err}" />
+										</div>
+										<div th:case="'CHECKBOX'" class="form-group row" classappend="${#fields.hasErrors('stringValue')}? has-error">
+											<div class="col-sm-12">
+												<input type="checkbox" th:each="option : ${field.options}" th:value="${option}" th:text="${option}" field="*{description}" class="form-control" />
+											</div>
+											<span class="help-block" each="err : ${#fields.errors('stringValue')}"  th:text="${err}" />
+										</div>
+									</div>
+								</fieldset>
 							</div>
 						</div>
 					</div>

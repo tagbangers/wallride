@@ -1,16 +1,21 @@
 package org.wallride.core.service;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.CustomFieldOption;
 import org.wallride.core.model.CustomFieldCreateRequest;
+import org.wallride.core.model.CustomFieldSearchRequest;
 import org.wallride.core.repository.CustomFieldRepository;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -19,19 +24,21 @@ public class CustomFieldService {
 	@Inject
 	private CustomFieldRepository customFieldRepository;
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = new CustomField();
+		customField.setIdx(customFieldRepository.count(request.getLanguage()) + 1);
 		customField.setName(request.getName());
 		customField.setDescription(request.getDescription());
 		customField.setFieldType(request.getType());
-		customField.getCustomFieldOptions().clear();
+		customField.setLanguage(request.getLanguage());
+		customField.getOptions().clear();
 		if (!CollectionUtils.isEmpty(request.getOptions())) {
 			request.getOptions().stream().forEach(optionName -> {
 				CustomFieldOption option = new CustomFieldOption();
 				option.setName(optionName);
 				option.setLanguage(request.getLanguage());
-				customField.getCustomFieldOptions().add(option);
+				customField.getOptions().add(option);
 			});
 		}
 		return customFieldRepository.save(customField);
@@ -121,6 +128,7 @@ public class CustomFieldService {
 		return customFieldRepository.findOneByCodeAndLanguage(code, language);
 	}
 
+*/
 	public Page<CustomField> getCustomFields(CustomFieldSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
 		return getCustomFields(request, pageable);
@@ -129,5 +137,8 @@ public class CustomFieldService {
 	public Page<CustomField> getCustomFields(CustomFieldSearchRequest request, Pageable pageable) {
 		return customFieldRepository.search(request, pageable);
 	}
-*/
+
+	public List<CustomField> getAllCustomFields() {
+		return customFieldRepository.findAll();
+	}
 }

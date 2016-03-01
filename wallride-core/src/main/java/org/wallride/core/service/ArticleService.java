@@ -189,6 +189,9 @@ public class ArticleService {
 		}
 		article.setMedias(medias);
 
+		article.getCustomFieldValues().clear();
+
+
 		article.setCreatedAt(now);
 		article.setCreatedBy(authorizedUser.toString());
 		article.setUpdatedAt(now);

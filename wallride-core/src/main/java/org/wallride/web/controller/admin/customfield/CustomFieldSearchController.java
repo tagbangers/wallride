@@ -70,8 +70,7 @@ public class CustomFieldSearchController {
             @PageableDefault(50) Pageable pageable,
             Model model,
             HttpServletRequest servletRequest) throws UnsupportedEncodingException {
-/*
-        Page<CustomField> customFields = customfieldService.getCustomfields(form.toCustomfieldSearchRequest(), pageable);
+        Page<CustomField> customFields = customfieldService.getCustomFields(form.toCustomFieldSearchRequest(), pageable);
 
         model.addAttribute("customFields", customFields);
         model.addAttribute("pageable", pageable);
@@ -84,7 +83,6 @@ public class CustomFieldSearchController {
         if (!StringUtils.isEmpty(uriComponents.getQuery())) {
             model.addAttribute("query", URLDecoder.decode(uriComponents.getQuery(), "UTF-8"));
         }
-*/
 
         return "customfield/index";
     }
