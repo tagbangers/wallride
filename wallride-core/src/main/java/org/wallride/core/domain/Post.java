@@ -125,7 +125,7 @@ public class Post extends DomainObject<Long> {
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
 	@SortNatural
-	private List<CustomFieldValue> customFieldValues = new ArrayList<>();
+	private SortedSet<CustomFieldValue> customFieldValues = new TreeSet<>();
 
 	@OneToMany(mappedBy = "drafted", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
@@ -262,11 +262,11 @@ public class Post extends DomainObject<Long> {
 		this.tags = tags;
 	}
 
-	public List<CustomFieldValue> getCustomFieldValues() {
+	public SortedSet<CustomFieldValue> getCustomFieldValues() {
 		return customFieldValues;
 	}
 
-	public void setCustomFieldValues(List<CustomFieldValue> customFieldValues) {
+	public void setCustomFieldValues(SortedSet<CustomFieldValue> customFieldValues) {
 		this.customFieldValues = customFieldValues;
 	}
 

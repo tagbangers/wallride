@@ -1,26 +1,38 @@
 package org.wallride.core.domain;
 
 
-import org.hibernate.annotations.*;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedEntityGraphs({
+		@NamedEntityGraph(name = CustomField.SHALLOW_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("options")}
+		),
+		@NamedEntityGraph(name = CustomField.DEEP_GRAPH_NAME,
+				attributeNodes = {
+						@NamedAttributeNode("options")})
+})
 @Table
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")
 @Indexed
 @SuppressWarnings("serial")
-public class CustomField extends DomainObject<Long> {
+public class CustomField extends DomainObject<Long> implements Comparable<CustomField> {
+
+	public static final String SHALLOW_GRAPH_NAME = "CUSTOM_FIELD_SHALLOW_GRAPH";
+	public static final String DEEP_GRAPH_NAME = "CUSTOM_FIELD_DEEP_GRAPH";
 
 	public enum FieldType {
 		UNDEFINED, TEXT, TEXTAREA, HTML, SELECTBOX, CHECKBOX, RADIO, NUMBER, DATE, DATETIME,
@@ -30,10 +42,10 @@ public class CustomField extends DomainObject<Long> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column
+	@Column(unique = true)
 	@Field
 	@SortableField
-	private long idx;
+	private int idx;
 
 	@Column(length = 200)
 	@Field
@@ -72,11 +84,11 @@ public class CustomField extends DomainObject<Long> {
 		this.id = id;
 	}
 
-	public long getIdx() {
+	public int getIdx() {
 		return idx;
 	}
 
-	public void setIdx(long idx) {
+	public void setIdx(int idx) {
 		this.idx = idx;
 	}
 
@@ -135,4 +147,31 @@ public class CustomField extends DomainObject<Long> {
 //	public void setCustomFieldValues(List<CustomFieldValue> customFieldValues) {
 //		this.customFieldValues = customFieldValues;
 //	}
+
+	@Override
+	public int compareTo(CustomField field) {
+		if (getId() == 0) {
+			return 1;
+		}
+		return getIdx() - field.getIdx();
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + " " + getId();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) return true;
+		if (other == null || !(other instanceof CustomField)) return false;
+		if (getId() == 0) return false;
+		CustomField that = (CustomField) other;
+		return getId() == that.getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getId()).toHashCode();
+	}
 }

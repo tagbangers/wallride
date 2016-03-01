@@ -19,10 +19,7 @@ package org.wallride.web.controller.admin.article;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.Post;
-import org.wallride.core.domain.Tag;
+import org.wallride.core.domain.*;
 import org.wallride.core.model.ArticleUpdateRequest;
 
 import javax.validation.constraints.NotNull;
@@ -63,6 +60,8 @@ public class ArticleEditForm implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+
+	private List<CustomFieldValueEditForm> customFields = new ArrayList<>();
 
 	@NotNull
 	private String language;
@@ -179,6 +178,14 @@ public class ArticleEditForm implements Serializable {
 		this.language = language;
 	}
 
+	public List<CustomFieldValueEditForm> getCustomFields() {
+		return customFields;
+	}
+
+	public void setCustomFields(List<CustomFieldValueEditForm> customFields) {
+		this.customFields = customFields;
+	}
+
 	public ArticleUpdateRequest buildArticleUpdateRequest() {
 		ArticleUpdateRequest.Builder builder = new ArticleUpdateRequest.Builder();
 		return builder
@@ -195,6 +202,7 @@ public class ArticleEditForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
+
 				.language(language)
 				.build();
 	}
@@ -227,6 +235,13 @@ public class ArticleEditForm implements Serializable {
 			form.setSeoTitle(article.getSeo().getTitle());
 			form.setSeoDescription(article.getSeo().getDescription());
 			form.setSeoKeywords(article.getSeo().getKeywords());
+		}
+
+		if (article.getCustomFieldValues() != null) {
+			for (CustomFieldValue fieldValue : article.getCustomFieldValues()) {
+				CustomFieldValueEditForm fieldForm = CustomFieldValueEditForm.fromDomainObject(fieldValue);
+				form.getCustomFields().add(fieldForm);
+			}
 		}
 		return form;
 	}

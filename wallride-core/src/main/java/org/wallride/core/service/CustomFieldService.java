@@ -1,6 +1,5 @@
 package org.wallride.core.service;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +15,8 @@ import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -24,10 +25,10 @@ public class CustomFieldService {
 	@Inject
 	private CustomFieldRepository customFieldRepository;
 
-	@CacheEvict(value="customFields", allEntries=true)
+	//@CacheEvict(value="customFields", allEntries=true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = new CustomField();
-		customField.setIdx(customFieldRepository.count(request.getLanguage()) + 1);
+		customField.setIdx(customFieldRepository.countForUpdate(request.getLanguage()) + 1);
 		customField.setName(request.getName());
 		customField.setDescription(request.getDescription());
 		customField.setFieldType(request.getType());
@@ -119,16 +120,14 @@ public class CustomFieldService {
 		return customField;
 	}*/
 
-/*
 	public CustomField getCustomFieldById(long id, String language) {
-		return customFieldRepository.findOneByIdAndLanguage(id, language);
+		return customFieldRepository.findOneForUpdateByIdAndLanguage(id, language);
 	}
 
-	public CustomField getCustomFieldByCode(String code, String language) {
-		return customFieldRepository.findOneByCodeAndLanguage(code, language);
+	public CustomField getCustomFieldByName(String name, String language) {
+		return customFieldRepository.findOneByNameAndLanguage(name, language);
 	}
 
-*/
 	public Page<CustomField> getCustomFields(CustomFieldSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
 		return getCustomFields(request, pageable);
@@ -138,7 +137,7 @@ public class CustomFieldService {
 		return customFieldRepository.search(request, pageable);
 	}
 
-	public List<CustomField> getAllCustomFields() {
-		return customFieldRepository.findAll();
+	public SortedSet<CustomField> getAllCustomFields() {
+		return new TreeSet<>(customFieldRepository.findAll());
 	}
 }

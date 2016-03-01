@@ -66,11 +66,6 @@ public class CustomFieldCreateController {
 		return new CustomFieldCreateForm();
 	}
 
-	@ModelAttribute("query")
-	public String query(@RequestParam(required = false) String query) {
-		return query;
-	}
-
 	@ExceptionHandler(BindException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public @ResponseBody RestValidationErrorModel bindException(BindException e) {
@@ -101,10 +96,10 @@ public class CustomFieldCreateController {
 			customfield = customfieldService.createCustomField(form.buildCustomFieldCreateRequest(), authorizedUser);
 		}
 		catch (EmptyCodeException e) {
-			errors.rejectValue("code", "NotNull");
+			errors.rejectValue("name", "NotNull");
 		}
 		catch (DuplicateCodeException e) {
-			errors.rejectValue("code", "NotDuplicate");
+			errors.rejectValue("name", "NotDuplicate");
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
@@ -113,7 +108,6 @@ public class CustomFieldCreateController {
 		redirectAttributes.addFlashAttribute("savedCustomField", customfield);
 		redirectAttributes.addAttribute("language", language);
 		redirectAttributes.addAttribute("id", customfield.getId());
-		redirectAttributes.addAttribute("query", query);
 		return "redirect:/_admin/{language}/customfields/index";
 	}
 }

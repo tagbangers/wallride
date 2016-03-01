@@ -1,6 +1,7 @@
 package org.wallride.core.domain;
 
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.annotations.Analyzer;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @Analyzer(definition = "synonyms")
 @Indexed
 @SuppressWarnings("serial")
-public class CustomFieldValue extends DomainObject<Long> {
+public class CustomFieldValue extends DomainObject<Long> implements Comparable<CustomFieldValue> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -113,5 +114,36 @@ public class CustomFieldValue extends DomainObject<Long> {
 
 	public void setDatetimeValue(LocalDateTime datetimeValue) {
 		this.datetimeValue = datetimeValue;
+	}
+
+	@Override
+	public int compareTo(CustomFieldValue customFieldValue) {
+		if (getId() == 0) {
+			return 1;
+		}
+		int fieldDiff = getCustomField().compareTo(customFieldValue.getCustomField());
+		if (fieldDiff != 0) {
+			return fieldDiff;
+		}
+		return Long.compare(getId(), customFieldValue.getId());
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + " " + getId();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) return true;
+		if (other == null || !(other instanceof CustomFieldValue)) return false;
+		if (getId() == 0) return false;
+		CustomFieldValue that = (CustomFieldValue) other;
+		return getId() == that.getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(getId()).toHashCode();
 	}
 }

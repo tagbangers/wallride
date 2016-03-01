@@ -24,8 +24,9 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 @SuppressWarnings("serial")
 public class ArticleCreateForm implements Serializable {
@@ -33,7 +34,7 @@ public class ArticleCreateForm implements Serializable {
 	public ArticleCreateForm() {
 	}
 
-	public ArticleCreateForm(List<CustomField> customFields) {
+	public ArticleCreateForm(SortedSet<CustomField> customFields) {
 		for (CustomField field : customFields) {
 			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
 			valueForm.setCustomFieldId(field.getId());
@@ -71,7 +72,7 @@ public class ArticleCreateForm implements Serializable {
 	private String seoDescription;
 	private String seoKeywords;
 
-	private Set<CustomFieldValueEditForm> customFieldValues = new HashSet<>();
+	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 
 	@NotNull
 	private String language;

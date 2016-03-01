@@ -45,6 +45,7 @@ import org.wallride.web.support.RestValidationErrorModel;
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/{language}/articles/create")
@@ -66,7 +67,7 @@ public class ArticleCreateController {
 
 	@ModelAttribute("form")
 	public ArticleCreateForm articleCreateForm() {
-		List<CustomField> customFields = customFieldService.getAllCustomFields();
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
 		ArticleCreateForm form = new ArticleCreateForm(customFields);
 		return  form;
 	}

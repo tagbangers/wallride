@@ -44,6 +44,7 @@ import org.wallride.core.exception.NotNullException;
 import org.wallride.core.model.*;
 import org.wallride.core.repository.*;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -189,15 +190,27 @@ public class ArticleService {
 		}
 		article.setMedias(medias);
 
-		article.getCustomFieldValues().clear();
-
-
 		article.setCreatedAt(now);
 		article.setCreatedBy(authorizedUser.toString());
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
 
-		return articleRepository.save(article);
+		article.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =  new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(article);
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				article.getCustomFieldValues().add(value);
+			}
+		}
+		article = entityManager.merge(article);
+		logger.info("Article CODE [{}] created by {}", article.getCode(), authorizedUser);
+		return article;
 	}
 
 	@CacheEvict(value = "articles", allEntries = true)
