@@ -61,7 +61,7 @@ public class PhysicalNamingStrategySnakeCaseImpl implements PhysicalNamingStrate
 
 		String regex = "([a-z])([A-Z])";
 		String replacement = "$1_$2";
-		String newName = identifier.getText().replaceAll(regex, replacement).toLowerCase();
+		String newName = identifier.render().replaceAll(regex, replacement).toLowerCase();
 		return Identifier.toIdentifier(newName);
 	}
 }

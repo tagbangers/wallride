@@ -45,6 +45,7 @@ public class Hbm2ddl {
 		final StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder(registry);
 
 		registryBuilder.applySetting(AvailableSettings.DIALECT, ExtendedMySQL5InnoDBDialect.class.getCanonicalName());
+		registryBuilder.applySetting(AvailableSettings.GLOBALLY_QUOTED_IDENTIFIERS, true);
 		registryBuilder.applySetting(AvailableSettings.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategySnakeCaseImpl.class);
 
 		final PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
