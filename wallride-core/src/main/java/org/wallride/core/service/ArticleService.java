@@ -208,7 +208,7 @@ public class ArticleService {
 				article.getCustomFieldValues().add(value);
 			}
 		}
-		article = entityManager.merge(article);
+		article = articleRepository.save(article);
 		logger.info("Article CODE [{}] created by {}", article.getCode(), authorizedUser);
 		return article;
 	}
