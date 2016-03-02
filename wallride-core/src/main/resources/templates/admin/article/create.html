@@ -458,9 +458,63 @@
 										</div>
 										<div th:case="'TEXTAREA'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].textValue')}? has-error">
 											<div class="col-sm-12">
-												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" style="min-height: 150px"></textarea>
+												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" style="min-height: 100px"></textarea>
 											</div>
 											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].textValue')}"  th:text="${err}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
+										</div>
+										<div th:case="'HTML'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].textValue')}? has-error">
+											<div class="col-sm-12">
+												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" style="min-height: 150px"></textarea>
+											</div>
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].textValue')}" th:text="${err}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
+											<script th:inline="javascript">
+												$(function() {
+													var selector = /*[[':input[name="' + 'customFieldValues[__${stat.index}__].textValue' + '"]']]*/ '#';
+													$(selector).redactor({
+														buttonSource: true,
+														minHeight: 150,
+														replaceDivs: false,
+														convertImageLinks: true,
+														convertVideoLinks: true,
+														imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+														imageManagerJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
+														toolbarFixed: true,
+														toolbarFixedBox: true,
+														removeEmptyTags: false,
+														plugins: ['table', 'video', 'fontsize', 'fontcolor', 'fullscreen', 'counter', 'imagemanager']
+													});
+												});
+											</script>
+										</div>
+										<div th:case="'NUMBER'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].numberValue')}? has-error">
+											<div class="col-sm-12">
+												<input type="text" class="form-control" th:field="*{customFieldValues[__${stat.index}__].numberValue}" style="width: 100%" placeholder=""/>
+											</div>
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].numberValue')}" th:text="${err}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
+										</div>
+										<div th:case="'DATE'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].dateValue')}? has-error">
+											<div class="col-sm-12">
+												<input type="text" class="form-control" th:field="*{customFieldValues[__${stat.index}__].dateValue}" style="width: 100%" placeholder=""/>
+											</div>
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].dateValue')}" th:text="${err}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
+										</div>
+										<div th:case="'DATETIME'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].datetimeValue')}? has-error">
+											<div class="col-sm-12">
+												<input type="text" class="form-control" th:field="*{customFieldValues[__${stat.index}__].datetimeValue}" style="width: 100%" placeholder=""/>
+											</div>
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].datetimeValue')}" th:text="${err}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
@@ -480,6 +534,15 @@
 										<div th:case="'CHECKBOX'" class="form-group row checkbox" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].stringValue')}? has-error">
 											<div class="col-sm-12">
 												<label th:each="option : ${field.options}"><input type="checkbox" th:field="*{customFieldValues[__${stat.index}__].stringValue}" th:value="${option}" th:text="${option}" /></label>
+											</div>
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].stringValue')}"  th:text="${err}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
+											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
+										</div>
+										<div th:case="'RADIO'" class="form-group row checkbox" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].stringValue')}? has-error">
+											<div class="col-sm-12">
+												<label th:each="option : ${field.options}"><input type="radio" th:field="*{customFieldValues[__${stat.index}__].stringValue}" th:value="${option}" th:text="${option}" /></label>
 											</div>
 											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].stringValue')}"  th:text="${err}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />

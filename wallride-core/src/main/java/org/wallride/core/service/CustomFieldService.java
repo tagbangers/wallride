@@ -1,21 +1,33 @@
 package org.wallride.core.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.CustomFieldOption;
-import org.wallride.core.model.CustomFieldCreateRequest;
-import org.wallride.core.model.CustomFieldSearchRequest;
-import org.wallride.core.model.CustomFieldUpdateRequest;
+import org.wallride.core.domain.Tag;
+import org.wallride.core.exception.ServiceException;
+import org.wallride.core.model.*;
 import org.wallride.core.repository.CustomFieldRepository;
 import org.wallride.core.support.AuthorizedUser;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -24,8 +36,14 @@ import java.util.TreeSet;
 @Transactional(rollbackFor=Exception.class)
 public class CustomFieldService {
 
-	@Inject
+	private static Logger logger = LoggerFactory.getLogger(CustomFieldService.class);
+
+	@Resource
 	private CustomFieldRepository customFieldRepository;
+	@Inject
+	private MessageCodesResolver messageCodesResolver;
+	@Inject
+	private PlatformTransactionManager transactionManager;
 
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
@@ -50,6 +68,9 @@ public class CustomFieldService {
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField updateCustomField(CustomFieldUpdateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = customFieldRepository.findOneForUpdateById(request.getId());
+		if (customField == null) {
+			throw new ServiceException();
+		}
 		customField.setName(request.getName());
 		customField.setDescription(request.getDescription());
 		customField.setFieldType(request.getType());
@@ -122,26 +143,45 @@ public class CustomFieldService {
 			}
 		}
 	}
-
-	@CacheEvict(value="articles", allEntries=true)
-	public CustomField deleteCustomField(long id, String language) {
-		CustomField customField = customFieldRepository.findOneForUpdateByIdAndLanguage(id, language);
-		CustomField parent = customField.getParent();
-		for (CustomField child : customField.getChildren()) {
-			child.setParent(parent);
-			customFieldRepository.saveAndFlush(child);
-		}
-		customField.getChildren().clear();
-		customFieldRepository.saveAndFlush(customField);
+*/
+	@CacheEvict(value="customFields", allEntries=true)
+	public CustomField deleteCustomField(CustomFieldDeleteRequest request, BindingResult result) {
+		CustomField customField = customFieldRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		customFieldRepository.delete(customField);
-
-		customFieldRepository.shiftLftRgt(customField.getLft(), customField.getRgt());
-		customFieldRepository.shiftRgt(customField.getRgt());
-		customFieldRepository.shiftLft(customField.getRgt());
-
 		return customField;
-	}*/
+	}
 
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	@CacheEvict(value = "customFields", allEntries = true)
+	public List<CustomField> bulkDeleteCustomField(CustomFieldBulkDeleteRequest bulkDeleteRequest, final BindingResult result) {
+		List<CustomField> customFields = new ArrayList<>();
+		for (long id : bulkDeleteRequest.getIds()) {
+			final CustomFieldDeleteRequest deleteRequest = new CustomFieldDeleteRequest.Builder()
+					.id(id)
+					.language(bulkDeleteRequest.getLanguage())
+					.build();
+
+			final BeanPropertyBindingResult r = new BeanPropertyBindingResult(deleteRequest, "request");
+			r.setMessageCodesResolver(messageCodesResolver);
+
+			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+			transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+			CustomField customField = null;
+			try {
+				customField = transactionTemplate.execute(new TransactionCallback<CustomField>() {
+					public CustomField doInTransaction(TransactionStatus status) {
+						return deleteCustomField(deleteRequest, result);
+					}
+				});
+				customFields.add(customField);
+			} catch (Exception e) {
+				logger.debug("Errors: {}", r);
+				result.addAllErrors(r);
+			}
+		}
+		return customFields;
+	}
+	
 	public CustomField getCustomFieldById(long id, String language) {
 		return customFieldRepository.findOneByIdAndLanguage(id, language);
 	}

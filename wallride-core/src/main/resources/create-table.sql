@@ -266,6 +266,12 @@ alter table blog_language
 alter table category
 	add constraint UK_86l62kycx6uuh2dbgymn8i065  unique (code, language);
 
+alter table custom_field
+	add constraint UKtacuvalxxjhoddac1g1iitepa unique (name, language);
+
+alter table custom_field
+	add constraint UK_l6uj9qracv5sa03gb9g6amy19 unique (idx);
+
 alter table popular_post
 	add constraint UK_a5tm7yxs8io57gsrtb5tbrlcm  unique (language, type, rank);
 

@@ -1,6 +1,7 @@
 package org.wallride.core.domain;
 
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -23,7 +24,7 @@ import java.util.List;
 				attributeNodes = {
 						@NamedAttributeNode("options")})
 })
-@Table
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "language"}))
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")
@@ -139,24 +140,15 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 
 	@Override
 	public int compareTo(CustomField field) {
-		if (getId() == 0) {
-			return 1;
-		}
-		return getIdx() - field.getIdx();
+		return new CompareToBuilder()
+				.append(getIdx(), field.getIdx())
+				.append(getId(), field.getId())
+				.toComparison();
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getName() + " " + getId();
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (this == other) return true;
-		if (other == null || !(other instanceof CustomField)) return false;
-		if (getId() == 0) return false;
-		CustomField that = (CustomField) other;
-		return getId() == that.getId();
+		return getName();
 	}
 
 	@Override

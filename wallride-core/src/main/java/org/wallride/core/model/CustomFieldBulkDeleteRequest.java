@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package org.wallride.web.controller.admin.customfield;
+package org.wallride.core.model;
 
-import org.wallride.core.model.CustomFieldBulkDeleteRequest;
-
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.List;
 
-public class CustomFieldBulkDeleteForm {
+public class CustomFieldBulkDeleteRequest implements Serializable {
 
 	private List<Long> ids;
-
-	private boolean confirmed;
-
-	@NotNull
 	private String language;
 
 	public List<Long> getIds() {
@@ -38,14 +32,6 @@ public class CustomFieldBulkDeleteForm {
 		this.ids = ids;
 	}
 
-	public boolean isConfirmed() {
-		return confirmed;
-	}
-
-	public void setConfirmed(boolean confirmed) {
-		this.confirmed = confirmed;
-	}
-
 	public String getLanguage() {
 		return language;
 	}
@@ -54,11 +40,29 @@ public class CustomFieldBulkDeleteForm {
 		this.language = language;
 	}
 
-	public CustomFieldBulkDeleteRequest buildCustomFieldBulkDeleteRequest() {
-		CustomFieldBulkDeleteRequest.Builder builder = new CustomFieldBulkDeleteRequest.Builder();
-		return builder
-				.ids(ids)
-				.language(language)
-				.build();
+	public static class Builder  {
+
+		private List<Long> ids;
+		private String language;
+
+		public Builder() {
+		}
+
+		public Builder ids(List<Long> ids) {
+			this.ids = ids;
+			return this;
+		}
+
+		public Builder language(String language) {
+			this.language = language;
+			return this;
+		}
+
+		public CustomFieldBulkDeleteRequest build() {
+			CustomFieldBulkDeleteRequest request = new CustomFieldBulkDeleteRequest();
+			request.ids = ids;
+			request.language = language;
+			return request;
+		}
 	}
 }

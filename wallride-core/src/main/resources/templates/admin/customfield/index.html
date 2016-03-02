@@ -75,7 +75,7 @@
 							</tr>
 							</thead>
 							<tbody>
-							<tr th:each="customfield : ${customFields}" th:attr="data-href=@{__${ADMIN_PATH}__/customfields/describe(id=${customfield.id},query=${query})}" >
+							<tr th:each="customfield : ${customFields}">
 								<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${customfield.id}" /></td>
 								<td th:text="${customfield.name?:'(No Titled)'}" style="font-weight: bold;">Title</td>
 								<td th:text="${customfield.description ne null ? customfield.description : ''}">2013/10/24</td>
@@ -142,20 +142,27 @@
 								</div>
 								<div class="modal-footer">
 									<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
-									<button class="btn btn-primary" th:attr="data-action=@{__${ADMIN_PATH}__/customfields/bulk-delete(query=${query})}" disabled="true" th:text="#{Delete}">Delete</button>
+									<button class="btn btn-primary" id="delete-custom-field" th:attr="data-action=@{__${ADMIN_PATH}__/customfields/bulk-delete(query=${query})}" disabled="true" th:text="#{Delete}">Delete</button>
 								</div>
 							</div>
 						</div>
 					</div>
 					<!--/#bulk-delete-modal -->
+					<!--/#bulk-delete-modal -->
 					<script th:inline="javascript">
 						// <![CDATA[
-						$(function () {
-							$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function () {
+						$(function() {
+							$('#bulk-delete-modal').on('change', ':input[name="confirmed"]', function() {
 								var confirmed = $(this);
 								$('#bulk-delete-modal .btn-primary').prop('disabled', !confirmed.is(':checked'));
 							});
-							$('#bulk-delete-modal').on('hidden.bs.modal', function () {
+							$('#bulk-delete-modal').on('click', '#delete-custom-field', function(e) {
+								e.preventDefault();
+								var $form = $(this).closest('form');
+								$form.attr('action', $(this).data('action'));
+								$form.submit();
+							});
+							$('#bulk-delete-modal').on('hidden.bs.modal', function() {
 								$(this).removeData('bs.modal');
 							});
 						});

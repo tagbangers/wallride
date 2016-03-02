@@ -91,7 +91,7 @@
 									var $content = $(tmpl.render());
 									$('.field-option', $content).attr('data-name', customInputOption).text(customInputOption);
 									$('.sortable').append($content);
-									$customInput.val('').closest('.form-group').removeClass('has-error');
+									$customInput.val('').focus().closest('.form-group').removeClass('has-error');
 								} else {
 									$customInput.closest('.form-group').addClass('has-error');
 									return false;
@@ -115,13 +115,12 @@
 								return false;
 							});
 
-							$customFieldForm.on('submit', function(event) {
+							$customFieldForm.on('submit', function() {
 								$('.field-option').each(function(index) {
 									var option = $(this).data('name');
 									var postName = "options[" + index + "]";
 									var field = $('<input type="hidden" />').attr("name", postName).val(option);
 									$customFieldForm.append(field);
-									index++;
 								});
 							});
 						});

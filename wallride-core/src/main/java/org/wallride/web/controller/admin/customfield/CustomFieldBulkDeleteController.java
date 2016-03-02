@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Tag;
-import org.wallride.core.service.TagService;
+import org.wallride.core.domain.CustomField;
+import org.wallride.core.service.CustomFieldService;
 import org.wallride.core.support.AuthorizedUser;
 
 import javax.inject.Inject;
@@ -43,7 +43,7 @@ import java.util.List;
 public class CustomFieldBulkDeleteController {
 
 	@Inject
-	private TagService tagService;
+	private CustomFieldService customFieldService;
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 	
@@ -68,17 +68,17 @@ public class CustomFieldBulkDeleteController {
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
-			return "redirect:/_admin/{language}/tags/index";
+			return "redirect:/_admin/{language}/customfields/index";
 		}
 		
-		Collection<Tag> tags = null;
+		Collection<CustomField> customFields = null;
 		try {
-			tags = tagService.bulkDeleteTag(form.buildTagBulkDeleteRequest(), errors);
+			customFields = customFieldService.bulkDeleteCustomField(form.buildCustomFieldBulkDeleteRequest(), errors);
 		}
 		catch (ValidationException e) {
 			if (errors.hasErrors()) {
 				logger.debug("Errors: {}", errors);
-				return "redirect:/_admin/{language}/tags/index";
+				return "redirect:/_admin/{language}/customfields/index";
 			}
 			throw e;
 		}
@@ -91,8 +91,8 @@ public class CustomFieldBulkDeleteController {
 			}
 		}
 		
-		redirectAttributes.addFlashAttribute("deletedTags", tags);
+		redirectAttributes.addFlashAttribute("deletedCustomFields", customFields);
 		redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
-		return "redirect:/_admin/{language}/tags/index";
+		return "redirect:/_admin/{language}/customfields/index";
 	}
 }
