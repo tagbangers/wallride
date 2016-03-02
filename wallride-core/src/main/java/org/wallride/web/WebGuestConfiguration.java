@@ -54,11 +54,11 @@ import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.repository.MediaRepository;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.PageService;
-import org.wallride.core.support.CustomThymeleafDialect;
+import org.wallride.repository.MediaRepository;
+import org.wallride.service.BlogService;
+import org.wallride.service.CategoryService;
+import org.wallride.service.PageService;
+import org.wallride.autoconfigure.WallRideThymeleafDialect;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
@@ -82,7 +82,7 @@ public class WebGuestConfiguration extends WebMvcConfigurationSupport {
 	private SpringResourceResourceResolver springResourceResourceResolver;
 
 	@Inject
-	private CustomThymeleafDialect customThymeleafDialect;
+	private WallRideThymeleafDialect wallRideThymeleafDialect;
 
 	@Inject
 	private BlogService blogService;
@@ -271,7 +271,7 @@ public class WebGuestConfiguration extends WebMvcConfigurationSupport {
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(new SpringSecurityDialect());
 		dialects.add(new Java8TimeDialect());
-		dialects.add(customThymeleafDialect);
+		dialects.add(wallRideThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
 	}

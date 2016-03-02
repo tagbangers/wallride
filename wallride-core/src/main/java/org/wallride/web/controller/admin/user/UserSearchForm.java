@@ -17,7 +17,7 @@
 package org.wallride.web.controller.admin.user;
 
 import org.springframework.util.StringUtils;
-import org.wallride.core.model.UserSearchRequest;
+import org.wallride.model.UserSearchRequest;
 
 import java.io.Serializable;
 

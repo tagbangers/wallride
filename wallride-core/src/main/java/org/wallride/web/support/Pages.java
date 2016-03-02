@@ -17,9 +17,9 @@
 package org.wallride.web.support;
 
 import org.thymeleaf.context.IProcessingContext;
-import org.wallride.core.domain.Page;
-import org.wallride.core.model.TreeNode;
-import org.wallride.core.support.PageUtils;
+import org.wallride.domain.Page;
+import org.wallride.model.TreeNode;
+import org.wallride.support.PageUtils;
 
 import java.util.List;
 import java.util.Map;

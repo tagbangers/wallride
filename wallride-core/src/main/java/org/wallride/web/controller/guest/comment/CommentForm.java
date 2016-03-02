@@ -16,10 +16,10 @@
 
 package org.wallride.web.controller.guest.comment;
 
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.User;
-import org.wallride.core.model.CommentCreateRequest;
-import org.wallride.core.model.CommentUpdateRequest;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.domain.User;
+import org.wallride.model.CommentCreateRequest;
+import org.wallride.model.CommentUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

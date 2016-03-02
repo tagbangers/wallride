@@ -23,9 +23,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.feed.AbstractRssFeedView;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.service.BlogService;
+import org.wallride.domain.Article;
+import org.wallride.domain.Blog;
+import org.wallride.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

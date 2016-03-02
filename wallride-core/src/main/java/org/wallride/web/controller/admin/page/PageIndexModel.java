@@ -16,8 +16,8 @@
 
 package org.wallride.web.controller.admin.page;
 
-import org.wallride.core.domain.Page;
-import org.wallride.core.model.TreeNode;
+import org.wallride.domain.Page;
+import org.wallride.model.TreeNode;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

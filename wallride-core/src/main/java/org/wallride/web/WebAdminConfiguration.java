@@ -47,10 +47,10 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.PageService;
-import org.wallride.core.support.CustomThymeleafDialect;
+import org.wallride.service.BlogService;
+import org.wallride.service.CategoryService;
+import org.wallride.service.PageService;
+import org.wallride.autoconfigure.WallRideThymeleafDialect;
 import org.wallride.web.support.*;
 
 import javax.inject.Inject;
@@ -74,7 +74,7 @@ public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 	private SpringResourceResourceResolver springResourceResourceResolver;
 
 	@Inject
-	private CustomThymeleafDialect customThymeleafDialect;
+	private WallRideThymeleafDialect wallRideThymeleafDialect;
 
 	@Inject
 	private BlogService blogService;
@@ -213,7 +213,7 @@ public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(new SpringSecurityDialect());
 		dialects.add(new Java8TimeDialect());
-		dialects.add(customThymeleafDialect);
+		dialects.add(wallRideThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
 	}

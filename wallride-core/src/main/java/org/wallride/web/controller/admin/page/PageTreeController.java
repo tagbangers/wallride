@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.core.service.PageService;
-import org.wallride.core.support.PageUtils;
+import org.wallride.service.PageService;
+import org.wallride.support.PageUtils;
 
 import javax.inject.Inject;
 

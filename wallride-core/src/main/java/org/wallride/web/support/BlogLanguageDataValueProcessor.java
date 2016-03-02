@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.BlogLanguage;
+import org.wallride.domain.BlogLanguage;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;

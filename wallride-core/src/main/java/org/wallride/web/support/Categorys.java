@@ -17,9 +17,9 @@
 package org.wallride.web.support;
 
 import org.thymeleaf.context.IProcessingContext;
-import org.wallride.core.domain.Category;
-import org.wallride.core.model.TreeNode;
-import org.wallride.core.support.CategoryUtils;
+import org.wallride.domain.Category;
+import org.wallride.model.TreeNode;
+import org.wallride.support.CategoryUtils;
 
 import java.util.List;
 

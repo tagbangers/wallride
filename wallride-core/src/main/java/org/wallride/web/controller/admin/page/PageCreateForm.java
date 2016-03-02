@@ -17,7 +17,7 @@
 package org.wallride.web.controller.admin.page;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.model.PageCreateRequest;
+import org.wallride.model.PageCreateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

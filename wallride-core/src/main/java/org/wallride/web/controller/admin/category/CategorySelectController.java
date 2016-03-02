@@ -19,8 +19,8 @@ package org.wallride.web.controller.admin.category;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.wallride.core.domain.Category;
-import org.wallride.core.service.CategoryService;
+import org.wallride.domain.Category;
+import org.wallride.service.CategoryService;
 import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;

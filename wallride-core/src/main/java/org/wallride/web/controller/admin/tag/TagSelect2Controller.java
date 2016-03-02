@@ -19,8 +19,8 @@ package org.wallride.web.controller.admin.tag;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.wallride.core.domain.Tag;
-import org.wallride.core.service.TagService;
+import org.wallride.domain.Tag;
+import org.wallride.service.TagService;
 import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;

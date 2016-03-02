@@ -30,8 +30,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.wallride.core.exception.ServiceException;
-import org.wallride.core.service.SystemService;
+import org.wallride.exception.ServiceException;
+import org.wallride.service.SystemService;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
 
 import javax.inject.Inject;

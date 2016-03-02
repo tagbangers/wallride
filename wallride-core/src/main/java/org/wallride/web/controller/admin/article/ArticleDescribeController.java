@@ -26,8 +26,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.wallride.core.domain.Article;
-import org.wallride.core.service.ArticleService;
+import org.wallride.domain.Article;
+import org.wallride.service.ArticleService;
 import org.wallride.web.support.HttpNotFoundException;
 
 import javax.inject.Inject;

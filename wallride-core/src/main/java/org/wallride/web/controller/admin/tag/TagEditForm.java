@@ -17,8 +17,8 @@
 package org.wallride.web.controller.admin.tag;
 
 import org.springframework.beans.BeanUtils;
-import org.wallride.core.domain.Category;
-import org.wallride.core.model.TagUpdateRequest;
+import org.wallride.domain.Category;
+import org.wallride.model.TagUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

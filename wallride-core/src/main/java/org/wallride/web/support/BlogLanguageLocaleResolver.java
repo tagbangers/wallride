@@ -19,9 +19,9 @@ package org.wallride.web.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.LocaleResolver;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.service.BlogService;
+import org.wallride.domain.Blog;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.tag;
 
-import org.wallride.core.model.TagMergeRequest;
+import org.wallride.model.TagMergeRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

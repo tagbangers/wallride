@@ -19,8 +19,8 @@ package org.wallride.web.controller.admin.user;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.wallride.core.domain.User;
-import org.wallride.core.service.UserService;
+import org.wallride.domain.User;
+import org.wallride.service.UserService;
 import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;

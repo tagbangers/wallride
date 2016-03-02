@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Page;
-import org.wallride.core.service.PageService;
+import org.wallride.domain.Page;
+import org.wallride.service.PageService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

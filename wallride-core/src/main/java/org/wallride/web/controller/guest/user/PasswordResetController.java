@@ -26,12 +26,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.PasswordResetToken;
-import org.wallride.core.exception.EmailNotFoundException;
-import org.wallride.core.model.PasswordResetTokenCreateRequest;
-import org.wallride.core.model.PasswordUpdateRequest;
-import org.wallride.core.service.UserService;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.domain.PasswordResetToken;
+import org.wallride.exception.EmailNotFoundException;
+import org.wallride.model.PasswordResetTokenCreateRequest;
+import org.wallride.model.PasswordUpdateRequest;
+import org.wallride.service.UserService;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;

@@ -22,11 +22,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.PopularPost;
-import org.wallride.core.domain.Post;
-import org.wallride.core.service.*;
+import org.wallride.domain.Article;
+import org.wallride.domain.Blog;
+import org.wallride.domain.PopularPost;
+import org.wallride.domain.Post;
+import org.wallride.service.*;
 import org.wallride.web.controller.admin.article.ArticleSearchForm;
 
 import javax.inject.Inject;

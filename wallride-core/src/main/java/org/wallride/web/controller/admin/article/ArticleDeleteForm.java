@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.article;
 
-import org.wallride.core.model.ArticleDeleteRequest;
+import org.wallride.model.ArticleDeleteRequest;
 
 import javax.validation.constraints.NotNull;
 

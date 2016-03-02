@@ -20,7 +20,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import org.wallride.core.model.CommentSearchRequest;
+import org.wallride.model.CommentSearchRequest;
 
 import java.io.Serializable;
 

@@ -27,13 +27,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.autoconfigure.ServletConfiguration;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.service.PageService;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.autoconfigure.WallRideServletConfiguration;
+import org.wallride.domain.Blog;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.service.BlogService;
+import org.wallride.service.CategoryService;
+import org.wallride.service.PageService;
+import org.wallride.support.AuthorizedUser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -124,7 +124,7 @@ public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter 
 
 	private String buildAdminPath(String currentLanguage) {
 //		String contextPath = request.getContextPath();
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath(ServletConfiguration.ADMIN_SERVLET_PATH);
+		UriComponentsBuilder builder = UriComponentsBuilder.fromPath(WallRideServletConfiguration.ADMIN_SERVLET_PATH);
 		builder.path("/{language}");
 		return builder.buildAndExpand(currentLanguage).toUriString();
 	}

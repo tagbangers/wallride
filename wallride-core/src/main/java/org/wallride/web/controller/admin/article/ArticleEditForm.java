@@ -19,11 +19,11 @@ package org.wallride.web.controller.admin.article;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.Post;
-import org.wallride.core.domain.Tag;
-import org.wallride.core.model.ArticleUpdateRequest;
+import org.wallride.domain.Article;
+import org.wallride.domain.Category;
+import org.wallride.domain.Post;
+import org.wallride.domain.Tag;
+import org.wallride.model.ArticleUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

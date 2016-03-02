@@ -14,12 +14,14 @@ import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebAppl
 import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 import org.wallride.autoconfigure.WallRideProperties;
+import org.wallride.service.BlogService;
 
 public class WallRideApplication extends SpringApplication {
 
@@ -90,5 +92,6 @@ public class WallRideApplication extends SpringApplication {
 			WebMvcAutoConfiguration.class,
 			SpringDataWebAutoConfiguration.class,
 	})
+	@ComponentScan(basePackageClasses = BlogService.class)
 	public static class DefaultSource {}
 }

@@ -20,9 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.UserInvitation;
-import org.wallride.core.service.UserService;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.domain.UserInvitation;
+import org.wallride.service.UserService;
+import org.wallride.support.AuthorizedUser;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
