@@ -48,7 +48,7 @@ public class PageSpecifications {
 
 	public static Specification<Page> path(Page page, boolean includeUnpublished) {
 		return (root, query, cb) -> {
-			query.distinct(true);
+//			query.distinct(true);
 			Root<Page> p1 = query.from(Page.class);
 			Root<Page> p2 = root;
 			Root<Page> p3 = query.from(Page.class);

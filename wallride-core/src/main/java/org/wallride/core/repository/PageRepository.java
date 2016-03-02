@@ -17,14 +17,16 @@
 package org.wallride.core.repository;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 
-import javax.persistence.LockModeType;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,10 +39,6 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 
 	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Page findOneByIdAndLanguage(Long id, String language);
-
-	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Page findOneForUpdateByIdAndLanguage(Long id, String language);
 
 	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Page findOneByCodeAndLanguage(String code, String language);

@@ -213,7 +213,8 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePageAsDraft(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		if (!page.getStatus().equals(Post.Status.DRAFT)) {
 			Page draft = pageRepository.findOne(PageSpecifications.draft(page));
 			if (draft == null) {
@@ -255,7 +256,8 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePageAsPublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		page.setDrafted(null);
 		page.setStatus(Post.Status.PUBLISHED);
 		pageRepository.save(page);
@@ -265,7 +267,8 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePageAsUnpublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		page.setDrafted(null);
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
@@ -275,7 +278,8 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page savePage(PageUpdateRequest request, AuthorizedUser authorizedUser) {
-		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
@@ -408,7 +412,8 @@ public class PageService {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {
-				Page page = pageRepository.findOneForUpdateByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
+				postRepository.lock(Long.parseLong((String) map.get("item_id")));
+				Page page = pageRepository.findOneByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
 				if (page != null) {
 					Page parent = null;
 					if (map.get("parent_id") != null) {
@@ -427,7 +432,8 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page deletePage(PageDeleteRequest request, BindingResult result) throws BindException {
-		Page page = pageRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		Page parent = page.getParent();
 		for (Page child : page.getChildren()) {
 			child.setParent(parent);
@@ -446,7 +452,8 @@ public class PageService {
 
 	@CacheEvict(value = "pages", allEntries = true)
 	public Page deletePage(long id, String language) {
-		Page page = pageRepository.findOneForUpdateByIdAndLanguage(id, language);
+		postRepository.lock(id);
+		Page page = pageRepository.findOneByIdAndLanguage(id, language);
 		Page parent = page.getParent();
 		for (Page child : page.getChildren()) {
 			child.setParent(parent);

@@ -199,7 +199,8 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsDraft(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
 			Article draft = articleRepository.findOne(ArticleSpecifications.draft(article));
 			if (draft == null) {
@@ -247,7 +248,8 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		publishArticle(article);
 		return saveArticle(request, authorizedUser);
 	}
@@ -262,7 +264,8 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		unpublishArticle(article);
 		return saveArticle(request, authorizedUser);
 	}
@@ -277,7 +280,8 @@ public class ArticleService {
 
 	@CacheEvict(value = "articles", allEntries = true)
 	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
-		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
 		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
@@ -387,7 +391,8 @@ public class ArticleService {
 
 	@CacheEvict(value="articles", allEntries=true)
 	public Article deleteArticle(ArticleDeleteRequest request, BindingResult result) throws BindException {
-		Article article = articleRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		postRepository.lock(request.getId());
+		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		articleRepository.delete(article);
 		return article;
 	}
@@ -396,7 +401,8 @@ public class ArticleService {
 	public List<Article> bulkPublishArticle(ArticleBulkPublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
-			Article article = articleRepository.findOneForUpdateByIdAndLanguage(id, request.getLanguage());
+			postRepository.lock(id);
+			Article article = articleRepository.findOneByIdAndLanguage(id, request.getLanguage());
 			if (article.getStatus() != Post.Status.DRAFT && request.getDate() == null) {
 				continue;
 			}
@@ -441,7 +447,8 @@ public class ArticleService {
 	public List<Article> bulkUnpublishArticle(ArticleBulkUnpublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
-			Article article = articleRepository.findOneForUpdateByIdAndLanguage(id, request.getLanguage());
+			postRepository.lock(id);
+			Article article = articleRepository.findOneByIdAndLanguage(id, request.getLanguage());
 			if (article.getStatus() == Post.Status.DRAFT) {
 				continue;
 			}

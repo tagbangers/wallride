@@ -44,8 +44,8 @@ import java.util.List;
 					@NamedAttributeNode("children"),
 					@NamedAttributeNode("categories"),
 					@NamedAttributeNode("tags"),
-					@NamedAttributeNode("relatedToPosts"),
-					@NamedAttributeNode("relatedByPosts"),
+					@NamedAttributeNode("relatedToPosts")
+//					@NamedAttributeNode("relatedByPosts"),
 			}
 	)
 })

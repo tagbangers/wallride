@@ -40,10 +40,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	Article findOneByIdAndLanguage(Long id, String language);
 
 	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Article findOneForUpdateByIdAndLanguage(Long id, String language);
-
-	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Article findOneByCodeAndLanguage(String code, String language);
 
 	@EntityGraph(value = Article.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
