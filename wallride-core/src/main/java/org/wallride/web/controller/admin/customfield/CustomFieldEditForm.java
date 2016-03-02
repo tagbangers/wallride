@@ -19,156 +19,64 @@ package org.wallride.web.controller.admin.customfield;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.Post;
-import org.wallride.core.domain.Tag;
+import org.wallride.core.domain.*;
 import org.wallride.core.model.ArticleUpdateRequest;
+import org.wallride.core.model.CustomFieldUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class CustomFieldEditForm implements Serializable {
 
-	interface GroupPublish {}
-
 	@NotNull
 	private Long id;
 
-	private String code;
+	@NotNull
+	private String name;
 
-	private String coverId;
+	@NotNull
+	private CustomField.FieldType type;
 
-	@NotNull(groups=GroupPublish.class)
-	private String title;
+	private String description;
 
-	@NotNull(groups=GroupPublish.class)
-	private String body;
-
-	private Long authorId;
-
-	@DateTimeFormat(pattern="yyyy/MM/dd HH:mm")
-	private LocalDateTime date;
-
-	private Set<Long> categoryIds = new HashSet<>();
-	private String tags;
-	private Set<Long> relatedPostIds = new HashSet<>();
-
-	private String seoTitle;
-	private String seoDescription;
-	private String seoKeywords;
+	private List<String> options = new ArrayList<>();
 
 	@NotNull
 	private String language;
 
-	public Long getId() {
-		return id;
+	public String getName() {
+		return name;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getCode() {
-		return code;
+	public CustomField.FieldType getType() {
+		return type;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setType(CustomField.FieldType type) {
+		this.type = type;
 	}
 
-	public String getCoverId() {
-		return coverId;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setCoverId(String coverId) {
-		this.coverId = coverId;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public String getTitle() {
-		return title;
+	public List<String> getOptions() {
+		return options;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getBody() {
-		return body;
-	}
-
-	public void setBody(String body) {
-		this.body = body;
-	}
-
-	public Long getAuthorId() {
-		return authorId;
-	}
-
-	public void setAuthorId(Long authorId) {
-		this.authorId = authorId;
-	}
-
-	public LocalDateTime getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDateTime date) {
-		this.date = date;
-	}
-
-	public Set<Long> getCategoryIds() {
-		return categoryIds;
-	}
-
-	public void setCategoryIds(Set<Long> categoryIds) {
-		this.categoryIds = categoryIds;
-	}
-
-	public String getTags() {
-		return tags;
-	}
-
-	public void setTags(String tags) {
-		this.tags = tags;
-	}
-
-	public Set<Long> getRelatedPostIds() {
-		return relatedPostIds;
-	}
-
-	public void setRelatedPostIds(Set<Long> relatedPostIds) {
-		this.relatedPostIds = relatedPostIds;
-	}
-
-	public String getSeoTitle() {
-		return seoTitle;
-	}
-
-	public void setSeoTitle(String seoTitle) {
-		this.seoTitle = seoTitle;
-	}
-
-	public String getSeoDescription() {
-		return seoDescription;
-	}
-
-	public void setSeoDescription(String seoDescription) {
-		this.seoDescription = seoDescription;
-	}
-
-	public String getSeoKeywords() {
-		return seoKeywords;
-	}
-
-	public void setSeoKeywords(String seoKeywords) {
-		this.seoKeywords = seoKeywords;
+	public void setOptions(List<String> options) {
+		this.options = options;
 	}
 
 	public String getLanguage() {
@@ -179,55 +87,43 @@ public class CustomFieldEditForm implements Serializable {
 		this.language = language;
 	}
 
-	public ArticleUpdateRequest buildArticleUpdateRequest() {
-		ArticleUpdateRequest.Builder builder = new ArticleUpdateRequest.Builder();
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public CustomFieldUpdateRequest buildCustomFieldUpdateRequest() {
+		switch (type) {
+			case SELECTBOX:
+			case CHECKBOX:
+			case RADIO:
+				break;
+			default:
+				options.clear();
+				break;
+		}
+		CustomFieldUpdateRequest.Builder builder = new CustomFieldUpdateRequest.Builder();
 		return builder
 				.id(id)
-				.code(code)
-				.coverId(coverId)
-				.title(title)
-				.body(body)
-				.authorId(authorId)
-				.date(date)
-				.categoryIds(categoryIds)
-				.tags(tags)
-				.relatedPostIds(relatedPostIds)
-				.seoTitle(seoTitle)
-				.seoDescription(seoDescription)
-				.seoKeywords(seoKeywords)
+				.name(name)
+				.description(description)
+				.type(type)
+				.options(options)
 				.language(language)
 				.build();
 	}
 
-	public static CustomFieldEditForm fromDomainObject(Article article) {
+	public static CustomFieldEditForm fromDomainObject(CustomField customField) {
 		CustomFieldEditForm form = new CustomFieldEditForm();
-		BeanUtils.copyProperties(article, form);
+		BeanUtils.copyProperties(customField, form);
+		form.setType(customField.getFieldType());
 
-		if (article.getStatus().equals(Post.Status.DRAFT)) {
-			form.setCode(article.getDraftedCode());
-		}
+		List<String> options = new LinkedList<>();
+		customField.getOptions().stream().map(o -> o.getName()).forEach(options::add);
 
-		form.setCoverId(article.getCover() != null ? article.getCover().getId() : null);
-
-		for (Category category : article.getCategories()) {
-			form.getCategoryIds().add(category.getId());
-		}
-
-		List<String> tagNames = new ArrayList<>();
-		for (Tag tag : article.getTags()) {
-			tagNames.add(tag.getName());
-		}
-		form.setTags(StringUtils.join(tagNames, ","));
-
-		for (Post post : article.getRelatedToPosts()) {
-			form.getRelatedPostIds().add(post.getId());
-		}
-
-		if (article.getSeo() != null) {
-			form.setSeoTitle(article.getSeo().getTitle());
-			form.setSeoDescription(article.getSeo().getDescription());
-			form.setSeoKeywords(article.getSeo().getKeywords());
-		}
 		return form;
 	}
 }

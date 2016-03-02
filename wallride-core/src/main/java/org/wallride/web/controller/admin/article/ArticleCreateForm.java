@@ -17,6 +17,7 @@
 package org.wallride.web.controller.admin.article;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
 import org.wallride.core.domain.CustomField;
 import org.wallride.core.model.ArticleCreateRequest;
 
@@ -190,19 +191,15 @@ public class ArticleCreateForm implements Serializable {
 	}
 
 	public ArticleCreateRequest buildArticleCreateRequest() {
-//		Set<CustomFieldValue> customFieldValues_ = null;
-//		if (!CollectionUtils.isEmpty(customFieldValues)) {
-//			customFieldValues_ = new HashSet<>();
-//			for (CustomFieldValueForm valueForm : customFieldValues) {
-//				CustomFieldValue value = new CustomFieldValue();
-//				value.setCustomFieldId(valueForm.getCustomFieldId());
-//				value.setStringValue(valueForm.getStringValue());
-//				value.setNumberValue(valueForm.getNumberValue());
-//				value.setDatetimeValue(valueForm.getDatetimeValue());
-//				value.setDateValue(valueForm.getDateValue());
-//				customFieldValues_.add(value);
-//			}
-//		}
+		Set<CustomFieldValueEditForm> customFieldValues_ = null;
+		if (!CollectionUtils.isEmpty(customFieldValues)) {
+		customFieldValues_ = new HashSet<>();
+			for (CustomFieldValueEditForm valueForm : customFieldValues) {
+				if (!valueForm.isEmpty()) {
+					customFieldValues_.add(valueForm);
+				}
+			}
+		}
 
 		ArticleCreateRequest.Builder builder = new ArticleCreateRequest.Builder();
 		return builder
@@ -218,7 +215,7 @@ public class ArticleCreateForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
-				.customFieldValues(customFieldValues)
+				.customFieldValues(customFieldValues_)
 				.language(language)
 				.build();
 	}

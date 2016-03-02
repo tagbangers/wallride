@@ -39,7 +39,9 @@ import javax.persistence.*;
 						@NamedAttributeNode("drafted"),
 						@NamedAttributeNode("categories"),
 						@NamedAttributeNode("tags"),
-						@NamedAttributeNode("relatedToPosts")})
+						@NamedAttributeNode("relatedToPosts"),
+						@NamedAttributeNode("customFieldValues")}
+		)
 })
 @Table(name = "article")
 @DynamicInsert

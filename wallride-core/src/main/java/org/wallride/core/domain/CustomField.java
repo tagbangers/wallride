@@ -72,9 +72,6 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	@OrderColumn(name="`idx`")
 	private List<CustomFieldOption> options = new ArrayList<>();
 
-//	@OneToMany(mappedBy = "customField", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//	private List<CustomFieldValue> customFieldValues = new ArrayList<>();
-
 	@Override
 	public Long getId() {
 		return id;
@@ -139,14 +136,6 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	public void setOptions(List<CustomFieldOption> options) {
 		this.options = options;
 	}
-
-//	public List<CustomFieldValue> getCustomFieldValues() {
-//		return customFieldValues;
-//	}
-//
-//	public void setCustomFieldValues(List<CustomFieldValue> customFieldValues) {
-//		this.customFieldValues = customFieldValues;
-//	}
 
 	@Override
 	public int compareTo(CustomField field) {

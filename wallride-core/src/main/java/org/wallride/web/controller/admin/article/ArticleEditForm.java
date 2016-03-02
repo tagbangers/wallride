@@ -19,16 +19,15 @@ package org.wallride.web.controller.admin.article;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
 import org.wallride.core.domain.*;
 import org.wallride.core.model.ArticleUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public class ArticleEditForm implements Serializable {
@@ -61,7 +60,7 @@ public class ArticleEditForm implements Serializable {
 	private String seoDescription;
 	private String seoKeywords;
 
-	private List<CustomFieldValueEditForm> customFields = new ArrayList<>();
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	@NotNull
 	private String language;
@@ -178,15 +177,23 @@ public class ArticleEditForm implements Serializable {
 		this.language = language;
 	}
 
-	public List<CustomFieldValueEditForm> getCustomFields() {
-		return customFields;
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
 	}
 
-	public void setCustomFields(List<CustomFieldValueEditForm> customFields) {
-		this.customFields = customFields;
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
 	}
 
 	public ArticleUpdateRequest buildArticleUpdateRequest() {
+		List<CustomFieldValueEditForm> customFieldValues_ = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(customFieldValues)) {
+			customFieldValues_ = customFieldValues.stream()
+					.filter(v -> v.getCustomFieldId() != 0)
+					.filter(v -> !v.isEmpty())
+					.collect(Collectors.toList());
+		}
+
 		ArticleUpdateRequest.Builder builder = new ArticleUpdateRequest.Builder();
 		return builder
 				.id(id)
@@ -202,12 +209,12 @@ public class ArticleEditForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
-
+				.customFieldValues(customFieldValues_)
 				.language(language)
 				.build();
 	}
 
-	public static ArticleEditForm fromDomainObject(Article article) {
+	public static ArticleEditForm fromDomainObject(Article article, Set<CustomField> customFields) {
 		ArticleEditForm form = new ArticleEditForm();
 		BeanUtils.copyProperties(article, form);
 
@@ -237,11 +244,27 @@ public class ArticleEditForm implements Serializable {
 			form.setSeoKeywords(article.getSeo().getKeywords());
 		}
 
-		if (article.getCustomFieldValues() != null) {
-			for (CustomFieldValue fieldValue : article.getCustomFieldValues()) {
-				CustomFieldValueEditForm fieldForm = CustomFieldValueEditForm.fromDomainObject(fieldValue);
-				form.getCustomFields().add(fieldForm);
+//		customFields.stream().filter(field -> field.
+
+		List<CustomFieldValue> fieldValues = new ArrayList<>(article.getCustomFieldValues());
+		for (CustomField field : customFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(field.getId());
+			valueForm.setName(field.getName());
+			valueForm.setDescription(field.getDescription());
+			valueForm.setFieldType(field.getFieldType());
+			valueForm.setOptions(field.getOptions());
+
+			for (CustomFieldValue value : fieldValues) {
+				if (field.equals(value.getCustomField())) {
+					valueForm.setNumberValue(value.getNumberValue());
+					valueForm.setStringValue(value.getStringValue());
+					valueForm.setDateValue(value.getDateValue());
+					valueForm.setDatetimeValue(value.getDatetimeValue());
+					valueForm.setTextValue(value.getTextValue());
+				}
 			}
+			form.getCustomFieldValues().add(valueForm);
 		}
 		return form;
 	}

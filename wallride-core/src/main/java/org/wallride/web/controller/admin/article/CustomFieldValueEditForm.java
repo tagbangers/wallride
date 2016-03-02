@@ -1,9 +1,11 @@
 package org.wallride.web.controller.admin.article;
 
+import org.springframework.util.StringUtils;
 import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.CustomFieldOption;
 import org.wallride.core.domain.CustomFieldValue;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,12 +15,14 @@ import java.util.List;
 public class CustomFieldValueEditForm implements Serializable {
 
 	private Long id;
+	@NotNull
 	private long customFieldId;
 	private String name;
 	private String description;
 	private CustomField.FieldType fieldType;
 	//	private Object value;
 	private String stringValue;
+	private String textValue;
 	private Long numberValue;
 	private LocalDate dateValue;
 	private LocalDateTime datetimeValue;
@@ -72,6 +76,14 @@ public class CustomFieldValueEditForm implements Serializable {
 		this.stringValue = stringValue;
 	}
 
+	public String getTextValue() {
+		return textValue;
+	}
+
+	public void setTextValue(String textValue) {
+		this.textValue = textValue;
+	}
+
 	public Long getNumberValue() {
 		return numberValue;
 	}
@@ -112,10 +124,47 @@ public class CustomFieldValueEditForm implements Serializable {
 		form.setDescription(customFieldValue.getCustomField().getDescription());
 		form.setFieldType(customFieldValue.getCustomField().getFieldType());
 		form.setStringValue(customFieldValue.getStringValue());
+		form.setTextValue(customFieldValue.getTextValue());
 		form.setNumberValue(customFieldValue.getNumberValue());
 		form.setDateValue(customFieldValue.getDateValue());
 		form.setDatetimeValue(customFieldValue.getDatetimeValue());
 		form.setOptions(customFieldValue.getCustomField().getOptions());
 		return form;
+	}
+
+	public boolean isEmpty() {
+		switch (getFieldType()) {
+			case TEXT:
+			case CHECKBOX:
+			case SELECTBOX:
+			case RADIO:
+				if (StringUtils.isEmpty(getStringValue())) {
+					return true;
+				}
+				return false;
+			case TEXTAREA:
+			case HTML:
+				if (StringUtils.isEmpty(getTextValue())) {
+					return true;
+				}
+				return false;
+			case DATE:
+				if (getDateValue() == null) {
+					return true;
+				}
+				return false;
+			case DATETIME:
+				if (getDatetimeValue() == null) {
+					return true;
+				}
+				return false;
+			case NUMBER:
+				if (getNumberValue() == null) {
+					return true;
+				}
+				return false;
+			default:
+				return true;
+		}
 	}
 }

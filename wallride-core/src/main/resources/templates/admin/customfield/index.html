@@ -38,6 +38,10 @@
 				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 				<span th:text="#{DeletedCustomFields}">CustomFields Deleted.</span>
 			</div>
+			<div class="alert alert-success" th:if="${savedCustomField ne null}">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+				<span th:text="#{SavedCustomField}">Article saved.</span>
+			</div>
 			<section class="search-result">
 				<form method="post">
 					<div class="search-result-header clearfix">

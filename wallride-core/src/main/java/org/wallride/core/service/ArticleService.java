@@ -54,6 +54,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -73,6 +74,9 @@ public class ArticleService {
 
 	@Resource
 	private MediaRepository mediaRepository;
+
+//	@Resource
+//	private CustomFieldValueRepository customFieldValueRepository;
 
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
@@ -197,11 +201,26 @@ public class ArticleService {
 
 		article.getCustomFieldValues().clear();
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+/*
+			request.getCustomFieldValues().stream().map(valueForm -> {
+				CustomFieldValue value = new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(article);
+				value.setStringValue(valueForm.getStringValue());
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				return value;
+			}).collect(Collectors.toCollection(() -> article.getCustomFieldValues()));
+*/
+
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
 				CustomFieldValue value =  new CustomFieldValue();
 				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
 				value.setPost(article);
 				value.setStringValue(valueForm.getStringValue());
+				value.setTextValue(valueForm.getTextValue());
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
@@ -397,6 +416,24 @@ public class ArticleService {
 
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
+
+		article.getCustomFieldValues().clear();
+		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =
+						new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(article);
+				value.setStringValue(valueForm.getStringValue());
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
+			}
+		}
+		article.setCustomFieldValues(new TreeSet<>(fieldValues));
 
 		return articleRepository.save(article);
 	}

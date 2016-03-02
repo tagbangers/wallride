@@ -19,7 +19,10 @@ public interface CustomFieldRepository extends JpaRepository<CustomField, Long>,
 	CustomField findOneById(String id);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	CustomField findOneForUpdateById(String id);
+	CustomField findOneForUpdateById(Long id);
+
+	@EntityGraph(value = CustomField.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	CustomField findOneByIdAndLanguage(Long id, String language);
 
 	@EntityGraph(value = CustomField.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	@Lock(LockModeType.PESSIMISTIC_WRITE)

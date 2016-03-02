@@ -79,7 +79,7 @@ public class CustomFieldCreateController {
 	}
 
 	@RequestMapping(method=RequestMethod.POST)
-	public String saveAsDraft(
+	public String save(
 			@PathVariable String language,
 			@Validated @ModelAttribute("form") CustomFieldCreateForm form,
 			BindingResult errors,

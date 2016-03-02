@@ -30,10 +30,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Article;
 import org.wallride.core.domain.Category;
+import org.wallride.core.domain.CustomField;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.TreeNode;
 import org.wallride.core.service.ArticleService;
+import org.wallride.core.service.CustomFieldService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
@@ -42,6 +44,8 @@ import org.wallride.web.support.RestValidationErrorModel;
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/{language}/articles/edit")
@@ -70,6 +74,9 @@ public class ArticleEditController {
 		return categoryUtils.getNodes(true);
 	}
 
+	@Inject
+	private CustomFieldService customFieldService;
+
 	@ModelAttribute("query")
 	public String query(@RequestParam(required = false) String query) {
 		return query;
@@ -94,8 +101,8 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("language", language);
 			return "redirect:/_admin/{language}/articles/index";
 		}
-
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
+		Set<CustomField> customFields = customFieldService.getAllCustomFields();
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(article, customFields);
 		model.addAttribute("form", form);
 
 		Article draft = articleService.getDraftById(id);
@@ -125,8 +132,8 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/articles/edit";
 		}
-
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft);
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 
 		return "article/edit";

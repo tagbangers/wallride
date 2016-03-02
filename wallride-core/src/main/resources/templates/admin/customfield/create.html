@@ -9,12 +9,13 @@
 <div>
 	<div id="wr-page-header">
 		<div class="page-header container-fluid">
-			<h1 th:text="#{AddNewCustomField}">ユーザー編集</h1>
+			<h1 th:text="${customField eq null} ? #{AddNewCustomField} : #{EditCustomField}">カスタムフィールド編集</h1>
 		</div>
 	</div>
 	<div id="wr-page-content">
 		<div class="container-fluid">
-			<form id="custom-field-form" class="form-horizontal" method="post" th:object="${form}" th:action="@{__${ADMIN_PATH}__/customfields/create}">
+			<form id="custom-field-form" th:fragment="form(title,customfield)" class="form-horizontal" method="post" th:object="${form}" th:action="@{__${ADMIN_PATH}__/customfields/create}">
+				<input type="hidden" name="id" th:value="${customField}? ${customField.id} : ''"  />
 				<div class="form-group" th:classappend="${#fields.hasErrors('name')}? has-error">
 					<label class="col-sm-2 control-label" th:text="#{FieldName}">FieldName</label>
 					<div class="col-sm-10">
@@ -33,7 +34,7 @@
 					<label class="col-sm-2 control-label" th:text="#{FieldType}">FieldType</label>
 					<div class="col-sm-6">
 						<select class="form-control" th:field="*{type}">
-							<option th:each="fieldType : ${fieldTypes}" th:value="${fieldType}" th:text="${#messages.msg('CustomField.FieldType.' + fieldType)}">指定なし</option>
+							<option th:each="fieldType : ${fieldTypes}" th:value="${fieldType}" th:text="${#messages.msg('CustomField.FieldType.' + fieldType)}" th:selected="${customField ne null and #strings.toString(customField.fieldType) eq #strings.toString(fieldType)}">指定なし</option>
 						</select>
 						<span class="help-block" th:each="err : ${#fields.errors('type')}" text="${err}" />
 					</div>
@@ -41,13 +42,20 @@
 				<div id="custom-field-options" class="form-group field-option-group">
 					<label class="col-sm-2 control-label" th:text="#{FieldOption}">FieldOption</label>
 					<div class="col-sm-6">
-						<input type="text" id="custom-field-options-input" class="form-control input-sm"/>
+						<input type="text" id="custom-field-options-input" class="form-control"/>
 					</div>
 					<div class="col-sm-1">
-						<a href="#" class="btn btn-default" data-append="option"><span class="glyphicon glyphicon-plus"></span> 追加</a>
+						<a href="#" class="btn btn-default" data-append="option"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">追加</span></a>
 					</div>
 					<div class="col-sm-offset-2 col-sm-10">
 						<ul class="sortable">
+							<th:block th:if="${customField ne null}">
+							<li class="option col-sm-7" th:if="${#lists.size(customField.options) gt 0}" th:each="option : ${customField.options}">
+								<span class="grippy"></span>
+								<div class="field-option" th:attr="data-name=${option.name}" th:text="${option.name}"></div>
+								<button class="pull-right btn btn-link remove" data-dismiss="option"><span class="glyphicon glyphicon-remove"></span></button>
+							</li>
+							</th:block>
 							<script id="option-tmpl" type="text/x-jsrender">
 							<li class="option col-sm-7">
 								<span class="grippy"></span>
@@ -56,9 +64,6 @@
 							</li>
 							</script>
 						</ul>
-<!--
-						<input type="hidden" id="options" name="options"/>
--->
 					</div>
 					<script>
 						$(function() {
@@ -66,7 +71,7 @@
 							var $fieldOption = $('#custom-field-options');
 
 							$customFieldForm.on('change', 'select[name="type"]', function() {
-								var value = $(this).val();
+								var value = $(this).val().toString();
 								if (value == 'SELECTBOX' || value == 'CHECKBOX' || value == 'RADIO') {
 									$fieldOption.show();
 								} else {
@@ -120,8 +125,8 @@
 								});
 							});
 						});
-					</script>	
-				</div>	
+					</script>
+				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<div class="btn-group">

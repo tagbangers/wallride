@@ -21,6 +21,7 @@ import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class ArticleCreateRequest implements Serializable {
@@ -37,7 +38,7 @@ public class ArticleCreateRequest implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
-	private Set<CustomFieldValueEditForm> customFieldValues = new HashSet<>();
+	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 	private String language;
 
 	public String getCode() {
@@ -110,7 +111,7 @@ public class ArticleCreateRequest implements Serializable {
 		private String seoTitle;
 		private String seoDescription;
 		private String seoKeywords;
-		private Set<CustomFieldValueEditForm> customFieldValues = new HashSet<>();
+		private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 		private String language;
 
 		public Builder() {

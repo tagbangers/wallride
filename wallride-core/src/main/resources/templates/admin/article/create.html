@@ -456,11 +456,11 @@
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
 										</div>
-										<div th:case="'TEXTAREA'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].stringValue')}? has-error">
+										<div th:case="'TEXTAREA'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].textValue')}? has-error">
 											<div class="col-sm-12">
-												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].stringValue}" class="form-control" style="min-height: 150px"></textarea>
+												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" style="min-height: 150px"></textarea>
 											</div>
-											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].stringValue')}"  th:text="${err}" />
+											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].textValue')}"  th:text="${err}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
@@ -468,6 +468,7 @@
 										<div th:case="'SELECTBOX'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].stringValue')}? has-error">
 											<div class="col-sm-12">
 												<select type="text" th:field="*{customFieldValues[__${stat.index}__].stringValue}" class="form-control">
+													<option value=""></option>
 													<option th:each="option : ${field.options}" th:value="${option}" th:text="${option}">wrtwetwet</option>
 												</select>
 											</div>

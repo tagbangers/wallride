@@ -108,6 +108,19 @@
 									</dl>
 								</dd>
 							</dl>
+							<dl th:each="fieldValue : ${article.customFieldValues}">
+								<dt th:text="${fieldValue.customField.name}">Custom Field</dt>
+								<dd th:switch="${#strings.toString(fieldValue.customField.fieldType)}">
+									<span th:case="'TEXT'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'SELECTBOX'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'CHECKBOX'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'TEXTAREA'" th:text="${fieldValue.textValue}"></span>
+									<span th:case="'HTML'" th:text="${fieldValue.textValue}"></span>
+									<span th:case="'DATE'" th:text="${fieldValue.dateValue}"></span>
+									<span th:case="'DATETIME'" th:text="${fieldValue.datetimeValue}"></span>
+									<span th:case="'NUMBER'" th:text="${fieldValue.numberValue}"></span>
+								</dd>
+							</dl>
 							<a th:href="@{__${ADMIN_PATH}__/articles/describe(part=delete-form,id=${article.id},query=${query})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeleteArticle}">記事を削除</span></a>
 							<!-- #delete-modal -->
 							<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">

@@ -1,5 +1,6 @@
 package org.wallride.core.service;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.CustomFieldOption;
 import org.wallride.core.model.CustomFieldCreateRequest;
 import org.wallride.core.model.CustomFieldSearchRequest;
+import org.wallride.core.model.CustomFieldUpdateRequest;
 import org.wallride.core.repository.CustomFieldRepository;
 import org.wallride.core.support.AuthorizedUser;
 
@@ -25,7 +27,7 @@ public class CustomFieldService {
 	@Inject
 	private CustomFieldRepository customFieldRepository;
 
-	//@CacheEvict(value="customFields", allEntries=true)
+	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = new CustomField();
 		customField.setIdx(customFieldRepository.countForUpdate(request.getLanguage()) + 1);
@@ -44,6 +46,26 @@ public class CustomFieldService {
 		}
 		return customFieldRepository.save(customField);
 	}
+
+	@CacheEvict(value="customFields", allEntries=true)
+	public CustomField updateCustomField(CustomFieldUpdateRequest request, AuthorizedUser authorizedUser) {
+		CustomField customField = customFieldRepository.findOneForUpdateById(request.getId());
+		customField.setName(request.getName());
+		customField.setDescription(request.getDescription());
+		customField.setFieldType(request.getType());
+		customField.setLanguage(request.getLanguage());
+		customField.getOptions().clear();
+		if (!CollectionUtils.isEmpty(request.getOptions())) {
+			request.getOptions().stream().forEach(optionName -> {
+				CustomFieldOption option = new CustomFieldOption();
+				option.setName(optionName);
+				option.setLanguage(request.getLanguage());
+				customField.getOptions().add(option);
+			});
+		}
+		return customFieldRepository.save(customField);
+	}
+
 
 /*	@CacheEvict(value="articles", allEntries=true)
 	public CustomField updateCustomField(CustomFieldUpdateRequest request, AuthorizedUser authorizedUser) {
@@ -121,7 +143,7 @@ public class CustomFieldService {
 	}*/
 
 	public CustomField getCustomFieldById(long id, String language) {
-		return customFieldRepository.findOneForUpdateByIdAndLanguage(id, language);
+		return customFieldRepository.findOneByIdAndLanguage(id, language);
 	}
 
 	public CustomField getCustomFieldByName(String name, String language) {
