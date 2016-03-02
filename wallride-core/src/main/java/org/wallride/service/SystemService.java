@@ -19,14 +19,8 @@ package org.wallride.service;
 import org.hibernate.*;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.annotations.Indexed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class SystemService {
@@ -52,14 +44,12 @@ public class SystemService {
 	public void reIndex() throws Exception {
 		logger.info("Re-Index started");
 
-		final List<Class> persistentClasses = detectPersistentClasses();
-
 		FullTextSession fullTextSession = Search.getFullTextSession((entityManager.unwrap(Session.class)));
 
 		fullTextSession.setFlushMode(FlushMode.MANUAL);
 		fullTextSession.setCacheMode(CacheMode.IGNORE);
 
-		for (Class persistentClass : persistentClasses) {
+		for (Class persistentClass : fullTextSession.getSearchFactory().getIndexedTypes()) {
 			Transaction transaction = fullTextSession.beginTransaction();
 
 			// Scrollable results will avoid loading too many objects in memory
@@ -78,22 +68,5 @@ public class SystemService {
 			transaction.commit();
 		}
 		logger.info("Re-Index finished");
-	}
-
-	private List<Class> detectPersistentClasses() throws Exception {
-		String locationPattern = "classpath:/org/wallride/domain/*";
-
-		List<Class> classes = new ArrayList<>();
-		PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		Resource[] resources = resourcePatternResolver.getResources(locationPattern);
-		SimpleMetadataReaderFactory metadataReaderFactory = new SimpleMetadataReaderFactory();
-		for (Resource resource : resources) {
-			MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
-			AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
-			if (metadata.hasAnnotation(Indexed.class.getName())) {
-				classes.add(Class.forName(metadata.getClassName()));
-			}
-		}
-		return classes;
 	}
 }

@@ -16,40 +16,30 @@
 
 package org.wallride.autoconfigure;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.util.ClassUtils;
 import org.wallride.domain.DomainObject;
-
-import javax.sql.DataSource;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Configuration
 //@EnableJpaAuditing
 public class WallRideJpaConfiguration extends HibernateJpaAutoConfiguration {
 
-	@Autowired
-	private DataSource dataSource;
-
-	@Autowired
-	private JpaProperties properties;
-
 	@Bean
 	@DependsOn("cacheManager")
 	@Override
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
-		super.entityManagerFactory(factoryBuilder);
-		Map<String, Object> vendorProperties = new LinkedHashMap<>();
-		vendorProperties.putAll(this.properties.getHibernateProperties(this.dataSource));
-		return factoryBuilder.dataSource(this.dataSource)
-				.packages(DomainObject.class)
-				.properties(vendorProperties)
-				.build();
+		return super.entityManagerFactory(factoryBuilder);
+	}
+
+	@Override
+	protected String[] getPackagesToScan() {
+		return new String[] {
+				ClassUtils.getPackageName(DomainObject.class)
+		};
 	}
 }
