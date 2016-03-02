@@ -81,7 +81,7 @@ public class SystemService {
 	}
 
 	private List<Class> detectPersistentClasses() throws Exception {
-		String locationPattern = "classpath:/org/wallride/core/domain/*";
+		String locationPattern = "classpath:/org/wallride/domain/*";
 
 		List<Class> classes = new ArrayList<>();
 		PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
