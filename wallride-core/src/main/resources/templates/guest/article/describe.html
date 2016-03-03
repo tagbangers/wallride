@@ -25,7 +25,9 @@
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 		<script th:src="@{/resources/lib/jquery.lazyload.min.js}" src="#"></script>
 		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:unless="${#httpServletRequest.getRequestURL().toString().contains('/_admin')}"> /*/-->
 		<script th:replace="google-analytics::ga(page=@{${@requestDataValueProcessor.processUrl(#httpServletRequest, #posts.path(article))}})"></script>
+		<!--/*/ </th:block> /*/-->
 	</head>
 	<body>
 		<div id="wrap">

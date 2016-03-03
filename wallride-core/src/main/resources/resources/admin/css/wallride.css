@@ -329,55 +329,55 @@ pre {
 }
 
 /**** sortable *****/
-ul.sortable .placeholder {
+ul.nested-sortable .placeholder {
 	outline: 1px dashed #bbb;
 }
-ul.sortable, ul.sortable ul {
+ul.nested-sortable, ul.nested-sortable ul {
 	margin: 0 0 0 50px;
 	padding: 0;
 	list-style-type: none;
 }
-ul.sortable {
+ul.nested-sortable {
 	margin: 1em 0;
 }
-.sortable li {
+.nested-sortable li {
 	margin: 10px 0 0 0;
 	padding: 0;
 }
-.sortable li div.category  {
+.nested-sortable li div.category  {
 	border: 1px solid #d4d4d4;
 	padding: 0;
 	margin: 0;
 	cursor: move;
 	background: #ffffff;
 }
-.sortable li div.category.off, .sortable li div.banner.off  {
+.nested-sortable li div.category.off, .nested-sortable li div.banner.off  {
 	background: #F5F5F5;
 }
-.sortable li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
+.nested-sortable li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
 	border-color: #999;
 	background: #fafafa;
 }
-.sortable .wr-tree-options .disclose {
+.nested-sortable .wr-tree-options .disclose {
 	cursor: pointer;
 	display: none;
 }
-.sortable li.mjs-nestedSortable-branch > div .wr-tree-option,
-.sortable li.mjs-nestedSortable-leaf > div .wr-tree-option {
+.nested-sortable li.mjs-nestedSortable-branch > div .wr-tree-option,
+.nested-sortable li.mjs-nestedSortable-leaf > div .wr-tree-option {
 	display: inline-block;
 }
-.sortable li.mjs-nestedSortable-leaf .disclose {
+.nested-sortable li.mjs-nestedSortable-leaf .disclose {
 	visibility: hidden;
 }
-.sortable li.mjs-nestedSortable-collapsed > ul {
+.nested-sortable li.mjs-nestedSortable-collapsed > ul {
 	display: none;
 }
-.sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-collapsed > div .disclose > span:before {
+.nested-sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-collapsed > div .disclose > span:before {
 	color: #819FAA;
 	content: ' \2b ';
 	/*content: ' \e080 ';*/
 }
-.sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-expanded > div .disclose > span:before {
+.nested-sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-expanded > div .disclose > span:before {
 	color: #819FAA;
 	content: ' \2212 ';
 }

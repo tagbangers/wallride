@@ -29,9 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.BlogLanguage;
+import org.wallride.core.domain.*;
 import org.wallride.core.exception.ServiceException;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.MediaService;
@@ -45,6 +43,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 @Controller
 @RequestMapping("/{language}/articles/preview")
@@ -73,6 +74,22 @@ public class ArticlePreviewController {
 		article.setTitle(form.getTitle());
 		article.setBody(form.getBody());
 		article.setDate(form.getDate() != null ? form.getDate() : LocalDateTime.now());
+
+		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		for (CustomFieldValueEditForm valueForm : form.getCustomFieldValues()) {
+			CustomFieldValue value = new CustomFieldValue();
+			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+				value.setStringValue(String.join(",", valueForm.getStringValues()));
+			} else {
+				value.setStringValue(valueForm.getStringValue());
+			}
+			value.setTextValue(valueForm.getTextValue());
+			value.setNumberValue(valueForm.getNumberValue());
+			value.setDateValue(valueForm.getDateValue());
+			value.setDatetimeValue(valueForm.getDatetimeValue());
+			fieldValues.add(value);
+		}
+		article.setCustomFieldValues(new TreeSet<>(fieldValues));
 		article.setAuthor(authorizedUser);
 
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext, "org.springframework.web.servlet.FrameworkServlet.CONTEXT.guestServlet");

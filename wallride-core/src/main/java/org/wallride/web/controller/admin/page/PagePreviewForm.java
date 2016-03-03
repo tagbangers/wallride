@@ -16,8 +16,15 @@
 
 package org.wallride.web.controller.admin.page;
 
+import org.wallride.core.domain.CustomFieldValue;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class PagePreviewForm implements Serializable {
@@ -35,6 +42,8 @@ public class PagePreviewForm implements Serializable {
 	private LocalDateTime date;
 
 	private Long parentId;
+
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	private String language;
 
@@ -92,6 +101,14 @@ public class PagePreviewForm implements Serializable {
 
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
+	}
+
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
 	}
 
 	public String getLanguage() {

@@ -29,13 +29,12 @@ import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.Page;
+import org.wallride.core.domain.*;
 import org.wallride.core.exception.ServiceException;
 import org.wallride.core.service.BlogService;
 import org.wallride.core.service.MediaService;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
 
@@ -45,6 +44,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 @Controller
 @RequestMapping("/{language}/pages/preview")
@@ -73,6 +75,21 @@ public class PagePreviewController {
 		page.setTitle(form.getTitle());
 		page.setBody(form.getBody());
 		page.setDate(form.getDate() != null ? form.getDate() : LocalDateTime.now());
+		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		for (CustomFieldValueEditForm valueForm : form.getCustomFieldValues()) {
+			CustomFieldValue value = new CustomFieldValue();
+			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+				value.setStringValue(String.join(",", valueForm.getStringValues()));
+			} else {
+				value.setStringValue(valueForm.getStringValue());
+			}
+			value.setTextValue(valueForm.getTextValue());
+			value.setNumberValue(valueForm.getNumberValue());
+			value.setDateValue(valueForm.getDateValue());
+			value.setDatetimeValue(valueForm.getDatetimeValue());
+			fieldValues.add(value);
+		}
+		page.setCustomFieldValues(new TreeSet<>(fieldValues));
 		page.setAuthor(authorizedUser);
 
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext, "org.springframework.web.servlet.FrameworkServlet.CONTEXT.guestServlet");
