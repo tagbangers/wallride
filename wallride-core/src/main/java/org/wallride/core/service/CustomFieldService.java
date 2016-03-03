@@ -20,6 +20,8 @@ import org.springframework.validation.MessageCodesResolver;
 import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.CustomFieldOption;
 import org.wallride.core.domain.Tag;
+import org.wallride.core.exception.DuplicateCodeException;
+import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.exception.ServiceException;
 import org.wallride.core.model.*;
 import org.wallride.core.repository.CustomFieldRepository;
@@ -48,6 +50,10 @@ public class CustomFieldService {
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = new CustomField();
+		CustomField duplicate = customFieldRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
+		if (duplicate != null) {
+			throw new DuplicateCodeException(request.getName());
+		}
 		customField.setIdx(customFieldRepository.countForUpdate(request.getLanguage()) + 1);
 		customField.setName(request.getName());
 		customField.setDescription(request.getDescription());
@@ -69,7 +75,7 @@ public class CustomFieldService {
 	public CustomField updateCustomField(CustomFieldUpdateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = customFieldRepository.findOneForUpdateById(request.getId());
 		if (customField == null) {
-			throw new ServiceException();
+			throw new EmptyCodeException(request.getName());
 		}
 		customField.setName(request.getName());
 		customField.setDescription(request.getDescription());

@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -113,6 +114,42 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 
 	public void setDatetimeValue(LocalDateTime datetimeValue) {
 		this.datetimeValue = datetimeValue;
+	}
+
+	public boolean isEmpty() {
+		switch (getCustomField().getFieldType()) {
+			case TEXT:
+			case SELECTBOX:
+			case RADIO:
+			case CHECKBOX:
+				if (StringUtils.isEmpty(getStringValue())) {
+					return true;
+				}
+				return false;
+			case TEXTAREA:
+			case HTML:
+				if (StringUtils.isEmpty(getTextValue())) {
+					return true;
+				}
+				return false;
+			case DATE:
+				if (getDateValue() == null) {
+					return true;
+				}
+				return false;
+			case DATETIME:
+				if (getDatetimeValue() == null) {
+					return true;
+				}
+				return false;
+			case NUMBER:
+				if (getNumberValue() == null) {
+					return true;
+				}
+				return false;
+			default:
+				return true;
+		}
 	}
 
 	@Override

@@ -1,5 +1,9 @@
 package org.wallride.web.controller.admin.article;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.CustomFieldOption;
@@ -17,14 +21,18 @@ public class CustomFieldValueEditForm implements Serializable {
 	private Long id;
 	@NotNull
 	private long customFieldId;
+	@NotNull
 	private String name;
 	private String description;
 	private CustomField.FieldType fieldType;
-	//	private Object value;
 	private String stringValue;
+	private String[] stringValues;
 	private String textValue;
+	@NumberFormat
 	private Long numberValue;
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate dateValue;
+	@DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
 	private LocalDateTime datetimeValue;
 	private List<CustomFieldOption> options = new ArrayList<>();
 
@@ -76,6 +84,14 @@ public class CustomFieldValueEditForm implements Serializable {
 		this.stringValue = stringValue;
 	}
 
+	public String[] getStringValues() {
+		return stringValues;
+	}
+
+	public void setStringValues(String[] stringValues) {
+		this.stringValues = stringValues;
+	}
+
 	public String getTextValue() {
 		return textValue;
 	}
@@ -116,29 +132,39 @@ public class CustomFieldValueEditForm implements Serializable {
 		this.options = options;
 	}
 
-	public static CustomFieldValueEditForm fromDomainObject(CustomFieldValue customFieldValue) {
+	public static CustomFieldValueEditForm fromDomainObject(CustomFieldValue fieldValue) {
 		CustomFieldValueEditForm form = new CustomFieldValueEditForm();
-		form.setId(customFieldValue.getId());
-		form.setCustomFieldId(customFieldValue.getCustomField().getId());
-		form.setName(customFieldValue.getCustomField().getName());
-		form.setDescription(customFieldValue.getCustomField().getDescription());
-		form.setFieldType(customFieldValue.getCustomField().getFieldType());
-		form.setStringValue(customFieldValue.getStringValue());
-		form.setTextValue(customFieldValue.getTextValue());
-		form.setNumberValue(customFieldValue.getNumberValue());
-		form.setDateValue(customFieldValue.getDateValue());
-		form.setDatetimeValue(customFieldValue.getDatetimeValue());
-		form.setOptions(customFieldValue.getCustomField().getOptions());
+		form.setId(fieldValue.getId());
+		form.setCustomFieldId(fieldValue.getCustomField().getId());
+		form.setName(fieldValue.getCustomField().getName());
+		form.setDescription(fieldValue.getCustomField().getDescription());
+		form.setFieldType(fieldValue.getCustomField().getFieldType());
+		if (fieldValue.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+			if (fieldValue.getStringValue() != null) {
+				form.setStringValues(fieldValue.getStringValue().split(","));
+			}
+		} else {
+			form.setStringValue(fieldValue.getStringValue());
+		}
+		form.setTextValue(fieldValue.getTextValue());
+		form.setNumberValue(fieldValue.getNumberValue());
+		form.setDateValue(fieldValue.getDateValue());
+		form.setDatetimeValue(fieldValue.getDatetimeValue());
+		form.setOptions(fieldValue.getCustomField().getOptions());
 		return form;
 	}
 
 	public boolean isEmpty() {
 		switch (getFieldType()) {
 			case TEXT:
-			case CHECKBOX:
 			case SELECTBOX:
 			case RADIO:
 				if (StringUtils.isEmpty(getStringValue())) {
+					return true;
+				}
+				return false;
+			case CHECKBOX:
+				if (getStringValues().length == 0) {
 					return true;
 				}
 				return false;

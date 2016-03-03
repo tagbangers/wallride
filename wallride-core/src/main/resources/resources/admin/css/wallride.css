@@ -147,7 +147,7 @@ pre {
 	background-color: transparent;
 }
 #wr-page-header .page-header {
-	margin: 15px 0px;
+	margin: 15px 0px 5px;
 	padding-bottom: 10px;
 	line-height: 34px;
 }
@@ -744,28 +744,36 @@ legend {
 	font-size: 28px;
 	font-weight: bold;
 }
-.wr-tool-panel .tools {
-	margin-bottom: 0.5em;
-}
-.wr-tool-panel .status {
+#wr-page-header .status {
 	font-size: 15px;
 	color: #5A5A5A;
 	font-weight: bold;
 	line-height: 34px;
+}
+#wr-page-header .publish-date {
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 0.5;
 }
 .wr-tool-panel .wr-tool-check {
 	line-height: 34px;
 	padding: 0 3px;
 }
 .wr-tool-panel dl {
-	margin: 1.5em 0;
+	margin: 0 0 1em;
 }
 .wr-tool-panel dl dt {
-	font-weight: normal;
+	font-weight: 500;
 	font-size: 14.5px;
 	line-height: 32px;
-	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
 	margin-bottom: 7px;
+}
+.wr-tool-panel dl:first-child > dt {
+    border-top: none;
+}
+.wr-tool-panel dl dd dl dt {
+    border-top: 1px dashed #ccc;
 }
 .wr-tool-panel dl dd {
 	font-size:14px;

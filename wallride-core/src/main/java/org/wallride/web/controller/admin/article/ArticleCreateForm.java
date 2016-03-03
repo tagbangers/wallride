@@ -191,16 +191,6 @@ public class ArticleCreateForm implements Serializable {
 	}
 
 	public ArticleCreateRequest buildArticleCreateRequest() {
-		Set<CustomFieldValueEditForm> customFieldValues_ = null;
-		if (!CollectionUtils.isEmpty(customFieldValues)) {
-		customFieldValues_ = new HashSet<>();
-			for (CustomFieldValueEditForm valueForm : customFieldValues) {
-				if (!valueForm.isEmpty()) {
-					customFieldValues_.add(valueForm);
-				}
-			}
-		}
-
 		ArticleCreateRequest.Builder builder = new ArticleCreateRequest.Builder();
 		return builder
 				.code(code)
@@ -215,7 +205,7 @@ public class ArticleCreateForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
-				.customFieldValues(customFieldValues_)
+				.customFieldValues(customFieldValues)
 				.language(language)
 				.build();
 	}

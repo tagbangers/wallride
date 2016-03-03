@@ -190,7 +190,7 @@ public class ArticleEditForm implements Serializable {
 		if (!CollectionUtils.isEmpty(customFieldValues)) {
 			customFieldValues_ = customFieldValues.stream()
 					.filter(v -> v.getCustomFieldId() != 0)
-					.filter(v -> !v.isEmpty())
+//					.filter(v -> !v.isEmpty())
 					.collect(Collectors.toList());
 		}
 
@@ -257,8 +257,15 @@ public class ArticleEditForm implements Serializable {
 
 			for (CustomFieldValue value : fieldValues) {
 				if (field.equals(value.getCustomField())) {
+					valueForm.setId(value.getId());
 					valueForm.setNumberValue(value.getNumberValue());
-					valueForm.setStringValue(value.getStringValue());
+					if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+						if (value.getStringValue() != null) {
+							valueForm.setStringValues(value.getStringValue().split(","));
+						}
+					} else {
+						valueForm.setStringValue(value.getStringValue());
+					}
 					valueForm.setDateValue(value.getDateValue());
 					valueForm.setDatetimeValue(value.getDatetimeValue());
 					valueForm.setTextValue(value.getTextValue());

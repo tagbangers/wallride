@@ -229,14 +229,6 @@
 								</fieldset>
 							</div>
 							<div class="col-sm-3 wr-tool-panel">
-								<div class="tools clearfix">
-									<div class="status" th:if="${page} ne null">
-										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
-										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
-										<span th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" class="glyphicon glyphicon-globe"></span>
-										<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span><br />
-									</div>
-								</div>
 								<fieldset>
 									<legend th:text="#{Date}">Date</legend>
 									<div class="form-group row" th:classappend="${#fields.hasErrors('date')}? has-error">

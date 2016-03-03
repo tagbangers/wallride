@@ -19,6 +19,20 @@
 							</div>
 						</div>
 						<div class="col-sm-3">
+							<div class="pull-left">
+								<div class="tools clearfix">
+									<div class="status">
+										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
+										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
+										<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+										<a th:href="@{__${WEBSITE_PATH}__/__${#temporals.format(page.date, 'yyyy/MM/dd')}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
+											<span class="glyphicon glyphicon-globe"></span>
+											<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+										</a>
+									</div>
+									<p class="publish-date"><span th:if="${page.date ne null}" th:text="${#temporals.format(page.date, 'yyyy/MM/dd HH:mm')}"></span></p>
+								</div>
+							</div>
 							<div class="pull-right">
 								<div class="btn-group">
 									<div th:classappend="${prev eq null}?'disabled'" class="previous">
@@ -65,23 +79,6 @@
 							<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id},query=${query})}" th:text="${page.author}">Author</a>
 						</div>
 						<div class="col-sm-3 wr-tool-panel">
-							<div class="tools clearfix">
-								<div class="pull-left">
-									<div class="status">
-										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
-										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
-										<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-										<a th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
-											<span class="glyphicon glyphicon-globe"></span>
-											<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-										</a>
-									</div>
-								</div>
-							</div>
-							<dl>
-								<dt th:text="#{Date}">Date</dt>
-								<dd th:if="${page.date ne null}" th:text="${#temporals.format(page.date, 'yyyy/MM/dd HH:mm')}"></dd>
-							</dl>
 							<dl>
 								<dt th:text="#{ParentPage}">Parent Page</dt>
 								<dd>

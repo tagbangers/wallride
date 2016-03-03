@@ -27,7 +27,6 @@ import java.util.List;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "language"}))
 @DynamicInsert
 @DynamicUpdate
-@Analyzer(definition = "synonyms")
 @Indexed
 @SuppressWarnings("serial")
 public class CustomField extends DomainObject<Long> implements Comparable<CustomField> {
@@ -149,10 +148,5 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	@Override
 	public String toString() {
 		return getName();
-	}
-
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(getId()).toHashCode();
 	}
 }
