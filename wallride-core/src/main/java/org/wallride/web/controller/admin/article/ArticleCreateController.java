@@ -68,8 +68,7 @@ public class ArticleCreateController {
 	@ModelAttribute("form")
 	public ArticleCreateForm articleCreateForm() {
 		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
-		ArticleCreateForm form = new ArticleCreateForm(customFields);
-		return  form;
+		return new ArticleCreateForm(customFields);
 	}
 
 	@ModelAttribute("categoryNodes")

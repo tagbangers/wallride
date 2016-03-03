@@ -29,19 +29,23 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Category;
+import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.Page;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.TreeNode;
+import org.wallride.core.service.CustomFieldService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.CategoryUtils;
+import org.wallride.web.controller.admin.article.ArticleEditForm;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/{language}/pages/edit")
@@ -51,6 +55,9 @@ public class PageEditController {
 	
 	@Inject
 	private PageService pageService;
+
+	@Inject
+	private CustomFieldService customFieldService;
 
 	@Inject
 	private CategoryUtils categoryUtils;
@@ -93,8 +100,8 @@ public class PageEditController {
 			redirectAttributes.addAttribute("language", language);
 			return "redirect:/_admin/{language}/pages/index";
 		}
-
-		PageEditForm form = PageEditForm.fromDomainObject(page);
+		Set<CustomField> customFields = customFieldService.getAllCustomFields();
+		PageEditForm form = PageEditForm.fromDomainObject(page, customFields);
 		model.addAttribute("form", form);
 
 		Page draft = pageService.getDraftById(id);
@@ -116,7 +123,6 @@ public class PageEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/pages/index";
 		}
-
 		Page draft = pageService.getDraftById(id);
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);
@@ -124,8 +130,8 @@ public class PageEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/pages/edit";
 		}
-
-		PageEditForm form = PageEditForm.fromDomainObject(draft);
+		Set<CustomField> customFields = customFieldService.getAllCustomFields();
+		PageEditForm form = PageEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 
 		return "page/edit";

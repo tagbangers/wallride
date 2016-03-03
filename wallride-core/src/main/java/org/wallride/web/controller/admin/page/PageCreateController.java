@@ -29,20 +29,24 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.wallride.core.domain.Category;
+import org.wallride.core.domain.CustomField;
 import org.wallride.core.domain.Page;
 import org.wallride.core.domain.Post;
 import org.wallride.core.exception.DuplicateCodeException;
 import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.TreeNode;
+import org.wallride.core.service.CustomFieldService;
 import org.wallride.core.service.PageService;
 import org.wallride.core.support.AuthorizedUser;
 import org.wallride.core.support.CategoryUtils;
+import org.wallride.web.controller.admin.article.ArticleCreateForm;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/{language}/pages/create")
@@ -57,11 +61,15 @@ public class PageCreateController {
 	private CategoryUtils categoryUtils;
 
 	@Inject
+	private CustomFieldService customFieldService;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
 	public PageCreateForm pageCreateForm() {
-		return new PageCreateForm();
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
+		return new PageCreateForm(customFields);
 	}
 
 	@ModelAttribute("categoryNodes")

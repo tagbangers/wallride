@@ -94,44 +94,9 @@ public class CustomFieldService {
 	}
 
 
-/*	@CacheEvict(value="articles", allEntries=true)
-	public CustomField updateCustomField(CustomFieldUpdateRequest request, AuthorizedUser authorizedUser) {
-		CustomField customField = customFieldRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
-		CustomField parent = null;
-		if (request.getParentId() != null) {
-			parent = customFieldRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage());
-		}
-
-		if (!(customField.getParent() == null && parent == null) && !ObjectUtils.nullSafeEquals(customField.getParent(), parent)) {
-			customFieldRepository.shiftLftRgt(customField.getLft(), customField.getRgt());
-			customFieldRepository.shiftRgt(customField.getRgt());
-			customFieldRepository.shiftLft(customField.getRgt());
-
-			int rgt = 0;
-			if (parent == null) {
-				rgt = customFieldRepository.findMaxRgt();
-				rgt++;
-			}
-			else {
-				rgt = parent.getRgt();
-				customFieldRepository.unshiftRgt(rgt);
-				customFieldRepository.unshiftLft(rgt);
-			}
-			customField.setLft(rgt);
-			customField.setRgt(rgt + 1);
-		}
-
-		customField.setParent(parent);
-		customField.setCode(request.getCode() != null ? request.getCode() : request.getName());
-		customField.setName(request.getName());
-		customField.setDescription(request.getDescription());
-		customField.setLanguage(request.getLanguage());
-
-		return customFieldRepository.save(customField);
-	}
-
-	@CacheEvict(value="articles", allEntries=true)
-	public void updateCustomFieldHierarchy(List<Map<String, Object>> data, String language) {
+/*
+	@CacheEvict(value="customFields", allEntries=true)
+	public void updateCustomFieldOrder(List<Map<String, Object>> data, String language) {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {

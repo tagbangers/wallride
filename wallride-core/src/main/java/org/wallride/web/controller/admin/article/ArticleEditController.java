@@ -57,6 +57,9 @@ public class ArticleEditController {
 	private ArticleService articleService;
 
 	@Inject
+	private CustomFieldService customFieldService;
+
+	@Inject
 	private CategoryUtils categoryUtils;
 
 	@Inject
@@ -73,9 +76,6 @@ public class ArticleEditController {
 	public List<TreeNode<Category>> setupCategoryNodes(@PathVariable String language) {
 		return categoryUtils.getNodes(true);
 	}
-
-	@Inject
-	private CustomFieldService customFieldService;
 
 	@ModelAttribute("query")
 	public String query(@RequestParam(required = false) String query) {

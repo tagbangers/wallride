@@ -19,11 +19,10 @@ package org.wallride.web.controller.admin.page;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.Page;
-import org.wallride.core.domain.Post;
-import org.wallride.core.domain.Tag;
+import org.springframework.util.CollectionUtils;
+import org.wallride.core.domain.*;
 import org.wallride.core.model.PageUpdateRequest;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public class PageEditForm implements Serializable {
@@ -65,6 +65,8 @@ public class PageEditForm implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 //	private Post.Status status;
 	
@@ -190,7 +192,15 @@ public class PageEditForm implements Serializable {
 //	public void setStatus(Post.Status status) {
 //		this.status = status;
 //	}
-	
+
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
+	}
+
 	public String getLanguage() {
 		return language;
 	}
@@ -200,6 +210,13 @@ public class PageEditForm implements Serializable {
 	}
 
 	public PageUpdateRequest buildPageUpdateRequest() {
+		List<CustomFieldValueEditForm> customFieldValues_ = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(customFieldValues)) {
+			customFieldValues_ = customFieldValues.stream()
+					.filter(v -> v.getCustomFieldId() != 0)
+					.collect(Collectors.toList());
+		}
+
 		PageUpdateRequest.Builder builder = new PageUpdateRequest.Builder();
 		return builder
 				.id(id)
@@ -216,12 +233,13 @@ public class PageEditForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
+				.customFieldValues(customFieldValues_)
 //				.status(status)
 				.language(language)
 				.build();
 	}
 
-	public static PageEditForm fromDomainObject(Page page) {
+	public static PageEditForm fromDomainObject(Page page, Set<CustomField> customFields) {
 		PageEditForm form = new PageEditForm();
 		BeanUtils.copyProperties(page, form);
 
@@ -250,6 +268,33 @@ public class PageEditForm implements Serializable {
 			form.setSeoTitle(page.getSeo().getTitle());
 			form.setSeoDescription(page.getSeo().getDescription());
 			form.setSeoKeywords(page.getSeo().getKeywords());
+		}
+		List<CustomFieldValue> fieldValues = new ArrayList<>(page.getCustomFieldValues());
+		for (CustomField field : customFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(field.getId());
+			valueForm.setName(field.getName());
+			valueForm.setDescription(field.getDescription());
+			valueForm.setFieldType(field.getFieldType());
+			valueForm.setOptions(field.getOptions());
+
+			for (CustomFieldValue value : fieldValues) {
+				if (field.equals(value.getCustomField())) {
+					valueForm.setId(value.getId());
+					valueForm.setNumberValue(value.getNumberValue());
+					if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+						if (value.getStringValue() != null) {
+							valueForm.setStringValues(value.getStringValue().split(","));
+						}
+					} else {
+						valueForm.setStringValue(value.getStringValue());
+					}
+					valueForm.setDateValue(value.getDateValue());
+					valueForm.setDatetimeValue(value.getDatetimeValue());
+					valueForm.setTextValue(value.getTextValue());
+				}
+			}
+			form.getCustomFieldValues().add(valueForm);
 		}
 		return form;
 	}

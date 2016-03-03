@@ -244,8 +244,6 @@ public class ArticleEditForm implements Serializable {
 			form.setSeoKeywords(article.getSeo().getKeywords());
 		}
 
-//		customFields.stream().filter(field -> field.
-
 		List<CustomFieldValue> fieldValues = new ArrayList<>(article.getCustomFieldValues());
 		for (CustomField field : customFields) {
 			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();

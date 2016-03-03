@@ -41,6 +41,7 @@ import org.wallride.core.exception.EmptyCodeException;
 import org.wallride.core.model.*;
 import org.wallride.core.repository.*;
 import org.wallride.core.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -208,6 +209,25 @@ public class PageService {
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
 
+		page.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =  new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(page);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setStringValue(String.join(",", valueForm.getStringValues()));
+				} else {
+					value.setStringValue(valueForm.getStringValue());
+				}
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				page.getCustomFieldValues().add(value);
+			}
+		}
+		
 		return pageRepository.save(page);
 	}
 
@@ -227,6 +247,10 @@ public class PageService {
 						.parentId(request.getParentId())
 						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createPage(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -244,6 +268,10 @@ public class PageService {
 						.parentId(request.getParentId())
 						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(request.getCustomFieldValues())
 						.language(request.getLanguage())
 						.build();
 				return savePage(updateRequest, authorizedUser);
@@ -400,6 +428,45 @@ public class PageService {
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
 
+		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				boolean isNew = true;
+				for (CustomFieldValue value : page.getCustomFieldValues()) {
+					if (value.getId().equals(valueForm.getId())) {
+						if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+							value.setStringValue(String.join(",", valueForm.getStringValues()));
+						} else {
+							value.setStringValue(valueForm.getStringValue());
+						}
+						value.setTextValue(valueForm.getTextValue());
+						value.setNumberValue(valueForm.getNumberValue());
+						value.setDateValue(valueForm.getDateValue());
+						value.setDatetimeValue(valueForm.getDatetimeValue());
+						fieldValues.add(value);
+						isNew = false;
+					}
+				}
+				if (isNew) {
+					CustomFieldValue newValue = new CustomFieldValue();
+					newValue.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+					newValue.setPost(page);
+					if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+						newValue.setStringValue(String.join(",", valueForm.getStringValues()));
+					} else {
+						newValue.setStringValue(valueForm.getStringValue());
+					}
+					newValue.setTextValue(valueForm.getTextValue());
+					newValue.setNumberValue(valueForm.getNumberValue());
+					newValue.setDateValue(valueForm.getDateValue());
+					newValue.setDatetimeValue(valueForm.getDatetimeValue());
+					fieldValues.add(newValue);
+				}
+			}
+		}
+		page.getCustomFieldValues().clear();
+		page.setCustomFieldValues(new TreeSet<>(fieldValues));
+		
 		return pageRepository.save(page);
 	}
 
