@@ -18,14 +18,15 @@ package org.wallride.autoconfigure;
 
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.util.ClassUtils;
 import org.wallride.domain.DomainObject;
 
 @Configuration
+@EntityScan(basePackageClasses = DomainObject.class)
 //@EnableJpaAuditing
 public class WallRideJpaConfiguration extends HibernateJpaAutoConfiguration {
 
@@ -34,12 +35,5 @@ public class WallRideJpaConfiguration extends HibernateJpaAutoConfiguration {
 	@Override
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
 		return super.entityManagerFactory(factoryBuilder);
-	}
-
-	@Override
-	protected String[] getPackagesToScan() {
-		return new String[] {
-				ClassUtils.getPackageName(DomainObject.class)
-		};
 	}
 }

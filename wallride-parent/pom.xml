@@ -48,7 +48,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spring-cloud-aws-context.verion>1.0.3.RELEASE</spring-cloud-aws-context.verion>
+        <spring-cloud-aws-context.verion>1.0.4.RELEASE</spring-cloud-aws-context.verion>
         <hibernate.version>5.1.0.Final</hibernate.version>
         <hibernate-search.version>5.5.2.Final</hibernate-search.version>
         <infinispan.version>8.1.0.Final</infinispan.version>

@@ -31,8 +31,6 @@ import org.wallride.autoconfigure.WallRideServletConfiguration;
 import org.wallride.domain.Blog;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.service.BlogService;
-import org.wallride.service.CategoryService;
-import org.wallride.service.PageService;
 import org.wallride.support.AuthorizedUser;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,21 +43,11 @@ import java.util.Map;
 public class DefaultModelAttributeInterceptor extends HandlerInterceptorAdapter {
 
 	private BlogService blogService;
-	private CategoryService categoryService;
-	private PageService pageService;
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultModelAttributeInterceptor.class);
 
 	public void setBlogService(BlogService blogService) {
 		this.blogService = blogService;
-	}
-
-	public void setCategoryService(CategoryService categoryService) {
-		this.categoryService = categoryService;
-	}
-
-	public void setPageService(PageService pageService) {
-		this.pageService = pageService;
 	}
 
 	@Override

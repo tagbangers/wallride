@@ -1,6 +1,6 @@
 package org.wallride.autoconfigure;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
@@ -8,14 +8,11 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
-import org.wallride.web.WebAdminConfiguration;
-import org.wallride.web.WebGuestConfiguration;
 import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
@@ -84,41 +81,54 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(name = "adminServletRegistrationBean")
+	public DispatcherServlet adminDispatcherServlet() {
+		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		context.setResourceLoader(getResourceLoader());
+		context.register(WebAdminConfiguration.class);
+		return new DispatcherServlet(context);
+	}
+
+	@Bean
+//	@ConditionalOnMissingBean(name = "adminServletRegistrationBean")
 	public ServletRegistrationBean adminServletRegistrationBean() {
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(createAdminServletContext());
-		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
+		ServletRegistrationBean registration = new ServletRegistrationBean(adminDispatcherServlet());
 		registration.setName(ADMIN_SERVLET_NAME);
 		registration.setLoadOnStartup(1);
 		registration.addUrlMappings(ADMIN_SERVLET_PATH + "/*");
 		return registration;
 	}
 
-	@Bean
-	@ConditionalOnMissingBean(name = "guestServletRegistrationBean")
-	public ServletRegistrationBean guestServletRegistrationBean() {
-		DispatcherServlet dispatcherServlet = new DispatcherServlet(createGuestServletContext());
+	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+	public DispatcherServlet guestDispatcherServlet() {
+		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		context.setResourceLoader(getResourceLoader());
+		context.register(WebGuestConfiguration.class);
+		return new DispatcherServlet(context);
+	}
+
+	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
+//	@ConditionalOnMissingBean(name = "guestServletRegistrationBean")
+	public ServletRegistrationBean guestServletRegistrationBean(DispatcherServlet dispatcherServlet) {
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
-//		registration.setName(DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME);
 		registration.setName(GUEST_SERVLET_NAME);
 		registration.setLoadOnStartup(2);
 		registration.addUrlMappings(GUEST_SERVLET_PATH + "/*");
 		return registration;
 	}
 
-	protected WebApplicationContext createAdminServletContext() {
-		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-		context.setResourceLoader(getResourceLoader());
-		context.register(WebAdminConfiguration.class);
-		return context;
-	}
-
-	protected WebApplicationContext createGuestServletContext() {
-		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-		context.setResourceLoader(getResourceLoader());
-		context.register(WebGuestConfiguration.class);
-		return context;
-	}
+//	protected WebApplicationContext createAdminServletContext() {
+//		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+//		context.setResourceLoader(getResourceLoader());
+//		context.register(WebAdminConfiguration.class);
+//		return context;
+//	}
+//
+//	protected WebApplicationContext createGuestServletContext() {
+//		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+//		context.setResourceLoader(getResourceLoader());
+//		context.register(WebGuestConfiguration.class);
+//		return context;
+//	}
 
 	@Bean
 	public RequestContextListener requestContextListener() {

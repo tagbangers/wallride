@@ -17,16 +17,30 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.service.CategoryService;
 import org.wallride.service.PageService;
 import org.wallride.support.CategoryUtils;
 import org.wallride.support.PageUtils;
+import org.wallride.web.support.ExtendedThymeleafViewResolver;
+
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Configuration
-public class WallRideThymeleafConfiguration extends ThymeleafAutoConfiguration {
+public class WallRideThymeleafConfiguration {
 
 	@Autowired
 	private WallRideProperties wallRideProperties;
@@ -36,6 +50,15 @@ public class WallRideThymeleafConfiguration extends ThymeleafAutoConfiguration {
 
 	@Autowired
 	private CategoryService categoryService;
+
+	@Inject
+	private SpringResourceResourceResolver springResourceResourceResolver;
+
+	@Inject
+	private ThymeleafProperties thymeleafProperties;
+
+	@Inject
+	private Environment environment;
 
 	@Bean
 	public PageUtils pageUtils() {
@@ -55,4 +78,60 @@ public class WallRideThymeleafConfiguration extends ThymeleafAutoConfiguration {
 		dialect.setWallRideProperties(wallRideProperties);
 		return dialect;
 	}
+
+	@Bean(name = {"defaultTemplateResolver", "homePathTemplateResolver"})
+	public TemplateResolver homePathTemplateResolver() {
+		TemplateResolver resolver = new TemplateResolver();
+		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setPrefix(wallRideProperties.getHome() + "themes/default/templates/");
+		resolver.setSuffix(this.thymeleafProperties.getSuffix());
+		resolver.setTemplateMode(this.thymeleafProperties.getMode());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
+		resolver.setCacheable(this.thymeleafProperties.isCache());
+		resolver.setOrder(1);
+		return resolver;
+	}
+
+	@Bean
+	public TemplateResolver classPathTemplateResolver() {
+		TemplateResolver resolver = new TemplateResolver();
+		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
+		resolver.setSuffix(this.thymeleafProperties.getSuffix());
+		resolver.setTemplateMode(this.thymeleafProperties.getMode());
+		resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
+		resolver.setCacheable(this.thymeleafProperties.isCache());
+		resolver.setOrder(2);
+		return resolver;
+	}
+
+	@Bean
+	public SpringTemplateEngine templateEngine() {
+		SpringTemplateEngine engine = new SpringTemplateEngine();
+//		engine.setTemplateResolver(templateResolver());
+		Set<TemplateResolver> templateResolvers = new LinkedHashSet<>();
+		templateResolvers.add(homePathTemplateResolver());
+		templateResolvers.add(classPathTemplateResolver());
+		engine.setTemplateResolvers(templateResolvers);
+
+		Set<IDialect> dialects = new HashSet<>();
+		dialects.add(new SpringSecurityDialect());
+		dialects.add(new Java8TimeDialect());
+		dialects.add(wallRideThymeleafDialect());
+		engine.setAdditionalDialects(dialects);
+		return engine;
+	}
+
+	@Bean
+	public ThymeleafViewResolver thymeleafViewResolver() {
+		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
+		viewResolver.setTemplateEngine(templateEngine());
+		viewResolver.setViewNames(this.thymeleafProperties.getViewNames());
+		viewResolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
+		viewResolver.setContentType(this.thymeleafProperties.getContentType() + ";charset=" + this.thymeleafProperties.getEncoding());
+		viewResolver.setCache(false);
+		viewResolver.setOrder(2);
+		return viewResolver;
+	}
+
 }

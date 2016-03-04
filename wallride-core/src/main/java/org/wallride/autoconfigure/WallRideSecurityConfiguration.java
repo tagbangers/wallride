@@ -51,7 +51,6 @@ import org.wallride.support.ProxyInsecureChannelProcessor;
 import org.wallride.support.ProxySecureChannelProcessor;
 import org.wallride.web.support.BlogLanguageRedirectStrategy;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +60,8 @@ import java.util.List;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WallRideSecurityConfiguration {
 
-	@Inject
+	@Autowired
 	private DataSource dataSource;
-//	@Inject
-//	private CacheManager cacheManager;
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -79,13 +76,13 @@ public class WallRideSecurityConfiguration {
 	@Order(1)
 	public static class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
 
-		@Inject
+		@Autowired
 		private AccessDecisionManager accessDecisionManager;
-//		@Inject
+//		@Autowired
 //		private SecurityExpressionHandler securityExpressionHandler;
-		@Inject
+		@Autowired
 		private PersistentTokenRepository persistentTokenRepository;
-		@Inject
+		@Autowired
 		private Environment environment;
 
 		@Override
@@ -146,13 +143,13 @@ public class WallRideSecurityConfiguration {
 	@Order(2)
 	public static class GuestSecurityConfig extends WebSecurityConfigurerAdapter {
 
-		@Inject
+		@Autowired
 		private AccessDecisionManager accessDecisionManager;
-//		@Inject
+//		@Autowired
 //		private SecurityExpressionHandler securityExpressionHandler;
-		@Inject
+		@Autowired
 		private PersistentTokenRepository persistentTokenRepository;
-		@Inject
+		@Autowired
 		private Environment environment;
 
 		@Override

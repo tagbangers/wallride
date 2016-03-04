@@ -1,55 +1,41 @@
-package org.wallride;
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.wallride.autoconfigure;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
-import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
-import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.service.BlogService;
 
-public class WallRideApplication extends SpringApplication {
-
-	public WallRideApplication(Object... sources) {
-		super(sources);
-		setApplicationContextClass(AnnotationConfigEmbeddedWebApplicationContext.class);
-		setEnvironment(createEnvironment());
-		setResourceLoader(createResourceLoader());
-	}
-
-	public static ConfigurableApplicationContext run(Object source, String... args) {
-		return run(new Object[] { DefaultSource.class, source }, args);
-	}
-
-	public static ConfigurableApplicationContext run(Object[] sources, String[] args) {
-		return new WallRideApplication(sources).run(args);
-	}
-
-	public static SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		builder.sources(WallRideApplication.DefaultSource.class);
-		builder.resourceLoader(WallRideApplication.createResourceLoader());
-		builder.environment(WallRideApplication.createEnvironment());
-		return builder;
-	}
+public class WallRideInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
 	@Override
-	public ConfigurableApplicationContext run(String... args) {
-		return super.run(args);
+	public void onApplicationEvent(ApplicationStartedEvent event) {
+		event.getSpringApplication().setEnvironment(createEnvironment());
+		event.getSpringApplication().setResourceLoader(createResourceLoader());
 	}
 
 	public static ConfigurableEnvironment createEnvironment() {
@@ -86,12 +72,4 @@ public class WallRideApplication extends SpringApplication {
 		}
 		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader, new PathMatchingResourcePatternResolver());
 	}
-
-	@EnableAutoConfiguration(exclude = {
-			DispatcherServletAutoConfiguration.class,
-			WebMvcAutoConfiguration.class,
-			SpringDataWebAutoConfiguration.class,
-	})
-	@ComponentScan(basePackageClasses = BlogService.class)
-	public static class DefaultSource {}
 }

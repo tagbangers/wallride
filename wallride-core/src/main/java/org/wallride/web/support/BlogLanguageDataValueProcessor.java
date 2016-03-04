@@ -54,7 +54,7 @@ public class BlogLanguageDataValueProcessor implements RequestDataValueProcessor
 		}
 
 		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
-		if (blogLanguage.getBlog().getLanguages().size() <= 1) {
+		if (blogLanguage == null || blogLanguage.getBlog().getLanguages().size() <= 1) {
 			return url;
 		}
 

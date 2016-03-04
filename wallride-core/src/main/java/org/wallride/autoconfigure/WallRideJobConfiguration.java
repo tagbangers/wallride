@@ -17,18 +17,15 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.wallride.job.UpdatePostViewsJobConfigurer;
 
 @Configuration
-@AutoConfigureAfter(WallRideJpaConfiguration.class)
 @Import({
 		UpdatePostViewsJobConfigurer.class,
 })
 @EnableBatchProcessing
-public class WallRideBatchConfiguration extends BatchAutoConfiguration {
+public class WallRideJobConfiguration {
 
 }

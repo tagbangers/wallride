@@ -16,18 +16,22 @@
 
 package org.wallride.bootstrap;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.wallride.WallRideApplication;
 
+@SpringBootApplication
+//@EnableAutoConfiguration
 public class Bootstrap extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
-		WallRideApplication.run(Bootstrap.class, args);
+		SpringApplication.run(Bootstrap.class, args);
 	}
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return WallRideApplication.configure(builder);
-	}
+//	@Override
+//	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+//		return SpringApplication.configure(builder);
+//	}
 }

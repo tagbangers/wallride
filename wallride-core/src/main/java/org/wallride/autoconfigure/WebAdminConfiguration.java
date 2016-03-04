@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.wallride.web;
+package org.wallride.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,12 +49,9 @@ import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.service.BlogService;
-import org.wallride.service.CategoryService;
-import org.wallride.service.PageService;
-import org.wallride.autoconfigure.WallRideThymeleafDialect;
+import org.wallride.web.controller.admin.DashboardController;
 import org.wallride.web.support.*;
 
-import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
@@ -64,31 +62,26 @@ import java.util.Locale;
 import java.util.Set;
 
 @Configuration
-@ComponentScan(basePackages= "org.wallride.web.controller.admin", excludeFilters={ @ComponentScan.Filter(Configuration.class)} )
+@ComponentScan(basePackageClasses = DashboardController.class)
 @EnableWebMvc
 public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 
-	@Inject
+	@Autowired
 	private MessageCodesResolver messageCodesResolver;
-	@Inject
+
+	@Autowired
 	private SpringResourceResourceResolver springResourceResourceResolver;
 
-	@Inject
+	@Autowired
 	private WallRideThymeleafDialect wallRideThymeleafDialect;
 
-	@Inject
+	@Autowired
 	private BlogService blogService;
 
-	@Inject
-	private CategoryService categoryService;
-
-	@Inject
-	private PageService pageService;
-
-	@Inject
+	@Autowired
 	private Environment environment;
 
-	@Inject
+	@Autowired
 	private ThymeleafProperties properties;
 
 	@Override
@@ -165,8 +158,6 @@ public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
 		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
 		defaultModelAttributeInterceptor.setBlogService(blogService);
-		defaultModelAttributeInterceptor.setCategoryService(categoryService);
-		defaultModelAttributeInterceptor.setPageService(pageService);
 		return defaultModelAttributeInterceptor;
 	}
 
