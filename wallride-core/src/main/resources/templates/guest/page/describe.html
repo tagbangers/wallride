@@ -43,6 +43,7 @@
 							<h1 th:text="${page.title}"></h1>
 						</div>
 						<p th:utext="${#posts.body(page)}"></p>
+
 						<time></time>
 					</article>
 					<div class="col-md-3">
@@ -55,11 +56,12 @@
 								</a>
 							</th:block>
 							<!--/*/ </th:block> /*/-->
-							<ul th:if="${page.tags}" class="list-inline">
-								<li th:each="tag : ${page.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
-							</ul>
-
 						</div>
+						<br/>
+						<ul th:if="${page.tags}" class="list-inline">
+							<li th:each="tag : ${page.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
+						</ul>
+						<p th:utext="${#posts.customValue(page,'html')}"></p>
 					</div>
 				</div>
 			</div>

@@ -26,16 +26,10 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.Page;
-import org.wallride.core.domain.Post;
+import org.wallride.core.domain.*;
 import org.wallride.core.support.PageUtils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -212,5 +206,14 @@ public class Posts {
 			return summary;
 		}
 		return summary.substring(0, length) + "...";
+	}
+
+	//TODO
+	public Object customValue(Post post, String name) {
+		Optional<CustomFieldValue> target = post.getCustomFieldValues().stream()
+				.filter(v -> v.getCustomField().getName().equals(name))
+				.findFirst();
+		Optional value = target.map(CustomFieldValue::getValue);
+		return value.orElse(null);
 	}
 }

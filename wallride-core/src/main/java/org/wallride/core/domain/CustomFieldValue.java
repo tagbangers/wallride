@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "custom_field_id"}))
 @DynamicInsert
 @DynamicUpdate
 @Analyzer(definition = "synonyms")
@@ -114,6 +114,27 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 
 	public void setDatetimeValue(LocalDateTime datetimeValue) {
 		this.datetimeValue = datetimeValue;
+	}
+
+	public Object getValue() {
+		switch (getCustomField().getFieldType()) {
+			case TEXT:
+			case SELECTBOX:
+			case RADIO:
+			case CHECKBOX:
+				return getStringValue();
+			case TEXTAREA:
+			case HTML:
+				return getTextValue();
+			case DATE:
+				return getDateValue();
+			case DATETIME:
+				return getDatetimeValue();
+			case NUMBER:
+				return getNumberValue();
+			default:
+				return null;
+		}
 	}
 
 	public boolean isEmpty() {

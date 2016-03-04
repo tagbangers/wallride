@@ -332,12 +332,12 @@ pre {
 ul.nested-sortable .placeholder {
 	outline: 1px dashed #bbb;
 }
-ul.nested-sortable, ul.nested-sortable ul {
+ul.nested-sortable,ul.sortable, ul.nested-sortable ul {
 	margin: 0 0 0 50px;
 	padding: 0;
 	list-style-type: none;
 }
-ul.nested-sortable {
+ul.nested-sortable, ul.sortable {
 	margin: 1em 0;
 }
 .nested-sortable li {
@@ -389,6 +389,7 @@ ul.nested-sortable {
 }
 .field-option-group ul li.option {
     border-bottom: 1px solid #d2d2d2;
+    margin-top: 10px;
 }
 .field-option-group .field-option {
     display: inline-block;

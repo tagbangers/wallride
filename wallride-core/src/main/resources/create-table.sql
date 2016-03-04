@@ -272,6 +272,9 @@ alter table custom_field
 alter table custom_field
 	add constraint UK_l6uj9qracv5sa03gb9g6amy19 unique (idx);
 
+alter table custom_field_value
+  add constraint UK9ob57xu92vk3be63clvjc9hii unique (post_id, custom_field_id);
+
 alter table popular_post
 	add constraint UK_a5tm7yxs8io57gsrtb5tbrlcm  unique (language, type, rank);
 

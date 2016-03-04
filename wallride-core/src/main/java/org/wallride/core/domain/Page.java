@@ -46,6 +46,7 @@ import java.util.List;
 					@NamedAttributeNode("tags"),
 					@NamedAttributeNode("relatedToPosts"),
 					@NamedAttributeNode("relatedByPosts"),
+					@NamedAttributeNode("customFieldValues")
 			}
 	)
 })
