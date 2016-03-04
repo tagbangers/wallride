@@ -77,7 +77,7 @@ public class PageDescribeController extends AbstractController {
 		}
 
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("/page/describe");
+		modelAndView.setViewName("page/describe");
 		modelAndView.addObject("page", page);
 		return modelAndView;
 	}
