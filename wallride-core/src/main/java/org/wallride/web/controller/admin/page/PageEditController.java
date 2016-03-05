@@ -28,17 +28,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.domain.Page;
-import org.wallride.core.exception.DuplicateCodeException;
-import org.wallride.core.exception.EmptyCodeException;
-import org.wallride.core.model.TreeNode;
-import org.wallride.core.service.CustomFieldService;
-import org.wallride.core.service.PageService;
-import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.CategoryUtils;
-import org.wallride.web.controller.admin.article.ArticleEditForm;
+import org.wallride.domain.Category;
+import org.wallride.domain.Page;
+import org.wallride.exception.DuplicateCodeException;
+import org.wallride.exception.EmptyCodeException;
+import org.wallride.model.TreeNode;
+import org.wallride.service.PageService;
+import org.wallride.support.AuthorizedUser;
+import org.wallride.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
 import org.wallride.web.support.RestValidationErrorModel;
 
@@ -123,6 +120,7 @@ public class PageEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/pages/index";
 		}
+
 		Page draft = pageService.getDraftById(id);
 		if (draft == null) {
 			redirectAttributes.addAttribute("language", language);

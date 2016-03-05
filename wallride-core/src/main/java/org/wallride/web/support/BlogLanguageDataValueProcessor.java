@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.BlogLanguage;
+import org.wallride.domain.BlogLanguage;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class BlogLanguageDataValueProcessor implements RequestDataValueProcessor
 		}
 
 		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
-		if (blogLanguage.getBlog().getLanguages().size() <= 1) {
+		if (blogLanguage == null || blogLanguage.getBlog().getLanguages().size() <= 1) {
 			return url;
 		}
 

@@ -26,8 +26,11 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.*;
-import org.wallride.core.support.PageUtils;
+import org.wallride.domain.Article;
+import org.wallride.domain.Blog;
+import org.wallride.domain.Page;
+import org.wallride.domain.Post;
+import org.wallride.support.PageUtils;
 
 import java.util.*;
 import java.util.regex.Matcher;

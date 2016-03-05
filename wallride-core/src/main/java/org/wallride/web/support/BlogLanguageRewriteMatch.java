@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UrlPathHelper;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteMatch;
-import org.wallride.core.domain.BlogLanguage;
+import org.wallride.domain.BlogLanguage;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;

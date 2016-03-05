@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.Media;
-import org.wallride.core.service.MediaService;
+import org.wallride.domain.Media;
+import org.wallride.service.MediaService;
 
 import javax.inject.Inject;
 

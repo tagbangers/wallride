@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.comment;
 
-import org.wallride.core.model.CommentBulkDeleteRequest;
+import org.wallride.model.CommentBulkDeleteRequest;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

@@ -20,8 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.Media;
-import org.wallride.core.service.MediaService;
+import org.wallride.domain.Media;
+import org.wallride.service.MediaService;
 
 import javax.inject.Inject;
 import java.util.List;

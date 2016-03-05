@@ -18,8 +18,8 @@ package org.wallride.web.support;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.service.BlogService;
+import org.wallride.domain.Blog;
+import org.wallride.service.BlogService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

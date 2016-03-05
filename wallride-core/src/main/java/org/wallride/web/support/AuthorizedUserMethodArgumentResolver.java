@@ -23,7 +23,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.support.AuthorizedUser;
 
 public class AuthorizedUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
 

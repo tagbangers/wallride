@@ -26,10 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Comment;
-import org.wallride.core.exception.ServiceException;
-import org.wallride.core.service.CommentService;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.domain.Comment;
+import org.wallride.exception.ServiceException;
+import org.wallride.service.CommentService;
+import org.wallride.support.AuthorizedUser;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

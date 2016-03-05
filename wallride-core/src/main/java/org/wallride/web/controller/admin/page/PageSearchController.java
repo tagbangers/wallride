@@ -30,9 +30,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.wallride.core.domain.Page;
-import org.wallride.core.domain.Post;
-import org.wallride.core.service.PageService;
+import org.wallride.domain.Page;
+import org.wallride.domain.Post;
+import org.wallride.service.PageService;
 import org.wallride.web.support.ControllerUtils;
 import org.wallride.web.support.Pagination;
 

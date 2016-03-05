@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.User;
-import org.wallride.core.exception.DuplicateEmailException;
-import org.wallride.core.exception.DuplicateLoginIdException;
-import org.wallride.core.service.SignupService;
+import org.wallride.domain.User;
+import org.wallride.exception.DuplicateEmailException;
+import org.wallride.exception.DuplicateLoginIdException;
+import org.wallride.service.SignupService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

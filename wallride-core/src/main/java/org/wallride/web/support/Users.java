@@ -21,8 +21,8 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.User;
+import org.wallride.domain.Blog;
+import org.wallride.domain.User;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -22,12 +22,12 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UrlPathHelper;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.domain.Page;
-import org.wallride.core.domain.Post;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.service.PageService;
+import org.wallride.domain.Blog;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.domain.Page;
+import org.wallride.domain.Post;
+import org.wallride.service.BlogService;
+import org.wallride.service.PageService;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
 import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.LanguageUrlPathHelper;
@@ -77,7 +77,7 @@ public class PageDescribeController extends AbstractController {
 		}
 
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("/page/describe");
+		modelAndView.setViewName("page/describe");
 		modelAndView.addObject("page", page);
 		return modelAndView;
 	}

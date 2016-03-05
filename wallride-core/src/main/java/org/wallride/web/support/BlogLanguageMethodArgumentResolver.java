@@ -22,9 +22,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.service.BlogService;
+import org.wallride.domain.Blog;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.service.BlogService;
 
 public class BlogLanguageMethodArgumentResolver implements HandlerMethodArgumentResolver {
 

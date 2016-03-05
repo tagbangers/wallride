@@ -1,1 +1,7 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.wallride.autoconfigure.WallRideAutoConfiguration
+# Application Listeners
+org.springframework.context.ApplicationListener=\
+org.wallride.autoconfigure.WallRideInitializer
+
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.wallride.autoconfigure.WallRideAutoConfiguration

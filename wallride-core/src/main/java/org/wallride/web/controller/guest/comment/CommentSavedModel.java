@@ -17,8 +17,8 @@
 package org.wallride.web.controller.guest.comment;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.wallride.core.domain.Comment;
-import org.wallride.core.support.LocalDateTimeSerializer;
+import org.wallride.domain.Comment;
+import org.wallride.support.LocalDateTimeSerializer;
 import org.wallride.web.support.DomainObjectSavedModel;
 
 import java.time.LocalDateTime;

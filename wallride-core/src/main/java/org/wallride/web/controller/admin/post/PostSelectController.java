@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.wallride.core.domain.Post;
-import org.wallride.core.model.PostSearchRequest;
-import org.wallride.core.service.PostService;
+import org.wallride.domain.Post;
+import org.wallride.model.PostSearchRequest;
+import org.wallride.service.PostService;
 import org.wallride.web.support.DomainObjectSelect2Model;
 
 import javax.inject.Inject;

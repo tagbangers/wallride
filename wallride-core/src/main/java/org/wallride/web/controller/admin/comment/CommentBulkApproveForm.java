@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.comment;
 
-import org.wallride.core.model.CommentBulkApproveRequest;
+import org.wallride.model.CommentBulkApproveRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

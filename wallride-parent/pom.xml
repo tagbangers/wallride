@@ -48,8 +48,8 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spring-cloud-aws-context.verion>1.0.3.RELEASE</spring-cloud-aws-context.verion>
-        <hibernate.version>5.0.7.Final</hibernate.version>
+        <spring-cloud-aws-context.verion>1.0.4.RELEASE</spring-cloud-aws-context.verion>
+        <hibernate.version>5.1.0.Final</hibernate.version>
         <hibernate-search.version>5.5.2.Final</hibernate-search.version>
         <infinispan.version>8.1.0.Final</infinispan.version>
         <infinispan-spring4.version>8.1.0.Alpha2</infinispan-spring4.version>
@@ -140,6 +140,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!--

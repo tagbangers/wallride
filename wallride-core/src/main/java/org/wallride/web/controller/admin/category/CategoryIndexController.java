@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.wallride.core.domain.Post;
-import org.wallride.core.service.ArticleService;
-import org.wallride.core.service.CategoryService;
-import org.wallride.core.support.CategoryUtils;
+import org.wallride.domain.Post;
+import org.wallride.service.ArticleService;
+import org.wallride.service.CategoryService;
+import org.wallride.support.CategoryUtils;
 
 import javax.inject.Inject;
 import java.util.Map;

@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.service.SetupService;
+import org.wallride.domain.Blog;
+import org.wallride.service.BlogService;
+import org.wallride.service.SetupService;
 import org.wallride.web.support.HttpForbiddenException;
 
 import javax.inject.Inject;

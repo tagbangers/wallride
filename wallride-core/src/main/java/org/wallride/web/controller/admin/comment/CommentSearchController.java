@@ -32,8 +32,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.wallride.core.domain.Comment;
-import org.wallride.core.service.CommentService;
+import org.wallride.domain.Comment;
+import org.wallride.service.CommentService;
 import org.wallride.web.support.ControllerUtils;
 
 import javax.inject.Inject;

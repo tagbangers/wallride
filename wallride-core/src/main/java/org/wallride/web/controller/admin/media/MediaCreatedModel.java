@@ -17,7 +17,7 @@
 package org.wallride.web.controller.admin.media;
 
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.core.domain.Media;
+import org.wallride.domain.Media;
 
 import java.io.Serializable;
 

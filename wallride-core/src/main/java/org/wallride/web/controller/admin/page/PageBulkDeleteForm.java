@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.page;
 
-import org.wallride.core.model.PageBulkDeleteRequest;
+import org.wallride.model.PageBulkDeleteRequest;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

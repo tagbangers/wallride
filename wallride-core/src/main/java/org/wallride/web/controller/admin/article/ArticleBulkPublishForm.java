@@ -17,7 +17,7 @@
 package org.wallride.web.controller.admin.article;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.model.ArticleBulkPublishRequest;
+import org.wallride.model.ArticleBulkPublishRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

@@ -17,9 +17,9 @@
 package org.wallride.web.controller.admin.user;
 
 import org.springframework.beans.BeanUtils;
-import org.wallride.core.domain.PersonalName;
-import org.wallride.core.domain.User;
-import org.wallride.core.model.UserUpdateRequest;
+import org.wallride.domain.PersonalName;
+import org.wallride.domain.User;
+import org.wallride.model.UserUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

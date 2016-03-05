@@ -26,12 +26,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.GoogleAnalytics;
-import org.wallride.core.exception.GoogleAnalyticsException;
-import org.wallride.core.model.GoogleAnalyticsUpdateRequest;
-import org.wallride.core.service.BlogService;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.domain.Blog;
+import org.wallride.domain.GoogleAnalytics;
+import org.wallride.exception.GoogleAnalyticsException;
+import org.wallride.model.GoogleAnalyticsUpdateRequest;
+import org.wallride.service.BlogService;
+import org.wallride.support.AuthorizedUser;
 
 import javax.inject.Inject;
 

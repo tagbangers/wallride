@@ -22,9 +22,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.wallride.core.domain.Article;
-import org.wallride.core.domain.BlogLanguage;
-import org.wallride.core.service.ArticleService;
+import org.wallride.domain.Article;
+import org.wallride.domain.BlogLanguage;
+import org.wallride.service.ArticleService;
 import org.wallride.web.controller.guest.article.ArticleSearchForm;
 import org.wallride.web.support.Pagination;
 

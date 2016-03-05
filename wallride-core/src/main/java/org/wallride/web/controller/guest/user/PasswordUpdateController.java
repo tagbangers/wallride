@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.User;
-import org.wallride.core.model.PasswordUpdateRequest;
-import org.wallride.core.service.UserService;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.domain.User;
+import org.wallride.model.PasswordUpdateRequest;
+import org.wallride.service.UserService;
+import org.wallride.support.AuthorizedUser;
 
 import javax.inject.Inject;
 

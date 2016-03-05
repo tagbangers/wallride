@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Blog;
-import org.wallride.core.domain.GoogleAnalytics;
-import org.wallride.core.service.BlogService;
+import org.wallride.domain.Blog;
+import org.wallride.domain.GoogleAnalytics;
+import org.wallride.service.BlogService;
 
 import javax.inject.Inject;
 
