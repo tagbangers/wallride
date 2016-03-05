@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.wallride.repository.BlogRepository;
 import org.wallride.service.BlogService;
 
@@ -53,8 +52,8 @@ import org.wallride.service.BlogService;
 public class WallRideAutoConfiguration {
 
 	@Bean
-	public SpringResourceResourceResolver springResourceResourceResolver() {
-		return new SpringResourceResourceResolver();
+	public WallRideResourceResourceResolver wallRideResourceResourceResolver() {
+		return new WallRideResourceResourceResolver();
 	}
 
 	@Bean

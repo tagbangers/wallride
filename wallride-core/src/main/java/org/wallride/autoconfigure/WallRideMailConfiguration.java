@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
 import javax.inject.Inject;
@@ -34,7 +33,7 @@ import java.util.Set;
 public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 
 	@Inject
-	private SpringResourceResourceResolver springResourceResourceResolver;
+	private WallRideResourceResourceResolver wallRideResourceResourceResolver;
 
 	@Inject
 	private WallRideThymeleafDialect wallRideThymeleafDialect;
@@ -48,7 +47,7 @@ public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 	@Bean(name = "emailTemplateResolver")
 	public TemplateResolver emailTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setResourceResolver(wallRideResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.mail"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());

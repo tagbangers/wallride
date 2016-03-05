@@ -45,7 +45,6 @@ import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.service.BlogService;
@@ -70,7 +69,7 @@ public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 	private MessageCodesResolver messageCodesResolver;
 
 	@Autowired
-	private SpringResourceResourceResolver springResourceResourceResolver;
+	private WallRideResourceResourceResolver wallRideResourceResourceResolver;
 
 	@Autowired
 	private WallRideThymeleafDialect wallRideThymeleafDialect;
@@ -171,7 +170,7 @@ public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 	@Bean(name="adminTemplateResolver")
 	public TemplateResolver adminTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setResourceResolver(wallRideResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.admin"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());
@@ -184,7 +183,7 @@ public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
 	@Bean(name="guestTemplateResolver")
 	public TemplateResolver guestTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setResourceResolver(wallRideResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());

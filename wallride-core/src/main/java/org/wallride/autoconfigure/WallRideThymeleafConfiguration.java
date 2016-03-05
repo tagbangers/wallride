@@ -25,7 +25,6 @@ import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.resourceresolver.SpringResourceResourceResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.service.CategoryService;
@@ -52,7 +51,7 @@ public class WallRideThymeleafConfiguration {
 	private CategoryService categoryService;
 
 	@Inject
-	private SpringResourceResourceResolver springResourceResourceResolver;
+	private WallRideResourceResourceResolver wallRideResourceResourceResolver;
 
 	@Inject
 	private ThymeleafProperties thymeleafProperties;
@@ -82,7 +81,7 @@ public class WallRideThymeleafConfiguration {
 	@Bean(name = {"defaultTemplateResolver", "homePathTemplateResolver"})
 	public TemplateResolver homePathTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setResourceResolver(wallRideResourceResourceResolver);
 		resolver.setPrefix(wallRideProperties.getHome() + "themes/default/templates/");
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
@@ -95,7 +94,7 @@ public class WallRideThymeleafConfiguration {
 	@Bean
 	public TemplateResolver classPathTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(springResourceResourceResolver);
+		resolver.setResourceResolver(wallRideResourceResourceResolver);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
@@ -133,5 +132,4 @@ public class WallRideThymeleafConfiguration {
 		viewResolver.setOrder(2);
 		return viewResolver;
 	}
-
 }
