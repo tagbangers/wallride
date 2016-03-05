@@ -66,7 +66,7 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 		if (StringUtils.hasText(request.getKeyword())) {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
-					"name", "description"
+					"name", "code", "description"
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
@@ -94,7 +94,7 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(CustomField.class);
 
-		Sort sort = new Sort(new SortField("idx", SortField.Type.LONG));
+		Sort sort = new Sort(new SortField("idx", SortField.Type.INT));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, CustomField.class)

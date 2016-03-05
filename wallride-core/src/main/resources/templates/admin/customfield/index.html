@@ -14,8 +14,39 @@
 			</div>
 			<div class="pull-right">
 				<div class="btn-group">
-					<button id="update-page-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:unless="${#lists.isEmpty(customFields)}" th:text="#{SaveOrder}">Save Order</button>
+					<button id="update-customfields-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:unless="${#lists.isEmpty(customFields)}" th:text="#{SortOrder}">Save Order</button>
 				</div>
+				<script th:inline="javascript">
+					// <![CDATA[
+					$(function() {
+						$('#update-customfields-sort').click(function(e) {
+							e.preventDefault();
+							var self = this;
+							$(self).button('loading');
+							$('.sortable').disableSelection();
+							var data = $('.sortable').sortable('toArray');
+							$.ajax({
+								url: /*[[@{__${ADMIN_PATH}__/customfields.json}]]*/ '#',
+								type: 'put',
+								dataType: 'json',
+								data: JSON.stringify(data),
+								contentType: 'application/json',
+								success: function(data) {
+									$('#message-saved').show();
+									$(self).button('reset');
+								},
+								error: function(jqXHR) {
+									$.each(jqXHR.responseJSON.fieldErrors, function (field, message) {
+										var field = $(':input[name="' + field + '"]', form);
+										$(field).closest('.form-group').addClass('has-error');
+									});
+									$(self).button('reset');
+								}
+							});
+						});
+					});
+					// ]]>
+				</script>
 				<div class="btn-group">
 					<a th:href="@{__${ADMIN_PATH}__/customfields/create(query=${query})}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCustomField}">Add New</span></a>
 				</div>
@@ -35,17 +66,17 @@
 		</section>
 
 		<div class="container-fluid">
-			<div class="alert alert-success" th:if="${deletedCustomField ne null}">
+			<div id="message-deleted" class="alert alert-success" th:if="${deletedCustomField ne null}">
 				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 				<span th:text="#{DeletedCustomField}">CustomField Deleted.</span>
 			</div>
-			<div class="alert alert-success" th:if="${deletedCustomFields ne null}">
+			<div id="message-deleted multiple" class="alert alert-success" th:if="${deletedCustomFields ne null}">
 				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 				<span th:text="#{DeletedCustomFields}">CustomFields Deleted.</span>
 			</div>
-			<div class="alert alert-success" th:if="${savedCustomField ne null}">
+			<div id="message-saved" class="alert alert-success" th:if="${savedCustomField ne null}">
 				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-				<span th:text="#{SavedCustomField}">Article saved.</span>
+				<span th:text="#{SavedCustomField}">CustomFields saved.</span>
 			</div>
 			<section class="search-result">
 				<form method="post">
@@ -80,7 +111,7 @@
 							</tr>
 							</thead>
 							<tbody class="sortable">
-							<tr th:each="customfield : ${customFields}">
+							<tr th:id="${customfield.id}" th:each="customfield : ${customFields}">
 								<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${customfield.id}" /></td>
 								<td th:text="${customfield.name?:'(No Titled)'}" style="font-weight: bold;">Title</td>
 								<td th:text="${customfield.description ne null ? customfield.description : ''}">2013/10/24</td>
@@ -126,6 +157,14 @@
 								}
 								if (checkedCount >= 1) {
 									$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
+								}
+							});
+							$('.sortable').disableSelection();
+
+							$( ".sortable" ).sortable({
+								change: function( event, ui ) {
+									$('#update-customfields-sort').prop('disabled', false);
+									$('button', $(this)).prop('disabled', true);
 								}
 							});
 						});

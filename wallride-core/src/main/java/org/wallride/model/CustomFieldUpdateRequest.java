@@ -11,6 +11,7 @@ public class CustomFieldUpdateRequest implements Serializable {
 
 	private long id;
 	private String name;
+	private String code;
 	private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 	private String description;
 	private List<String> options = new ArrayList<>();
@@ -22,6 +23,10 @@ public class CustomFieldUpdateRequest implements Serializable {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getCode() {
+		return code;
 	}
 
 	public CustomField.FieldType getType() {
@@ -44,6 +49,7 @@ public class CustomFieldUpdateRequest implements Serializable {
 
 		private long id;
 		private String name;
+		private String code;
 		private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 		private String description;
 		private List<String> options = new ArrayList<>();
@@ -59,6 +65,11 @@ public class CustomFieldUpdateRequest implements Serializable {
 
 		public Builder name(String name) {
 			this.name = name;
+			return this;
+		}
+
+		public Builder code(String code) {
+			this.code = code;
 			return this;
 		}
 
@@ -86,6 +97,7 @@ public class CustomFieldUpdateRequest implements Serializable {
 			CustomFieldUpdateRequest request = new CustomFieldUpdateRequest();
 			request.id = id;
 			request.name = name;
+			request.code = code;
 			request.type = type;
 			request.description = description;
 			request.options = options;

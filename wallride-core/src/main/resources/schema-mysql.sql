@@ -54,42 +54,43 @@ CREATE TABLE `category` (
 
 create table `custom_field` (
   `id` bigint not null auto_increment,
+  `idx` integer,
+  `code` varchar(200),
+  `name` varchar(200),
+  `field_type` varchar(50) not null,
+  `language` varchar(3) not null,
+  `default_value` varchar(200),
+  `description` longtext,
   `created_at` datetime not null,
   `created_by` varchar(100),
   `updated_at` datetime not null,
   `updated_by` varchar(100),
-  `default_value` varchar(200),
-  `description` longtext,
-  `field_type` varchar(50) not null,
-  `idx` integer,
-  `language` varchar(3) not null,
-  `name` varchar(200),
   primary key (`id`)
 )
   ENGINE=InnoDB;
 
 create table `custom_field_value` (
   `id` bigint not null auto_increment,
+  `custom_field_id` bigint not null,
+  `post_id` bigint not null,
+  `string_value` varchar(200),
+  `text_value` longtext,
+  `date_value` date,
+  `datetime_value` datetime,
+  `number_value` bigint,
   `created_at` datetime not null,
   `created_by` varchar(100),
   `updated_at` datetime not null,
   `updated_by` varchar(100),
-  `date_value` date,
-  `datetime_value` datetime,
-  `number_value` bigint,
-  `string_value` varchar(255),
-  `text_value` longtext,
-  `custom_field_id` bigint not null,
-  `post_id` bigint not null,
   primary key (`id`)
 )
   ENGINE=InnoDB;
 
 create table `custom_field_option` (
   `custom_field_id` bigint not null,
-  `language` varchar(3) not null,
-  `name` varchar(200) not null,
   `idx` integer not null,
+  `name` varchar(200) not null,
+  `language` varchar(3) not null,
   primary key (`custom_field_id` , `idx`)
 )
   ENGINE=InnoDB;
@@ -282,7 +283,7 @@ CREATE TABLE `user_role` (
 ALTER TABLE `blog` ADD CONSTRAINT UK_398ypeix0usuwxip7hl30tl95 UNIQUE (`code`);
 ALTER TABLE `blog_language` ADD CONSTRAINT `UKjvbtdcpruai93kkn9en48os1j` UNIQUE (`blog_id`, `language`);
 ALTER TABLE `category` ADD CONSTRAINT `UKbcyxs660s0fku8sf6pgy137ai` UNIQUE (`code`, `language`);
-ALTER TABLE `custom_field` ADD CONSTRAINT `UKix3po6weuk4wvhvc95n5rk5ch` UNIQUE (`name`, `language`);
+ALTER TABLE `custom_field` ADD CONSTRAINT `UKix3po6weuk4wvhvc95n5rk5ch` UNIQUE (`code`, `language`);
 ALTER TABLE `custom_field` ADD CONSTRAINT UK_l6uj9qracv5sa03gb9g6amy19 UNIQUE (`idx`);
 ALTER TABLE `custom_field_value` ADD CONSTRAINT `UKnn598oul2m13aiorw3e5clc1i` UNIQUE (`post_id`, `custom_field_id`);
 ALTER TABLE `popular_post` ADD CONSTRAINT `UKevl12yr4xxkydmkvigjq82iui` UNIQUE (`language`, `type`, `rank`);

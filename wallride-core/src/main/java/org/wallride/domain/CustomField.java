@@ -2,6 +2,8 @@ package org.wallride.domain;
 
 
 import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.annotations.Field;
@@ -14,15 +16,12 @@ import java.util.List;
 
 @Entity
 @NamedEntityGraphs({
-		@NamedEntityGraph(name = CustomField.SHALLOW_GRAPH_NAME,
-				attributeNodes = {
-						@NamedAttributeNode("options")}
-		),
+		@NamedEntityGraph(name = CustomField.SHALLOW_GRAPH_NAME),
 		@NamedEntityGraph(name = CustomField.DEEP_GRAPH_NAME,
 				attributeNodes = {
 						@NamedAttributeNode("options")})
 })
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "language"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"code", "language"}))
 @DynamicInsert
 @DynamicUpdate
 @Indexed
@@ -43,7 +42,11 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	@Column(unique = true)
 	@Field
 	@SortableField
-	private int idx;
+	private Integer idx;
+
+	@Column(length = 200)
+	@Field
+	private String code;
 
 	@Column(length = 200)
 	@Field
@@ -79,12 +82,20 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 		this.id = id;
 	}
 
-	public int getIdx() {
+	public Integer getIdx() {
 		return idx;
 	}
 
-	public void setIdx(int idx) {
+	public void setIdx(Integer idx) {
 		this.idx = idx;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {
@@ -139,8 +150,26 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	public int compareTo(CustomField field) {
 		return new CompareToBuilder()
 				.append(getIdx(), field.getIdx())
-				.append(getId(), field.getId())
+//				.append(getId(), field.getId())
 				.toComparison();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) { return false; }
+		if (other == this) { return true; }
+		if (other.getClass() != getClass()) { return false; }
+		CustomField customField = (CustomField) other;
+		return new EqualsBuilder()
+				.append(getCode(), (customField.getCode()))
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+				.append(getCode())
+				.toHashCode();
 	}
 
 	@Override

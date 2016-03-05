@@ -31,6 +31,9 @@ public class CustomFieldCreateForm implements Serializable {
 	private String name;
 
 	@NotNull
+	private String code;
+
+	@NotNull
 	private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 
 	private String description;
@@ -46,6 +49,14 @@ public class CustomFieldCreateForm implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public CustomField.FieldType getType() {
@@ -84,6 +95,7 @@ public class CustomFieldCreateForm implements Serializable {
 		CustomFieldCreateRequest.Builder builder = new CustomFieldCreateRequest.Builder();
 		return builder
 				.name(name)
+				.code(code)
 				.description(description)
 				.type(type)
 				.options(options)

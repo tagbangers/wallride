@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wallride.domain.CustomField;
 
 import javax.persistence.LockModeType;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -29,6 +30,12 @@ public interface CustomFieldRepository extends JpaRepository<CustomField, Long>,
 
 	@EntityGraph(value = CustomField.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	CustomField findOneByNameAndLanguage(String name, String language);
+
+	@EntityGraph(value = CustomField.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	CustomField findOneByCodeAndLanguage(String code, String language);
+
+	@EntityGraph(value = CustomField.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	List<CustomField> findAllByLanguage(String language);
 
 	@Query("select count(customfield.idx) from CustomField customfield where customfield.language = :language ")
 	int count(@Param("language") String language);

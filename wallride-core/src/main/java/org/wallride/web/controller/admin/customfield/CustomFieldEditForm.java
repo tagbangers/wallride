@@ -36,6 +36,9 @@ public class CustomFieldEditForm implements Serializable {
 	private String name;
 
 	@NotNull
+	private String code;
+
+	@NotNull
 	private CustomField.FieldType type;
 
 	private String description;
@@ -51,6 +54,14 @@ public class CustomFieldEditForm implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public CustomField.FieldType getType() {
@@ -107,6 +118,7 @@ public class CustomFieldEditForm implements Serializable {
 		return builder
 				.id(id)
 				.name(name)
+				.code(code)
 				.description(description)
 				.type(type)
 				.options(options)

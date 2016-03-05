@@ -10,6 +10,7 @@ import java.util.List;
 public class CustomFieldCreateRequest implements Serializable {
 
 	private String name;
+	private String code;
 	private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 	private String description;
 	private List<String> options = new ArrayList<>();
@@ -17,6 +18,10 @@ public class CustomFieldCreateRequest implements Serializable {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getCode() {
+		return code;
 	}
 
 	public CustomField.FieldType getType() {
@@ -38,6 +43,7 @@ public class CustomFieldCreateRequest implements Serializable {
 	public static class Builder {
 
 		private String name;
+		private String code;
 		private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 		private String description;
 		private List<String> options = new ArrayList<>();
@@ -48,6 +54,11 @@ public class CustomFieldCreateRequest implements Serializable {
 
 		public Builder name(String name) {
 			this.name = name;
+			return this;
+		}
+
+		public Builder code(String code) {
+			this.code = code;
 			return this;
 		}
 
@@ -74,6 +85,7 @@ public class CustomFieldCreateRequest implements Serializable {
 		public CustomFieldCreateRequest build() {
 			CustomFieldCreateRequest request = new CustomFieldCreateRequest();
 			request.name = name;
+			request.code = code;
 			request.type = type;
 			request.description = description;
 			request.options = options;

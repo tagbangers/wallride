@@ -23,6 +23,13 @@
 						<span class="help-block" th:each="err : ${#fields.errors('name')}" text="${err}" />
 					</div>
 				</div>
+				<div class="form-group" th:classappend="${#fields.hasErrors('code')}? has-error">
+					<label class="col-sm-2 control-label" th:text="#{FieldCode}">FieldName</label>
+					<div class="col-sm-10">
+						<input type="text" th:field="*{code}" class="form-control" th:attr="placeholder=#{FieldCode}" />
+						<span class="help-block" th:each="err : ${#fields.errors('code')}" text="${err}" />
+					</div>
+				</div>
 				<div class="form-group" th:classappend="${#fields.hasErrors('description')}? has-error">
 					<label class="col-sm-2 control-label" th:text="#{Description}">Description</label>
 					<div class="col-sm-10">
@@ -67,6 +74,8 @@
 					</div>
 					<script>
 						$(function() {
+							$('.sortable').sortable();
+
 							var $customFieldForm = $('#custom-field-form');
 							var $fieldOption = $('#custom-field-options');
 

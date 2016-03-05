@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.domain.CustomField;
 import org.wallride.domain.CustomFieldOption;
+import org.wallride.exception.ServiceException;
 import org.wallride.repository.CustomFieldRepository;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
@@ -27,10 +28,8 @@ import org.wallride.support.AuthorizedUser;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -48,12 +47,13 @@ public class CustomFieldService {
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = new CustomField();
-		CustomField duplicate = customFieldRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
+		CustomField duplicate = customFieldRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
 		if (duplicate != null) {
-			throw new DuplicateCodeException(request.getName());
+			throw new DuplicateCodeException(request.getCode());
 		}
 		customField.setIdx(customFieldRepository.countForUpdate(request.getLanguage()) + 1);
 		customField.setName(request.getName());
+		customField.setCode(request.getCode());
 		customField.setDescription(request.getDescription());
 		customField.setFieldType(request.getType());
 		customField.setLanguage(request.getLanguage());
@@ -76,6 +76,7 @@ public class CustomFieldService {
 			throw new EmptyCodeException(request.getName());
 		}
 		customField.setName(request.getName());
+		customField.setCode(request.getCode());
 		customField.setDescription(request.getDescription());
 		customField.setFieldType(request.getType());
 		customField.setLanguage(request.getLanguage());
@@ -91,32 +92,30 @@ public class CustomFieldService {
 		return customFieldRepository.save(customField);
 	}
 
-
-/*
 	@CacheEvict(value="customFields", allEntries=true)
-	public void updateCustomFieldOrder(List<Map<String, Object>> data, String language) {
+	public void updateCustomFieldOrder(List<Long> data, String language, BindingResult result) {
+		List<CustomField> customFields = customFieldRepository.findAllByLanguage(language);
+		customFields.stream().forEach(v -> {
+			v.setIdx(null);
+			customFieldRepository.saveAndFlush(v);
+		});
+
 		for (int i = 0; i < data.size(); i++) {
-			Map<String, Object> map = data.get(i);
-			if (map.get("item_id") != null) {
-				CustomField customField = customFieldRepository.findOneForUpdateByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
-				if (customField != null) {
-					CustomField parent = null;
-					if (map.get("parent_id") != null) {
-						parent = customFieldRepository.findOneByIdAndLanguage(Long.parseLong((String) map.get("parent_id")), language);
-					}
-					customField.setParent(parent);
-					customField.setLft(((int) map.get("left")) - 1);
-					customField.setRgt(((int) map.get("right")) - 1);
+			Long id = data.get(i);
+			for (CustomField customField : customFields) {
+				if (id.equals(customField.getId())) {
+					customField.setIdx(i + 1);
 					customFieldRepository.save(customField);
 				}
 			}
 		}
-	}
-*/
+}
+
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField deleteCustomField(CustomFieldDeleteRequest request, BindingResult result) {
-		CustomField customField = customFieldRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		CustomField customField = customFieldRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		customFieldRepository.delete(customField);
+
 		return customField;
 	}
 
