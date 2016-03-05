@@ -16,17 +16,15 @@
 
 package org.wallride.web.controller.admin.customfield;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.wallride.core.domain.*;
-import org.wallride.core.model.ArticleUpdateRequest;
+import org.wallride.core.domain.CustomField;
 import org.wallride.core.model.CustomFieldUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class CustomFieldEditForm implements Serializable {

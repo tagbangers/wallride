@@ -40,7 +40,14 @@ import javax.persistence.*;
 						@NamedAttributeNode("categories"),
 						@NamedAttributeNode("tags"),
 						@NamedAttributeNode("relatedToPosts"),
-						@NamedAttributeNode("customFieldValues")}
+						@NamedAttributeNode(value = "customFieldValues", subgraph = "customFieldValue")},
+				subgraphs =  {
+						@NamedSubgraph(name = "customFieldValue",
+								attributeNodes = {
+										@NamedAttributeNode("customField")
+								}
+						)
+				}
 		)
 })
 @Table(name = "article")

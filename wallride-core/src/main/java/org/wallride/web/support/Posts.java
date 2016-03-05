@@ -208,7 +208,6 @@ public class Posts {
 		return summary.substring(0, length) + "...";
 	}
 
-	//TODO
 	public Object customValue(Post post, String name) {
 		Optional<CustomFieldValue> target = post.getCustomFieldValues().stream()
 				.filter(v -> v.getCustomField().getName().equals(name))
