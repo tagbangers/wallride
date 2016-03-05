@@ -89,7 +89,6 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
-//	@ConditionalOnMissingBean(name = "adminServletRegistrationBean")
 	public ServletRegistrationBean adminServletRegistrationBean() {
 		ServletRegistrationBean registration = new ServletRegistrationBean(adminDispatcherServlet());
 		registration.setName(ADMIN_SERVLET_NAME);
@@ -107,7 +106,6 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
-//	@ConditionalOnMissingBean(name = "guestServletRegistrationBean")
 	public ServletRegistrationBean guestServletRegistrationBean(DispatcherServlet dispatcherServlet) {
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
 		registration.setName(GUEST_SERVLET_NAME);
@@ -115,20 +113,6 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 		registration.addUrlMappings(GUEST_SERVLET_PATH + "/*");
 		return registration;
 	}
-
-//	protected WebApplicationContext createAdminServletContext() {
-//		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-//		context.setResourceLoader(getResourceLoader());
-//		context.register(WebAdminConfiguration.class);
-//		return context;
-//	}
-//
-//	protected WebApplicationContext createGuestServletContext() {
-//		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-//		context.setResourceLoader(getResourceLoader());
-//		context.register(WebGuestConfiguration.class);
-//		return context;
-//	}
 
 	@Bean
 	public RequestContextListener requestContextListener() {
