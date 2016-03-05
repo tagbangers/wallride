@@ -1,9 +1,9 @@
-package org.wallride.core.model;
+package org.wallride.model;
 
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.BlogLanguage;
+import org.wallride.domain.BlogLanguage;
 
 import java.io.Serializable;
 

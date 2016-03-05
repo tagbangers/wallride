@@ -16,15 +16,12 @@
 
 package org.wallride.web.controller.admin.page;
 
-import org.wallride.core.domain.CustomFieldValue;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings("serial")
 public class PagePreviewForm implements Serializable {

@@ -1,4 +1,4 @@
-package org.wallride.core.service;
+package org.wallride.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +17,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.domain.CustomFieldOption;
-import org.wallride.core.domain.Tag;
-import org.wallride.core.exception.DuplicateCodeException;
-import org.wallride.core.exception.EmptyCodeException;
-import org.wallride.core.exception.ServiceException;
-import org.wallride.core.model.*;
-import org.wallride.core.repository.CustomFieldRepository;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldOption;
+import org.wallride.repository.CustomFieldRepository;
+import org.wallride.exception.DuplicateCodeException;
+import org.wallride.exception.EmptyCodeException;
+import org.wallride.model.*;
+import org.wallride.support.AuthorizedUser;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;

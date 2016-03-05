@@ -1,13 +1,11 @@
 package org.wallride.web.controller.admin.article;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.domain.CustomFieldOption;
-import org.wallride.core.domain.CustomFieldValue;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldOption;
+import org.wallride.domain.CustomFieldValue;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

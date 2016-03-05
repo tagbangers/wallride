@@ -14,42 +14,33 @@
  * limitations under the License.
  */
 
-package org.wallride.core.model;
+package org.wallride.model;
 
 import java.io.Serializable;
-import java.util.List;
 
-public class CustomFieldBulkDeleteRequest implements Serializable {
+public class CustomFieldDeleteRequest implements Serializable {
 
-	private List<Long> ids;
+	private Long id;
 	private String language;
 
-	public List<Long> getIds() {
-		return ids;
-	}
-
-	public void setIds(List<Long> ids) {
-		this.ids = ids;
+	public Long getId() {
+		return id;
 	}
 
 	public String getLanguage() {
 		return language;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
 	public static class Builder  {
 
-		private List<Long> ids;
+		private Long id;
 		private String language;
 
 		public Builder() {
 		}
 
-		public Builder ids(List<Long> ids) {
-			this.ids = ids;
+		public Builder id(Long id) {
+			this.id = id;
 			return this;
 		}
 
@@ -58,9 +49,9 @@ public class CustomFieldBulkDeleteRequest implements Serializable {
 			return this;
 		}
 
-		public CustomFieldBulkDeleteRequest build() {
-			CustomFieldBulkDeleteRequest request = new CustomFieldBulkDeleteRequest();
-			request.ids = ids;
+		public CustomFieldDeleteRequest build() {
+			CustomFieldDeleteRequest request = new CustomFieldDeleteRequest();
+			request.id = id;
 			request.language = language;
 			return request;
 		}

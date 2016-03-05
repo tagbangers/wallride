@@ -26,6 +26,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.Article;
 import org.wallride.domain.Blog;
 import org.wallride.domain.Page;

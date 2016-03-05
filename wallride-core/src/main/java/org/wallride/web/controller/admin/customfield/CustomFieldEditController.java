@@ -28,11 +28,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.exception.DuplicateCodeException;
-import org.wallride.core.exception.EmptyCodeException;
-import org.wallride.core.service.CustomFieldService;
-import org.wallride.core.support.AuthorizedUser;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
+import org.wallride.exception.DuplicateCodeException;
+import org.wallride.exception.EmptyCodeException;
+import org.wallride.support.AuthorizedUser;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;

@@ -1,9 +1,9 @@
-package org.wallride.core.repository;
+package org.wallride.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.model.CustomFieldSearchRequest;
+import org.wallride.domain.CustomField;
+import org.wallride.model.CustomFieldSearchRequest;
 
 public interface CustomFieldRepositoryCustom {
 

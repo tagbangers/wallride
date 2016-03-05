@@ -16,7 +16,7 @@
 
 package org.wallride.web.controller.admin.customfield;
 
-import org.wallride.core.model.CustomFieldBulkDeleteRequest;
+import org.wallride.model.CustomFieldBulkDeleteRequest;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

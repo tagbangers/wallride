@@ -1,4 +1,4 @@
-package org.wallride.core.domain;
+package org.wallride.domain;
 
 
 import org.hibernate.search.annotations.Field;

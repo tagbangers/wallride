@@ -28,6 +28,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
 import org.wallride.domain.Article;
 import org.wallride.domain.Category;
 import org.wallride.exception.DuplicateCodeException;

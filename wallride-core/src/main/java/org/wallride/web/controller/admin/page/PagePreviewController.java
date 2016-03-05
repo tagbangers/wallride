@@ -29,6 +29,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.Blog;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.domain.Page;
@@ -36,6 +38,7 @@ import org.wallride.exception.ServiceException;
 import org.wallride.service.BlogService;
 import org.wallride.service.MediaService;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
 

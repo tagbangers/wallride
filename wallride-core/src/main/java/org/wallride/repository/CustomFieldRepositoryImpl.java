@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wallride.core.repository;
+package org.wallride.repository;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -34,8 +34,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.model.CustomFieldSearchRequest;
+import org.wallride.domain.CustomField;
+import org.wallride.model.CustomFieldSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

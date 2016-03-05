@@ -17,8 +17,8 @@
 package org.wallride.web.controller.admin.customfield;
 
 import org.springframework.beans.BeanUtils;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.model.CustomFieldUpdateRequest;
+import org.wallride.domain.CustomField;
+import org.wallride.model.CustomFieldUpdateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

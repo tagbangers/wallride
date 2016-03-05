@@ -1,24 +1,19 @@
-package org.wallride.core.model;
+package org.wallride.model;
 
 
-import org.wallride.core.domain.CustomField;
+import org.wallride.domain.CustomField;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomFieldUpdateRequest implements Serializable {
+public class CustomFieldCreateRequest implements Serializable {
 
-	private long id;
 	private String name;
 	private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 	private String description;
 	private List<String> options = new ArrayList<>();
 	private String language;
-
-	public long getId() {
-		return id;
-	}
 
 	public String getName() {
 		return name;
@@ -42,7 +37,6 @@ public class CustomFieldUpdateRequest implements Serializable {
 
 	public static class Builder {
 
-		private long id;
 		private String name;
 		private CustomField.FieldType type = CustomField.FieldType.UNDEFINED;
 		private String description;
@@ -50,11 +44,6 @@ public class CustomFieldUpdateRequest implements Serializable {
 		private String language;
 
 		public Builder() {
-		}
-
-		public Builder id(long id) {
-			this.id = id;
-			return this;
 		}
 
 		public Builder name(String name) {
@@ -82,9 +71,8 @@ public class CustomFieldUpdateRequest implements Serializable {
 			return this;
 		}
 
-		public CustomFieldUpdateRequest build() {
-			CustomFieldUpdateRequest request = new CustomFieldUpdateRequest();
-			request.id = id;
+		public CustomFieldCreateRequest build() {
+			CustomFieldCreateRequest request = new CustomFieldCreateRequest();
 			request.name = name;
 			request.type = type;
 			request.description = description;

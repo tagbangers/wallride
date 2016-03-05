@@ -37,6 +37,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.autoconfigure.WallRideProperties;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
@@ -44,6 +46,7 @@ import org.wallride.exception.NotNullException;
 import org.wallride.model.*;
 import org.wallride.repository.*;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -53,7 +56,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor=Exception.class)

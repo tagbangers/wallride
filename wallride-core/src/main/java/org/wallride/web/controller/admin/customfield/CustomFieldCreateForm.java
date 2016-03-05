@@ -16,8 +16,8 @@
 
 package org.wallride.web.controller.admin.customfield;
 
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.model.CustomFieldCreateRequest;
+import org.wallride.domain.CustomField;
+import org.wallride.model.CustomFieldCreateRequest;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

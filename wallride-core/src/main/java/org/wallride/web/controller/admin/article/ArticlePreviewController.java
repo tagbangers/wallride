@@ -29,6 +29,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.Article;
 import org.wallride.domain.Blog;
 import org.wallride.domain.BlogLanguage;

@@ -17,6 +17,7 @@
 package org.wallride.web.controller.admin.article;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.wallride.domain.CustomField;
 import org.wallride.model.ArticleCreateRequest;
 
 import javax.validation.constraints.NotNull;

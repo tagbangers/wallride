@@ -21,28 +21,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.wallride.core.domain.Category;
-import org.wallride.core.domain.CustomField;
-import org.wallride.core.domain.Post;
-import org.wallride.core.exception.DuplicateCodeException;
-import org.wallride.core.exception.EmptyCodeException;
-import org.wallride.core.model.TreeNode;
-import org.wallride.core.service.CustomFieldService;
-import org.wallride.core.support.AuthorizedUser;
-import org.wallride.core.support.CategoryUtils;
-import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
+import org.wallride.exception.DuplicateCodeException;
+import org.wallride.exception.EmptyCodeException;
+import org.wallride.support.AuthorizedUser;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
-import javax.validation.groups.Default;
-import java.util.List;
 
 @Controller
 @RequestMapping("/{language}/customfields/create")
