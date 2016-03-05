@@ -67,7 +67,7 @@
 	<modules>
 		<module>wallride-bootstrap</module>
 		<module>wallride-core</module>
-		<module>wallride-starter</module>
+		<module>wallride-parent</module>
 		<module>wallride-tools</module>
 	</modules>
 
