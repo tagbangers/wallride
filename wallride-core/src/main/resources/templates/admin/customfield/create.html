@@ -15,26 +15,30 @@
 	<div id="wr-page-content">
 		<div class="container-fluid">
 			<form id="custom-field-form" th:fragment="form(title,customfield)" class="form-horizontal" method="post" th:object="${form}" th:action="@{__${ADMIN_PATH}__/customfields/create}">
+				<div class="alert alert-danger" th:if="${#fields.hasErrors('all')}">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<span th:text="#{Error}">Error</span>
+				</div>
 				<input type="hidden" name="id" th:value="${customField}? ${customField.id} : ''"  />
 				<div class="form-group" th:classappend="${#fields.hasErrors('name')}? has-error">
 					<label class="col-sm-2 control-label" th:text="#{FieldName}">FieldName</label>
-					<div class="col-sm-10">
+					<div class="col-sm-6">
 						<input type="text" th:field="*{name}" class="form-control" th:attr="placeholder=#{FieldName}" />
-						<span class="help-block" th:each="err : ${#fields.errors('name')}" text="${err}" />
+						<span class="help-block" th:each="err : ${#fields.errors('name')}" th:text="${err}" />
 					</div>
 				</div>
 				<div class="form-group" th:classappend="${#fields.hasErrors('code')}? has-error">
 					<label class="col-sm-2 control-label" th:text="#{Code}">FieldName</label>
-					<div class="col-sm-10">
+					<div class="col-sm-6">
 						<input type="text" th:field="*{code}" class="form-control" th:attr="placeholder=#{Code}" />
-						<span class="help-block" th:each="err : ${#fields.errors('code')}" text="${err}" />
+						<span class="help-block" th:each="err : ${#fields.errors('code')}" th:text="${err}" />
 					</div>
 				</div>
 				<div class="form-group" th:classappend="${#fields.hasErrors('description')}? has-error">
 					<label class="col-sm-2 control-label" th:text="#{Description}">Description</label>
-					<div class="col-sm-10">
+					<div class="col-sm-6">
 						<textarea type="text" th:field="*{description}" class="form-control" style="min-height: 150px" th:attr="placeholder=#{Description}"></textarea>
-						<span class="help-block" th:each="err : ${#fields.errors('description')}" text="${err}" />
+						<span class="help-block" th:each="err : ${#fields.errors('description')}" th:text="${err}" />
 					</div>
 				</div>
 				<div class="form-group" th:classappend="${#fields.hasErrors('type')}? has-error">
@@ -43,7 +47,7 @@
 						<select class="form-control" th:field="*{type}">
 							<option th:each="fieldType : ${fieldTypes}" th:value="${fieldType}" th:text="${#messages.msg('CustomField.FieldType.' + fieldType)}" th:selected="${customField ne null and #strings.toString(customField.fieldType) eq #strings.toString(fieldType)}">指定なし</option>
 						</select>
-						<span class="help-block" th:each="err : ${#fields.errors('type')}" text="${err}" />
+						<span class="help-block" th:each="err : ${#fields.errors('type')}" th:text="${err}" />
 					</div>
 				</div>
 				<div id="custom-field-options" class="form-group field-option-group">
@@ -63,6 +67,13 @@
 								<button class="pull-right btn btn-link remove" data-dismiss="option"><span class="glyphicon glyphicon-remove"></span></button>
 							</li>
 							</th:block>
+							<th:block th:if="*{options ne null}">
+							<li class="option col-sm-7" th:each="option : *{options}">
+								<span class="grippy"></span>
+								<div class="field-option" th:attr="data-name=${option}" th:text="${option}"></div>
+								<button class="pull-right btn btn-link remove" data-dismiss="option"><span class="glyphicon glyphicon-remove"></span></button>
+							</li>
+							</th:block>
 							<script id="option-tmpl" type="text/x-jsrender">
 							<li class="option col-sm-7">
 								<span class="grippy"></span>
@@ -78,6 +89,7 @@
 
 							var $customFieldForm = $('#custom-field-form');
 							var $fieldOption = $('#custom-field-options');
+							var $customInput = $('#custom-field-options-input');
 
 							$customFieldForm.on('change', 'select[name="type"]', function() {
 								var value = $(this).val().toString();
@@ -89,9 +101,15 @@
 							});
 							$('select[name="type"]',$customFieldForm).trigger('change');
 
+							$customInput.on('keypress', function(e) {
+								if (e.keyCode === 13) {
+									e.preventDefault();
+									$('[data-append="option"]').trigger('click');
+								}
+							});
+
 							var $options = [];
 							$fieldOption.on('click', '[data-append="option"]', function() {
-								var $customInput = $('#custom-field-options-input');
 								var customInputOption = $customInput.val();
 
 								if (!isDuplicated($('.field-option'), customInputOption)) {

@@ -87,10 +87,10 @@ public class CustomFieldCreateController {
 			customfield = customfieldService.createCustomField(form.buildCustomFieldCreateRequest(), authorizedUser);
 		}
 		catch (EmptyCodeException e) {
-			errors.rejectValue("name", "NotNull");
+			errors.rejectValue("code", "NotNull");
 		}
 		catch (DuplicateCodeException e) {
-			errors.rejectValue("name", "NotDuplicate");
+			errors.rejectValue("code", "NotDuplicate");
 		}
 		if (errors.hasErrors()) {
 			logger.debug("Errors: {}", errors);
