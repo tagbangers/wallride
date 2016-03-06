@@ -98,10 +98,10 @@ public class PageUtils {
 
 	public Map<Page, String> getPaths(Page page, boolean includeUnpublished) {
 		List<Page> parents = pageService.getPathPages(page, includeUnpublished);
-		if (CollectionUtils.isEmpty(parents)) {
-			return null;
-		}
 		Map<Page, String> paths = new LinkedHashMap<>();
+		if (CollectionUtils.isEmpty(parents)) {
+			return paths;
+		}
 		StringBuilder path = new StringBuilder();
 		for (Page p : parents) {
 			if (path != null) {

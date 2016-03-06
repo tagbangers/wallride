@@ -84,7 +84,8 @@ public class PageSpecifications {
 		return (root, query, cb) -> {
 			query.distinct(true);
 			List<Predicate> predicates = new ArrayList<>();
-			predicates.add(cb.equal(root.get(Page_.parent), page));
+
+			predicates.add(cb.equal(root.get(Page_.parent).get(Page_.id), page.getId()));
 			if (!includeUnpublished) {
 				predicates.add(cb.equal(root.get(Page_.status), Page.Status.PUBLISHED));
 			}
