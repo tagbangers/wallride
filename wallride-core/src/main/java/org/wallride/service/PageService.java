@@ -435,39 +435,27 @@ public class PageService {
 		page.setUpdatedBy(authorizedUser.toString());
 
 		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		Map<Long, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		for (CustomFieldValue value : page.getCustomFieldValues()) {
+			valueMap.put(value.getId(), value);
+		}
+
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
-				boolean isNew = true;
-				for (CustomFieldValue value : page.getCustomFieldValues()) {
-					if (value.getId().equals(valueForm.getId())) {
-						if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-							value.setStringValue(String.join(",", valueForm.getStringValues()));
-						} else {
-							value.setStringValue(valueForm.getStringValue());
-						}
-						value.setTextValue(valueForm.getTextValue());
-						value.setNumberValue(valueForm.getNumberValue());
-						value.setDateValue(valueForm.getDateValue());
-						value.setDatetimeValue(valueForm.getDatetimeValue());
-						fieldValues.add(value);
-						isNew = false;
-					}
+				CustomFieldValue value = valueMap.get(valueForm.getId());
+				if (value == null) {
+					value = new CustomFieldValue();
 				}
-				if (isNew) {
-					CustomFieldValue newValue = new CustomFieldValue();
-					newValue.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
-					newValue.setPost(page);
-					if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-						newValue.setStringValue(String.join(",", valueForm.getStringValues()));
-					} else {
-						newValue.setStringValue(valueForm.getStringValue());
-					}
-					newValue.setTextValue(valueForm.getTextValue());
-					newValue.setNumberValue(valueForm.getNumberValue());
-					newValue.setDateValue(valueForm.getDateValue());
-					newValue.setDatetimeValue(valueForm.getDatetimeValue());
-					fieldValues.add(newValue);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setStringValue(String.join(",", valueForm.getStringValues()));
+				} else {
+					value.setStringValue(valueForm.getStringValue());
 				}
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
 			}
 		}
 		page.getCustomFieldValues().clear();

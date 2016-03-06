@@ -73,7 +73,7 @@ CREATE TABLE "custom_field_value" (
   "date_value"      DATE,
   "datetime_value"  TIMESTAMP,
   "number_value"    INT8,
-  "string_value"    VARCHAR(200),
+  "string_value"    VARCHAR(300),
   "text_value"      TEXT,
   "custom_field_id" INT8      NOT NULL,
   "post_id"         INT8      NOT NULL,

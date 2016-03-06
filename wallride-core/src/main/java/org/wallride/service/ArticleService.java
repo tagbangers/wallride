@@ -37,8 +37,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.domain.CustomField;
-import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
@@ -412,39 +410,27 @@ public class ArticleService {
 		article.setUpdatedBy(authorizedUser.toString());
 
 		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		Map<Long, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		for (CustomFieldValue value : article.getCustomFieldValues()) {
+			valueMap.put(value.getId(), value);
+		}
+
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
-				boolean isNew = true;
-				for (CustomFieldValue value : article.getCustomFieldValues()) {
-					if (value.getId().equals(valueForm.getId())) {
-						if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-							value.setStringValue(String.join(",", valueForm.getStringValues()));
-						} else {
-							value.setStringValue(valueForm.getStringValue());
-						}
-						value.setTextValue(valueForm.getTextValue());
-						value.setNumberValue(valueForm.getNumberValue());
-						value.setDateValue(valueForm.getDateValue());
-						value.setDatetimeValue(valueForm.getDatetimeValue());
-						fieldValues.add(value);
-						isNew = false;
-					}
+				CustomFieldValue value = valueMap.get(valueForm.getId());
+				if (value == null) {
+					value = new CustomFieldValue();
 				}
-				if (isNew) {
-					CustomFieldValue newValue = new CustomFieldValue();
-					newValue.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
-					newValue.setPost(article);
-					if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-						newValue.setStringValue(String.join(",", valueForm.getStringValues()));
-					} else {
-						newValue.setStringValue(valueForm.getStringValue());
-					}
-					newValue.setTextValue(valueForm.getTextValue());
-					newValue.setNumberValue(valueForm.getNumberValue());
-					newValue.setDateValue(valueForm.getDateValue());
-					newValue.setDatetimeValue(valueForm.getDatetimeValue());
-					fieldValues.add(newValue);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setStringValue(String.join(",", valueForm.getStringValues()));
+				} else {
+					value.setStringValue(valueForm.getStringValue());
 				}
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
 			}
 		}
 		article.getCustomFieldValues().clear();

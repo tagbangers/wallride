@@ -36,7 +36,7 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Post post;
 
-	@Column(length = 200)
+	@Column(length = 300)
 	@Field
 	private String stringValue;
 
