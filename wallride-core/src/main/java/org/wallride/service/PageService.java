@@ -292,7 +292,9 @@ public class PageService {
 		page.setDrafted(null);
 		page.setStatus(Post.Status.PUBLISHED);
 		pageRepository.save(page);
-		pageRepository.delete(deleteTarget);
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		return savePage(request, authorizedUser);
 	}
 
@@ -305,7 +307,9 @@ public class PageService {
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
 		pageRepository.deleteByDrafted(page);
-		pageRepository.delete(deleteTarget);
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		return savePage(request, authorizedUser);
 	}
 
@@ -438,17 +442,19 @@ public class PageService {
 		page.setUpdatedBy(authorizedUser.toString());
 
 		List<CustomFieldValue> fieldValues = new ArrayList<>();
-		Map<Long, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
 		for (CustomFieldValue value : page.getCustomFieldValues()) {
-			valueMap.put(value.getId(), value);
+			valueMap.put(value.getCustomField(), value);
 		}
-
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
-				CustomFieldValue value = valueMap.get(valueForm.getId());
+				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
+				CustomFieldValue value = valueMap.get(customField);
 				if (value == null) {
 					value = new CustomFieldValue();
 				}
+				value.setCustomField(customField);
+				value.setPost(page);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
 					value.setStringValue(String.join(",", valueForm.getStringValues()));
 				} else {

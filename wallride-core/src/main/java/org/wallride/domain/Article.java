@@ -45,11 +45,7 @@ import javax.persistence.*;
 				subgraphs =  {
 						@NamedSubgraph(name = "customFieldValue",
 								attributeNodes = {
-										@NamedAttributeNode("customField")
-								}
-						)
-				}
-		)
+										@NamedAttributeNode("customField")})})
 })
 @Table(name = "article")
 @DynamicInsert

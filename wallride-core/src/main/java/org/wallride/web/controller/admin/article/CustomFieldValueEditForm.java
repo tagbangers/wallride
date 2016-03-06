@@ -16,7 +16,7 @@ import java.util.List;
 
 public class CustomFieldValueEditForm implements Serializable {
 
-	private Long id;
+	private Long id; //TODO when post is updated from draft id changes to draft instead of original one.
 	@NotNull
 	private long customFieldId;
 	@NotNull

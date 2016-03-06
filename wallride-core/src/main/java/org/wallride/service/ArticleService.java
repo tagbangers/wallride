@@ -76,6 +76,9 @@ public class ArticleService {
 	@Resource
 	private MediaRepository mediaRepository;
 
+	@Resource
+	private CustomFieldRepository customFieldRepository;
+
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
 
@@ -281,10 +284,12 @@ public class ArticleService {
 
 	private Article publishArticle(Article article) {
 		Article deleteTarget = getDraftById(article.getId());
+		if (deleteTarget != null) {
+			articleRepository.delete(deleteTarget);
+		}
 		article.setDrafted(null);
 		article.setStatus(Post.Status.PUBLISHED);
 		Article published = articleRepository.save(article);
-		articleRepository.delete(deleteTarget);
 		return published;
 	}
 
@@ -298,10 +303,12 @@ public class ArticleService {
 
 	private Article unpublishArticle(Article article) {
 		Article deleteTarget = getDraftById(article.getId());
+		if (deleteTarget != null) {
+			articleRepository.delete(deleteTarget);
+		}
 		article.setDrafted(null);
 		article.setStatus(Post.Status.DRAFT);
 		Article unpublished = articleRepository.save(article);
-		articleRepository.delete(deleteTarget);
 		return unpublished;
 	}
 
@@ -413,18 +420,22 @@ public class ArticleService {
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
 
-		List<CustomFieldValue> fieldValues = new ArrayList<>();
-		Map<Long, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
+		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
 		for (CustomFieldValue value : article.getCustomFieldValues()) {
-			valueMap.put(value.getId(), value);
+			valueMap.put(value.getCustomField(), value);
 		}
 
+		article.getCustomFieldValues().clear();
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
-				CustomFieldValue value = valueMap.get(valueForm.getId());
+				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
+				CustomFieldValue value = valueMap.get(customField);
 				if (value == null) {
 					value = new CustomFieldValue();
 				}
+				value.setCustomField(customField);
+				value.setPost(article);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
 					value.setStringValue(String.join(",", valueForm.getStringValues()));
 				} else {
@@ -437,8 +448,7 @@ public class ArticleService {
 				fieldValues.add(value);
 			}
 		}
-		article.getCustomFieldValues().clear();
-		article.setCustomFieldValues(new TreeSet<>(fieldValues));
+		article.setCustomFieldValues(fieldValues);
 
 		return articleRepository.save(article);
 	}
