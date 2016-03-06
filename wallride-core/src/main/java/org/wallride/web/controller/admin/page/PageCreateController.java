@@ -66,8 +66,8 @@ public class PageCreateController {
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
-	public PageCreateForm pageCreateForm() {
-		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
+	public PageCreateForm pageCreateForm(@PathVariable String language) {
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		return new PageCreateForm(customFields);
 	}
 

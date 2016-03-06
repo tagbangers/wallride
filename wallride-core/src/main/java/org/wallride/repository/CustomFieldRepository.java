@@ -40,7 +40,6 @@ public interface CustomFieldRepository extends JpaRepository<CustomField, Long>,
 	@Query("select count(customfield.idx) from CustomField customfield where customfield.language = :language ")
 	int count(@Param("language") String language);
 
-	@Query("select count(customfield.idx) from CustomField customfield where customfield.language = :language ")
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	int countForUpdate(@Param("language") String language);
+	@Query("select coalesce(max(idx), 0) from CustomField customfield where customfield.language = :language ")
+	int findMaxIdxByLanguage(@Param("language")String language);
 }

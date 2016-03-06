@@ -212,9 +212,10 @@ public class Posts {
 		return summary.substring(0, length) + "...";
 	}
 
-	public Object customValue(Post post, String name) {
+	public Object customValue(Post post, String code) {
 		Optional<CustomFieldValue> target = post.getCustomFieldValues().stream()
-				.filter(v -> v.getCustomField().getName().equals(name))
+				.filter(v -> v.getCustomField().getCode().equals(code))
+				.filter(v -> v.getCustomField().getLanguage().equals(post.getLanguage()))
 				.findFirst();
 		Optional value = target.map(CustomFieldValue::getValue);
 		return value.orElse(null);

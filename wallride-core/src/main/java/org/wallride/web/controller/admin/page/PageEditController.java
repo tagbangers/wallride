@@ -99,7 +99,7 @@ public class PageEditController {
 			redirectAttributes.addAttribute("language", language);
 			return "redirect:/_admin/{language}/pages/index";
 		}
-		Set<CustomField> customFields = customFieldService.getAllCustomFields();
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		PageEditForm form = PageEditForm.fromDomainObject(page, customFields);
 		model.addAttribute("form", form);
 
@@ -130,7 +130,7 @@ public class PageEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/pages/edit";
 		}
-		Set<CustomField> customFields = customFieldService.getAllCustomFields();
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		PageEditForm form = PageEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 

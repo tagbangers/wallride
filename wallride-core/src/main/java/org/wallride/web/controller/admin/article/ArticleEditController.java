@@ -101,7 +101,7 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("language", language);
 			return "redirect:/_admin/{language}/articles/index";
 		}
-		Set<CustomField> customFields = customFieldService.getAllCustomFields();
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(article, customFields);
 		model.addAttribute("form", form);
 
@@ -132,7 +132,7 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/articles/edit";
 		}
-		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 

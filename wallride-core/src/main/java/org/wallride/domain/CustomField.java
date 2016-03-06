@@ -39,7 +39,7 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column(unique = true)
+	@Column
 	@Field
 	@SortableField
 	private Integer idx;
@@ -150,7 +150,7 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	public int compareTo(CustomField field) {
 		return new CompareToBuilder()
 				.append(getIdx(), field.getIdx())
-//				.append(getId(), field.getId())
+				.append(getId(), field.getId())
 				.toComparison();
 	}
 
@@ -161,14 +161,14 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 		if (other.getClass() != getClass()) { return false; }
 		CustomField customField = (CustomField) other;
 		return new EqualsBuilder()
-				.append(getCode(), (customField.getCode()))
+				.append(getId(), (customField.getId()))
 				.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-				.append(getCode())
+				.append(getId())
 				.toHashCode();
 	}
 

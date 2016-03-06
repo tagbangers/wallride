@@ -14,16 +14,28 @@
 			</div>
 			<div class="pull-right">
 				<div class="btn-group">
-					<button id="update-customfields-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:unless="${#lists.isEmpty(customFields)}" th:text="#{SortOrder}">Save Order</button>
+					<button id="sort-order" class="btn btn-sm btn-default" data-loading-text="saving..." th:unless="${#lists.isEmpty(customFields)}" th:text="#{SortOrder}">Save Order</button>
+				</div>
+				<div class="btn-group">
+					<button id="update-order" type="submit" class="btn btn-sm btn-primary hide" data-loading-text="saving..." th:unless="${#lists.isEmpty(customFields)}" th:text="#{SaveOrder}">Save Order</button>
 				</div>
 				<script th:inline="javascript">
 					// <![CDATA[
 					$(function() {
-						$('#update-customfields-sort').click(function(e) {
+						$('#sort-order').on('click', function (e) {
+							e.preventDefault();
+							var self = this;
+							$(this).hide();
+							$('#update-order').removeClass('hide');
+							$('.sortable').sortable();
+							$('.wr-tr-checkbox > input').prop('type', 'hidden');
+							$('.wr-tr-checkbox').append('<span class="grippy"></span>');
+						});
+						$('#update-order').click(function(e) {
 							e.preventDefault();
 							var self = this;
 							$(self).button('loading');
-							$('.sortable').disableSelection();
+							$('.sortable').sortable('disable');
 							var data = $('.sortable').sortable('toArray');
 							$.ajax({
 								url: /*[[@{__${ADMIN_PATH}__/customfields.json}]]*/ '#',
@@ -32,8 +44,7 @@
 								data: JSON.stringify(data),
 								contentType: 'application/json',
 								success: function(data) {
-									$('#message-saved').show();
-									$(self).button('reset');
+									location = /*[[@{__${ADMIN_PATH}__/customfields/index?updated}]]*/ '#';
 								},
 								error: function(jqXHR) {
 									$.each(jqXHR.responseJSON.fieldErrors, function (field, message) {
@@ -103,6 +114,7 @@
 							<tr>
 								<th class="wr-tr-checkbox" style="width:40px"><input type="checkbox"/></th>
 								<th th:text="#{FieldName}">FieldName</th>
+								<th th:text="#{Code}">FieldName</th>
 								<th th:text="#{Description}">Description</th>
 								<th th:text="#{FieldType}">FieldType</th>
 								<th th:text="#{FieldOption}">FieldOption</th>
@@ -113,7 +125,8 @@
 							<tbody class="sortable">
 							<tr th:id="${customfield.id}" th:each="customfield : ${customFields}">
 								<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${customfield.id}" /></td>
-								<td th:text="${customfield.name?:'(No Titled)'}" style="font-weight: bold;">Title</td>
+								<td th:text="${customfield.name}">Title</td>
+								<td th:text="${customfield.code}">Title</td>
 								<td th:text="${customfield.description ne null ? customfield.description : ''}">2013/10/24</td>
 								<td th:text="${#messages.msg('CustomField.FieldType.' + customfield.fieldType)}"></td>
 								<td th:text="${#strings.setJoin(customfield.options, '&nbsp;,&nbsp;')}"></td>
@@ -159,14 +172,12 @@
 									$('#wr-page-content .search-result .wr-bulk-action .btn').removeClass('disabled');
 								}
 							});
-							$('.sortable').disableSelection();
-
-							$( ".sortable" ).sortable({
-								change: function( event, ui ) {
-									$('#update-customfields-sort').prop('disabled', false);
-									$('button', $(this)).prop('disabled', true);
-								}
-							});
+//							$( ".sortable" ).sortable({
+//								change: function( event, ui ) {
+//									$('#update-customfields-sort').prop('disabled', false);
+//									$('button', $(this)).prop('disabled', true);
+//								}
+//							});
 						});
 						// ]]>
 					</script>

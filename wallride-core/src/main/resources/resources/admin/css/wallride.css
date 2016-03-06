@@ -397,7 +397,7 @@ ul.nested-sortable, ul.sortable {
 .field-option-group .field-option > .remove {
     padding-top: 1px;
 }
-span.grippy {
+.grippy {
     content: '....';
     width: 20px;
     height: 20px;
@@ -412,10 +412,10 @@ span.grippy {
     font-size: 12px;
     font-family: sans-serif;
     letter-spacing: 2px;
-    color: #d1d1d1;
+    color: #c4c4c4;
     text-shadow: 1px 0 1px black;
 }
-span.grippy::after {
+.grippy::after {
     content: '.. .. .. ..';
 }
 /**** article-edit *****/

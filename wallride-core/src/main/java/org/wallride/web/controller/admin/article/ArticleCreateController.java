@@ -66,8 +66,8 @@ public class ArticleCreateController {
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
-	public ArticleCreateForm articleCreateForm() {
-		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields();
+	public ArticleCreateForm articleCreateForm(@PathVariable String language) {
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		return new ArticleCreateForm(customFields);
 	}
 

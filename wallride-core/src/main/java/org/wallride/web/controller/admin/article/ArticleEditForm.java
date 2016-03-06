@@ -249,30 +249,33 @@ public class ArticleEditForm implements Serializable {
 			form.setSeoKeywords(article.getSeo().getKeywords());
 		}
 
-		List<CustomFieldValue> fieldValues = new ArrayList<>(article.getCustomFieldValues());
-		for (CustomField field : customFields) {
+		List<CustomFieldValue> storedValues = new ArrayList<>(article.getCustomFieldValues());
+		Map<CustomField, CustomFieldValue> storedFieldValueMap = new LinkedHashMap<>();
+		storedValues.stream().forEach(value -> {
+			storedFieldValueMap.put(value.getCustomField(), value);
+		});
+		for (CustomField orgField : customFields) {
 			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
-			valueForm.setCustomFieldId(field.getId());
-			valueForm.setName(field.getName());
-			valueForm.setDescription(field.getDescription());
-			valueForm.setFieldType(field.getFieldType());
-			valueForm.setOptions(field.getOptions());
+			valueForm.setCustomFieldId(orgField.getId());
+			valueForm.setName(orgField.getName());
+			valueForm.setDescription(orgField.getDescription());
+			valueForm.setFieldType(orgField.getFieldType());
+			valueForm.setOptions(orgField.getOptions());
 
-			for (CustomFieldValue value : fieldValues) {
-				if (field.equals(value.getCustomField())) {
-					valueForm.setId(value.getId());
-					valueForm.setNumberValue(value.getNumberValue());
-					if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-						if (value.getStringValue() != null) {
-							valueForm.setStringValues(value.getStringValue().split(","));
-						}
-					} else {
-						valueForm.setStringValue(value.getStringValue());
+			CustomFieldValue value = storedFieldValueMap.get(orgField);
+			if (value != null) {
+				valueForm.setId(value.getId());
+				valueForm.setNumberValue(value.getNumberValue());
+				if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					if (value.getStringValue() != null) {
+						valueForm.setStringValues(value.getStringValue().split(","));
 					}
-					valueForm.setDateValue(value.getDateValue());
-					valueForm.setDatetimeValue(value.getDatetimeValue());
-					valueForm.setTextValue(value.getTextValue());
+				} else {
+					valueForm.setStringValue(value.getStringValue());
 				}
+				valueForm.setDateValue(value.getDateValue());
+				valueForm.setDatetimeValue(value.getDatetimeValue());
+				valueForm.setTextValue(value.getTextValue());
 			}
 			form.getCustomFieldValues().add(valueForm);
 		}

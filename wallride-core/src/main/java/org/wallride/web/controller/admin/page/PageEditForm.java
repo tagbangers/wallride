@@ -32,10 +32,7 @@ import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
@@ -244,7 +241,7 @@ public class PageEditForm implements Serializable {
 				.build();
 	}
 
-	public static PageEditForm fromDomainObject(Page page, Set<CustomField> customFields) {
+	public static PageEditForm fromDomainObject(Page page, Set<CustomField> allCustomFields) {
 		PageEditForm form = new PageEditForm();
 		BeanUtils.copyProperties(page, form);
 
@@ -274,30 +271,34 @@ public class PageEditForm implements Serializable {
 			form.setSeoDescription(page.getSeo().getDescription());
 			form.setSeoKeywords(page.getSeo().getKeywords());
 		}
-		List<CustomFieldValue> fieldValues = new ArrayList<>(page.getCustomFieldValues());
-		for (CustomField field : customFields) {
-			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
-			valueForm.setCustomFieldId(field.getId());
-			valueForm.setName(field.getName());
-			valueForm.setDescription(field.getDescription());
-			valueForm.setFieldType(field.getFieldType());
-			valueForm.setOptions(field.getOptions());
 
-			for (CustomFieldValue value : fieldValues) {
-				if (field.equals(value.getCustomField())) {
-					valueForm.setId(value.getId());
-					valueForm.setNumberValue(value.getNumberValue());
-					if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-						if (value.getStringValue() != null) {
-							valueForm.setStringValues(value.getStringValue().split(","));
-						}
-					} else {
-						valueForm.setStringValue(value.getStringValue());
+		List<CustomFieldValue> storedValues = new ArrayList<>(page.getCustomFieldValues());
+		Map<CustomField, CustomFieldValue> storedFieldValueMap = new LinkedHashMap<>();
+		storedValues.stream().forEach(value -> {
+			storedFieldValueMap.put(value.getCustomField(), value);
+		});
+
+		for (CustomField orgField : allCustomFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(orgField.getId());
+			valueForm.setName(orgField.getName());
+			valueForm.setFieldType(orgField.getFieldType());
+			valueForm.setOptions(orgField.getOptions());
+
+			CustomFieldValue value = storedFieldValueMap.get(orgField);
+			if (value != null) {
+				valueForm.setId(value.getId());
+				valueForm.setNumberValue(value.getNumberValue());
+				if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					if (value.getStringValue() != null) {
+						valueForm.setStringValues(value.getStringValue().split(","));
 					}
-					valueForm.setDateValue(value.getDateValue());
-					valueForm.setDatetimeValue(value.getDatetimeValue());
-					valueForm.setTextValue(value.getTextValue());
+				} else {
+					valueForm.setStringValue(value.getStringValue());
 				}
+				valueForm.setDateValue(value.getDateValue());
+				valueForm.setDatetimeValue(value.getDatetimeValue());
+				valueForm.setTextValue(value.getTextValue());
 			}
 			form.getCustomFieldValues().add(valueForm);
 		}

@@ -284,7 +284,6 @@ ALTER TABLE `blog` ADD CONSTRAINT UK_398ypeix0usuwxip7hl30tl95 UNIQUE (`code`);
 ALTER TABLE `blog_language` ADD CONSTRAINT `UKjvbtdcpruai93kkn9en48os1j` UNIQUE (`blog_id`, `language`);
 ALTER TABLE `category` ADD CONSTRAINT `UKbcyxs660s0fku8sf6pgy137ai` UNIQUE (`code`, `language`);
 ALTER TABLE `custom_field` ADD CONSTRAINT `UKix3po6weuk4wvhvc95n5rk5ch` UNIQUE (`code`, `language`);
-ALTER TABLE `custom_field` ADD CONSTRAINT UK_l6uj9qracv5sa03gb9g6amy19 UNIQUE (`idx`);
 ALTER TABLE `custom_field_value` ADD CONSTRAINT `UKnn598oul2m13aiorw3e5clc1i` UNIQUE (`post_id`, `custom_field_id`);
 ALTER TABLE `popular_post` ADD CONSTRAINT `UKevl12yr4xxkydmkvigjq82iui` UNIQUE (`language`, `type`, `rank`);
 ALTER TABLE `post` ADD CONSTRAINT `UKl52i0qo9maim4jb28sahyaf02` UNIQUE (`code`, `language`);

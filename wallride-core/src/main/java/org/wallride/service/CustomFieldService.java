@@ -51,7 +51,7 @@ public class CustomFieldService {
 		if (duplicate != null) {
 			throw new DuplicateCodeException(request.getCode());
 		}
-		customField.setIdx(customFieldRepository.countForUpdate(request.getLanguage()) + 1);
+		customField.setIdx(customFieldRepository.findMaxIdxByLanguage(request.getLanguage()) + 1);
 		customField.setName(request.getName());
 		customField.setCode(request.getCode());
 		customField.setDescription(request.getDescription());
@@ -95,27 +95,24 @@ public class CustomFieldService {
 	@CacheEvict(value="customFields", allEntries=true)
 	public void updateCustomFieldOrder(List<Long> data, String language, BindingResult result) {
 		List<CustomField> customFields = customFieldRepository.findAllByLanguage(language);
-		customFields.stream().forEach(v -> {
-			v.setIdx(null);
-			customFieldRepository.saveAndFlush(v);
+		Map<Long, CustomField> fieldMap = new LinkedHashMap<>();
+		customFields.stream().forEach(customField -> {
+			fieldMap.put(customField.getId(), customField);
+			customField.setIdx(null);
+			customFieldRepository.saveAndFlush(customField);
 		});
 
 		for (int i = 0; i < data.size(); i++) {
-			Long id = data.get(i);
-			for (CustomField customField : customFields) {
-				if (id.equals(customField.getId())) {
-					customField.setIdx(i + 1);
-					customFieldRepository.save(customField);
-				}
-			}
+			CustomField customField = fieldMap.get(data.get(i));
+			customField.setIdx(i + 1);
+			customFieldRepository.save(customField);
 		}
-}
+	}
 
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField deleteCustomField(CustomFieldDeleteRequest request, BindingResult result) {
 		CustomField customField = customFieldRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		customFieldRepository.delete(customField);
-
 		return customField;
 	}
 
@@ -169,5 +166,9 @@ public class CustomFieldService {
 
 	public SortedSet<CustomField> getAllCustomFields() {
 		return new TreeSet<>(customFieldRepository.findAll());
+	}
+
+	public SortedSet<CustomField> getAllCustomFields(String language) {
+		return new TreeSet<>(customFieldRepository.findAllByLanguage(language));
 	}
 }
