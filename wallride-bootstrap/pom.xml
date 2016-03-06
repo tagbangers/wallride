@@ -11,6 +11,13 @@
     </parent>
     <artifactId>wallride-bootstrap</artifactId>
     <packaging>${packaging.type}</packaging>
+    <name>WallRide Bootstrap</name>
+    <description>CMS for developers of principles</description>
+    <url>http://wallride.org/</url>
+    <organization>
+        <name>Tagbangers, Inc.</name>
+        <url>https://www.tagbangers.co.jp/</url>
+    </organization>
 
     <properties>
         <start-class>org.wallride.bootstrap.Bootstrap</start-class>
