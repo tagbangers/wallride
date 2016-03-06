@@ -37,6 +37,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.autoconfigure.WallRideProperties;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
@@ -278,10 +280,11 @@ public class ArticleService {
 	}
 
 	private Article publishArticle(Article article) {
+		Article deleteTarget = getDraftById(article.getId());
 		article.setDrafted(null);
 		article.setStatus(Post.Status.PUBLISHED);
 		Article published = articleRepository.save(article);
-		articleRepository.deleteByDrafted(article);
+		articleRepository.delete(deleteTarget);
 		return published;
 	}
 
@@ -294,10 +297,11 @@ public class ArticleService {
 	}
 
 	private Article unpublishArticle(Article article) {
+		Article deleteTarget = getDraftById(article.getId());
 		article.setDrafted(null);
 		article.setStatus(Post.Status.DRAFT);
 		Article unpublished = articleRepository.save(article);
-		articleRepository.deleteByDrafted(article);
+		articleRepository.delete(deleteTarget);
 		return unpublished;
 	}
 

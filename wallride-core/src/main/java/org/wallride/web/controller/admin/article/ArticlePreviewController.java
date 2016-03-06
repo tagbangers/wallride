@@ -36,6 +36,7 @@ import org.wallride.domain.Blog;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.exception.ServiceException;
 import org.wallride.service.BlogService;
+import org.wallride.service.CustomFieldService;
 import org.wallride.service.MediaService;
 import org.wallride.support.AuthorizedUser;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
@@ -62,6 +63,9 @@ public class ArticlePreviewController {
 	private MediaService mediaService;
 
 	@Inject
+	private CustomFieldService customFieldService;
+
+	@Inject
 	private ServletContext servletContext;
 
 	@RequestMapping
@@ -82,6 +86,7 @@ public class ArticlePreviewController {
 		List<CustomFieldValue> fieldValues = new ArrayList<>();
 		for (CustomFieldValueEditForm valueForm : form.getCustomFieldValues()) {
 			CustomFieldValue value = new CustomFieldValue();
+			value.setCustomField(customFieldService.getCustomFieldById(valueForm.getCustomFieldId(), language));
 			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
 				value.setStringValue(String.join(",", valueForm.getStringValues()));
 			} else {
@@ -121,7 +126,7 @@ public class ArticlePreviewController {
 		ThymeleafEvaluationContext evaluationContext = new ThymeleafEvaluationContext(context, null);
 		ctx.getVariables().put(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME, evaluationContext);
 
-		SpringTemplateEngine templateEngine = context.getBean(SpringTemplateEngine.class);
+		SpringTemplateEngine templateEngine = context.getBean("templateEngine", SpringTemplateEngine.class);
 		String html = templateEngine.process("article/describe", ctx);
 
 		response.setContentType("text/html;charset=UTF-8");

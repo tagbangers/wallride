@@ -30,8 +30,9 @@ import javax.persistence.*;
 						@NamedAttributeNode("cover"),
 						@NamedAttributeNode("author"),
 						@NamedAttributeNode("drafted"),
-						@NamedAttributeNode("categories")}
-		),
+						@NamedAttributeNode("categories"),
+						@NamedAttributeNode("tags")
+				}),
 		@NamedEntityGraph(name = Article.DEEP_GRAPH_NAME,
 				attributeNodes = {
 						@NamedAttributeNode("cover"),

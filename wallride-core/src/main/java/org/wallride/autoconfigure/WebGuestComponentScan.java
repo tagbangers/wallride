@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.wallride.bootstrap;
+package org.wallride.autoconfigure;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication
-public class Bootstrap extends SpringBootServletInitializer {
+import java.lang.annotation.*;
 
-	public static void main(String[] args) {
-		SpringApplication.run(Bootstrap.class, args);
-	}
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import(WebGuestComponentScanRegistrar.class)
+public @interface WebGuestComponentScan {
+
+	String[] value() default {};
+
+	String[] basePackages() default {};
+
+	Class<?>[] basePackageClasses() default {};
 }

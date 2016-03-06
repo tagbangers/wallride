@@ -8,9 +8,8 @@
 		<meta name="author" content="" />
 		<title th:text="${WEBSITE_TITLE}">Title</title>
 		<!--/*/ <th:block th:fragment="head-link"> /*/-->
-		<link rel="shortcut icon" th:href="@{/resource/favicon.png}" />
-		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/atom.xml}" />
-		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{__${WEBSITE_LINK}__/feed/rss.xml}" />
+		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/atom.xml}" />
+		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/rss.xml}" />
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
 		<link rel="stylesheet" th:href="@{/resources/css/sticky-footer-navbar.css}" href="#" />
 		<link rel="stylesheet" th:href="@{/resources/css/common.css}" href="#" />

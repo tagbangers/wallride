@@ -36,10 +36,9 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
@@ -62,8 +61,7 @@ import java.util.Set;
 
 @Configuration
 @ComponentScan(basePackageClasses = DashboardController.class)
-@EnableWebMvc
-public class WebAdminConfiguration extends WebMvcConfigurerAdapter {
+public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 
 	@Autowired
 	private MessageCodesResolver messageCodesResolver;

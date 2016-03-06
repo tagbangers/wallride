@@ -17,7 +17,10 @@
 package org.wallride.repository;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +75,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	List<Map<String, Object>> countByTagIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
 
 	@Modifying
-	@Query("delete from Article article where article.drafted = :drafted ")
-	void deleteByDrafted(@Param("drafted") Article dradted);
+	@Query("delete Article article where article.drafted = :drafted ")
+	void deleteByDrafted(@Param("drafted") Article drafted);
 }

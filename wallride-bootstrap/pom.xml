@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.wallride</groupId>
         <artifactId>wallride-parent</artifactId>
-        <version>1.0.0.M3</version>
+        <version>1.0.0.M4</version>
         <relativePath>../wallride-parent/pom.xml</relativePath>
     </parent>
     <artifactId>wallride-bootstrap</artifactId>
@@ -19,12 +19,11 @@
         <url>https://www.tagbangers.co.jp/</url>
     </organization>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.wallride</groupId>
-            <artifactId>wallride-core</artifactId>
-        </dependency>
+    <properties>
+        <start-class>org.wallride.bootstrap.Bootstrap</start-class>
+    </properties>
 
+    <dependencies>
         <!-- MySQL Driver -->
         <dependency>
             <groupId>mysql</groupId>

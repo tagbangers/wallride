@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.wallride</groupId>
-        <artifactId>wallride-parent</artifactId>
-        <version>1.0.0.M3</version>
-        <relativePath>../wallride-parent/pom.xml</relativePath>
+        <artifactId>wallride</artifactId>
+        <version>1.0.0.M4</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>wallride-tools</artifactId>
     <packaging>jar</packaging>

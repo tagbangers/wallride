@@ -288,10 +288,11 @@ public class PageService {
 	public Page savePageAsPublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
+		Page deleteTarget = getDraftById(page.getId());
 		page.setDrafted(null);
 		page.setStatus(Post.Status.PUBLISHED);
 		pageRepository.save(page);
-		pageRepository.deleteByDrafted(page);
+		pageRepository.delete(deleteTarget);
 		return savePage(request, authorizedUser);
 	}
 
@@ -299,10 +300,12 @@ public class PageService {
 	public Page savePageAsUnpublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
+		Page deleteTarget = getDraftById(page.getId());
 		page.setDrafted(null);
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
 		pageRepository.deleteByDrafted(page);
+		pageRepository.delete(deleteTarget);
 		return savePage(request, authorizedUser);
 	}
 

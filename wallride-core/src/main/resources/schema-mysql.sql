@@ -73,7 +73,7 @@ create table `custom_field_value` (
   `id` bigint not null auto_increment,
   `custom_field_id` bigint not null,
   `post_id` bigint not null,
-  `string_value` varchar(300),
+  `string_value` varchar(200),
   `text_value` longtext,
   `date_value` date,
   `datetime_value` datetime,
