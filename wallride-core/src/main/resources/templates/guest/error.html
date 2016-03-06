@@ -1,0 +1,10 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+	<head>
+		<meta charset="utf-8"/>
+		<title th:text="${WEBSITE_TITLE}">Title</title>
+	</head>
+	<body>
+		<p th:text="|${status} ${error}|">404 Not Found</p>
+	</body>
+</html>

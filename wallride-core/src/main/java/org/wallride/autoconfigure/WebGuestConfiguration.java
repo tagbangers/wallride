@@ -47,7 +47,6 @@ import org.wallride.web.controller.guest.IndexController;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.*;
 
-import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
@@ -60,17 +59,17 @@ public class WebGuestConfiguration extends WebMvcConfigurationSupport {
 
 	private static final String CLASSPATH_RESOURCE_LOCATION = "classpath:/resources/guest/";
 
-	@Inject
+	@Autowired
+	private WallRideProperties wallRideProperties;
+
+	@Autowired
 	private MessageCodesResolver messageCodesResolver;
 
-	@Inject
+	@Autowired
 	private BlogService blogService;
 
-	@Inject
+	@Autowired
 	private PageService pageService;
-
-	@Inject
-	private WallRideProperties wallRideProperties;
 
 	@Autowired
 	private MediaRepository mediaRepository;
