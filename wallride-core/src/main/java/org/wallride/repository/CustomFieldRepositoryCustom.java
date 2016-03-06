@@ -5,8 +5,11 @@ import org.springframework.data.domain.Pageable;
 import org.wallride.domain.CustomField;
 import org.wallride.model.CustomFieldSearchRequest;
 
+import java.util.List;
+
 public interface CustomFieldRepositoryCustom {
 
 	Page<CustomField> search(CustomFieldSearchRequest request);
 	Page<CustomField> search(CustomFieldSearchRequest request, Pageable pageable);
+	List<Long> searchForId(CustomFieldSearchRequest request);
 }

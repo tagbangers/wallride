@@ -94,14 +94,13 @@ public class CustomFieldService {
 
 	@CacheEvict(value="customFields", allEntries=true)
 	public void updateCustomFieldOrder(List<Long> data, String language, BindingResult result) {
+		customFieldRepository.updateNullByLanguage(language);
 		List<CustomField> customFields = customFieldRepository.findAllByLanguage(language);
+
 		Map<Long, CustomField> fieldMap = new LinkedHashMap<>();
 		customFields.stream().forEach(customField -> {
 			fieldMap.put(customField.getId(), customField);
-			customField.setIdx(null);
-			customFieldRepository.saveAndFlush(customField);
 		});
-
 		for (int i = 0; i < data.size(); i++) {
 			CustomField customField = fieldMap.get(data.get(i));
 			customField.setIdx(i + 1);

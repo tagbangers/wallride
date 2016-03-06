@@ -24,6 +24,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -40,6 +41,7 @@ import org.wallride.model.CustomFieldSearchRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 	
@@ -53,6 +55,26 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 
 	@Override
 	public Page<CustomField> search(CustomFieldSearchRequest request, Pageable pageable) {
+		Session session = (Session) entityManager.getDelegate();
+		Criteria criteria = session.createCriteria(CustomField.class)
+				.setFetchMode("options", FetchMode.JOIN);
+
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, pageable, criteria);
+		int resultSize = persistenceQuery.getResultSize();
+		List<CustomField> results = persistenceQuery.getResultList();
+		return new PageImpl<>(results, pageable, resultSize);
+	}
+
+	@Override
+	public List<Long> searchForId(CustomFieldSearchRequest request) {
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		persistenceQuery.setProjection("id");
+		List<Object[]> results = persistenceQuery.getResultList();
+		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
+		return nos;
+	}
+
+	public FullTextQuery buildFullTextQuery(CustomFieldSearchRequest request, Pageable pageable, Criteria criteria) {
 		FullTextEntityManager fullTextEntityManager =  Search.getFullTextEntityManager(entityManager);
 		QueryBuilder qb = fullTextEntityManager.getSearchFactory()
 				.buildQueryBuilder()
@@ -91,9 +113,6 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 
 		Query searchQuery = junction.createQuery();
 		
-		Session session = (Session) entityManager.getDelegate();
-		Criteria criteria = session.createCriteria(CustomField.class);
-
 		Sort sort = new Sort(new SortField("idx", SortField.Type.INT));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
@@ -104,11 +123,6 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 			persistenceQuery.setFirstResult(pageable.getOffset());
 			persistenceQuery.setMaxResults(pageable.getPageSize());
 		}
-
-		int resultSize = persistenceQuery.getResultSize();
-
-		@SuppressWarnings("unchecked")
-		List<CustomField> results = persistenceQuery.getResultList();
-		return new PageImpl<>(results, pageable, resultSize);
+		return persistenceQuery;
 	}
 }

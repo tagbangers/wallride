@@ -5,6 +5,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.springframework.util.StringUtils;
@@ -36,19 +37,24 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 	private Post post;
 
 	@Column(length = 200)
+	@Field
 	private String stringValue;
 
 	@Column
+	@Field
 	private Long numberValue;
 
 	@Column
 	@Lob
+	@Field
 	private String textValue;
 
 	@Column
+	@Field
 	private LocalDate dateValue;
 
 	@Column
+	@Field
 	private LocalDateTime datetimeValue;
 
 	@Override
