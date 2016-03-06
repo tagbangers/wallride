@@ -60,8 +60,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		Criteria criteria = session.createCriteria(Article.class)
 				.setFetchMode("cover", FetchMode.JOIN)
 				.setFetchMode("user", FetchMode.JOIN)
-				.setFetchMode("categories", FetchMode.JOIN);
-//				.setFetchMode("tags", FetchMode.JOIN);
+				.setFetchMode("categories", FetchMode.JOIN)
+				.setFetchMode("tags", FetchMode.JOIN);
 
 		FullTextQuery persistenceQuery = buildFullTextQuery(request, pageable, criteria);
 		int resultSize = persistenceQuery.getResultSize();

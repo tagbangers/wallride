@@ -30,8 +30,9 @@ import javax.persistence.*;
 						@NamedAttributeNode("cover"),
 						@NamedAttributeNode("author"),
 						@NamedAttributeNode("drafted"),
-						@NamedAttributeNode("categories")}
-		),
+						@NamedAttributeNode("categories"),
+						@NamedAttributeNode("tags")
+				}),
 		@NamedEntityGraph(name = Article.DEEP_GRAPH_NAME,
 				attributeNodes = {
 						@NamedAttributeNode("cover"),
@@ -39,7 +40,8 @@ import javax.persistence.*;
 						@NamedAttributeNode("drafted"),
 						@NamedAttributeNode("categories"),
 						@NamedAttributeNode("tags"),
-						@NamedAttributeNode("relatedToPosts")})
+						@NamedAttributeNode("relatedToPosts")
+				})
 })
 @Table(name = "article")
 @DynamicInsert
