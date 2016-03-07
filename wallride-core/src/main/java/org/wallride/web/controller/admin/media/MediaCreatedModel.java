@@ -27,9 +27,12 @@ public class MediaCreatedModel implements Serializable {
 
 	private String filelink;
 
+	private String filename;
+
 	public MediaCreatedModel(Media media, WallRideProperties wallRideProperties) {
 		this.id = media.getId();
 		this.filelink = wallRideProperties.getMediaUrlPrefix() + media.getId();
+		this.filename = media.getOriginalName();
 	}
 
 	public String getId() {
@@ -38,5 +41,9 @@ public class MediaCreatedModel implements Serializable {
 
 	public String getFilelink() {
 		return filelink;
+	}
+
+	public String getFilename() {
+		return filename;
 	}
 }
