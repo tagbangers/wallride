@@ -282,6 +282,7 @@ public class PageEditForm implements Serializable {
 			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
 			valueForm.setCustomFieldId(orgField.getId());
 			valueForm.setName(orgField.getName());
+			valueForm.setDescription(orgField.getDescription());
 			valueForm.setFieldType(orgField.getFieldType());
 			valueForm.setOptions(orgField.getOptions());
 

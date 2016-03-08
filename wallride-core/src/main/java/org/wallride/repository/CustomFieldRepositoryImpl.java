@@ -36,10 +36,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomField_;
 import org.wallride.model.CustomFieldSearchRequest;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +52,16 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Override
+	public void lock(long id) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = cb.createQuery(Long.class);
+		Root<CustomField> root = query.from(CustomField.class);
+		query.select(root.get(CustomField_.id));
+		query.where(cb.equal(root.get(CustomField_.id), id));
+		entityManager.createQuery(query).setLockMode(LockModeType.PESSIMISTIC_WRITE).getSingleResult();
+	}
 
 	@Override
 	public Page<CustomField> search(CustomFieldSearchRequest request) {

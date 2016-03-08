@@ -59,14 +59,8 @@ import java.util.regex.Pattern;
 @Transactional(rollbackFor = Exception.class)
 public class PageService {
 
-	@Inject
+	@Resource
 	private BlogService blogService;
-
-	@Inject
-	private MessageCodesResolver messageCodesResolver;
-
-	@Inject
-	private PlatformTransactionManager transactionManager;
 
 	@Resource
 	private PostRepository postRepository;
@@ -79,6 +73,12 @@ public class PageService {
 
 	@Resource
 	private MediaRepository mediaRepository;
+
+	@Inject
+	private MessageCodesResolver messageCodesResolver;
+
+	@Inject
+	private PlatformTransactionManager transactionManager;
 
 	@Inject
 	private WallRideProperties wallRideProperties;
@@ -289,12 +289,12 @@ public class PageService {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		Page deleteTarget = getDraftById(page.getId());
-		page.setDrafted(null);
-		page.setStatus(Post.Status.PUBLISHED);
-		pageRepository.save(page);
 		if (deleteTarget != null) {
 			pageRepository.delete(deleteTarget);
 		}
+		page.setDrafted(null);
+		page.setStatus(Post.Status.PUBLISHED);
+		pageRepository.save(page);
 		return savePage(request, authorizedUser);
 	}
 
@@ -303,13 +303,13 @@ public class PageService {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		Page deleteTarget = getDraftById(page.getId());
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		page.setDrafted(null);
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
 		pageRepository.deleteByDrafted(page);
-		if (deleteTarget != null) {
-			pageRepository.delete(deleteTarget);
-		}
 		return savePage(request, authorizedUser);
 	}
 
@@ -441,11 +441,13 @@ public class PageService {
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
 
-		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
 		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
 		for (CustomFieldValue value : page.getCustomFieldValues()) {
 			valueMap.put(value.getCustomField(), value);
 		}
+
+		page.getCustomFieldValues().clear();
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
 				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
@@ -467,8 +469,7 @@ public class PageService {
 				fieldValues.add(value);
 			}
 		}
-		page.getCustomFieldValues().clear();
-		page.setCustomFieldValues(new TreeSet<>(fieldValues));
+		page.setCustomFieldValues(fieldValues);
 
 		return pageRepository.save(page);
 	}

@@ -195,7 +195,6 @@ public class ArticleEditForm implements Serializable {
 		if (!CollectionUtils.isEmpty(customFieldValues)) {
 			customFieldValues_ = customFieldValues.stream()
 					.filter(v -> v.getCustomFieldId() != 0)
-//					.filter(v -> !v.isEmpty())
 					.collect(Collectors.toList());
 		}
 

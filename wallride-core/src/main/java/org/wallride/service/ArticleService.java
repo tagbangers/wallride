@@ -76,9 +76,6 @@ public class ArticleService {
 	@Resource
 	private MediaRepository mediaRepository;
 
-	@Resource
-	private CustomFieldRepository customFieldRepository;
-
 	@Inject
 	private MessageCodesResolver messageCodesResolver;
 
@@ -218,9 +215,8 @@ public class ArticleService {
 				article.getCustomFieldValues().add(value);
 			}
 		}
-		article = articleRepository.save(article);
-		logger.info("Article CODE [{}] created by {}", article.getCode(), authorizedUser);
-		return article;
+
+		return articleRepository.save(article);
 	}
 
 	@CacheEvict(value = "articles", allEntries = true)

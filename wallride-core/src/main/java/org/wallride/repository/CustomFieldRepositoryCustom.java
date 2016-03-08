@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface CustomFieldRepositoryCustom {
 
+	void lock(long id);
 	Page<CustomField> search(CustomFieldSearchRequest request);
 	Page<CustomField> search(CustomFieldSearchRequest request, Pageable pageable);
 	List<Long> searchForId(CustomFieldSearchRequest request);

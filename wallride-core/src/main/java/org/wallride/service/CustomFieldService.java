@@ -110,6 +110,7 @@ public class CustomFieldService {
 
 	@CacheEvict(value="customFields", allEntries=true)
 	public CustomField deleteCustomField(CustomFieldDeleteRequest request, BindingResult result) {
+		customFieldRepository.lock(request.getId());
 		CustomField customField = customFieldRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		customFieldRepository.delete(customField);
 		return customField;

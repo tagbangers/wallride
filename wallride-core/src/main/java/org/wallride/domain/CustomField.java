@@ -6,6 +6,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
@@ -13,6 +14,8 @@ import org.hibernate.search.annotations.SortableField;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Entity
 @NamedEntityGraphs({
@@ -67,6 +70,10 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	@Column(length = 3, nullable = false)
 	@Field
 	private String language;
+
+	@OneToMany(mappedBy = "customField", cascade = CascadeType.ALL)
+	@SortNatural
+	private SortedSet<CustomFieldValue> customFieldValues = new TreeSet<>();
 
 	@ElementCollection(fetch=FetchType.LAZY)
 	@JoinTable(name="custom_field_option", joinColumns=@JoinColumn(name="custom_field_id"))
@@ -136,6 +143,14 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public SortedSet<CustomFieldValue> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(SortedSet<CustomFieldValue> customFieldValues) {
+		this.customFieldValues = customFieldValues;
 	}
 
 	public List<CustomFieldOption> getOptions() {
