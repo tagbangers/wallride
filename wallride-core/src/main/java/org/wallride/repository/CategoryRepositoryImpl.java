@@ -35,16 +35,31 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.wallride.domain.Category;
+import org.wallride.domain.Category_;
 import org.wallride.model.CategorySearchRequest;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Override
+	public void lock(long id) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = cb.createQuery(Long.class);
+		Root<Category> root = query.from(Category.class);
+		query.select(root.get(Category_.id));
+		query.where(cb.equal(root.get(Category_.id), id));
+		entityManager.createQuery(query).setLockMode(LockModeType.PESSIMISTIC_WRITE).getSingleResult();
+	}
 
 	@Override
 	public Page<Category> search(CategorySearchRequest request) {

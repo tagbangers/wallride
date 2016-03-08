@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.Map;
 
 public class MediaHttpRequestHandler extends WebContentGenerator implements HttpRequestHandler, InitializingBean {
@@ -109,6 +110,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		}
 		response.setContentLength((int) length);
 		response.setContentType(media.getMimeType());
+		response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + URLEncoder.encode(media.getOriginalName(), "UTF-8"));
 
 		FileCopyUtils.copy(resource.getInputStream(), response.getOutputStream());
 	}

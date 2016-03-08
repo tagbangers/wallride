@@ -77,7 +77,8 @@ public class CategoryService {
 
 	@CacheEvict(value="articles", allEntries=true)
 	public Category updateCategory(CategoryUpdateRequest request, AuthorizedUser authorizedUser) {
-		Category category = categoryRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		categoryRepository.lock(request.getId());
+		Category category = categoryRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		Category parent = null;
 		if (request.getParentId() != null) {
 			parent = categoryRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage());
@@ -116,7 +117,8 @@ public class CategoryService {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {
-				Category category = categoryRepository.findOneForUpdateByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
+				categoryRepository.lock(Long.parseLong((String) map.get("item_id")));
+				Category category = categoryRepository.findOneByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
 				if (category != null) {
 					Category parent = null;
 					if (map.get("parent_id") != null) {
@@ -133,7 +135,8 @@ public class CategoryService {
 
 	@CacheEvict(value="articles", allEntries=true)
 	public Category deleteCategory(long id, String language) {
-		Category category = categoryRepository.findOneForUpdateByIdAndLanguage(id, language);
+		categoryRepository.lock(id);
+		Category category = categoryRepository.findOneByIdAndLanguage(id, language);
 		Category parent = category.getParent();
 		for (Category child : category.getChildren()) {
 			child.setParent(parent);
