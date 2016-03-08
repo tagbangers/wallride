@@ -34,9 +34,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
 	@EntityGraph(value = Category.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Category findOneByIdAndLanguage(Long id, String language);
 
-	@EntityGraph(value = Category.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	Category findOneForUpdateByIdAndLanguage(Long id, String language);
+//	@EntityGraph(value = Category.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+//	@Lock(LockModeType.PESSIMISTIC_WRITE)
+//	Category findOneForUpdateByIdAndLanguage(Long id, String language);
 
 	@EntityGraph(value = Category.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Category findOneByCodeAndLanguage(String code, String language);
