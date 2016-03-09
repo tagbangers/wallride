@@ -31,7 +31,7 @@ public interface CustomFieldRepository extends JpaRepository<CustomField, Long>,
 	@EntityGraph(value = CustomField.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	CustomField findOneByCodeAndLanguage(String code, String language);
 
-	@EntityGraph(value = CustomField.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	@EntityGraph(value = CustomField.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	List<CustomField> findAllByLanguage(String language);
 
 	@Query("select coalesce(max(idx), 0) from CustomField customField where customField.language = :language ")
