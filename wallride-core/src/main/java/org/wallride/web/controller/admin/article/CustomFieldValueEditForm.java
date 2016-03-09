@@ -24,7 +24,7 @@ public class CustomFieldValueEditForm implements Serializable {
 	private String description;
 	private CustomField.FieldType fieldType;
 	private String stringValue;
-	private String[] stringValues;
+	private String[] textValues;
 	private String textValue;
 	@NumberFormat
 	private Long numberValue;
@@ -82,12 +82,12 @@ public class CustomFieldValueEditForm implements Serializable {
 		this.stringValue = stringValue;
 	}
 
-	public String[] getStringValues() {
-		return stringValues;
+	public String[] getTextValues() {
+		return textValues;
 	}
 
-	public void setStringValues(String[] stringValues) {
-		this.stringValues = stringValues;
+	public void setTextValues(String[] textValues) {
+		this.textValues = textValues;
 	}
 
 	public String getTextValue() {
@@ -138,13 +138,13 @@ public class CustomFieldValueEditForm implements Serializable {
 		form.setDescription(fieldValue.getCustomField().getDescription());
 		form.setFieldType(fieldValue.getCustomField().getFieldType());
 		if (fieldValue.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-			if (fieldValue.getStringValue() != null) {
-				form.setStringValues(fieldValue.getStringValue().split(","));
+			if (fieldValue.getTextValue() != null) {
+				form.setTextValues(fieldValue.getTextValue().split(","));
 			}
 		} else {
-			form.setStringValue(fieldValue.getStringValue());
+			form.setTextValue(fieldValue.getTextValue());
 		}
-		form.setTextValue(fieldValue.getTextValue());
+		form.setStringValue(fieldValue.getStringValue());
 		form.setNumberValue(fieldValue.getNumberValue());
 		form.setDateValue(fieldValue.getDateValue());
 		form.setDatetimeValue(fieldValue.getDatetimeValue());
@@ -162,7 +162,7 @@ public class CustomFieldValueEditForm implements Serializable {
 				}
 				return false;
 			case CHECKBOX:
-				if (getStringValues().length == 0) {
+				if (getTextValues().length == 0) {
 					return true;
 				}
 				return false;

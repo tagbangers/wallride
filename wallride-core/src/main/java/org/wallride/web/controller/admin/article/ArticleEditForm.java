@@ -264,17 +264,17 @@ public class ArticleEditForm implements Serializable {
 			CustomFieldValue value = storedFieldValueMap.get(orgField);
 			if (value != null) {
 				valueForm.setId(value.getId());
-				valueForm.setNumberValue(value.getNumberValue());
 				if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					if (value.getStringValue() != null) {
-						valueForm.setStringValues(value.getStringValue().split(","));
+					if (value.getTextValue() != null) {
+						valueForm.setTextValues(value.getTextValue().split(","));
 					}
 				} else {
-					valueForm.setStringValue(value.getStringValue());
+					valueForm.setTextValue(value.getTextValue());
 				}
+				valueForm.setStringValue(value.getStringValue());
+				valueForm.setNumberValue(value.getNumberValue());
 				valueForm.setDateValue(value.getDateValue());
 				valueForm.setDatetimeValue(value.getDatetimeValue());
-				valueForm.setTextValue(value.getTextValue());
 			}
 			form.getCustomFieldValues().add(valueForm);
 		}

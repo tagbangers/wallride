@@ -88,11 +88,11 @@ public class PagePreviewController {
 			CustomFieldValue value = new CustomFieldValue();
 			value.setCustomField(customFieldService.getCustomFieldById(valueForm.getCustomFieldId(), language));
 			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-				value.setStringValue(String.join(",", valueForm.getStringValues()));
+				value.setTextValue(String.join(",", valueForm.getTextValues()));
 			} else {
-				value.setStringValue(valueForm.getStringValue());
+				value.setTextValue(valueForm.getTextValue());
 			}
-			value.setTextValue(valueForm.getTextValue());
+			value.setStringValue(valueForm.getStringValue());
 			value.setNumberValue(valueForm.getNumberValue());
 			value.setDateValue(valueForm.getDateValue());
 			value.setDatetimeValue(valueForm.getDatetimeValue());

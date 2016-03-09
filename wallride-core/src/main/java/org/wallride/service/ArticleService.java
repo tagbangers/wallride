@@ -204,11 +204,11 @@ public class ArticleService {
 				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
 				value.setPost(article);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					value.setStringValue(String.join(",", valueForm.getStringValues()));
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
 				} else {
-					value.setStringValue(valueForm.getStringValue());
+					value.setTextValue(valueForm.getTextValue());
 				}
-				value.setTextValue(valueForm.getTextValue());
+				value.setStringValue(valueForm.getStringValue());
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
@@ -321,7 +321,7 @@ public class ArticleService {
 			}
 		}
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null && !duplicate.equals(article)) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -433,11 +433,11 @@ public class ArticleService {
 				value.setCustomField(customField);
 				value.setPost(article);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					value.setStringValue(String.join(",", valueForm.getStringValues()));
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
 				} else {
-					value.setStringValue(valueForm.getStringValue());
+					value.setTextValue(valueForm.getTextValue());
 				}
-				value.setTextValue(valueForm.getTextValue());
+				value.setStringValue(valueForm.getStringValue());
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());

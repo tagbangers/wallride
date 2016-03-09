@@ -127,10 +127,10 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 			case TEXT:
 			case SELECTBOX:
 			case RADIO:
-			case CHECKBOX:
 				return getStringValue();
 			case TEXTAREA:
 			case HTML:
+			case CHECKBOX:
 				return getTextValue();
 			case DATE:
 				return getDateValue();
@@ -148,13 +148,13 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 			case TEXT:
 			case SELECTBOX:
 			case RADIO:
-			case CHECKBOX:
 				if (StringUtils.isEmpty(getStringValue())) {
 					return true;
 				}
 				return false;
 			case TEXTAREA:
 			case HTML:
+			case CHECKBOX:
 				if (StringUtils.isEmpty(getTextValue())) {
 					return true;
 				}

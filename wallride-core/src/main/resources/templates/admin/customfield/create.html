@@ -60,6 +60,7 @@
 					</div>
 					<div class="col-sm-offset-2 col-sm-10">
 						<ul class="sortable">
+<!--
 							<th:block th:if="${customField ne null}">
 							<li class="option col-sm-7" th:if="${#lists.size(customField.options) gt 0}" th:each="option : ${customField.options}">
 								<span class="grippy"></span>
@@ -67,6 +68,7 @@
 								<button class="pull-right btn btn-link remove" data-dismiss="option"><span class="glyphicon glyphicon-remove"></span></button>
 							</li>
 							</th:block>
+-->
 							<th:block th:if="*{options ne null}">
 							<li class="option col-sm-7" th:each="option : *{options}">
 								<span class="grippy"></span>
@@ -112,16 +114,17 @@
 							$fieldOption.on('click', '[data-append="option"]', function() {
 								var customInputOption = $customInput.val();
 
-								if (!isDuplicated($('.field-option'), customInputOption)) {
+								if (customInputOption == ''
+										|| isDuplicated($('.field-option'), customInputOption)) {
+									$customInput.closest('.form-group').addClass('has-error');
+									return false;
+								} else {
 									$options.push(customInputOption);
 									var tmpl = $.templates("#option-tmpl");
 									var $content = $(tmpl.render());
 									$('.field-option', $content).attr('data-name', customInputOption).text(customInputOption);
 									$('.sortable').append($content);
 									$customInput.val('').focus().closest('.form-group').removeClass('has-error');
-								} else {
-									$customInput.closest('.form-group').addClass('has-error');
-									return false;
 								}
 								return false;
 							});
