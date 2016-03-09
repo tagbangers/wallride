@@ -40,8 +40,12 @@ import javax.persistence.*;
 						@NamedAttributeNode("drafted"),
 						@NamedAttributeNode("categories"),
 						@NamedAttributeNode("tags"),
-						@NamedAttributeNode("relatedToPosts")
-				})
+						@NamedAttributeNode("relatedToPosts"),
+						@NamedAttributeNode(value = "customFieldValues", subgraph = "customFieldValue")},
+				subgraphs =  {
+						@NamedSubgraph(name = "customFieldValue",
+								attributeNodes = {
+										@NamedAttributeNode("customField")})})
 })
 @Table(name = "article")
 @DynamicInsert

@@ -17,16 +17,35 @@
 package org.wallride.web.controller.admin.page;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.wallride.domain.CustomField;
 import org.wallride.model.PageCreateRequest;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 @SuppressWarnings("serial")
 public class PageCreateForm implements Serializable {
+
+	public PageCreateForm() {
+	}
+
+	public PageCreateForm(SortedSet<CustomField> customFields) {
+		for (CustomField field : customFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(field.getId());
+			valueForm.setName(field.getName());
+			valueForm.setDescription(field.getDescription());
+			valueForm.setFieldType(field.getFieldType());
+			valueForm.setOptions(field.getOptions());
+			customFieldValues.add(valueForm);
+		}
+	}
 
 	public interface GroupPublish {}
 	
@@ -56,6 +75,8 @@ public class PageCreateForm implements Serializable {
 	private String seoKeywords;
 
 //	private Post.Status status;
+
+	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 
 	@NotNull
 	private String language;
@@ -164,6 +185,14 @@ public class PageCreateForm implements Serializable {
 		this.seoKeywords = seoKeywords;
 	}
 
+	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
+	}
+
 	//	public Post.Status getStatus() {
 //		return status;
 //	}
@@ -196,6 +225,7 @@ public class PageCreateForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
+				.customFieldValues(customFieldValues)
 //				.status(status)
 				.language(language)
 				.build();

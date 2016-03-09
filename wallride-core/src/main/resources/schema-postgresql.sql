@@ -48,6 +48,46 @@ CREATE TABLE "category" (
   PRIMARY KEY ("id")
 );
 
+CREATE TABLE "custom_field" (
+  "id"            BIGSERIAL   NOT NULL,
+  "created_at"    TIMESTAMP   NOT NULL,
+  "created_by"    VARCHAR(100),
+  "updated_at"    TIMESTAMP   NOT NULL,
+  "updated_by"    VARCHAR(100),
+  "code"          VARCHAR(200),
+  "default_value" VARCHAR(200),
+  "description"   TEXT,
+  "field_type"    VARCHAR(50) NOT NULL,
+  "idx"           INT4,
+  "language"      VARCHAR(3)  NOT NULL,
+  "name"          VARCHAR(200),
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "custom_field_value" (
+  "id"              BIGSERIAL NOT NULL,
+  "created_at"      TIMESTAMP NOT NULL,
+  "created_by"      VARCHAR(100),
+  "updated_at"      TIMESTAMP NOT NULL,
+  "updated_by"      VARCHAR(100),
+  "date_value"      DATE,
+  "datetime_value"  TIMESTAMP,
+  "number_value"    INT8,
+  "string_value"    VARCHAR(300),
+  "text_value"      TEXT,
+  "custom_field_id" INT8      NOT NULL,
+  "post_id"         INT8      NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "custom_field_option" (
+  "custom_field_id" INT8         NOT NULL,
+  "language"        VARCHAR(3)   NOT NULL,
+  "name"            VARCHAR(200) NOT NULL,
+  "idx"             INT4         NOT NULL,
+  PRIMARY KEY ("custom_field_id", "idx")
+);
+
 CREATE TABLE "comment" (
   "id"          BIGSERIAL    NOT NULL,
   "post_id"     INT8         NOT NULL,
@@ -221,6 +261,8 @@ CREATE TABLE "user_role" (
 ALTER TABLE "blog" ADD CONSTRAINT UK_398ypeix0usuwxip7hl30tl95 UNIQUE ("code");
 ALTER TABLE "blog_language" ADD CONSTRAINT "UKjvbtdcpruai93kkn9en48os1j" UNIQUE ("blog_id", "language");
 ALTER TABLE "category" ADD CONSTRAINT "UKbcyxs660s0fku8sf6pgy137ai" UNIQUE ("code", "language");
+ALTER TABLE "custom_field" ADD CONSTRAINT "UKemnyfll4hbd0vfi01kx12dyjb" UNIQUE ("code", "language");
+ALTER TABLE "custom_field_value" ADD CONSTRAINT "UKnn598oul2m13aiorw3e5clc1i" UNIQUE ("post_id", "custom_field_id");
 ALTER TABLE "popular_post" ADD CONSTRAINT "UKevl12yr4xxkydmkvigjq82iui" UNIQUE ("language", "type", "rank");
 ALTER TABLE "post" ADD CONSTRAINT "UKl52i0qo9maim4jb28sahyaf02" UNIQUE ("code", "language");
 ALTER TABLE "tag" ADD CONSTRAINT "UKk25qstev2lpae13bk95lxny1y" UNIQUE ("name", "language");
@@ -229,6 +271,9 @@ ALTER TABLE "user" ADD CONSTRAINT UK_6ntlp6n5ltjg6hhxl66jj5u0l UNIQUE ("login_id
 ALTER TABLE "article" ADD CONSTRAINT "FK2v5gc16vlmfc3b7v9mug9p0nh" FOREIGN KEY ("id") REFERENCES "post";
 ALTER TABLE "blog_language" ADD CONSTRAINT "FKm26flfhreaktwyf5x7niter6u" FOREIGN KEY ("blog_id") REFERENCES "blog";
 ALTER TABLE "category" ADD CONSTRAINT "FKpqbj33aij72uwx8rwt086hvq2" FOREIGN KEY ("parent_id") REFERENCES "category";
+ALTER TABLE "custom_field_value" ADD CONSTRAINT "FK68g6fssy3gjj4jovfso18uysm" FOREIGN KEY ("custom_field_id") REFERENCES "custom_field";
+ALTER TABLE "custom_field_option" ADD CONSTRAINT "FKjquafa57imfqsl50qxqm29txr" FOREIGN KEY ("custom_field_id") REFERENCES "custom_field";
+ALTER TABLE "custom_field_value" ADD CONSTRAINT "FK814q6mnv98jdn8ubh5fkyy3sc" FOREIGN KEY ("post_id") REFERENCES "post";
 ALTER TABLE "comment" ADD CONSTRAINT "FKg229tmp8ip9shg6ydifpc2mk6" FOREIGN KEY ("author_id") REFERENCES "user";
 ALTER TABLE "comment" ADD CONSTRAINT "FKgxbwgh8hcc6k5f2q9vkmjvdps" FOREIGN KEY ("post_id") REFERENCES "post";
 ALTER TABLE "navigation_item" ADD CONSTRAINT "FKo9pj7oh5oc36ia8f9flji199u" FOREIGN KEY ("parent_id") REFERENCES "navigation_item";

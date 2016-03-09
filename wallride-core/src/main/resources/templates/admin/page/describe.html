@@ -19,6 +19,20 @@
 							</div>
 						</div>
 						<div class="col-sm-3">
+							<div class="pull-left">
+								<div class="tools clearfix">
+									<div class="status">
+										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
+										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
+										<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+										<a th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
+											<span class="glyphicon glyphicon-globe"></span>
+											<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
+										</a>
+									</div>
+									<p class="publish-date"><span th:if="${page.date ne null}" th:text="${#temporals.format(page.date, 'yyyy/MM/dd HH:mm')}"></span></p>
+								</div>
+							</div>
 							<div class="pull-right">
 								<div class="btn-group">
 									<div th:classappend="${prev eq null}?'disabled'" class="previous">
@@ -65,23 +79,6 @@
 							<span class="glyphicon glyphicon-user"></span> Created By <a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id},query=${query})}" th:text="${page.author}">Author</a>
 						</div>
 						<div class="col-sm-3 wr-tool-panel">
-							<div class="tools clearfix">
-								<div class="pull-left">
-									<div class="status">
-										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
-										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
-										<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-										<a th:href="@{__${WEBSITE_PATH}__/__${page.code}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
-											<span class="glyphicon glyphicon-globe"></span>
-											<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-										</a>
-									</div>
-								</div>
-							</div>
-							<dl>
-								<dt th:text="#{Date}">Date</dt>
-								<dd th:if="${page.date ne null}" th:text="${#temporals.format(page.date, 'yyyy/MM/dd HH:mm')}"></dd>
-							</dl>
 							<dl>
 								<dt th:text="#{ParentPage}">Parent Page</dt>
 								<dd>
@@ -127,6 +124,20 @@
 									</dl>
 								</dd>
 							</dl>
+							<dl th:each="fieldValue : ${page.customFieldValues}">
+								<dt th:unless="${fieldValue.isEmpty()}" th:text="${fieldValue.customField.name}"></dt>
+								<dd th:switch="${#strings.toString(fieldValue.customField.fieldType)}">
+									<span th:case="'TEXT'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'SELECTBOX'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'CHECKBOX'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'RADIO'" th:text="${fieldValue.stringValue}"></span>
+									<span th:case="'TEXTAREA'" th:text="${fieldValue.textValue}"></span>
+									<span th:case="'HTML'" th:utext="${fieldValue.textValue}"></span>
+									<span th:case="'DATE'" th:text="${fieldValue.dateValue}"></span>
+									<span th:case="'DATETIME'" th:text="${fieldValue.datetimeValue}"></span>
+									<span th:case="'NUMBER'" th:text="${fieldValue.numberValue}"></span>
+								</dd>
+							</dl>
 							<a th:href="@{__${ADMIN_PATH}__/pages/describe(part=delete-form,id=${page.id},query=${query})}" data-toggle="modal" data-target="#delete-modal"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{DeletePage}">ページを削除</span></a>
 							<!-- #delete-modal -->
 							<div id="delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -155,6 +166,7 @@
 									$('#delete-modal').on('hidden.bs.modal', function() {
 										$(this).removeData('bs.modal');
 									});
+									$('img', '#wr-page-content').addClass('img-responsive');
 								});
 								// ]]>
 							</script>

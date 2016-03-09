@@ -75,6 +75,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	List<Map<String, Object>> countByTagIdGrouped(@Param("status") Post.Status status, @Param("language") String language);
 
 	@Modifying
-	@Query("delete from Article article where article.drafted = :drafted ")
-	void deleteByDrafted(@Param("drafted") Article dradted);
+	@Query("delete Article article where article.drafted = :drafted ")
+	void deleteByDrafted(@Param("drafted") Article drafted);
 }

@@ -19,6 +19,9 @@ package org.wallride.web.controller.admin.article;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.CollectionUtils;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.Article;
 import org.wallride.domain.Category;
 import org.wallride.domain.Post;
@@ -28,10 +31,8 @@ import org.wallride.model.ArticleUpdateRequest;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public class ArticleEditForm implements Serializable {
@@ -63,6 +64,8 @@ public class ArticleEditForm implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	@NotNull
 	private String language;
@@ -179,7 +182,22 @@ public class ArticleEditForm implements Serializable {
 		this.language = language;
 	}
 
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
+	}
+
 	public ArticleUpdateRequest buildArticleUpdateRequest() {
+		List<CustomFieldValueEditForm> customFieldValues_ = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(customFieldValues)) {
+			customFieldValues_ = customFieldValues.stream()
+					.filter(v -> v.getCustomFieldId() != 0)
+					.collect(Collectors.toList());
+		}
+
 		ArticleUpdateRequest.Builder builder = new ArticleUpdateRequest.Builder();
 		return builder
 				.id(id)
@@ -195,11 +213,12 @@ public class ArticleEditForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
+				.customFieldValues(customFieldValues_)
 				.language(language)
 				.build();
 	}
 
-	public static ArticleEditForm fromDomainObject(Article article) {
+	public static ArticleEditForm fromDomainObject(Article article, Set<CustomField> customFields) {
 		ArticleEditForm form = new ArticleEditForm();
 		BeanUtils.copyProperties(article, form);
 
@@ -227,6 +246,37 @@ public class ArticleEditForm implements Serializable {
 			form.setSeoTitle(article.getSeo().getTitle());
 			form.setSeoDescription(article.getSeo().getDescription());
 			form.setSeoKeywords(article.getSeo().getKeywords());
+		}
+
+		List<CustomFieldValue> storedValues = new ArrayList<>(article.getCustomFieldValues());
+		Map<CustomField, CustomFieldValue> storedFieldValueMap = new LinkedHashMap<>();
+		storedValues.stream().forEach(value -> {
+			storedFieldValueMap.put(value.getCustomField(), value);
+		});
+		for (CustomField orgField : customFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(orgField.getId());
+			valueForm.setName(orgField.getName());
+			valueForm.setDescription(orgField.getDescription());
+			valueForm.setFieldType(orgField.getFieldType());
+			valueForm.setOptions(orgField.getOptions());
+
+			CustomFieldValue value = storedFieldValueMap.get(orgField);
+			if (value != null) {
+				valueForm.setId(value.getId());
+				valueForm.setNumberValue(value.getNumberValue());
+				if (value.getCustomField().getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					if (value.getStringValue() != null) {
+						valueForm.setStringValues(value.getStringValue().split(","));
+					}
+				} else {
+					valueForm.setStringValue(value.getStringValue());
+				}
+				valueForm.setDateValue(value.getDateValue());
+				valueForm.setDatetimeValue(value.getDatetimeValue());
+				valueForm.setTextValue(value.getTextValue());
+			}
+			form.getCustomFieldValues().add(valueForm);
 		}
 		return form;
 	}

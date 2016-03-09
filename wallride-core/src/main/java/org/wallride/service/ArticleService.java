@@ -37,6 +37,8 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.autoconfigure.WallRideProperties;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
@@ -44,6 +46,7 @@ import org.wallride.exception.NotNullException;
 import org.wallride.model.*;
 import org.wallride.repository.*;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -194,6 +197,25 @@ public class ArticleService {
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
 
+		article.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =  new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(article);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setStringValue(String.join(",", valueForm.getStringValues()));
+				} else {
+					value.setStringValue(valueForm.getStringValue());
+				}
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				article.getCustomFieldValues().add(value);
+			}
+		}
+
 		return articleRepository.save(article);
 	}
 
@@ -216,6 +238,7 @@ public class ArticleService {
 						.seoTitle(request.getSeoTitle())
 						.seoDescription(request.getSeoDescription())
 						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -236,6 +259,7 @@ public class ArticleService {
 						.seoTitle(request.getSeoTitle())
 						.seoDescription(request.getSeoDescription())
 						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(request.getCustomFieldValues())
 						.language(request.getLanguage())
 						.build();
 				return saveArticle(updateRequest, authorizedUser);
@@ -255,10 +279,13 @@ public class ArticleService {
 	}
 
 	private Article publishArticle(Article article) {
+		Article deleteTarget = getDraftById(article.getId());
+		if (deleteTarget != null) {
+			articleRepository.delete(deleteTarget);
+		}
 		article.setDrafted(null);
 		article.setStatus(Post.Status.PUBLISHED);
 		Article published = articleRepository.save(article);
-		articleRepository.deleteByDrafted(article);
 		return published;
 	}
 
@@ -271,10 +298,13 @@ public class ArticleService {
 	}
 
 	private Article unpublishArticle(Article article) {
+		Article deleteTarget = getDraftById(article.getId());
+		if (deleteTarget != null) {
+			articleRepository.delete(deleteTarget);
+		}
 		article.setDrafted(null);
 		article.setStatus(Post.Status.DRAFT);
 		Article unpublished = articleRepository.save(article);
-		articleRepository.deleteByDrafted(article);
 		return unpublished;
 	}
 
@@ -385,6 +415,36 @@ public class ArticleService {
 
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
+
+		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
+		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		for (CustomFieldValue value : article.getCustomFieldValues()) {
+			valueMap.put(value.getCustomField(), value);
+		}
+
+		article.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
+				CustomFieldValue value = valueMap.get(customField);
+				if (value == null) {
+					value = new CustomFieldValue();
+				}
+				value.setCustomField(customField);
+				value.setPost(article);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setStringValue(String.join(",", valueForm.getStringValues()));
+				} else {
+					value.setStringValue(valueForm.getStringValue());
+				}
+				value.setTextValue(valueForm.getTextValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
+			}
+		}
+		article.setCustomFieldValues(fieldValues);
 
 		return articleRepository.save(article);
 	}
