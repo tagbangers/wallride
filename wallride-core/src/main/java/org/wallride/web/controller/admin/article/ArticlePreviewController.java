@@ -29,11 +29,14 @@ import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.Article;
 import org.wallride.domain.Blog;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.exception.ServiceException;
 import org.wallride.service.BlogService;
+import org.wallride.service.CustomFieldService;
 import org.wallride.service.MediaService;
 import org.wallride.support.AuthorizedUser;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
@@ -45,6 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 @Controller
 @RequestMapping("/{language}/articles/preview")
@@ -55,6 +61,9 @@ public class ArticlePreviewController {
 
 	@Inject
 	private MediaService mediaService;
+
+	@Inject
+	private CustomFieldService customFieldService;
 
 	@Inject
 	private ServletContext servletContext;
@@ -73,6 +82,23 @@ public class ArticlePreviewController {
 		article.setTitle(form.getTitle());
 		article.setBody(form.getBody());
 		article.setDate(form.getDate() != null ? form.getDate() : LocalDateTime.now());
+
+		List<CustomFieldValue> fieldValues = new ArrayList<>();
+		for (CustomFieldValueEditForm valueForm : form.getCustomFieldValues()) {
+			CustomFieldValue value = new CustomFieldValue();
+			value.setCustomField(customFieldService.getCustomFieldById(valueForm.getCustomFieldId(), language));
+			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+				value.setTextValue(String.join(",", valueForm.getTextValues()));
+			} else {
+				value.setTextValue(valueForm.getTextValue());
+			}
+			value.setStringValue(valueForm.getStringValue());
+			value.setNumberValue(valueForm.getNumberValue());
+			value.setDateValue(valueForm.getDateValue());
+			value.setDatetimeValue(valueForm.getDatetimeValue());
+			fieldValues.add(value);
+		}
+		article.setCustomFieldValues(new TreeSet<>(fieldValues));
 		article.setAuthor(authorizedUser);
 
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext, "org.springframework.web.servlet.FrameworkServlet.CONTEXT.guestServlet");

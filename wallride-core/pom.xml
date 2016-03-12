@@ -292,5 +292,11 @@
 			<version>9.4-1206-jdbc42</version>
 			<scope>provided</scope>
 		</dependency>
-	</dependencies>
+
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>jsrender</artifactId>
+            <version>1.0.0-rc.70</version>
+        </dependency>
+    </dependencies>
 </project>

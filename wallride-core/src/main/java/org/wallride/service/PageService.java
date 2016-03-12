@@ -35,12 +35,15 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.autoconfigure.WallRideProperties;
+import org.wallride.domain.CustomField;
+import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
 import org.wallride.model.*;
 import org.wallride.repository.*;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -56,14 +59,8 @@ import java.util.regex.Pattern;
 @Transactional(rollbackFor = Exception.class)
 public class PageService {
 
-	@Inject
+	@Resource
 	private BlogService blogService;
-
-	@Inject
-	private MessageCodesResolver messageCodesResolver;
-
-	@Inject
-	private PlatformTransactionManager transactionManager;
 
 	@Resource
 	private PostRepository postRepository;
@@ -76,6 +73,12 @@ public class PageService {
 
 	@Resource
 	private MediaRepository mediaRepository;
+
+	@Inject
+	private MessageCodesResolver messageCodesResolver;
+
+	@Inject
+	private PlatformTransactionManager transactionManager;
 
 	@Inject
 	private WallRideProperties wallRideProperties;
@@ -97,7 +100,7 @@ public class PageService {
 		}
 
 		if (!status.equals(Post.Status.DRAFT)) {
-			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -208,6 +211,25 @@ public class PageService {
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
 
+		page.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =  new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(page);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
+				} else {
+					value.setTextValue(valueForm.getTextValue());
+				}
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				page.getCustomFieldValues().add(value);
+			}
+		}
+
 		return pageRepository.save(page);
 	}
 
@@ -228,6 +250,10 @@ public class PageService {
 						.parentId(request.getParentId())
 						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createPage(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -245,6 +271,10 @@ public class PageService {
 						.parentId(request.getParentId())
 						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(request.getCustomFieldValues())
 						.language(request.getLanguage())
 						.build();
 				return savePage(updateRequest, authorizedUser);
@@ -258,10 +288,13 @@ public class PageService {
 	public Page savePageAsPublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
+		Page deleteTarget = getDraftById(page.getId());
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		page.setDrafted(null);
 		page.setStatus(Post.Status.PUBLISHED);
 		pageRepository.save(page);
-		pageRepository.deleteByDrafted(page);
 		return savePage(request, authorizedUser);
 	}
 
@@ -269,6 +302,10 @@ public class PageService {
 	public Page savePageAsUnpublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
+		Page deleteTarget = getDraftById(page.getId());
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		page.setDrafted(null);
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
@@ -403,6 +440,36 @@ public class PageService {
 
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
+
+		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
+		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		for (CustomFieldValue value : page.getCustomFieldValues()) {
+			valueMap.put(value.getCustomField(), value);
+		}
+
+		page.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
+				CustomFieldValue value = valueMap.get(customField);
+				if (value == null) {
+					value = new CustomFieldValue();
+				}
+				value.setCustomField(customField);
+				value.setPost(page);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
+				} else {
+					value.setTextValue(valueForm.getTextValue());
+				}
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
+			}
+		}
+		page.setCustomFieldValues(fieldValues);
 
 		return pageRepository.save(page);
 	}

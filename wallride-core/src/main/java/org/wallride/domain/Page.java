@@ -44,10 +44,12 @@ import java.util.List;
 					@NamedAttributeNode("children"),
 					@NamedAttributeNode("categories"),
 					@NamedAttributeNode("tags"),
-					@NamedAttributeNode("relatedToPosts")
-//					@NamedAttributeNode("relatedByPosts"),
-			}
-	)
+					@NamedAttributeNode("relatedToPosts"),
+					@NamedAttributeNode(value = "customFieldValues", subgraph = "customFieldValue")},
+			subgraphs =  {
+					@NamedSubgraph(name = "customFieldValue",
+							attributeNodes = {
+									@NamedAttributeNode("customField")})})
 })
 @Table(name="page")
 @DynamicInsert

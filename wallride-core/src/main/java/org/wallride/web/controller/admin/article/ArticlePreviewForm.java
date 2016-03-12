@@ -18,7 +18,9 @@ package org.wallride.web.controller.admin.article;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("serial")
@@ -39,6 +41,8 @@ public class ArticlePreviewForm implements Serializable {
 	private Set<Long> categoryIds = new HashSet<>();
 
 	private Set<Long> tagIds = new HashSet<>();
+
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	private String language;
 
@@ -104,6 +108,14 @@ public class ArticlePreviewForm implements Serializable {
 
 	public void setTagIds(Set<Long> tagIds) {
 		this.tagIds = tagIds;
+	}
+
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
 	}
 
 	public String getLanguage() {

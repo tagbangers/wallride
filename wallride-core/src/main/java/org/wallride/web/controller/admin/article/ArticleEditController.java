@@ -28,6 +28,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
 import org.wallride.domain.Article;
 import org.wallride.domain.Category;
 import org.wallride.exception.DuplicateCodeException;
@@ -42,6 +44,8 @@ import org.wallride.web.support.RestValidationErrorModel;
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/{language}/articles/edit")
@@ -51,6 +55,9 @@ public class ArticleEditController {
 	
 	@Inject
 	private ArticleService articleService;
+
+	@Inject
+	private CustomFieldService customFieldService;
 
 	@Inject
 	private CategoryUtils categoryUtils;
@@ -94,8 +101,8 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("language", language);
 			return "redirect:/_admin/{language}/articles/index";
 		}
-
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(article, customFields);
 		model.addAttribute("form", form);
 
 		Article draft = articleService.getDraftById(id);
@@ -125,8 +132,8 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/articles/edit";
 		}
-
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft);
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 
 		return "article/edit";

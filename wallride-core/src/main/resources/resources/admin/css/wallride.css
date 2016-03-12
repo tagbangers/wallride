@@ -147,7 +147,7 @@ pre {
 	background-color: transparent;
 }
 #wr-page-header .page-header {
-	margin: 15px 0px;
+	margin: 15px 0px 5px;
 	padding-bottom: 10px;
 	line-height: 34px;
 }
@@ -329,57 +329,94 @@ pre {
 }
 
 /**** sortable *****/
-ul.sortable .placeholder {
+ul.nested-sortable .placeholder {
 	outline: 1px dashed #bbb;
 }
-ul.sortable, ul.sortable ul {
+ul.nested-sortable,ul.sortable, ul.nested-sortable ul {
 	margin: 0 0 0 50px;
 	padding: 0;
 	list-style-type: none;
 }
-ul.sortable {
+ul.nested-sortable, ul.sortable {
 	margin: 1em 0;
 }
-.sortable li {
+.nested-sortable li {
 	margin: 10px 0 0 0;
 	padding: 0;
 }
-.sortable li div.category  {
+.nested-sortable li div.category  {
 	border: 1px solid #d4d4d4;
 	padding: 0;
 	margin: 0;
 	cursor: move;
 	background: #ffffff;
 }
-.sortable li div.category.off, .sortable li div.banner.off  {
+.nested-sortable li div.category.off, .nested-sortable li div.banner.off  {
 	background: #F5F5F5;
 }
-.sortable li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
+.nested-sortable li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
 	border-color: #999;
 	background: #fafafa;
 }
-.sortable .wr-tree-options .disclose {
+.nested-sortable .wr-tree-options .disclose {
 	cursor: pointer;
 	display: none;
 }
-.sortable li.mjs-nestedSortable-branch > div .wr-tree-option,
-.sortable li.mjs-nestedSortable-leaf > div .wr-tree-option {
+.nested-sortable li.mjs-nestedSortable-branch > div .wr-tree-option,
+.nested-sortable li.mjs-nestedSortable-leaf > div .wr-tree-option {
 	display: inline-block;
 }
-.sortable li.mjs-nestedSortable-leaf .disclose {
+.nested-sortable li.mjs-nestedSortable-leaf .disclose {
 	visibility: hidden;
 }
-.sortable li.mjs-nestedSortable-collapsed > ul {
+.nested-sortable li.mjs-nestedSortable-collapsed > ul {
 	display: none;
 }
-.sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-collapsed > div .disclose > span:before {
+.nested-sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-collapsed > div .disclose > span:before {
 	color: #819FAA;
 	content: ' \2b ';
 	/*content: ' \e080 ';*/
 }
-.sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-expanded > div .disclose > span:before {
+.nested-sortable li.mjs-nestedSortable-branch.mjs-nestedSortable-expanded > div .disclose > span:before {
 	color: #819FAA;
 	content: ' \2212 ';
+}
+/*.sortable li button.remove {
+    float: right;
+}*/
+.field-option-group ul.sortable {
+    margin: 0;
+}
+.field-option-group ul li.option {
+    border-bottom: 1px solid #d2d2d2;
+    margin-top: 10px;
+}
+.field-option-group .field-option {
+    display: inline-block;
+}
+.field-option-group .field-option > .remove {
+    padding-top: 1px;
+}
+.grippy {
+    content: '....';
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 5px;
+    padding: 3px 4px;
+    cursor: move;
+    vertical-align: middle;
+    margin-top: -.7em;
+    margin-right: .3em;
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    color: #c4c4c4;
+    text-shadow: 1px 0 1px black;
+}
+.grippy::after {
+    content: '.. .. .. ..';
 }
 /**** article-edit *****/
 #category-fieldset ul ul {
@@ -708,28 +745,36 @@ legend {
 	font-size: 28px;
 	font-weight: bold;
 }
-.wr-tool-panel .tools {
-	margin-bottom: 0.5em;
-}
-.wr-tool-panel .status {
+#wr-page-header .status {
 	font-size: 15px;
 	color: #5A5A5A;
 	font-weight: bold;
 	line-height: 34px;
+}
+#wr-page-header .publish-date {
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 0.5;
 }
 .wr-tool-panel .wr-tool-check {
 	line-height: 34px;
 	padding: 0 3px;
 }
 .wr-tool-panel dl {
-	margin: 1.5em 0;
+	margin: 0 0 1em;
 }
 .wr-tool-panel dl dt {
-	font-weight: normal;
+	font-weight: 500;
 	font-size: 14.5px;
 	line-height: 32px;
-	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
 	margin-bottom: 7px;
+}
+.wr-tool-panel dl:first-child > dt {
+    border-top: none;
+}
+.wr-tool-panel dl dd dl dt {
+    border-top: 1px dashed #ccc;
 }
 .wr-tool-panel dl dd {
 	font-size:14px;
