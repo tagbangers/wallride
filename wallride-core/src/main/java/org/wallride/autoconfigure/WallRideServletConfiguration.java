@@ -10,7 +10,6 @@ import org.springframework.boot.context.web.OrderedHttpPutFormContentFilter;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
@@ -23,7 +22,6 @@ import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
 @Configuration
-@Import(WebGuestConfiguration.class)
 public class WallRideServletConfiguration implements ResourceLoaderAware {
 
 	public static final String GUEST_SERVLET_NAME = "guestServlet";
@@ -71,7 +69,10 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 
 	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 	public DispatcherServlet guestDispatcherServlet() {
-		return new DispatcherServlet();
+		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		context.setResourceLoader(getResourceLoader());
+		context.register(WebGuestConfiguration.class);
+		return new DispatcherServlet(context);
 	}
 
 	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
