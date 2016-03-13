@@ -208,7 +208,7 @@
 									<div class="form-group" th:classappend="${#fields.hasErrors('body')}? has-error">
 										<textarea th:field="*{body}" class="form-control" placeholder="Enter body here" th:attr="placeholder=#{EnterBody}"></textarea>
 										<span class="help-block" th:each="err : ${#fields.errors('body')}" th:text="${err}" />
-										<script th:inline="javascript" th:include="froala::setting(selector='#wr-page-content :input[name=body]')"></script>
+										<script th:inline="javascript" th:replace="froala::setting(selector='#wr-page-content :input[name=body]')"></script>
 									</div>
 								</fieldset>
 							</div>
@@ -445,7 +445,7 @@
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
-											<script th:inline="javascript" th:include="froala::setting(selector='.customFieldValues__${stat.index}__-textValue')"></script>
+											<script th:inline="javascript" th:replace="froala::setting(selector='.customFieldValues__${stat.index}__-textValue')"></script>
 										</div>
 										<div th:case="'NUMBER'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].numberValue')}? has-error">
 											<div class="col-sm-12">
