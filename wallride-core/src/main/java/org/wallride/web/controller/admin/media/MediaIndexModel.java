@@ -24,27 +24,27 @@ import java.time.format.DateTimeFormatter;
 
 public class MediaIndexModel implements Serializable {
 
-	private String thumb;
+	private String url;
 
-	private String image;
+	private String thumb;
 
 	private String name;
 
 	private String tag;
 
 	public MediaIndexModel(Media media, WallRideProperties wallRideProperties) {
+		this.url = wallRideProperties.getMediaUrlPrefix() + media.getId();
 		this.thumb = wallRideProperties.getMediaUrlPrefix() + media.getId() + "?w=100&h=100&m=1";
-		this.image = wallRideProperties.getMediaUrlPrefix() + media.getId();
 		this.name = media.getOriginalName();
 		this.tag = media.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM"));
 	}
 
-	public String getThumb() {
-		return thumb;
+	public String getUrl() {
+		return url;
 	}
 
-	public String getImage() {
-		return image;
+	public String getThumb() {
+		return thumb;
 	}
 
 	public String getName() {
