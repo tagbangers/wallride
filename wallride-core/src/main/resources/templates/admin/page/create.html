@@ -208,16 +208,7 @@
 									<div class="form-group" th:classappend="${#fields.hasErrors('body')}? has-error">
 										<textarea th:field="*{body}" class="form-control" placeholder="Enter body here" th:attr="placeholder=#{EnterBody}"></textarea>
 										<span class="help-block" th:each="err : ${#fields.errors('body')}" th:text="${err}" />
-										<script th:inline="javascript">
-											$(function() {
-												$('#wr-page-content :input[name="body"]').froalaEditor({
-													heightMin: 300,
-													imageUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-													imageManagerLoadURL: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-													fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-												});
-											});
-										</script>
+										<script th:inline="javascript" th:include="froala::setting(selector='#wr-page-content :input[name=body]')"></script>
 									</div>
 								</fieldset>
 							</div>
@@ -447,26 +438,14 @@
 										</div>
 										<div th:case="'HTML'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].textValue')}? has-error">
 											<div class="col-sm-12">
-												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" style="min-height: 150px"></textarea>
+												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" th:classappend="'customFieldValues__${stat.index}__-textValue'" style="min-height: 150px"></textarea>
 											</div>
 											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].textValue')}" th:text="${err}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].id}" th:value="${field.id}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
-											<script th:inline="javascript">
-												/*<![CDATA[*/
-												$(function() {
-													var selector = /*[[':input[name="' + 'customFieldValues[__${stat.index}__].textValue' + '"]']]*/ '#';
-													$(selector).froalaEditor({
-														heightMin: 150,
-														imageUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-														imageManagerLoadURL: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-														fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-													});
-												});
-												/*]]>*/
-											</script>
+											<script th:inline="javascript" th:include="froala::setting(selector='.customFieldValues__${stat.index}__-textValue')"></script>
 										</div>
 										<div th:case="'NUMBER'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].numberValue')}? has-error">
 											<div class="col-sm-12">

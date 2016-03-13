@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8"/>
+		<title>WallRide</title>
+	</head>
+	<body>
+		<script th:fragment="setting(selector)" th:inline="javascript">
+			/*<![CDATA[*/
+			$(function () {
+				var selector = /*[[${selector}]]*/ '#';
+				$(selector).froalaEditor({
+					toolbarButtons: ['paragraphFormat', 'bold', 'underline', 'formatUL', 'color', 'align', 'quote', 'insertLink', 'insertImage', 'insertFile', 'insertTable', 'undo', 'redo', 'html', 'fullscreen'],
+					heightMin: 300,
+					imageUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+					imageManagerLoadURL: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
+					fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#'
+				});
+			});
+			/*]]>*/
+		</script>
+	</body>
+</html>
