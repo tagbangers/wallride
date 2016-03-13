@@ -17,6 +17,7 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,16 +46,22 @@ public class WebGuestConfiguration {
 	private ContentNegotiationManager mvcContentNegotiationManager;
 
 	@Bean(name = "guestRequestMappingHandlerMapping")
-	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+	public RequestMappingHandlerMapping requestMappingHandlerMapping(PageDescribeController pageDescribeController) {
 		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
 		handlerMapping.setOrder(Ordered.LOWEST_PRECEDENCE);
-		handlerMapping.setDefaultHandler(new PageDescribeController(blogService, pageService));
+		handlerMapping.setDefaultHandler(pageDescribeController);
 		handlerMapping.setInterceptors(new HandlerInterceptor[] {
 				defaultModelAttributeInterceptor(),
 				setupRedirectInterceptor()
 		});
 		handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager);
 		return handlerMapping;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public PageDescribeController pageDescribeController() {
+		return new PageDescribeController(blogService, pageService);
 	}
 
 	@Bean

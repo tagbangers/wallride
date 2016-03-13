@@ -50,6 +50,14 @@ public class PageDescribeController extends AbstractController {
 		this.urlPathHelper = new LanguageUrlPathHelper(blogService);
 	}
 
+	public BlogService getBlogService() {
+		return blogService;
+	}
+
+	public PageService getPageService() {
+		return pageService;
+	}
+
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
@@ -76,6 +84,10 @@ public class PageDescribeController extends AbstractController {
 			throw new HttpNotFoundException();
 		}
 
+		return createModelAndView(page);
+	}
+
+	protected ModelAndView createModelAndView(Page page) {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("page/describe");
 		modelAndView.addObject("page", page);
