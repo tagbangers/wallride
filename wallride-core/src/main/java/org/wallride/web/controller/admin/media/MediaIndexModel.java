@@ -28,15 +28,15 @@ public class MediaIndexModel implements Serializable {
 
 	private String image;
 
-	private String title;
+	private String name;
 
-	private String folder;
+	private String tag;
 
 	public MediaIndexModel(Media media, WallRideProperties wallRideProperties) {
 		this.thumb = wallRideProperties.getMediaUrlPrefix() + media.getId() + "?w=100&h=100&m=1";
 		this.image = wallRideProperties.getMediaUrlPrefix() + media.getId();
-		this.title = media.getOriginalName();
-		this.folder = media.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM"));
+		this.name = media.getOriginalName();
+		this.tag = media.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM"));
 	}
 
 	public String getThumb() {
@@ -47,11 +47,11 @@ public class MediaIndexModel implements Serializable {
 		return image;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 
-	public String getFolder() {
-		return folder;
+	public String getTag() {
+		return tag;
 	}
 }

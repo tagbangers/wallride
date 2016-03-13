@@ -30,7 +30,8 @@
 											var action = /*[[@{__${ADMIN_PATH}__/articles/preview}]]*/ '#';
 											form.attr('action', action);
 											form.attr('target', '_blank');
-											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
+//											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
+											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').froalaEditor('html.get'));
 											form.submit();
 										});
 									});
@@ -44,7 +45,8 @@
 											var $this = $(this);
 											$this.button('loading');
 											var $form = $this.closest('form');
-											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
+//											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
+											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').froalaEditor('html.get'));
 											var data = $form.serializeArray();
 											data.push({name: 'draft', value: 1});
 											$.ajax({
@@ -226,20 +228,26 @@
 										<span class="help-block" th:each="err : ${#fields.errors('body')}" th:text="${err}" />
 										<script th:inline="javascript">
 											$(function() {
-												$('#wr-page-content :input[name="body"]').redactor({
+												/*$('#wr-page-content :input[name="body"]').redactor({
 													buttonSource: true,
 													minHeight: 300,
 													replaceDivs: false,
 													convertImageLinks: true,
 													convertVideoLinks: true,
-													imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-													imageManagerJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-													fileUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+													imageUpload: /!*[[@{__${ADMIN_PATH}__/media/create.json}]]*!/ '#',
+													imageManagerJson: /!*[[@{__${ADMIN_PATH}__/media/index.json}]]*!/ '#',
+													fileUpload: /!*[[@{__${ADMIN_PATH}__/media/create.json}]]*!/ '#',
 													toolbarFixed: true,
 													toolbarFixedBox: true,
 													removeEmptyTags: false,
 													plugins: ['table', 'video', 'fontsize', 'fontcolor', 'fullscreen', 'counter', 'imagemanager']
-												});
+												});*/
+												$('#wr-page-content :input[name="body"]').froalaEditor({
+													heightMin: 300,
+													imageUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+													imageManagerLoadURL: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
+													fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+												 });
 											});
 										</script>
 									</div>
@@ -473,19 +481,25 @@
 												/*<![CDATA[*/
 												$(function() {
 													var selector = /*[[':input[name="' + 'customFieldValues[__${stat.index}__].textValue' + '"]']]*/ '#';
-													$(selector).redactor({
+													/*$(selector).redactor({
 														buttonSource: true,
 														minHeight: 150,
 														replaceDivs: false,
 														convertImageLinks: true,
 														convertVideoLinks: true,
-														imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-														imageManagerJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-														fileUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+														imageUpload: /!*[[@{__${ADMIN_PATH}__/media/create.json}]]*!/ '#',
+														imageManagerJson: /!*[[@{__${ADMIN_PATH}__/media/index.json}]]*!/ '#',
+														fileUpload: /!*[[@{__${ADMIN_PATH}__/media/create.json}]]*!/ '#',
 														toolbarFixed: true,
 														toolbarFixedBox: true,
 														removeEmptyTags: false,
 														plugins: ['table', 'video', 'fontsize', 'fontcolor', 'fullscreen', 'counter', 'imagemanager']
+													});*/
+													$(selector).froalaEditor({
+														heightMin: 150,
+														imageUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+														imageManagerLoadURL: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
+														fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
 													});
 												});
 												/*]]>*/

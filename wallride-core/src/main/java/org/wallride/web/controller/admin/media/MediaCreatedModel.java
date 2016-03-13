@@ -23,27 +23,13 @@ import java.io.Serializable;
 
 public class MediaCreatedModel implements Serializable {
 
-	private String id;
-
-	private String filelink;
-
-	private String filename;
+	private String link;
 
 	public MediaCreatedModel(Media media, WallRideProperties wallRideProperties) {
-		this.id = media.getId();
-		this.filelink = wallRideProperties.getMediaUrlPrefix() + media.getId();
-		this.filename = media.getOriginalName();
+		this.link = wallRideProperties.getMediaUrlPrefix() + media.getId();
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public String getFilelink() {
-		return filelink;
-	}
-
-	public String getFilename() {
-		return filename;
+	public String getLink() {
+		return link;
 	}
 }
