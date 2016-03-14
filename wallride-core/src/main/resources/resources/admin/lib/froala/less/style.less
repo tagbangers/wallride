@@ -1,0 +1,258 @@
+@import 'mixins.less';
+@import 'variables.less';
+
+.link-style-mixin(@sel){
+  // Link styles.
+  @{sel} {
+    &.fr-strong {
+      font-weight: 700;
+    }
+
+    &.fr-green {
+      color: green;
+    }
+  }
+}
+
+.link-style(@cls: '') when not (@cls = '') {
+  .link-style-mixin(~'a.@{cls}');
+}
+
+.link-style(@cls: '') when (@cls = '') {
+  .link-style-mixin(~'a');
+}
+
+.image-style-mixin(@sel) {
+  /**
+   * Image style.
+   */
+  @{sel} {
+    z-index: 3;
+    position: relative;
+    overflow: auto;
+    cursor: pointer;
+
+    &.fr-dib {
+      margin: auto;
+      display: block;
+      float: none;
+      vertical-align: top;
+      margin-top: @image-margin;
+      margin-bottom: @image-margin;
+
+      &.fr-fil {
+        margin: @image-margin auto @image-margin 0;
+        left: @image-margin;
+      }
+
+      &.fr-fir {
+        margin: @image-margin 0 @image-margin auto;
+        right: @image-margin;
+      }
+    }
+
+    &.fr-dii {
+      margin: auto;
+      display: inline-block;
+      float: none;
+      margin-top: @image-margin;
+      margin-bottom: @image-margin;
+
+      &.fr-fil {
+        margin: @image-margin (2 * @image-margin) @image-margin 0;
+        left: @image-margin;
+        float: left;
+      }
+
+      &.fr-fir {
+        margin: @image-margin 0 @image-margin (2 * @image-margin);
+        right: @image-margin;
+        float: right;
+      }
+    }
+
+    // Image styles.
+    &.fr-rounded {
+      .border-radius(100%);
+    }
+
+    &.fr-bordered {
+      border: solid 10px #CCC;
+	  .box-sizing(content-box);
+    }
+  }
+}
+
+.image-style(@cls: '') when not (@cls = '') {
+  .image-style-mixin(~'img.@{cls}');
+}
+
+.image-style(@cls: '') when (@cls = '') {
+  .image-style-mixin(~'img');
+}
+
+.video-style(@cls: '') {
+  /**
+   * Video style
+   */
+  .fr-video {
+    text-align: center;
+    position: relative;
+
+    > * {
+      .box-sizing(content-box);
+      max-width: 100%;
+      border: none;
+    }
+
+    &.fr-dvb {
+      display: block;
+      clear: both;
+
+      &.fr-fvl {
+        text-align: left;
+      }
+
+      &.fr-fvr {
+        text-align: right;
+      }
+    }
+
+    &.fr-dvi {
+      display: inline-block;
+
+      &.fr-fvl {
+        float: left;
+      }
+
+      &.fr-fvr {
+        float: right;
+      }
+    }
+  }
+}
+
+.fr-view {
+  table {
+    border: none;
+    border-collapse: collapse;
+    empty-cells: show;
+    max-width: 100%;
+
+    // Table style.
+    &.fr-dashed-borders {
+      td, th {
+        border-style: dashed;
+      }
+    }
+
+    &.fr-alternate-rows {
+      tbody tr:nth-child(2n) {
+        background: lighten(@gray, 16%);
+      }
+    }
+
+    td, th {
+      border: @table-border;
+
+      &:empty {
+        height: 20px;
+      }
+
+      // Table cell styles.
+      &.fr-highlighted {
+        border: 1px double red;
+      }
+
+      &.fr-thick {
+        border-width: 2px;
+      }
+    }
+
+    th {
+      background: mix(@white, @editor-text, 90%);;
+    }
+  }
+
+  hr {
+    clear: both;
+    .user-select(none);
+    page-break-after: always;
+  }
+
+  .fr-file {
+    position: relative;
+
+    &::after {
+      position: relative;
+      content: "\1F4CE";
+      font-weight: normal;
+    }
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  blockquote {
+    border-left: solid 2px @blockquote-level1-color;
+    margin-left: 0;
+    padding-left: 5px;
+    color: @blockquote-level1-color;
+
+    blockquote {
+      border-color: @blockquote-level2-color;
+      color: @blockquote-level2-color;
+
+      blockquote {
+        border-color: @blockquote-level3-color;
+        color: @blockquote-level3-color;
+      }
+    }
+  }
+
+  span.fr-emoticon {
+    font-weight: normal;
+    font-family: "Apple Color Emoji","Segoe UI Emoji","NotoColorEmoji","Segoe UI Symbol","Android Emoji","EmojiSymbols";
+    display: inline;
+    line-height: 0;
+
+    &.fr-emoticon-img {
+      font-size: inherit;
+      height: 1em;
+      width: 1em;
+      min-height: 20px;
+      min-width: 20px;
+      display: inline-block;
+      margin: -.2em .15em .2em;
+      line-height: normal;
+      vertical-align: middle;
+    }
+  }
+
+  .fr-text-gray {
+    color: #AAA !important;
+  }
+
+  .fr-text-bordered {
+    border-top: solid 1px #222;
+    border-bottom: solid 1px #222;
+    padding: 10px 0;
+  }
+
+  .fr-text-spaced {
+    letter-spacing: 1px;
+  }
+
+  .fr-text-uppercase {
+    text-transform: uppercase;
+  }
+
+  .image-style();
+  .video-style();
+  .link-style();
+}
+
+.link-style('fr-view');
+.image-style('fr-view');
