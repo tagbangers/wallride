@@ -50,41 +50,41 @@ CREATE TABLE "category" (
 
 CREATE TABLE "custom_field" (
   "id"            BIGSERIAL   NOT NULL,
+  "idx"           INT4,
+  "code"          VARCHAR(200),
+  "language"      VARCHAR(3)  NOT NULL,
+  "name"          VARCHAR(200),
+  "field_type"    VARCHAR(50) NOT NULL,
+  "description"   TEXT,
+  "default_value" VARCHAR(200),
   "created_at"    TIMESTAMP   NOT NULL,
   "created_by"    VARCHAR(100),
   "updated_at"    TIMESTAMP   NOT NULL,
   "updated_by"    VARCHAR(100),
-  "code"          VARCHAR(200),
-  "default_value" VARCHAR(200),
-  "description"   TEXT,
-  "field_type"    VARCHAR(50) NOT NULL,
-  "idx"           INT4,
-  "language"      VARCHAR(3)  NOT NULL,
-  "name"          VARCHAR(200),
   PRIMARY KEY ("id")
 );
 
 CREATE TABLE "custom_field_value" (
   "id"              BIGSERIAL NOT NULL,
+  "custom_field_id" INT8      NOT NULL,
+  "post_id"         INT8      NOT NULL,
+  "string_value"    VARCHAR(300),
+  "text_value"      TEXT,
+  "number_value"    INT8,
+  "date_value"      DATE,
+  "datetime_value"  TIMESTAMP,
   "created_at"      TIMESTAMP NOT NULL,
   "created_by"      VARCHAR(100),
   "updated_at"      TIMESTAMP NOT NULL,
   "updated_by"      VARCHAR(100),
-  "date_value"      DATE,
-  "datetime_value"  TIMESTAMP,
-  "number_value"    INT8,
-  "string_value"    VARCHAR(300),
-  "text_value"      TEXT,
-  "custom_field_id" INT8      NOT NULL,
-  "post_id"         INT8      NOT NULL,
   PRIMARY KEY ("id")
 );
 
 CREATE TABLE "custom_field_option" (
   "custom_field_id" INT8         NOT NULL,
+  "idx"             INT4         NOT NULL,
   "language"        VARCHAR(3)   NOT NULL,
   "name"            VARCHAR(200) NOT NULL,
-  "idx"             INT4         NOT NULL,
   PRIMARY KEY ("custom_field_id", "idx")
 );
 

@@ -56,9 +56,9 @@ create table `custom_field` (
   `id` bigint not null auto_increment,
   `idx` integer,
   `code` varchar(200),
+  `language` varchar(3) not null,
   `name` varchar(200),
   `field_type` varchar(50) not null,
-  `language` varchar(3) not null,
   `default_value` varchar(200),
   `description` longtext,
   `created_at` datetime not null,
@@ -89,8 +89,8 @@ create table `custom_field_value` (
 create table `custom_field_option` (
   `custom_field_id` bigint not null,
   `idx` integer not null,
-  `name` varchar(200) not null,
   `language` varchar(3) not null,
+  `name` varchar(200) not null,
   primary key (`custom_field_id` , `idx`)
 )
   ENGINE=InnoDB;
