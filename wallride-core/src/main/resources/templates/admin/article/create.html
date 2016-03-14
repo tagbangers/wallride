@@ -175,7 +175,7 @@
 												$('#post-cover-dropzone :input[name="coverId"]').val(data.result.id);
 												$('#post-cover-dropzone .progress').addClass('hide');
 												$('#post-cover-dropzone .progress-bar').css('width', '0%');
-												var img = $('<img class="wr-post-cover" />').attr('src', data.result.filelink + '?' + $.param({w: 1200, h: 500, m: 1}));
+												var img = $('<img class="wr-post-cover" />').attr('src', data.result.link + '?' + $.param({w: 1200, h: 500, m: 1}));
 												$('#post-cover-dropzone img').remove();
 												$('#post-cover-dropzone').append(img);
 												$('#post-cover-dropzone .image-wrap').removeClass('hide');
