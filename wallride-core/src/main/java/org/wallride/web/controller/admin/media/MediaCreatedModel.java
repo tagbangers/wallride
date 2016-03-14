@@ -25,25 +25,25 @@ public class MediaCreatedModel implements Serializable {
 
 	private String id;
 
-	private String filelink;
+	private String link;
 
-	private String filename;
+	private String name;
 
 	public MediaCreatedModel(Media media, WallRideProperties wallRideProperties) {
 		this.id = media.getId();
-		this.filelink = wallRideProperties.getMediaUrlPrefix() + media.getId();
-		this.filename = media.getOriginalName();
+		this.link = wallRideProperties.getMediaUrlPrefix() + media.getId();
+		this.name = media.getOriginalName();
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public String getFilelink() {
-		return filelink;
+	public String getLink() {
+		return link;
 	}
 
-	public String getFilename() {
-		return filename;
+	public String getName() {
+		return name;
 	}
 }

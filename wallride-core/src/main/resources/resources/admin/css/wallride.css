@@ -827,3 +827,12 @@ legend {
 .wr-post-status-SCHEDULED {
 	color: #ffc31e;
 }
+
+.fr-toolbar {
+    border-top: 1px solid #ccc;
+}
+.fr-toolbar .fr-command.fr-btn i, .fr-popup .fr-command.fr-btn i {
+    font-size: 12px;
+    width: 12px;
+    margin: 8px 8.5px;
+}

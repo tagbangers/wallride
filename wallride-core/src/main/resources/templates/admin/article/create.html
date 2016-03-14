@@ -30,7 +30,7 @@
 											var action = /*[[@{__${ADMIN_PATH}__/articles/preview}]]*/ '#';
 											form.attr('action', action);
 											form.attr('target', '_blank');
-											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
+											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').froalaEditor('html.get'));
 											form.submit();
 										});
 									});
@@ -44,7 +44,7 @@
 											var $this = $(this);
 											$this.button('loading');
 											var $form = $this.closest('form');
-											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').redactor('code.get'));
+											$(':input[name="body"]', $form).val($('#wr-page-content :input[name="body"]').froalaEditor('html.get'));
 											var data = $form.serializeArray();
 											data.push({name: 'draft', value: 1});
 											$.ajax({
@@ -175,7 +175,7 @@
 												$('#post-cover-dropzone :input[name="coverId"]').val(data.result.id);
 												$('#post-cover-dropzone .progress').addClass('hide');
 												$('#post-cover-dropzone .progress-bar').css('width', '0%');
-												var img = $('<img class="wr-post-cover" />').attr('src', data.result.filelink + '?' + $.param({w: 1200, h: 500, m: 1}));
+												var img = $('<img class="wr-post-cover" />').attr('src', data.result.link + '?' + $.param({w: 1200, h: 500, m: 1}));
 												$('#post-cover-dropzone img').remove();
 												$('#post-cover-dropzone').append(img);
 												$('#post-cover-dropzone .image-wrap').removeClass('hide');
@@ -224,24 +224,7 @@
 									<div class="form-group" th:classappend="${#fields.hasErrors('body')}? has-error">
 										<textarea th:field="*{body}" class="form-control" th:attr="placeholder=#{EnterBody}" placeholder="Enter body here"></textarea>
 										<span class="help-block" th:each="err : ${#fields.errors('body')}" th:text="${err}" />
-										<script th:inline="javascript">
-											$(function() {
-												$('#wr-page-content :input[name="body"]').redactor({
-													buttonSource: true,
-													minHeight: 300,
-													replaceDivs: false,
-													convertImageLinks: true,
-													convertVideoLinks: true,
-													imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-													imageManagerJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-													fileUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-													toolbarFixed: true,
-													toolbarFixedBox: true,
-													removeEmptyTags: false,
-													plugins: ['table', 'video', 'fontsize', 'fontcolor', 'fullscreen', 'counter', 'imagemanager']
-												});
-											});
-										</script>
+										<script th:inline="javascript" th:replace="froala::setting(selector='#wr-page-content :input[name=body]')"></script>
 									</div>
 								</fieldset>
 							</div>
@@ -462,34 +445,14 @@
 										</div>
 										<div th:case="'HTML'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].textValue')}? has-error">
 											<div class="col-sm-12">
-												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" style="min-height: 150px"></textarea>
+												<textarea type="text" th:field="*{customFieldValues[__${stat.index}__].textValue}" class="form-control" th:classappend="'customFieldValues__${stat.index}__-textValue'" style="min-height: 150px"></textarea>
 											</div>
 											<span class="help-block" th:each="err : ${#fields.errors('customFieldValues[__${stat.index}__].textValue')}" th:text="${err}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].id}" th:value="${field.id}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].customFieldId}" th:value="${field.customFieldId}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].name}" th:value="${field.name}" />
 											<input type="hidden" th:field="*{customFieldValues[__${stat.index}__].fieldType}" th:value="${field.fieldType}" />
-											<script th:inline="javascript">
-												/*<![CDATA[*/
-												$(function() {
-													var selector = /*[[':input[name="' + 'customFieldValues[__${stat.index}__].textValue' + '"]']]*/ '#';
-													$(selector).redactor({
-														buttonSource: true,
-														minHeight: 150,
-														replaceDivs: false,
-														convertImageLinks: true,
-														convertVideoLinks: true,
-														imageUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-														imageManagerJson: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-														fileUpload: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
-														toolbarFixed: true,
-														toolbarFixedBox: true,
-														removeEmptyTags: false,
-														plugins: ['table', 'video', 'fontsize', 'fontcolor', 'fullscreen', 'counter', 'imagemanager']
-													});
-												});
-												/*]]>*/
-											</script>
+											<script th:inline="javascript" th:replace="froala::setting(selector='.customFieldValues__${stat.index}__-textValue')"></script>
 										</div>
 										<div th:case="'NUMBER'" class="form-group row" th:classappend="${#fields.hasErrors('customFieldValues[__${stat.index}__].numberValue')}? has-error">
 											<div class="col-sm-12">
