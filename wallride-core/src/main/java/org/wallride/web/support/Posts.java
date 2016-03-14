@@ -188,7 +188,7 @@ public class Posts {
 				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
 				Matcher matcher = pattern.matcher(element.attr("style"));
 				if (matcher.find()) {
-					String replaced = src + "?w=" + matcher.group(1);
+					String replaced = src + "?w=" + Integer.parseInt(matcher.group(1)) * 2;
 					element.attr("src", replaced);
 				}
 			}
