@@ -21,6 +21,7 @@ import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionEnhancingDialect;
 import org.wallride.support.CategoryUtils;
 import org.wallride.support.PageUtils;
+import org.wallride.support.PostUtils;
 import org.wallride.web.support.*;
 
 import java.util.Collections;
@@ -29,11 +30,17 @@ import java.util.Map;
 
 public class WallRideThymeleafDialect extends AbstractDialect implements IExpressionEnhancingDialect {
 
+	private PostUtils postUtils;
+
 	private PageUtils pageUtils;
 
 	private CategoryUtils categoryUtils;
 
 	private WallRideProperties wallRideProperties;
+
+	public void setPostUtils(PostUtils postUtils) {
+		this.postUtils = postUtils;
+	}
 
 	public void setPageUtils(PageUtils pageUtils) {
 		this.pageUtils = pageUtils;
@@ -50,7 +57,7 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 	@Override
 	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
 		Map<String, Object> objects = new HashMap<>();
-		objects.put("posts", new Posts(processingContext, wallRideProperties, pageUtils));
+		objects.put("posts", new Posts(processingContext, postUtils, wallRideProperties));
 		objects.put("pages", new Pages(processingContext, pageUtils));
 		objects.put("categorys", new Categorys(processingContext, categoryUtils));
 		objects.put("medias", new Medias(processingContext, wallRideProperties));
