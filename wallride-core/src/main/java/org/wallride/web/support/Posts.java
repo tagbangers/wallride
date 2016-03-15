@@ -123,6 +123,20 @@ public class Posts {
 				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
 	}
 
+	public String thumbnail(Post post) {
+		if (post.getCover() != null) {
+			return wallRideProperties.getMediaUrlPrefix() + post.getCover().getId();
+		}
+		else {
+			Document document = Jsoup.parse(post.getBody());
+			Elements elements = document.select("img");
+			for (Element element : elements) {
+				return element.attr("src");
+			}
+		}
+		return null;
+	}
+
 	public String body(Post post) {
 		if (!StringUtils.hasText(post.getBody())) {
 			return null;
