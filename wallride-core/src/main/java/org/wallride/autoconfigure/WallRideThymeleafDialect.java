@@ -16,6 +16,7 @@
 
 package org.wallride.autoconfigure;
 
+import org.springframework.mobile.device.LiteDeviceResolver;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionEnhancingDialect;
@@ -62,6 +63,7 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 		objects.put("categorys", new Categorys(processingContext, categoryUtils));
 		objects.put("medias", new Medias(processingContext, wallRideProperties));
 		objects.put("users", new Users(processingContext, wallRideProperties));
+		objects.put("devices", new Devices(new LiteDeviceResolver()));
 		return Collections.unmodifiableMap(objects);
 	}
 
