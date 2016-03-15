@@ -45,7 +45,7 @@
 					</div>
 					<div class="col-md-3">
 						<div class="list-group" th:if="${category eq null}">
-							<a th:each="node : ${CATEGORY_TREE.rootNodes}" th:href="@{/category/__${node.category.code}__}" th:text="${node.category.name}" class="list-group-item">Link</a>
+							<a th:each="node : ${#categorys.nodes}" th:href="@{/category/__${node.object.code}__}" th:text="${node.object.name}" class="list-group-item">Link</a>
 						</div>
 						<div class="list-group" th:if="${category ne null}">
 							<a th:each="category : ${category.children}" th:href="@{/category/__${category.code}__}" th:text="${category.name}" class="list-group-item">Link</a>
