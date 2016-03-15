@@ -20,12 +20,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.LiteDeviceResolver;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.*;
 import org.wallride.support.PostUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -169,5 +172,21 @@ public class Posts {
 				.findFirst();
 		Optional value = target.map(CustomFieldValue::getValue);
 		return value.orElse(null);
+	}
+
+	public boolean isMobile(HttpServletRequest request) {
+		return resolveDevice(request).isMobile();
+	}
+
+	public boolean isNormal(HttpServletRequest request) {
+		return resolveDevice(request).isNormal();
+	}
+
+	public boolean isTablet(HttpServletRequest request) {
+		return resolveDevice(request).isTablet();
+	}
+
+	private Device resolveDevice(HttpServletRequest request) {
+		return new LiteDeviceResolver().resolveDevice(request);
 	}
 }
