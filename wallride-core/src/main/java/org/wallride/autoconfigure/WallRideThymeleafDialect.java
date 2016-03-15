@@ -63,7 +63,7 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 		objects.put("categorys", new Categorys(processingContext, categoryUtils));
 		objects.put("medias", new Medias(processingContext, wallRideProperties));
 		objects.put("users", new Users(processingContext, wallRideProperties));
-		objects.put("devices", new Devices(new LiteDeviceResolver()));
+		objects.put("devices", new Devices(processingContext, new LiteDeviceResolver()));
 		return Collections.unmodifiableMap(objects);
 	}
 

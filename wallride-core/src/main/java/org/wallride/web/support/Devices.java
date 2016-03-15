@@ -18,30 +18,33 @@ package org.wallride.web.support;
 
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceResolver;
-
-import javax.servlet.http.HttpServletRequest;
+import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IWebContext;
 
 public class Devices {
 
+	private IProcessingContext processingContext;
+
 	private DeviceResolver deviceResolver;
 
-	public Devices (DeviceResolver deviceResolver) {
+	public Devices (IProcessingContext processingContext, DeviceResolver deviceResolver) {
+		this.processingContext = processingContext;
 		this.deviceResolver = deviceResolver;
 	}
 
-	public boolean isMobile(HttpServletRequest request) {
-		return resolveDevice(request).isMobile();
+	public boolean isMobile() {
+		return resolveDevice().isMobile();
 	}
 
-	public boolean isNormal(HttpServletRequest request) {
-		return resolveDevice(request).isNormal();
+	public boolean isNormal() {
+		return resolveDevice().isNormal();
 	}
 
-	public boolean isTablet(HttpServletRequest request) {
-		return resolveDevice(request).isTablet();
+	public boolean isTablet() {
+		return resolveDevice().isTablet();
 	}
 
-	private Device resolveDevice(HttpServletRequest request) {
-		return deviceResolver.resolveDevice(request);
+	private Device resolveDevice() {
+		return deviceResolver.resolveDevice(((IWebContext) processingContext.getContext()).getHttpServletRequest());
 	}
 }
