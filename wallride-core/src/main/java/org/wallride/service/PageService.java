@@ -38,8 +38,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
 import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.domain.CustomField;
-import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
@@ -627,6 +625,10 @@ public class PageService {
 
 	public List<Page> getSiblingPages(Page page, boolean includeUnpublished) {
 		return pageRepository.findAll(PageSpecifications.siblings(page, includeUnpublished));
+	}
+
+	public Page getPageById(long id) {
+		return pageRepository.findOneById(id);
 	}
 
 	public Page getPageById(long id, String language) {

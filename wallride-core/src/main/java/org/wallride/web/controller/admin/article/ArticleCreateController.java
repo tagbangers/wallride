@@ -66,9 +66,15 @@ public class ArticleCreateController {
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
-	public ArticleCreateForm articleCreateForm(@PathVariable String language) {
+	public ArticleCreateForm articleCreateForm(
+			@PathVariable String language,
+			@RequestParam(required = false) String code) {
 		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
-		return new ArticleCreateForm(customFields);
+		ArticleCreateForm form = new ArticleCreateForm(customFields);
+		if (code != null) {
+			form.setCode(code);
+		}
+		return form;
 	}
 
 	@ModelAttribute("categoryNodes")

@@ -28,6 +28,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.domain.Article;
 import org.wallride.domain.CustomField;
 import org.wallride.service.CustomFieldService;
 import org.wallride.domain.Category;
@@ -39,6 +40,7 @@ import org.wallride.service.PageService;
 import org.wallride.support.AuthorizedUser;
 import org.wallride.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
@@ -95,10 +97,22 @@ public class PageEditController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		Page page = pageService.getPageById(id, language);
-		if (!language.equals(page.getLanguage())) {
-			redirectAttributes.addAttribute("language", language);
-			return "redirect:/_admin/{language}/pages/index";
+		if (page == null) {
+			throw new HttpNotFoundException();
 		}
+
+		if (!page.getLanguage().equals(language)) {
+			Page target = pageService.getPageByCode(page.getCode(), language);
+			if (target != null) {
+				redirectAttributes.addAttribute("id", target.getId());
+				return "redirect:/_admin/{language}/pages/edit?id={id}";
+			} else {
+				redirectAttributes.addFlashAttribute("original", page);
+				redirectAttributes.addAttribute("code", page.getCode());
+				return "redirect:/_admin/{language}/pages/create?code={code}";
+			}
+		}
+		
 		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		PageEditForm form = PageEditForm.fromDomainObject(page, customFields);
 		model.addAttribute("form", form);

@@ -39,6 +39,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, Article
 	Article findOne(Specification<Article> spec);
 
 	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Article findOneById(Long id);
+
+	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Article findOneByIdAndLanguage(Long id, String language);
 
 	@EntityGraph(value = Article.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)

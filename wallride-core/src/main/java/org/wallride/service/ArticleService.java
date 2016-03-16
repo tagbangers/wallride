@@ -632,6 +632,10 @@ public class ArticleService {
 		return new TreeSet<>(page.getContent());
 	}
 
+	public Article getArticleById(long id) {
+		return articleRepository.findOneById(id);
+	}
+
 	public Article getArticleById(long id, String language) {
 		return articleRepository.findOneByIdAndLanguage(id, language);
 	}

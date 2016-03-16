@@ -31,7 +31,7 @@
 			<div th:replace="layout::nav"></div>
 			<div class="container">
 				<div class="alert alert-warning" th:if="${category.language ne #locale.language}">
-					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{NotSupportedLanguage(${#messages.msg('Language.' + category.language)})}">Please note that this page is available only in English.</span>
+					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{LanguageNotSupported(${#messages.msg('Language.' + category.language)})}">Please note that this page is available only in English.</span>
 				</div>
 				<div class="row">
 					<div class="col-md-9">

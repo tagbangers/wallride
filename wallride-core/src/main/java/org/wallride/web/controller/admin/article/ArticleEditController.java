@@ -39,6 +39,7 @@ import org.wallride.service.ArticleService;
 import org.wallride.support.AuthorizedUser;
 import org.wallride.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
@@ -66,10 +67,8 @@ public class ArticleEditController {
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("article")
-	public Article setupArticle(
-			@PathVariable String language,
-			@RequestParam long id) {
-		return articleService.getArticleById(id, language);
+	public Article setupArticle(@RequestParam long id) {
+		return articleService.getArticleById(id);
 	}
 
 	@ModelAttribute("categoryNodes")
@@ -97,10 +96,22 @@ public class ArticleEditController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		Article article = (Article) model.asMap().get("article");
-		if (!language.equals(article.getLanguage())) {
-			redirectAttributes.addAttribute("language", language);
-			return "redirect:/_admin/{language}/articles/index";
+		if (article == null) {
+			throw new HttpNotFoundException();
 		}
+
+		if (!article.getLanguage().equals(language)) {
+			Article target = articleService.getArticleByCode(article.getCode(), language);
+			if (target != null) {
+				redirectAttributes.addAttribute("id", target.getId());
+				return "redirect:/_admin/{language}/articles/edit?id={id}";
+			} else {
+				redirectAttributes.addFlashAttribute("original", article);
+				redirectAttributes.addAttribute("code", article.getCode());
+				return "redirect:/_admin/{language}/articles/create?code={code}";
+			}
+		}
+
 		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
 		ArticleEditForm form = ArticleEditForm.fromDomainObject(article, customFields);
 		model.addAttribute("form", form);

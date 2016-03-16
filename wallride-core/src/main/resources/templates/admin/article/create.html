@@ -117,6 +117,10 @@
 									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 									<span th:text="#{YouHaveDraft}">You have draft.</span><a th:href="@{__${ADMIN_PATH}__/articles/edit(id=${draft.drafted.id},draft)}"><span th:text="#{CopyDraft}">Copy draft</span></a>
 								</div>
+								<div class="alert alert-info" th:if="${original ne null}">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+									<span th:text="#{LanguageNotFound(${#messages.msg('Language.' + #locale.language)}, ${original.title})}">There is no {0} version of "{1}".</span>
+								</div>
 								<fieldset>
 									<div class="form-group">
 										<div id="post-cover-dropzone" class="wr-post-cover-dropzone col-sm-12" style="">
