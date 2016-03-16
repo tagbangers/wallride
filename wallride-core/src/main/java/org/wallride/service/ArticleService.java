@@ -16,6 +16,7 @@
 
 package org.wallride.service;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -450,7 +451,9 @@ public class ArticleService {
 				value.setCustomField(customField);
 				value.setPost(article);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					value.setTextValue(String.join(",", valueForm.getTextValues()));
+					if (!ArrayUtils.isEmpty(valueForm.getTextValues())) {
+						value.setTextValue(String.join(",", valueForm.getTextValues()));
+					}
 				} else {
 					value.setTextValue(valueForm.getTextValue());
 				}

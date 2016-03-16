@@ -329,6 +329,11 @@ public class Post extends DomainObject<Long> {
 		this.medias = medias;
 	}
 
+	@Override
+	public String print() {
+		return getTitle();
+	}
+
 //	@Override
 //	public String toString() {
 //		return getTitle();

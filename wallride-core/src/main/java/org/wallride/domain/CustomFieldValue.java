@@ -180,6 +180,11 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 	}
 
 	@Override
+	public String print() {
+		return this.getClass().getName() + " " + getId();
+	}
+
+	@Override
 	public int compareTo(CustomFieldValue customFieldValue) {
 		if (getId() == 0) {
 			return 1;

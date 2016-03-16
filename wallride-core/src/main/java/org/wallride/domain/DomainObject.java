@@ -103,6 +103,8 @@ public abstract class DomainObject<ID extends Serializable> implements Serializa
 		this.updatedBy = updatedBy;
 	}
 
+	public abstract String print();
+
 	@Override
 	public boolean equals(Object other) {
 		if (this == other) return true;
