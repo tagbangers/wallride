@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.User;
 import org.wallride.domain.UserInvitation;
 import org.wallride.exception.DuplicateEmailException;
@@ -61,12 +62,12 @@ public class SignupService {
 		return true;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public AuthorizedUser signup(SignupRequest request, User.Role role) throws ServiceException {
 		return signup(request, role, null);
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public AuthorizedUser signup(SignupRequest request, User.Role role, String token) throws ServiceException {
 		UserInvitation invitation = null;
 		if (token != null) {

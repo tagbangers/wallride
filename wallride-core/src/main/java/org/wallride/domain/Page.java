@@ -33,7 +33,8 @@ import java.util.List;
 					@NamedAttributeNode("author"),
 					@NamedAttributeNode("parent"),
 					@NamedAttributeNode("children"),
-					@NamedAttributeNode("categories")
+					@NamedAttributeNode("categories"),
+					@NamedAttributeNode("tags")
 			}
 	),
 	@NamedEntityGraph(name = Page.DEEP_GRAPH_NAME,

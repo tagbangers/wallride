@@ -36,6 +36,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.CustomField;
 import org.wallride.domain.CustomFieldValue;
@@ -88,9 +89,9 @@ public class ArticleService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private static Logger logger = LoggerFactory.getLogger(ArticleService.class); 
+	private static Logger logger = LoggerFactory.getLogger(ArticleService.class);
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article createArticle(ArticleCreateRequest request, Post.Status status, AuthorizedUser authorizedUser) {
 		LocalDateTime now = LocalDateTime.now();
 
@@ -219,7 +220,7 @@ public class ArticleService {
 		return articleRepository.save(article);
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticleAsDraft(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -270,7 +271,7 @@ public class ArticleService {
 		}
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -289,7 +290,7 @@ public class ArticleService {
 		return published;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -308,7 +309,7 @@ public class ArticleService {
 		return unpublished;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -449,7 +450,7 @@ public class ArticleService {
 		return articleRepository.save(article);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article deleteArticle(ArticleDeleteRequest request, BindingResult result) throws BindException {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -457,7 +458,7 @@ public class ArticleService {
 		return article;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public List<Article> bulkPublishArticle(ArticleBulkPublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
@@ -503,7 +504,7 @@ public class ArticleService {
 		return articles;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public List<Article> bulkUnpublishArticle(ArticleBulkUnpublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
@@ -524,7 +525,7 @@ public class ArticleService {
 	}
 
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public List<Article> bulkDeleteArticle(ArticleBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : bulkDeleteRequest.getIds()) {
@@ -587,12 +588,12 @@ public class ArticleService {
 		return articles;
 	}
 
-	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status")
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public SortedSet<Article> getArticlesByCategoryCode(String language, String code, Post.Status status) {
 		return getArticlesByCategoryCode(language, code, status, 10);
 	}
 
-	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status + '.' + #size")
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public SortedSet<Article> getArticlesByCategoryCode(String language, String code, Post.Status status, int size) {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withLanguage(language)
@@ -604,7 +605,7 @@ public class ArticleService {
 		return new TreeSet<>(page.getContent());
 	}
 
-	@Cacheable(value = "articles", key = "'list.latest.' + #language + '.' + #status + '.' + #size")
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public SortedSet<Article> getLatestArticles(String language, Post.Status status, int size) {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withLanguage(language)

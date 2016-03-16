@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.Category;
 import org.wallride.domain.Category_;
 import org.wallride.model.CategoryCreateRequest;
@@ -44,7 +45,7 @@ public class CategoryService {
 	@Inject
 	private CategoryRepository categoryRepository;
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Category createCategory(CategoryCreateRequest request, AuthorizedUser authorizedUser) {
 		Category category = new Category();
 
@@ -75,7 +76,7 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Category updateCategory(CategoryUpdateRequest request, AuthorizedUser authorizedUser) {
 		categoryRepository.lock(request.getId());
 		Category category = categoryRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -112,7 +113,7 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public void updateCategoryHierarchy(List<Map<String, Object>> data, String language) {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
@@ -133,7 +134,7 @@ public class CategoryService {
 		}
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Category deleteCategory(long id, String language) {
 		categoryRepository.lock(id);
 		Category category = categoryRepository.findOneByIdAndLanguage(id, language);

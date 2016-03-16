@@ -17,19 +17,18 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.CustomField;
 import org.wallride.domain.CustomFieldOption;
-import org.wallride.exception.ServiceException;
-import org.wallride.repository.CustomFieldRepository;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
 import org.wallride.model.*;
+import org.wallride.repository.CustomFieldRepository;
 import org.wallride.support.AuthorizedUser;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -44,7 +43,7 @@ public class CustomFieldService {
 	@Inject
 	private PlatformTransactionManager transactionManager;
 
-	@CacheEvict(value="customFields", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.CUSTOM_FIELD_CACHE, allEntries = true)
 	public CustomField createCustomField(CustomFieldCreateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = new CustomField();
 		CustomField duplicate = customFieldRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
@@ -69,7 +68,7 @@ public class CustomFieldService {
 		return customFieldRepository.save(customField);
 	}
 
-	@CacheEvict(value="customFields", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.CUSTOM_FIELD_CACHE, allEntries = true)
 	public CustomField updateCustomField(CustomFieldUpdateRequest request, AuthorizedUser authorizedUser) {
 		CustomField customField = customFieldRepository.findOneForUpdateById(request.getId());
 		if (customField == null) {
@@ -92,7 +91,7 @@ public class CustomFieldService {
 		return customFieldRepository.save(customField);
 	}
 
-	@CacheEvict(value="customFields", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.CUSTOM_FIELD_CACHE, allEntries = true)
 	public void updateCustomFieldOrder(List<Long> data, String language, BindingResult result) {
 		customFieldRepository.updateNullByLanguage(language);
 		List<CustomField> customFields = customFieldRepository.findAllByLanguage(language);
@@ -108,7 +107,7 @@ public class CustomFieldService {
 		}
 	}
 
-	@CacheEvict(value="customFields", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.CUSTOM_FIELD_CACHE, allEntries = true)
 	public CustomField deleteCustomField(CustomFieldDeleteRequest request, BindingResult result) {
 		customFieldRepository.lock(request.getId());
 		CustomField customField = customFieldRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -117,7 +116,7 @@ public class CustomFieldService {
 	}
 
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
-	@CacheEvict(value = "customFields", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.CUSTOM_FIELD_CACHE, allEntries = true)
 	public List<CustomField> bulkDeleteCustomField(CustomFieldBulkDeleteRequest bulkDeleteRequest, final BindingResult result) {
 		List<CustomField> customFields = new ArrayList<>();
 		for (long id : bulkDeleteRequest.getIds()) {

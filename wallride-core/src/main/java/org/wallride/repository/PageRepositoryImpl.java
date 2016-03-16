@@ -59,6 +59,8 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 		Criteria criteria = session.createCriteria(Page.class)
 				.setFetchMode("cover", FetchMode.JOIN)
 				.setFetchMode("author", FetchMode.JOIN)
+				.setFetchMode("categories", FetchMode.JOIN)
+				.setFetchMode("tags", FetchMode.JOIN)
 				.setFetchMode("parent", FetchMode.JOIN)
 				.setFetchMode("children", FetchMode.JOIN);
 
