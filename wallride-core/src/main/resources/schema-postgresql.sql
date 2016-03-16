@@ -105,7 +105,7 @@ CREATE TABLE "comment" (
 
 CREATE TABLE "media" (
   "id"            VARCHAR(50) NOT NULL,
-  "mime_type"     VARCHAR(50) NOT NULL,
+  "mime_type"     VARCHAR(500) NOT NULL,
   "original_name" VARCHAR(500),
   "created_at"    TIMESTAMP   NOT NULL,
   "created_by"    VARCHAR(100),
