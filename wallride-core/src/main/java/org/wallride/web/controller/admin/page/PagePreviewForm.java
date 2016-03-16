@@ -16,6 +16,7 @@
 
 package org.wallride.web.controller.admin.page;
 
+import org.wallride.support.CodeFormat;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import java.io.Serializable;
@@ -26,6 +27,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class PagePreviewForm implements Serializable {
 
+	@CodeFormat
 	private String code;
 
 	private String coverId;

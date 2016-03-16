@@ -19,6 +19,7 @@ package org.wallride.web.controller.admin.page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.domain.CustomField;
 import org.wallride.model.PageCreateRequest;
+import org.wallride.support.CodeFormat;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.validation.constraints.NotNull;
@@ -48,7 +49,8 @@ public class PageCreateForm implements Serializable {
 	}
 
 	public interface GroupPublish {}
-	
+
+	@CodeFormat
 	private String code;
 
 	private String coverId;

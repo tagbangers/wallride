@@ -47,6 +47,7 @@ import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.wallride.service.BlogService;
+import org.wallride.support.CodeFormatAnnotationFormatterFactory;
 import org.wallride.web.controller.admin.DashboardController;
 import org.wallride.web.support.*;
 
@@ -123,6 +124,7 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 				return Normalizer.normalize(value, Normalizer.Form.NFKC);
 			}
 		});
+		registry.addFormatterForFieldAnnotation(new CodeFormatAnnotationFormatterFactory());
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import org.wallride.domain.Page;
 import org.wallride.domain.Post;
 import org.wallride.domain.Tag;
 import org.wallride.model.PageUpdateRequest;
+import org.wallride.support.CodeFormat;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.validation.constraints.NotNull;
@@ -43,6 +44,7 @@ public class PageEditForm implements Serializable {
 	@NotNull
 	private Long id;
 
+	@CodeFormat
 	private String code;
 
 	private String coverId;

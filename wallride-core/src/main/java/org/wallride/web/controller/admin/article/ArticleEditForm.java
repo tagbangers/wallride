@@ -27,6 +27,7 @@ import org.wallride.domain.Category;
 import org.wallride.domain.Post;
 import org.wallride.domain.Tag;
 import org.wallride.model.ArticleUpdateRequest;
+import org.wallride.support.CodeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -42,6 +43,7 @@ public class ArticleEditForm implements Serializable {
 	@NotNull
 	private Long id;
 
+	@CodeFormat
 	private String code;
 
 	private String coverId;

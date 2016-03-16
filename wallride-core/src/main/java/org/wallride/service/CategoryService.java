@@ -17,6 +17,7 @@
 package org.wallride.service;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,14 +28,17 @@ import org.springframework.util.ObjectUtils;
 import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.Category;
 import org.wallride.domain.Category_;
+import org.wallride.exception.ServiceException;
 import org.wallride.model.CategoryCreateRequest;
 import org.wallride.model.CategorySearchRequest;
 import org.wallride.model.CategoryUpdateRequest;
 import org.wallride.repository.CategoryRepository;
 import org.wallride.repository.CategorySpecifications;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.support.CodeFormatter;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +70,15 @@ public class CategoryService {
 		}
 
 		category.setParent(parent);
-		category.setCode(request.getCode() != null ? request.getCode() : request.getName());
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getName(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
+		category.setCode(code);
 		category.setName(request.getName());
 		category.setDescription(request.getDescription());
 		category.setLft(rgt);
@@ -105,7 +117,15 @@ public class CategoryService {
 		}
 
 		category.setParent(parent);
-		category.setCode(request.getCode() != null ? request.getCode() : request.getName());
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getName(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
+		category.setCode(code);
 		category.setName(request.getName());
 		category.setDescription(request.getDescription());
 		category.setLanguage(request.getLanguage());
