@@ -16,6 +16,8 @@
 
 package org.wallride.web.controller.admin.article;
 
+import org.wallride.support.CodeFormat;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.Set;
 @SuppressWarnings("serial")
 public class ArticlePreviewForm implements Serializable {
 
+	@CodeFormat
 	private String code;
 
 	private String coverId;

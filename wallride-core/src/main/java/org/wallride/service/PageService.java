@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -42,15 +43,18 @@ import org.wallride.domain.CustomFieldValue;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
+import org.wallride.exception.ServiceException;
 import org.wallride.model.*;
 import org.wallride.repository.*;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.support.CodeFormatter;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -91,7 +95,14 @@ public class PageService {
 	public Page createPage(PageCreateRequest request, Post.Status status, AuthorizedUser authorizedUser) {
 		LocalDateTime now = LocalDateTime.now();
 
-		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getTitle(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
 		if (!StringUtils.hasText(code)) {
 			if (!status.equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
@@ -318,7 +329,14 @@ public class PageService {
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
-		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getTitle(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
 		if (!StringUtils.hasText(code)) {
 			if (!page.getStatus().equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();

@@ -18,6 +18,7 @@ package org.wallride.web.controller.admin.customfield;
 
 import org.wallride.domain.CustomField;
 import org.wallride.model.CustomFieldCreateRequest;
+import org.wallride.support.CodeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ public class CustomFieldCreateForm implements Serializable {
 	@NotNull
 	private String name;
 
+	@CodeFormat
 	@NotNull
 	private String code;
 

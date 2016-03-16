@@ -39,6 +39,7 @@ import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.wallride.repository.MediaRepository;
 import org.wallride.service.BlogService;
+import org.wallride.support.CodeFormatAnnotationFormatterFactory;
 import org.wallride.web.support.*;
 
 import java.text.Normalizer;
@@ -88,6 +89,7 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 				return Normalizer.normalize(value, Normalizer.Form.NFKC);
 			}
 		});
+		registry.addFormatterForFieldAnnotation(new CodeFormatAnnotationFormatterFactory());
 	}
 
 	@Override

@@ -19,6 +19,7 @@ package org.wallride.web.controller.admin.article;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.wallride.domain.CustomField;
 import org.wallride.model.ArticleCreateRequest;
+import org.wallride.support.CodeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -48,6 +49,7 @@ public class ArticleCreateForm implements Serializable {
 
 	interface GroupPublish {}
 
+	@CodeFormat
 	private String code;
 
 	private String coverId;

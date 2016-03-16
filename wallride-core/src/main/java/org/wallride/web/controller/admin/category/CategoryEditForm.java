@@ -19,6 +19,7 @@ package org.wallride.web.controller.admin.category;
 import org.springframework.beans.BeanUtils;
 import org.wallride.domain.Category;
 import org.wallride.model.CategoryUpdateRequest;
+import org.wallride.support.CodeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -31,6 +32,7 @@ public class CategoryEditForm implements Serializable {
 
 	private Long parentId;
 
+	@CodeFormat
 	private String code;
 
 	@NotNull
