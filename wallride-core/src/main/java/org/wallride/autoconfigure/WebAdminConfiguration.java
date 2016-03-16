@@ -77,6 +77,12 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 	private BlogService blogService;
 
 	@Autowired
+	private DefaultModelAttributeInterceptor defaultModelAttributeInterceptor;
+
+	@Autowired
+	private SetupRedirectInterceptor setupRedirectInterceptor;
+
+	@Autowired
 	private Environment environment;
 
 	@Autowired
@@ -142,8 +148,8 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 		webContentInterceptor.setUseCacheControlNoStore(true);
 		registry.addInterceptor(webContentInterceptor);
 
-		registry.addInterceptor(defaultModelAttributeInterceptor());
-		registry.addInterceptor(setupRedirectInterceptor());
+		registry.addInterceptor(defaultModelAttributeInterceptor);
+		registry.addInterceptor(setupRedirectInterceptor);
 	}
 
 	@Override
@@ -153,21 +159,7 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 
 	// additional webmvc-related beans
 
-	@Bean
-	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
-		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
-		defaultModelAttributeInterceptor.setBlogService(blogService);
-		return defaultModelAttributeInterceptor;
-	}
-
-	@Bean
-	public SetupRedirectInterceptor setupRedirectInterceptor() {
-		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
-		setupRedirectInterceptor.setBlogService(blogService);
-		return setupRedirectInterceptor;
-	}
-
-	@Bean(name="adminTemplateResolver")
+	@Bean(name = "adminTemplateResolver")
 	public TemplateResolver adminTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(wallRideResourceResourceResolver);
@@ -180,7 +172,7 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 		return resolver;
 	}
 
-	@Bean(name="guestTemplateResolver")
+	@Bean(name = "guestTemplateResolver")
 	public TemplateResolver guestTemplateResolver() {
 		TemplateResolver resolver = new TemplateResolver();
 		resolver.setResourceResolver(wallRideResourceResourceResolver);

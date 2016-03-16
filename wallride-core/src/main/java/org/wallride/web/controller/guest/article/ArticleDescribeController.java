@@ -16,6 +16,7 @@
 
 package org.wallride.web.controller.guest.article;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -32,16 +33,16 @@ import org.wallride.service.ArticleService;
 import org.wallride.service.CommentService;
 import org.wallride.web.support.HttpNotFoundException;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}/{code:.+}")
 public class ArticleDescribeController {
 
-	@Inject
+	@Autowired
 	private ArticleService articleService;
-	@Inject
+
+	@Autowired
 	private CommentService commentService;
 
 	@RequestMapping
@@ -55,8 +56,12 @@ public class ArticleDescribeController {
 			RedirectAttributes redirectAttributes) {
 		Article article = articleService.getArticleByCode(code, blogLanguage.getLanguage());
 		if (article == null) {
+			article = articleService.getArticleByCode(code, blogLanguage.getBlog().getDefaultLanguage());
+		}
+		if (article == null) {
 			throw new HttpNotFoundException();
 		}
+
 		if (article.getStatus() != Post.Status.PUBLISHED) {
 			throw new HttpNotFoundException();
 		}

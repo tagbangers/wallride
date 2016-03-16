@@ -78,6 +78,9 @@ public class PageDescribeController extends AbstractController {
 
 		Page page = pageService.getPageByCode(variables.get("code"), blogLanguage.getLanguage());
 		if (page == null) {
+			page = pageService.getPageByCode(variables.get("code"), blogLanguage.getBlog().getDefaultLanguage());
+		}
+		if (page == null) {
 			throw new HttpNotFoundException();
 		}
 		if (page.getStatus() != Post.Status.PUBLISHED) {

@@ -125,9 +125,15 @@ public class ArticleIndexController {
 		String lastCode = codes[codes.length - 1];
 
 		Category category = categoryService.getCategoryByCode(lastCode, blogLanguage.getLanguage());
+		if (category == null) {
+			category = categoryService.getCategoryByCode(lastCode, blogLanguage.getBlog().getDefaultLanguage());
+		}
+		if (category == null) {
+			throw new HttpNotFoundException();
+		}
 
 		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(blogLanguage.getLanguage());
+		form.setLanguage(category.getLanguage());
 		form.getCategoryIds().add(category.getId());
 
 		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
@@ -135,7 +141,7 @@ public class ArticleIndexController {
 		model.addAttribute("articles", articles);
 		model.addAttribute("pageable", pageable);
 		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
-		return "article/index";
+		return "article/category";
 	}
 
 	private String extractPathFromPattern(final HttpServletRequest request){
@@ -171,5 +177,4 @@ public class ArticleIndexController {
 		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
 		return "article/author";
 	}
-
 }

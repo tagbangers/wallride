@@ -32,6 +32,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -103,6 +104,12 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 	}
 
 	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(defaultModelAttributeInterceptor());
+		registry.addInterceptor(setupRedirectInterceptor());
+	}
+
+	@Override
 	public MessageCodesResolver getMessageCodesResolver() {
 		return messageCodesResolver;
 	}
@@ -142,6 +149,20 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 		handlerMapping.setOrder(0);
 		handlerMapping.setUrlMap(urlMap);
 		return handlerMapping;
+	}
+
+	@Bean
+	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
+		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
+		defaultModelAttributeInterceptor.setBlogService(blogService);
+		return defaultModelAttributeInterceptor;
+	}
+
+	@Bean
+	public SetupRedirectInterceptor setupRedirectInterceptor() {
+		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
+		setupRedirectInterceptor.setBlogService(blogService);
+		return setupRedirectInterceptor;
 	}
 
 	@Bean

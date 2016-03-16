@@ -34,17 +34,19 @@
 			<div th:replace="layout::nav"></div>
 			<img th:if="${page.cover ne null}" th:src="@{${#medias.link(page.cover)}(w=1200,h=300,m=1)}" class="post-cover" />
 			<div class="container">
+				<div class="alert alert-warning" th:if="${page.language ne #locale.language}">
+					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{NotSupportedLanguage(${#messages.msg('Language.' + page.language)})}">Please note that this page is available only in English.</span>
+				</div>
 				<div class="row">
-					<div class="col-md-12">
-
-					</div>
 					<article class="col-md-9">
 						<div class="page-header">
 							<h1 th:text="${page.title}"></h1>
 						</div>
 						<p th:utext="${#posts.body(page)}"></p>
-
 						<time></time>
+						<ul th:if="${page.tags}" class="list-inline">
+							<li th:each="tag : ${page.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
+						</ul>
 					</article>
 					<div class="col-md-3">
 						<div class="list-group"  style="margin-top: 40px;">
@@ -57,11 +59,6 @@
 							</th:block>
 							<!--/*/ </th:block> /*/-->
 						</div>
-						<br/>
-						<ul th:if="${page.tags}" class="list-inline">
-							<li th:each="tag : ${page.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
-						</ul>
-						<p th:utext="${#posts.customValue(page,'html')}"></p>
 					</div>
 				</div>
 			</div>

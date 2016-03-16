@@ -45,14 +45,20 @@ public class WebGuestConfiguration {
 	@Autowired
 	private ContentNegotiationManager mvcContentNegotiationManager;
 
+	@Autowired
+	private DefaultModelAttributeInterceptor defaultModelAttributeInterceptor;
+
+	@Autowired
+	private SetupRedirectInterceptor setupRedirectInterceptor;
+
 	@Bean(name = "guestRequestMappingHandlerMapping")
 	public RequestMappingHandlerMapping requestMappingHandlerMapping(PageDescribeController pageDescribeController) {
 		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
 		handlerMapping.setOrder(Ordered.LOWEST_PRECEDENCE);
 		handlerMapping.setDefaultHandler(pageDescribeController);
 		handlerMapping.setInterceptors(new HandlerInterceptor[] {
-				defaultModelAttributeInterceptor(),
-				setupRedirectInterceptor()
+				defaultModelAttributeInterceptor,
+				setupRedirectInterceptor
 		});
 		handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager);
 		return handlerMapping;
@@ -62,19 +68,5 @@ public class WebGuestConfiguration {
 	@ConditionalOnMissingBean
 	public PageDescribeController pageDescribeController() {
 		return new PageDescribeController(blogService, pageService);
-	}
-
-	@Bean
-	public DefaultModelAttributeInterceptor defaultModelAttributeInterceptor() {
-		DefaultModelAttributeInterceptor defaultModelAttributeInterceptor = new DefaultModelAttributeInterceptor();
-		defaultModelAttributeInterceptor.setBlogService(blogService);
-		return defaultModelAttributeInterceptor;
-	}
-
-	@Bean
-	public SetupRedirectInterceptor setupRedirectInterceptor() {
-		SetupRedirectInterceptor setupRedirectInterceptor = new SetupRedirectInterceptor();
-		setupRedirectInterceptor.setBlogService(blogService);
-		return setupRedirectInterceptor;
 	}
 }

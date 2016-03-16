@@ -34,6 +34,9 @@
 			<div th:replace="layout::nav"></div>
 			<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=1200,h=400,m=1)}" class="post-cover" />
 			<article class="container">
+				<div class="alert alert-warning" th:if="${article.language ne #locale.language}">
+					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{NotSupportedLanguage(${#messages.msg('Language.' + article.language)})}">Please note that this page is available only in English.</span>
+				</div>
 				<div class="page-header">
 					<h1 th:text="${article.title}"></h1>
 				</div>

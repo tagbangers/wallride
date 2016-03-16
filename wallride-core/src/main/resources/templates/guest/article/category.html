@@ -30,29 +30,37 @@
 		<div id="wrap">
 			<div th:replace="layout::nav"></div>
 			<div class="container">
-				<div class="alert alert-warning" th:if="${tag.language ne #locale.language}">
-					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{NotSupportedLanguage(${#messages.msg('Language.' + tag.language)})}">Please note that this page is available only in English.</span>
+				<div class="alert alert-warning" th:if="${category.language ne #locale.language}">
+					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{NotSupportedLanguage(${#messages.msg('Language.' + category.language)})}">Please note that this page is available only in English.</span>
 				</div>
 				<div class="row">
 					<div class="col-md-9">
 						<div class="page-header">
-							<h1 th:text="${tag.name}"></h1>
+							<h1 th:text="${category.name}"></h1>
 						</div>
-						<post th:each="post : ${posts}" class="wr-post-summary row">
-							<div class="col-sm-2" th:with="thumbnail = ${#posts.thumbnail(post)}">
-								<img th:if="${thumbnail}" th:src="@{${thumbnail}(w=120,h=120,m=1)}" class="wr-post-cover" />
+						<article th:each="article : ${articles}" class="wr-post-summary row">
+							<div class="col-sm-2" th:with="thumbnail = ${#posts.thumbnail(article)}">
+								<img th:if="${thumbnail}" th:src="@{${thumbnail}(w=120,h=120,m=1)}" class="wr-article-cover" />
 								<img th:unless="${thumbnail}" />
 							</div>
 							<div class="col-sm-10">
-								<h2 class="wr-post-title"><a th:href="@{${#posts.path(post)}}" th:text="${post.title}?:'No Titled'" href="#"></a></h2>
-								<p th:text="${#posts.summary(post, 45)}"></p>
-								<p style="margin-bottom:5px"><time th:text="${#temporals.format(post.date, 'yyyy/MM/dd HH:mm')}"></time>&nbsp;&nbsp;&nbsp;
-									<a th:if="${post.author ne null}" class="wr-author"><span class="glyphicon glyphicon-user"></span> <span th:text="${post.author}"></span></a></p>
-								<span th:unless="${#lists.isEmpty(post.tags)}">
-									<a th:each="tag : ${post.tags}" th:href="@{/tag/__${tag}__}" class="wr-tag"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Link</span></span></a>&nbsp;&nbsp;
+								<h2 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h2>
+								<p th:text="${#posts.summary(article, 45)}"></p>
+								<p style="margin-bottom:5px"><time th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></time>&nbsp;&nbsp;&nbsp;
+									<a th:if="${article.author ne null}" class="wr-author"><span class="glyphicon glyphicon-user"></span> <span th:text="${article.author}"></span></a></p>
+								<span th:unless="${#lists.isEmpty(article.tags)}">
+									<a th:each="tag : ${article.tags}" th:href="@{/tag/__${tag}__}" class="wr-tag"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Link</span></span></a>&nbsp;&nbsp;
 								</span>&nbsp;&nbsp;
 							</div>
-						</post>
+						</article>
+					</div>
+					<div class="col-md-3">
+						<div class="list-group" th:if="${category eq null}">
+							<a th:each="node : ${CATEGORY_TREE.rootNodes}" th:href="@{/category/__${node.category.code}__}" th:text="${node.category.name}" class="list-group-item">Link</a>
+						</div>
+						<div class="list-group" th:if="${category ne null}">
+							<a th:each="category : ${category.children}" th:href="@{/category/__${category.code}__}" th:text="${category.name}" class="list-group-item">Link</a>
+						</div>
 					</div>
 				</div>
 			</div>
