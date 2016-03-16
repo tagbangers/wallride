@@ -16,6 +16,9 @@ public class CodeFormatter implements Formatter<String> {
 
 	@Override
 	public String parse(String text, Locale locale) throws ParseException {
+		if (text == null) {
+			return null;
+		}
 		String value = StringUtils.trimWhitespace(text);
 		value = Normalizer.normalize(value, Normalizer.Form.NFKC);
 		value = StringUtils.replace(value, " ", "-");
