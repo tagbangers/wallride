@@ -836,3 +836,16 @@ legend {
     width: 12px;
     margin: 8px 8.5px;
 }
+img.fr-dii.fr-fil {
+    margin: 5px 0 5px 10px;
+    right: 5px;
+    float: left;
+}
+img.fr-dii.fr-fir {
+    margin: 5px 0 5px 10px;
+    right: 5px;
+    float: right;
+}
+img.fr-dii {
+    display: inline-block;
+}

@@ -111,6 +111,33 @@ p {
 time {
     font-size: 90%;
 }
+img.fr-dii.fr-fil {
+    margin: 0px 10px 0px 0px;
+    left: 5px;
+    float: left;
+}
+img.fr-dii.fr-fir {
+    margin: 0px 0 0px 10px;
+    right: 5px;
+    float: right;
+}
+img.fr-dii {
+    display: inline-block;
+}
 .footer {
 	margin-top: 20px;
+}
+.navbar-default {
+    background-color: #1C1D21;
+    border-color: #1C1D21;
+}
+.navbar-default .navbar-brand {
+    color: #FFF;
+}
+.navbar-default .navbar-nav>li>a {
+    color: #FFF;
+}
+.navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus {
+    color: #aeaeae;
+    background-color: transparent;
 }

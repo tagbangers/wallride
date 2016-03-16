@@ -39,18 +39,16 @@
 				</div>
 				<div class="page-body">
 					<div class="row">
-						<div class="col-sm-7">
+						<div class="col-sm-12">
 						<p th:utext="${#posts.body(article)}"></p>
 						<time></time>
 						<ul th:if="${article.tags}" class="list-inline">
 							<li th:each="tag : ${article.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
 						</ul>
-						</div>
-						<div class="col-sm-3">
-							<dl th:each="val : ${article.customFieldValues}">
-								<!--<dt th:if="${val.value ne null}" th:text="${val.customField.name}"></dt>-->
-								<dd th:text="${val.value}"></dd>
-							</dl>
+						<dl th:each="val : ${article.customFieldValues}">
+							<!--<dt th:if="${val.value ne null}" th:text="${val.customField.name}"></dt>-->
+							<dd th:text="${val.value}"></dd>
+						</dl>
 						</div>
 					</div>
 				</div>

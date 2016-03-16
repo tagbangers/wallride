@@ -31,6 +31,11 @@
 			<div th:replace="layout::nav"></div>
 			<div class="container">
 				<div class="row">
+					<div class="col-sm-12">
+						<h1 style="margin-bottom: 30px">Latest News</h1>
+					</div>
+				</div>
+				<div class="row">
 					<div class="col-md-9">
 						<article th:each="article : ${articles}" class="wr-post-summary row">
 							<div class="col-sm-2" th:with="thumbnail = ${#posts.thumbnail(article)}">
