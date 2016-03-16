@@ -162,6 +162,11 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	}
 
 	@Override
+	public String print() {
+		return getName();
+	}
+
+	@Override
 	public int compareTo(CustomField field) {
 		return new CompareToBuilder()
 				.append(getIdx(), field.getIdx())

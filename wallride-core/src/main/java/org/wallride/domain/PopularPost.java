@@ -115,6 +115,11 @@ public class PopularPost extends DomainObject<Long> implements Comparable<Popula
 	}
 
 	@Override
+	public String print() {
+		return getType() + " " + Integer.toString(getRank());
+	}
+
+	@Override
 	public int compareTo(PopularPost o) {
 		return new CompareToBuilder()
 				.append(getLanguage(), o.getLanguage())

@@ -102,4 +102,9 @@ public class UserInvitation extends DomainObject<String> {
 	public void setAcceptedAt(LocalDateTime acceptedAt) {
 		this.acceptedAt = acceptedAt;
 	}
+
+	@Override
+	public String print() {
+		return getEmail();
+	}
 }

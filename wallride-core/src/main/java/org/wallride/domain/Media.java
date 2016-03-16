@@ -82,4 +82,9 @@ public class Media extends DomainObject<String> {
 	public void setPosts(List<Post> posts) {
 		this.posts = posts;
 	}
+
+	@Override
+	public String print() {
+		return getId() + " " + getOriginalName();
+	}
 }

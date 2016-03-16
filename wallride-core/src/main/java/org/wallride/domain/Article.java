@@ -58,6 +58,7 @@ public class Article extends Post implements Comparable<Article> {
 	public static final String SHALLOW_GRAPH_NAME = "ARTICLE_SHALLOW_GRAPH";
 	public static final String DEEP_GRAPH_NAME = "ARTICLE_DEEP_GRAPH";
 
+	@Override
 	public int compareTo(Article article) {
 		if (getDate() != null && article.getDate() == null) return 1;
 		if (getDate() == null && article.getDate() != null) return -1;

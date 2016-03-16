@@ -81,4 +81,9 @@ public class PasswordResetToken extends DomainObject<String> {
 	public void setExpiredAt(LocalDateTime expiredAt) {
 		this.expiredAt = expiredAt;
 	}
+
+	@Override
+	public String print() {
+		return getEmail() + " " + getToken();
+	}
 }

@@ -107,6 +107,11 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 	}
 
 	@Override
+	public String print() {
+		return getName();
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

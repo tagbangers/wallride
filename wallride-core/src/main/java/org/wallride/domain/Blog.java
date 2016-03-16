@@ -144,4 +144,9 @@ public class Blog extends DomainObject<Long> {
 	public boolean isMultiLanguage() {
 		return (getLanguages().size() > 1);
 	}
+
+	@Override
+	public String print() {
+		return getTitle();
+	}
 }
