@@ -28,31 +28,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Searches {
+public class Articles {
 
 	private IProcessingContext processingContext;
-	private PostUtils postUtils;
-	private PageUtils pageUtils;
 	private ArticleUtils articleUtils;
 
-	public Searches(IProcessingContext processingContext, PostUtils postUtils, PageUtils pageUtils, ArticleUtils articleUtils) {
+	public Articles(IProcessingContext processingContext, ArticleUtils articleUtils) {
 		this.processingContext = processingContext;
-		this.postUtils = postUtils;
-		this.pageUtils = pageUtils;
 		this.articleUtils = articleUtils;
 	}
 
-	public List<Article> articles(Condition condition) {
-		Page<Article> result = articleUtils.search(condition.buildRequest(), condition.size);
+	public List<Article> search(Condition condition) {
+		Page<Article> result = articleUtils.search(condition.buildArticleSearchRequest(), condition.size);
 		return new ArrayList<>(result.getContent());
 	}
 
 	public Condition condition() {
-		return new Condition().size(1);
+		return new Condition();
 	}
 
-	public class Condition {
-		private int size;
+	class Condition {
+
+		private int size = 1;
 
 		private String keyword;
 		private Collection<Long> categoryIds;
@@ -110,8 +107,8 @@ public class Searches {
 			this.language = language;
 			return this;
 		}
-		
-		private ArticleSearchRequest buildRequest() {
+
+		private ArticleSearchRequest buildArticleSearchRequest() {
 			ArticleSearchRequest request = new ArticleSearchRequest()
 					.withKeyword(this.keyword)
 					.withCategoryIds(this.categoryIds)
