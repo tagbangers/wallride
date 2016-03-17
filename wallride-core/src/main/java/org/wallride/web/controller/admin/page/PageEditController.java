@@ -28,6 +28,9 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.domain.Article;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
 import org.wallride.domain.Category;
 import org.wallride.domain.Page;
 import org.wallride.exception.DuplicateCodeException;
@@ -37,11 +40,13 @@ import org.wallride.service.PageService;
 import org.wallride.support.AuthorizedUser;
 import org.wallride.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/{language}/pages/edit")
@@ -51,6 +56,9 @@ public class PageEditController {
 	
 	@Inject
 	private PageService pageService;
+
+	@Inject
+	private CustomFieldService customFieldService;
 
 	@Inject
 	private CategoryUtils categoryUtils;
@@ -89,12 +97,24 @@ public class PageEditController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		Page page = pageService.getPageById(id, language);
-		if (!language.equals(page.getLanguage())) {
-			redirectAttributes.addAttribute("language", language);
-			return "redirect:/_admin/{language}/pages/index";
+		if (page == null) {
+			throw new HttpNotFoundException();
 		}
 
-		PageEditForm form = PageEditForm.fromDomainObject(page);
+		if (!page.getLanguage().equals(language)) {
+			Page target = pageService.getPageByCode(page.getCode(), language);
+			if (target != null) {
+				redirectAttributes.addAttribute("id", target.getId());
+				return "redirect:/_admin/{language}/pages/edit?id={id}";
+			} else {
+				redirectAttributes.addFlashAttribute("original", page);
+				redirectAttributes.addAttribute("code", page.getCode());
+				return "redirect:/_admin/{language}/pages/create?code={code}";
+			}
+		}
+		
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		PageEditForm form = PageEditForm.fromDomainObject(page, customFields);
 		model.addAttribute("form", form);
 
 		Page draft = pageService.getDraftById(id);
@@ -124,8 +144,8 @@ public class PageEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/pages/edit";
 		}
-
-		PageEditForm form = PageEditForm.fromDomainObject(draft);
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		PageEditForm form = PageEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 
 		return "page/edit";

@@ -17,6 +17,7 @@
 package org.wallride.service;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,16 +25,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.Category;
 import org.wallride.domain.Category_;
+import org.wallride.exception.ServiceException;
 import org.wallride.model.CategoryCreateRequest;
 import org.wallride.model.CategorySearchRequest;
 import org.wallride.model.CategoryUpdateRequest;
 import org.wallride.repository.CategoryRepository;
 import org.wallride.repository.CategorySpecifications;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.support.CodeFormatter;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +49,7 @@ public class CategoryService {
 	@Inject
 	private CategoryRepository categoryRepository;
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Category createCategory(CategoryCreateRequest request, AuthorizedUser authorizedUser) {
 		Category category = new Category();
 
@@ -65,7 +70,15 @@ public class CategoryService {
 		}
 
 		category.setParent(parent);
-		category.setCode(request.getCode() != null ? request.getCode() : request.getName());
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getName(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
+		category.setCode(code);
 		category.setName(request.getName());
 		category.setDescription(request.getDescription());
 		category.setLft(rgt);
@@ -75,9 +88,10 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Category updateCategory(CategoryUpdateRequest request, AuthorizedUser authorizedUser) {
-		Category category = categoryRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
+		categoryRepository.lock(request.getId());
+		Category category = categoryRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		Category parent = null;
 		if (request.getParentId() != null) {
 			parent = categoryRepository.findOneByIdAndLanguage(request.getParentId(), request.getLanguage());
@@ -103,7 +117,15 @@ public class CategoryService {
 		}
 
 		category.setParent(parent);
-		category.setCode(request.getCode() != null ? request.getCode() : request.getName());
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getName(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
+		category.setCode(code);
 		category.setName(request.getName());
 		category.setDescription(request.getDescription());
 		category.setLanguage(request.getLanguage());
@@ -111,12 +133,13 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public void updateCategoryHierarchy(List<Map<String, Object>> data, String language) {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
 			if (map.get("item_id") != null) {
-				Category category = categoryRepository.findOneForUpdateByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
+				categoryRepository.lock(Long.parseLong((String) map.get("item_id")));
+				Category category = categoryRepository.findOneByIdAndLanguage(Long.parseLong((String) map.get("item_id")), language);
 				if (category != null) {
 					Category parent = null;
 					if (map.get("parent_id") != null) {
@@ -131,9 +154,10 @@ public class CategoryService {
 		}
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Category deleteCategory(long id, String language) {
-		Category category = categoryRepository.findOneForUpdateByIdAndLanguage(id, language);
+		categoryRepository.lock(id);
+		Category category = categoryRepository.findOneByIdAndLanguage(id, language);
 		Category parent = category.getParent();
 		for (Category child : category.getChildren()) {
 			child.setParent(parent);

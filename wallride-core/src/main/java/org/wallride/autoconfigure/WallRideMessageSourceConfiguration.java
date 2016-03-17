@@ -15,6 +15,7 @@ public class WallRideMessageSourceConfiguration extends MessageSourceAutoConfigu
 	@Bean
 	public MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setDefaultEncoding("utf-8");
 		messageSource.setBasenames(
 				"classpath:/messages/messages",
 				"classpath:/messages/validations",

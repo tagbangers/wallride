@@ -33,6 +33,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.Article;
 import org.wallride.domain.Tag;
 import org.wallride.exception.DuplicateNameException;
@@ -62,7 +63,7 @@ public class TagService {
 	@Inject
 	private PlatformTransactionManager transactionManager;
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Tag createTag(TagCreateRequest request, AuthorizedUser authorizedUser) {
 		Tag duplicate = tagRepository.findOneByNameAndLanguage(request.getName(), request.getLanguage());
 		if (duplicate != null) {
@@ -82,7 +83,7 @@ public class TagService {
 		return tagRepository.saveAndFlush(tag);
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Tag updateTag(TagUpdateRequest request, AuthorizedUser authorizedUser) {
 		Tag tag = tagRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
@@ -103,7 +104,7 @@ public class TagService {
 		return tagRepository.saveAndFlush(tag);
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Tag mergeTags(TagMergeRequest request, AuthorizedUser authorizedUser) {
 		// Get all articles that have tag for merging
 		ArticleSearchRequest searchRequest = new ArticleSearchRequest()
@@ -130,7 +131,7 @@ public class TagService {
 		return mergedTag;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public Tag deleteTag(TagDeleteRequest request, BindingResult result) {
 		Tag tag = tagRepository.findOneForUpdateByIdAndLanguage(request.getId(), request.getLanguage());
 		tagRepository.delete(tag);
@@ -138,7 +139,7 @@ public class TagService {
 	}
 
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = {WallRideCacheConfiguration.ARTICLE_CACHE, WallRideCacheConfiguration.PAGE_CACHE}, allEntries = true)
 	public List<Tag> bulkDeleteTag(TagBulkDeleteRequest bulkDeleteRequest, final BindingResult result) {
 		List<Tag> tags = new ArrayList<>();
 		for (long id : bulkDeleteRequest.getIds()) {

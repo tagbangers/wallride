@@ -25,7 +25,9 @@ import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.wallride.domain.Article;
 import org.wallride.domain.Page;
 import org.wallride.service.PageService;
 import org.wallride.web.support.HttpNotFoundException;
@@ -54,10 +56,23 @@ public class PageDescribeController {
 			@PathVariable String language,
 			@RequestParam long id,
 			String query,
-			Model model) {
-		Page page = pageService.getPageById(id, language);
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		Page page = pageService.getPageById(id);
 		if (page == null) {
 			throw new HttpNotFoundException();
+		}
+
+		if (!page.getLanguage().equals(language)) {
+			Page target = pageService.getPageByCode(page.getCode(), language);
+			if (target != null) {
+				redirectAttributes.addAttribute("id", target.getId());
+				return "redirect:/_admin/{language}/pages/describe?id={id}";
+			} else {
+				redirectAttributes.addFlashAttribute("original", page);
+				redirectAttributes.addAttribute("code", page.getCode());
+				return "redirect:/_admin/{language}/pages/create?code={code}";
+			}
 		}
 
 		MutablePropertyValues mpvs = new MutablePropertyValues(UriComponentsBuilder.newInstance().query(query).build().getQueryParams());

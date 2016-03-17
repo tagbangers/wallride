@@ -36,9 +36,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.model.PostSearchRequest;
 import org.wallride.domain.Post;
 import org.wallride.domain.Post_;
+import org.wallride.model.PostSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;

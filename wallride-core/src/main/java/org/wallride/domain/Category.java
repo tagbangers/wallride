@@ -185,6 +185,11 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 //	}
 
 	@Override
+	public String print() {
+		return getName();
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

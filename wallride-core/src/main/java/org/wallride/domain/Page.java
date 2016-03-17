@@ -33,7 +33,8 @@ import java.util.List;
 					@NamedAttributeNode("author"),
 					@NamedAttributeNode("parent"),
 					@NamedAttributeNode("children"),
-					@NamedAttributeNode("categories")
+					@NamedAttributeNode("categories"),
+					@NamedAttributeNode("tags")
 			}
 	),
 	@NamedEntityGraph(name = Page.DEEP_GRAPH_NAME,
@@ -44,10 +45,12 @@ import java.util.List;
 					@NamedAttributeNode("children"),
 					@NamedAttributeNode("categories"),
 					@NamedAttributeNode("tags"),
-					@NamedAttributeNode("relatedToPosts")
-//					@NamedAttributeNode("relatedByPosts"),
-			}
-	)
+					@NamedAttributeNode("relatedToPosts"),
+					@NamedAttributeNode(value = "customFieldValues", subgraph = "customFieldValue")},
+			subgraphs =  {
+					@NamedSubgraph(name = "customFieldValue",
+							attributeNodes = {
+									@NamedAttributeNode("customField")})})
 })
 @Table(name="page")
 @DynamicInsert

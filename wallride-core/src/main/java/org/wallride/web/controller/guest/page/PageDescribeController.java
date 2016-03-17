@@ -50,6 +50,14 @@ public class PageDescribeController extends AbstractController {
 		this.urlPathHelper = new LanguageUrlPathHelper(blogService);
 	}
 
+	public BlogService getBlogService() {
+		return blogService;
+	}
+
+	public PageService getPageService() {
+		return pageService;
+	}
+
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		BlogLanguage blogLanguage = (BlogLanguage) request.getAttribute(BlogLanguageMethodArgumentResolver.BLOG_LANGUAGE_ATTRIBUTE);
@@ -70,12 +78,19 @@ public class PageDescribeController extends AbstractController {
 
 		Page page = pageService.getPageByCode(variables.get("code"), blogLanguage.getLanguage());
 		if (page == null) {
+			page = pageService.getPageByCode(variables.get("code"), blogLanguage.getBlog().getDefaultLanguage());
+		}
+		if (page == null) {
 			throw new HttpNotFoundException();
 		}
 		if (page.getStatus() != Post.Status.PUBLISHED) {
 			throw new HttpNotFoundException();
 		}
 
+		return createModelAndView(page);
+	}
+
+	protected ModelAndView createModelAndView(Page page) {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("page/describe");
 		modelAndView.addObject("page", page);

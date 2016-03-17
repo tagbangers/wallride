@@ -28,6 +28,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
 import org.wallride.domain.Article;
 import org.wallride.domain.Category;
 import org.wallride.exception.DuplicateCodeException;
@@ -37,11 +39,14 @@ import org.wallride.service.ArticleService;
 import org.wallride.support.AuthorizedUser;
 import org.wallride.support.CategoryUtils;
 import org.wallride.web.support.DomainObjectSavedModel;
+import org.wallride.web.support.HttpNotFoundException;
 import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/{language}/articles/edit")
@@ -53,16 +58,17 @@ public class ArticleEditController {
 	private ArticleService articleService;
 
 	@Inject
+	private CustomFieldService customFieldService;
+
+	@Inject
 	private CategoryUtils categoryUtils;
 
 	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("article")
-	public Article setupArticle(
-			@PathVariable String language,
-			@RequestParam long id) {
-		return articleService.getArticleById(id, language);
+	public Article setupArticle(@RequestParam long id) {
+		return articleService.getArticleById(id);
 	}
 
 	@ModelAttribute("categoryNodes")
@@ -90,12 +96,24 @@ public class ArticleEditController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		Article article = (Article) model.asMap().get("article");
-		if (!language.equals(article.getLanguage())) {
-			redirectAttributes.addAttribute("language", language);
-			return "redirect:/_admin/{language}/articles/index";
+		if (article == null) {
+			throw new HttpNotFoundException();
 		}
 
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(article);
+		if (!article.getLanguage().equals(language)) {
+			Article target = articleService.getArticleByCode(article.getCode(), language);
+			if (target != null) {
+				redirectAttributes.addAttribute("id", target.getId());
+				return "redirect:/_admin/{language}/articles/edit?id={id}";
+			} else {
+				redirectAttributes.addFlashAttribute("original", article);
+				redirectAttributes.addAttribute("code", article.getCode());
+				return "redirect:/_admin/{language}/articles/create?code={code}";
+			}
+		}
+
+		Set<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(article, customFields);
 		model.addAttribute("form", form);
 
 		Article draft = articleService.getDraftById(id);
@@ -125,8 +143,8 @@ public class ArticleEditController {
 			redirectAttributes.addAttribute("query", query);
 			return "redirect:/_admin/{language}/articles/edit";
 		}
-
-		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft);
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		ArticleEditForm form = ArticleEditForm.fromDomainObject(draft, customFields);
 		model.addAttribute("form", form);
 
 		return "article/edit";

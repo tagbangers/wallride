@@ -21,21 +21,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.domain.Article;
-import org.wallride.domain.Blog;
-import org.wallride.domain.Page;
-import org.wallride.domain.Post;
-import org.wallride.support.PageUtils;
+import org.wallride.domain.*;
+import org.wallride.support.PostUtils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,89 +34,46 @@ public class Posts {
 
 	private IProcessingContext processingContext;
 
+	private PostUtils postUtils;
+
 	private WallRideProperties wallRideProperties;
 
-	private PageUtils pageUtils;
-
-	public Posts(IProcessingContext processingContext, WallRideProperties wallRideProperties, PageUtils pageUtils) {
+	public Posts(IProcessingContext processingContext, PostUtils postUtils, WallRideProperties wallRideProperties) {
 		this.processingContext = processingContext;
+		this.postUtils = postUtils;
 		this.wallRideProperties = wallRideProperties;
-		this.pageUtils = pageUtils;
 	}
 
 	public String link(Article article) {
-		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, article, true);
+		return postUtils.link(article);
 	}
 
 	public String link(Article article, boolean encode) {
-		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, article, encode);
+		return postUtils.link(article, encode);
 	}
 
 	public String link(Page page) {
-		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, page, true);
+		return postUtils.link(page);
 	}
 
 	public String link(Page page, boolean encode) {
-		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
-		return path(builder, page, encode);
+		return postUtils.link(page, encode);
 	}
 
 	public String path(Article article) {
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, article, true);
+		return postUtils.path(article);
 	}
 
 	public String path(Article article, boolean encode) {
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, article, encode);
+		return postUtils.path(article, encode);
 	}
 
 	public String path(Page page) {
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, page, true);
+		return postUtils.path(page);
 	}
 
 	public String path(Page page, boolean encode) {
-		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("");
-		return path(builder, page, encode);
-	}
-
-	private String path(UriComponentsBuilder builder, Article article, boolean encode) {
-		Map<String, Object> params = new HashMap<>();
-		builder.path("/{year}/{month}/{day}/{code}");
-		params.put("year", String.format("%04d", article.getDate().getYear()));
-		params.put("month", String.format("%02d", article.getDate().getMonth().getValue()));
-		params.put("day", String.format("%02d", article.getDate().getDayOfMonth()));
-		params.put("code", article.getCode());
-
-		UriComponents components = builder.buildAndExpand(params);
-		if (encode) {
-			components = components.encode();
-		}
-		return components.toUriString();
-	}
-
-	private String path(UriComponentsBuilder builder, Page page, boolean encode) {
-		Map<String, Object> params = new HashMap<>();
-
-		List<String> codes = new LinkedList<>();
-		Map<Page, String> paths = pageUtils.getPaths(page);
-		paths.keySet().stream().map(p -> p.getCode()).forEach(codes::add);
-
-		for (int i = 0; i < codes.size(); i++) {
-			String key = "code" + i;
-			builder.path("/{" + key + "}");
-			params.put(key, codes.get(i));
-		}
-
-		UriComponents components = builder.buildAndExpand(params);
-		if (encode) {
-			components = components.encode();
-		}
-		return components.toUriString();
+		return postUtils.path(page, encode);
 	}
 
 	public String metaKeywords(Post post) {
@@ -175,6 +123,20 @@ public class Posts {
 				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
 	}
 
+	public String thumbnail(Post post) {
+		if (post.getCover() != null) {
+			return wallRideProperties.getMediaUrlPrefix() + post.getCover().getId();
+		}
+		else {
+			Document document = Jsoup.parse(post.getBody());
+			Elements elements = document.select("img");
+			for (Element element : elements) {
+				return element.attr("src");
+			}
+		}
+		return null;
+	}
+
 	public String body(Post post) {
 		if (!StringUtils.hasText(post.getBody())) {
 			return null;
@@ -190,7 +152,7 @@ public class Posts {
 				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
 				Matcher matcher = pattern.matcher(element.attr("style"));
 				if (matcher.find()) {
-					String replaced = src + "?w=" + matcher.group(1);
+					String replaced = src + "?w=" + Integer.parseInt(matcher.group(1)) * 2;
 					element.attr("src", replaced);
 				}
 			}
@@ -212,5 +174,14 @@ public class Posts {
 			return summary;
 		}
 		return summary.substring(0, length) + "...";
+	}
+
+	public Object customValue(Post post, String code) {
+		Optional<CustomFieldValue> target = post.getCustomFieldValues().stream()
+				.filter(v -> v.getCustomField().getCode().equals(code))
+				.filter(v -> v.getCustomField().getLanguage().equals(post.getLanguage()))
+				.findFirst();
+		Optional value = target.map(CustomFieldValue::getValue);
+		return value.orElse(null);
 	}
 }

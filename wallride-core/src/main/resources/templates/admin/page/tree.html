@@ -58,7 +58,7 @@
 						<span th:text="#{DeletedPage}">Page deleted.</span>
 					</div>
 					<ul th:unless="${#lists.isEmpty(pageNodes)}" th:replace="page/tree::page(${pageNodes})"></ul>
-					<ul id="page-tree" class="sortable" th:fragment="page(nodes)">
+					<ul id="page-tree" class="nested-sortable" th:fragment="page(nodes)">
 						<li th:each="node : ${nodes}" th:id="${'page-tree_' + node.object.id}">
 							<div class="category clearfix" th:classappend="${#strings.toString(node.object.status) ne 'PUBLISHED'} ? 'off'">
 								<div class="wr-tree-options pull-left">

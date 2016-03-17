@@ -1,3 +1,4 @@
+@import url(//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700,700italic);
 .wr-post-summary {
 	margin-bottom: 20px;
 }
@@ -11,7 +12,7 @@
 	border-radius: 5px;
 }
 .author pre {
-	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+    font-family:Avenir , "Open Sans" , "Helvetica Neue" , Helvetica , Arial , Verdana , Roboto , "游ゴシック" , "Yu Gothic" , "游ゴシック体" , "YuGothic" , "ヒラギノ角ゴ Pro W3" , "Hiragino Kaku Gothic Pro" , "Meiryo UI" , "メイリオ" , Meiryo , "ＭＳ Ｐゴシック" , "MS PGothic" , sans-serif;
 	border: transparent;
 	padding: 0;
 
@@ -64,13 +65,88 @@ table th, table td {
 table th {
 	width: 30%;
 }
-body {
-	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+body{
+    font-family:Avenir , "Open Sans" , "Helvetica Neue" , Helvetica , Arial , Verdana , Roboto , "游ゴシック" , "Yu Gothic" , "游ゴシック体" , "YuGothic" , "ヒラギノ角ゴ Pro W3" , "Hiragino Kaku Gothic Pro" , "Meiryo UI" , "メイリオ" , Meiryo , "ＭＳ Ｐゴシック" , "MS PGothic" , sans-serif;
+    font-weight: 500;
 }
 h1, h2, h3, h4, h5 {
-	font-family: "メイリオ", Meiryo, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "ＭＳ Ｐゴシック", "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+    font-family:Avenir , "Open Sans" , "Helvetica Neue" , Helvetica , Arial , Verdana , Roboto , "游ゴシック" , "Yu Gothic" , "游ゴシック体" , "YuGothic" , "ヒラギノ角ゴ Pro W3" , "Hiragino Kaku Gothic Pro" , "Meiryo UI" , "メイリオ" , Meiryo , "ＭＳ Ｐゴシック" , "MS PGothic" , sans-serif;
+    font-weight: 700;
 }
-
+h1 {
+    font-size: 2.4em;
+}
+h2 {
+    font-size: 2.0em;
+}
+h3 {
+    font-size: 1.6em;
+}
+h4 {
+    font-size: 1.2em;
+}
+.wr-post-title {
+    margin-top: 0;
+}
+.wr-post-title a {
+    color: #4E4E4E;
+}
+.wr-author {
+    color: #6F6F6F;
+    font-size: 90%;
+}
+.label-default {
+    background-color: #F3F0F0;
+    color: #565656;
+    border: 1px solid #cccccc;
+}
+a.wr-tag:hover {
+    text-decoration: none;
+    opacity: 0.7;
+}
+p {
+    font-size: 15px;
+    line-height: 1.6em;
+}
+time {
+    font-size: 90%;
+}
+img.fr-dii.fr-fil {
+    margin: 0px 10px 0px 0px;
+    left: 5px;
+    float: left;
+}
+img.fr-dii.fr-fir {
+    margin: 0px 0 0px 10px;
+    right: 5px;
+    float: right;
+}
+img.fr-dii {
+    display: inline-block;
+}
 .footer {
 	margin-top: 20px;
+}
+.navbar-default {
+    background-color: #1C1D21;
+    border-color: #1C1D21;
+}
+.navbar-default .navbar-brand {
+    color: #FFF;
+}
+.navbar-default .navbar-nav>li>a {
+    color: #FFF;
+}
+.navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus {
+    color: #aeaeae;
+    background-color: transparent;
+}
+.container > .alert {
+    margin-top: 15px;
+}
+.alert + .page-header {
+    margin-top: 15px;
+}
+.alert .row .page-header {
+    margin-top: 0;
 }

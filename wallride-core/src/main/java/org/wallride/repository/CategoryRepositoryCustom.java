@@ -23,6 +23,7 @@ import org.wallride.model.CategorySearchRequest;
 
 public interface CategoryRepositoryCustom {
 
+	void lock(long id);
 	Page<Category> search(CategorySearchRequest request);
 	Page<Category> search(CategorySearchRequest request, Pageable pageable);
 }

@@ -30,15 +30,27 @@
 		<div id="wrap">
 			<div th:replace="layout::nav"></div>
 			<div class="container">
+				<div class="page-header">
+					<h1>Latest News</h1>
+				</div>
 				<div class="row">
 					<div class="col-md-9">
 						<article th:each="article : ${articles}" class="wr-post-summary row">
 							<div class="col-sm-2">
 								<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=120,h=120,m=1)}" class="wr-post-cover" />
+								<img th:unless="${article.cover ne null}" th:src="@{/resources/img/noimage.png}" style="width: 120px; height: 120px;" />
 							</div>
 							<div class="col-sm-10">
-								<h1 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h1>
-								<time th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></time>
+								<h2 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h2>
+								<p th:text="${#posts.summary(article, 45)}"></p>
+								<p style="margin-bottom:5px"><time th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></time>&nbsp;&nbsp;&nbsp;
+								<a th:if="${article.author ne null}" class="wr-author" th:href="@{${#users.path(article.author)}}"><span class="glyphicon glyphicon-user"></span> <span th:text="${article.author}"></span></a></p>
+								<span th:unless="${#lists.isEmpty(article.categories)}">
+									<a th:each="category : ${article.categories}" th:href="@{/category/__${category.code}__}" class="wr-category"><span class="glyphicon glyphicon-bookmark"></span> <span th:text="${category.name}">Link</span></a>
+								</span>&nbsp;&nbsp;
+								<span th:unless="${#lists.isEmpty(article.tags)}">
+									<a th:each="tag : ${article.tags}" th:href="@{/tag/__${tag}__}" class="wr-tag"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Link</span></span></a>&nbsp;&nbsp;
+								</span>
 							</div>
 						</article>
 					</div>

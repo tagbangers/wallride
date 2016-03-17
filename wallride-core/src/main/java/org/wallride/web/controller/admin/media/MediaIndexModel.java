@@ -24,34 +24,34 @@ import java.time.format.DateTimeFormatter;
 
 public class MediaIndexModel implements Serializable {
 
+	private String url;
+
 	private String thumb;
 
-	private String image;
+	private String name;
 
-	private String title;
-
-	private String folder;
+	private String tag;
 
 	public MediaIndexModel(Media media, WallRideProperties wallRideProperties) {
+		this.url = wallRideProperties.getMediaUrlPrefix() + media.getId();
 		this.thumb = wallRideProperties.getMediaUrlPrefix() + media.getId() + "?w=100&h=100&m=1";
-		this.image = wallRideProperties.getMediaUrlPrefix() + media.getId();
-		this.title = media.getOriginalName();
-		this.folder = media.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM"));
+		this.name = media.getOriginalName();
+		this.tag = media.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy/MM"));
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public String getThumb() {
 		return thumb;
 	}
 
-	public String getImage() {
-		return image;
+	public String getName() {
+		return name;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public String getFolder() {
-		return folder;
+	public String getTag() {
+		return tag;
 	}
 }

@@ -40,4 +40,9 @@ public class NavigationItemCategory extends NavigationItem {
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+
+	@Override
+	public String print() {
+		return getCategory().getName();
+	}
 }

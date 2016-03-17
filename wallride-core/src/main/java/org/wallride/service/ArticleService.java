@@ -16,10 +16,12 @@
 
 package org.wallride.service;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,19 +38,24 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
 import org.wallride.exception.NotNullException;
+import org.wallride.exception.ServiceException;
 import org.wallride.model.*;
 import org.wallride.repository.*;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.support.CodeFormatter;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -85,13 +92,20 @@ public class ArticleService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private static Logger logger = LoggerFactory.getLogger(ArticleService.class); 
+	private static Logger logger = LoggerFactory.getLogger(ArticleService.class);
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article createArticle(ArticleCreateRequest request, Post.Status status, AuthorizedUser authorizedUser) {
 		LocalDateTime now = LocalDateTime.now();
 
-		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getTitle(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
 		if (!StringUtils.hasText(code)) {
 			if (!status.equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
@@ -194,10 +208,29 @@ public class ArticleService {
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
 
+		article.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =  new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(article);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
+				} else {
+					value.setTextValue(valueForm.getTextValue());
+				}
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				article.getCustomFieldValues().add(value);
+			}
+		}
+
 		return articleRepository.save(article);
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticleAsDraft(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -216,6 +249,7 @@ public class ArticleService {
 						.seoTitle(request.getSeoTitle())
 						.seoDescription(request.getSeoDescription())
 						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -236,6 +270,7 @@ public class ArticleService {
 						.seoTitle(request.getSeoTitle())
 						.seoDescription(request.getSeoDescription())
 						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(request.getCustomFieldValues())
 						.language(request.getLanguage())
 						.build();
 				return saveArticle(updateRequest, authorizedUser);
@@ -246,7 +281,7 @@ public class ArticleService {
 		}
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticleAsPublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -255,14 +290,17 @@ public class ArticleService {
 	}
 
 	private Article publishArticle(Article article) {
+		Article deleteTarget = getDraftById(article.getId());
+		if (deleteTarget != null) {
+			articleRepository.delete(deleteTarget);
+		}
 		article.setDrafted(null);
 		article.setStatus(Post.Status.PUBLISHED);
 		Article published = articleRepository.save(article);
-		articleRepository.deleteByDrafted(article);
 		return published;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticleAsUnpublished(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -271,27 +309,37 @@ public class ArticleService {
 	}
 
 	private Article unpublishArticle(Article article) {
+		Article deleteTarget = getDraftById(article.getId());
+		if (deleteTarget != null) {
+			articleRepository.delete(deleteTarget);
+		}
 		article.setDrafted(null);
 		article.setStatus(Post.Status.DRAFT);
 		Article unpublished = articleRepository.save(article);
-		articleRepository.deleteByDrafted(article);
 		return unpublished;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article saveArticle(ArticleUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
-		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getTitle(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
 		if (!StringUtils.hasText(code)) {
 			if (!article.getStatus().equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
 			}
 		}
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
-			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null && !duplicate.equals(article)) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -386,10 +434,42 @@ public class ArticleService {
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
 
+		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
+		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		for (CustomFieldValue value : article.getCustomFieldValues()) {
+			valueMap.put(value.getCustomField(), value);
+		}
+
+		article.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
+				CustomFieldValue value = valueMap.get(customField);
+				if (value == null) {
+					value = new CustomFieldValue();
+				}
+				value.setCustomField(customField);
+				value.setPost(article);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					if (!ArrayUtils.isEmpty(valueForm.getTextValues())) {
+						value.setTextValue(String.join(",", valueForm.getTextValues()));
+					}
+				} else {
+					value.setTextValue(valueForm.getTextValue());
+				}
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
+			}
+		}
+		article.setCustomFieldValues(fieldValues);
+
 		return articleRepository.save(article);
 	}
 
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public Article deleteArticle(ArticleDeleteRequest request, BindingResult result) throws BindException {
 		postRepository.lock(request.getId());
 		Article article = articleRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -397,7 +477,7 @@ public class ArticleService {
 		return article;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public List<Article> bulkPublishArticle(ArticleBulkPublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
@@ -443,7 +523,7 @@ public class ArticleService {
 		return articles;
 	}
 
-	@CacheEvict(value = "articles", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public List<Article> bulkUnpublishArticle(ArticleBulkUnpublishRequest request, AuthorizedUser authorizedUser) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : request.getIds()) {
@@ -464,7 +544,7 @@ public class ArticleService {
 	}
 
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
-	@CacheEvict(value="articles", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.ARTICLE_CACHE, allEntries = true)
 	public List<Article> bulkDeleteArticle(ArticleBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
 		List<Article> articles = new ArrayList<>();
 		for (long id : bulkDeleteRequest.getIds()) {
@@ -527,12 +607,12 @@ public class ArticleService {
 		return articles;
 	}
 
-	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status")
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public SortedSet<Article> getArticlesByCategoryCode(String language, String code, Post.Status status) {
 		return getArticlesByCategoryCode(language, code, status, 10);
 	}
 
-	@Cacheable(value = "articles", key = "'list.category-code.' + #language + '.' + #code + '.' + #status + '.' + #size")
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public SortedSet<Article> getArticlesByCategoryCode(String language, String code, Post.Status status, int size) {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withLanguage(language)
@@ -544,7 +624,7 @@ public class ArticleService {
 		return new TreeSet<>(page.getContent());
 	}
 
-	@Cacheable(value = "articles", key = "'list.latest.' + #language + '.' + #status + '.' + #size")
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public SortedSet<Article> getLatestArticles(String language, Post.Status status, int size) {
 		ArticleSearchRequest request = new ArticleSearchRequest()
 				.withLanguage(language)
@@ -553,6 +633,10 @@ public class ArticleService {
 		Pageable pageable = new PageRequest(0, size);
 		Page<Article> page = articleRepository.search(request, pageable);
 		return new TreeSet<>(page.getContent());
+	}
+
+	public Article getArticleById(long id) {
+		return articleRepository.findOneById(id);
 	}
 
 	public Article getArticleById(long id, String language) {

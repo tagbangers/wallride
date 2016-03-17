@@ -27,10 +27,13 @@ import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
+import org.wallride.service.ArticleService;
 import org.wallride.service.CategoryService;
 import org.wallride.service.PageService;
+import org.wallride.support.ArticleUtils;
 import org.wallride.support.CategoryUtils;
 import org.wallride.support.PageUtils;
+import org.wallride.support.PostUtils;
 import org.wallride.web.support.ExtendedThymeleafViewResolver;
 
 import javax.inject.Inject;
@@ -43,6 +46,9 @@ public class WallRideThymeleafConfiguration {
 
 	@Autowired
 	private WallRideProperties wallRideProperties;
+
+	@Autowired
+	private ArticleService articleService;
 
 	@Autowired
 	private PageService pageService;
@@ -60,6 +66,16 @@ public class WallRideThymeleafConfiguration {
 	private Environment environment;
 
 	@Bean
+	public PostUtils postUtils(PageUtils pageUtils) {
+		return new PostUtils(pageUtils);
+	}
+
+	@Bean
+	public ArticleUtils articleUtils() {
+		return new ArticleUtils(articleService);
+	}
+
+	@Bean
 	public PageUtils pageUtils() {
 		return new PageUtils(pageService);
 	}
@@ -72,7 +88,11 @@ public class WallRideThymeleafConfiguration {
 	@Bean
 	public WallRideThymeleafDialect wallRideThymeleafDialect() {
 		WallRideThymeleafDialect dialect = new WallRideThymeleafDialect();
-		dialect.setPageUtils(pageUtils());
+		ArticleUtils articleUtils = articleUtils();
+		PageUtils pageUtils = pageUtils();
+		dialect.setPostUtils(postUtils(pageUtils));
+		dialect.setArticleUtils(articleUtils);
+		dialect.setPageUtils(pageUtils);
 		dialect.setCategoryUtils(categoryUtils());
 		dialect.setWallRideProperties(wallRideProperties);
 		return dialect;

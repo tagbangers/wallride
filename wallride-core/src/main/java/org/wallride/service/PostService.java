@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,6 +47,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.*;
 import org.wallride.exception.GoogleAnalyticsException;
 import org.wallride.exception.ServiceException;
@@ -58,8 +60,6 @@ import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.BlogLanguageRewriteMatch;
 import org.wallride.web.support.BlogLanguageRewriteRule;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.ServletContext;
@@ -80,21 +80,21 @@ import java.util.*;
 @Transactional(rollbackFor=Exception.class)
 public class PostService {
 
-	@Inject
+	@Autowired
 	private CacheManager cacheManager;
-	@Inject
+	@Autowired
 	private ServletContext servletContext;
 
-	@Inject
+	@Autowired
 	private JobLauncher jobLauncher;
-	@Inject
+	@Autowired
 	private JobExplorer jobExplorer;
-	@Inject
+	@Autowired
 	private Job updatePostViewsJob;
 
-	@Resource
+	@Autowired
 	private PostRepository postRepository;
-	@Resource
+	@Autowired
 	private PopularPostRepository popularPostRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(PostService.class);
@@ -110,8 +110,8 @@ public class PostService {
 		}
 
 		if (!CollectionUtils.isEmpty(posts)) {
-			cacheManager.getCache("articles").clear();
-			cacheManager.getCache("pages").clear();
+			cacheManager.getCache(WallRideCacheConfiguration.ARTICLE_CACHE).clear();
+			cacheManager.getCache(WallRideCacheConfiguration.PAGE_CACHE).clear();
 		}
 
 		return posts;
@@ -147,7 +147,7 @@ public class PostService {
 	 * @param maxRank
 	 * @see PostService#getPopularPosts(String, PopularPost.Type)
 	 */
-	@CacheEvict(value = "popularPosts", key = "'list.type.' + #blogLanguage.language + '.' + #type")
+	@CacheEvict(value = WallRideCacheConfiguration.POPULAR_POST_CACHE, key = "'list.type.' + #blogLanguage.language + '.' + #type")
 	public void updatePopularPosts(BlogLanguage blogLanguage, PopularPost.Type type, int maxRank) {
 		logger.info("Start update of the popular posts");
 
@@ -309,7 +309,7 @@ public class PostService {
 	 * @return
 	 * @see PostService#updatePopularPosts(BlogLanguage, PopularPost.Type, int)
 	 */
-	@Cacheable(value = "popularPosts", key = "'list.type.' + #language + '.' + #type")
+	@Cacheable(value = WallRideCacheConfiguration.POPULAR_POST_CACHE, key = "'list.type.' + #language + '.' + #type")
 	public SortedSet<PopularPost> getPopularPosts(String language, PopularPost.Type type) {
 		Specification<PopularPost> spec = (root, query, cb) -> {
 			Join<PopularPost, Post> post = (Join<PopularPost, Post>) root.fetch(PopularPost_.post);

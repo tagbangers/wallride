@@ -40,4 +40,9 @@ public class NavigationItemPage extends NavigationItem {
 	public void setPage(Page page) {
 		this.page = page;
 	}
+
+	@Override
+	public String print() {
+		return getPage().getTitle();
+	}
 }

@@ -16,9 +16,12 @@
 
 package org.wallride.model;
 
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @SuppressWarnings("serial")
@@ -37,6 +40,7 @@ public class PageCreateRequest implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 	//	private Post.Status status;
 	private String language;
 
@@ -92,6 +96,10 @@ public class PageCreateRequest implements Serializable {
 		return seoKeywords;
 	}
 
+	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
 	//	public Post.Status getStatus() {
 //		return status;
 //	}
@@ -115,6 +123,7 @@ public class PageCreateRequest implements Serializable {
 		private String seoTitle;
 		private String seoDescription;
 		private String seoKeywords;
+		private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 		private String language;
 
 		public Builder() {
@@ -185,6 +194,11 @@ public class PageCreateRequest implements Serializable {
 			return this;
 		}
 
+		public Builder customFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+			this.customFieldValues = customFieldValues;
+			return this;
+		}
+
 		public Builder language(String language) {
 			this.language = language;
 			return this;
@@ -205,6 +219,7 @@ public class PageCreateRequest implements Serializable {
 			request.seoTitle = seoTitle;
 			request.seoDescription = seoDescription;
 			request.seoKeywords = seoKeywords;
+			request.customFieldValues = customFieldValues;
 //			request.status = status;
 			request.language = language;
 			return request;

@@ -19,6 +19,8 @@ package org.wallride.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -34,18 +36,23 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MessageCodesResolver;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.*;
 import org.wallride.exception.DuplicateCodeException;
 import org.wallride.exception.EmptyCodeException;
+import org.wallride.exception.ServiceException;
 import org.wallride.model.*;
 import org.wallride.repository.*;
 import org.wallride.support.AuthorizedUser;
+import org.wallride.support.CodeFormatter;
+import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -55,15 +62,6 @@ import java.util.regex.Pattern;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class PageService {
-
-	@Inject
-	private BlogService blogService;
-
-	@Inject
-	private MessageCodesResolver messageCodesResolver;
-
-	@Inject
-	private PlatformTransactionManager transactionManager;
 
 	@Resource
 	private PostRepository postRepository;
@@ -78,6 +76,12 @@ public class PageService {
 	private MediaRepository mediaRepository;
 
 	@Inject
+	private MessageCodesResolver messageCodesResolver;
+
+	@Inject
+	private PlatformTransactionManager transactionManager;
+
+	@Inject
 	private WallRideProperties wallRideProperties;
 
 	@PersistenceContext
@@ -85,11 +89,18 @@ public class PageService {
 
 	private static Logger logger = LoggerFactory.getLogger(PageService.class);
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page createPage(PageCreateRequest request, Post.Status status, AuthorizedUser authorizedUser) {
 		LocalDateTime now = LocalDateTime.now();
 
-		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getTitle(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
 		if (!StringUtils.hasText(code)) {
 			if (!status.equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
@@ -97,7 +108,7 @@ public class PageService {
 		}
 
 		if (!status.equals(Post.Status.DRAFT)) {
-			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null) {
 				throw new DuplicateCodeException(request.getCode());
 			}
@@ -208,10 +219,29 @@ public class PageService {
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
 
+		page.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomFieldValue value =  new CustomFieldValue();
+				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
+				value.setPost(page);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
+				} else {
+					value.setTextValue(valueForm.getTextValue());
+				}
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				page.getCustomFieldValues().add(value);
+			}
+		}
+
 		return pageRepository.save(page);
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page savePageAsDraft(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -228,6 +258,10 @@ public class PageService {
 						.parentId(request.getParentId())
 						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createPage(createRequest, Post.Status.DRAFT, authorizedUser);
@@ -245,6 +279,10 @@ public class PageService {
 						.parentId(request.getParentId())
 						.categoryIds(request.getCategoryIds())
 						.tags(request.getTags())
+						.seoTitle(request.getSeoTitle())
+						.seoDescription(request.getSeoDescription())
+						.seoKeywords(request.getSeoKeywords())
+						.customFieldValues(request.getCustomFieldValues())
 						.language(request.getLanguage())
 						.build();
 				return savePage(updateRequest, authorizedUser);
@@ -254,21 +292,28 @@ public class PageService {
 		}
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page savePageAsPublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
+		Page deleteTarget = getDraftById(page.getId());
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		page.setDrafted(null);
 		page.setStatus(Post.Status.PUBLISHED);
 		pageRepository.save(page);
-		pageRepository.deleteByDrafted(page);
 		return savePage(request, authorizedUser);
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page savePageAsUnpublished(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
+		Page deleteTarget = getDraftById(page.getId());
+		if (deleteTarget != null) {
+			pageRepository.delete(deleteTarget);
+		}
 		page.setDrafted(null);
 		page.setStatus(Post.Status.DRAFT);
 		pageRepository.save(page);
@@ -276,13 +321,20 @@ public class PageService {
 		return savePage(request, authorizedUser);
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page savePage(PageUpdateRequest request, AuthorizedUser authorizedUser) {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
 		LocalDateTime now = LocalDateTime.now();
 
-		String code = (request.getCode() != null) ? request.getCode() : request.getTitle();
+		String code = request.getCode();
+		if (code == null) {
+			try {
+				code = new CodeFormatter().parse(request.getTitle(), LocaleContextHolder.getLocale());
+			} catch (ParseException e) {
+				throw new ServiceException(e);
+			}
+		}
 		if (!StringUtils.hasText(code)) {
 			if (!page.getStatus().equals(Post.Status.DRAFT)) {
 				throw new EmptyCodeException();
@@ -404,10 +456,40 @@ public class PageService {
 		page.setUpdatedAt(now);
 		page.setUpdatedBy(authorizedUser.toString());
 
+		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
+		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
+		for (CustomFieldValue value : page.getCustomFieldValues()) {
+			valueMap.put(value.getCustomField(), value);
+		}
+
+		page.getCustomFieldValues().clear();
+		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
+				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
+				CustomFieldValue value = valueMap.get(customField);
+				if (value == null) {
+					value = new CustomFieldValue();
+				}
+				value.setCustomField(customField);
+				value.setPost(page);
+				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+					value.setTextValue(String.join(",", valueForm.getTextValues()));
+				} else {
+					value.setTextValue(valueForm.getTextValue());
+				}
+				value.setStringValue(valueForm.getStringValue());
+				value.setNumberValue(valueForm.getNumberValue());
+				value.setDateValue(valueForm.getDateValue());
+				value.setDatetimeValue(valueForm.getDatetimeValue());
+				fieldValues.add(value);
+			}
+		}
+		page.setCustomFieldValues(fieldValues);
+
 		return pageRepository.save(page);
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public void updatePageHierarchy(List<Map<String, Object>> data, String language) {
 		for (int i = 0; i < data.size(); i++) {
 			Map<String, Object> map = data.get(i);
@@ -430,7 +512,7 @@ public class PageService {
 		}
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page deletePage(PageDeleteRequest request, BindingResult result) throws BindException {
 		postRepository.lock(request.getId());
 		Page page = pageRepository.findOneByIdAndLanguage(request.getId(), request.getLanguage());
@@ -450,7 +532,7 @@ public class PageService {
 		return page;
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	public Page deletePage(long id, String language) {
 		postRepository.lock(id);
 		Page page = pageRepository.findOneByIdAndLanguage(id, language);
@@ -470,7 +552,7 @@ public class PageService {
 		return page;
 	}
 
-	@CacheEvict(value = "pages", allEntries = true)
+	@CacheEvict(value = WallRideCacheConfiguration.PAGE_CACHE, allEntries = true)
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public List<Page> bulkDeletePage(PageBulkDeleteRequest bulkDeleteRequest, BindingResult result) {
 		List<Page> pages = new ArrayList<>();
@@ -509,18 +591,22 @@ public class PageService {
 		return pageRepository.searchForId(request);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)
 	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request) {
 		return getPages(request, null);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)
 	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request, Pageable pageable) {
 		return pageRepository.search(request, pageable);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)
 	public List<Page> getPathPages(Page page) {
 		return getPathPages(page, false);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)
 	public List<Page> getPathPages(Page page, boolean includeUnpublished) {
 		return pageRepository.findAll(PageSpecifications.path(page, includeUnpublished));
 	}
@@ -539,6 +625,10 @@ public class PageService {
 
 	public List<Page> getSiblingPages(Page page, boolean includeUnpublished) {
 		return pageRepository.findAll(PageSpecifications.siblings(page, includeUnpublished));
+	}
+
+	public Page getPageById(long id) {
+		return pageRepository.findOneById(id);
 	}
 
 	public Page getPageById(long id, String language) {

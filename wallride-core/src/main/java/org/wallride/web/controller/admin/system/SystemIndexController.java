@@ -89,7 +89,7 @@ public class SystemIndexController {
 		ModelAndView mv = new ModelAndView("dummy");
 		interceptor.postHandle(request, response, this, mv);
 
-		SpringTemplateEngine templateEngine = context.getBean(SpringTemplateEngine.class);
+		SpringTemplateEngine templateEngine = context.getBean("templateEngine", SpringTemplateEngine.class);
 		logger.info("Clear cache started");
 		templateEngine.clearTemplateCache();
 		logger.info("Clear cache finished");

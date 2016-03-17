@@ -31,47 +31,46 @@
 			<div th:replace="layout::nav"></div>
 			<div class="container">
 				<div class="row">
-					<div class="col-md-9">
-						<div class="row author">
-							<div class="col-md-2">
-								<img style="width:100px; border-radius: 50%" th:src="${author.getGravatarUrl(100)}" src="http://placehold.it/170/eeeeee/ffffff" />
-							</div>
-							<div class="col-sm-10">
-								<h2 th:text="${author}"></h2>
-								<pre th:utext="${author.description}"></pre>
-							</div>
+					<div class="row author">
+						<div class="col-md-2">
+							<img style="width:100px; border-radius: 50%" th:src="${author.getGravatarUrl(100)}" src="http://placehold.it/170/eeeeee/ffffff" />
 						</div>
-						<div class="pagination-group pull-right">
-							<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
-							<div class="pull-right">
-								<ul class="pagination paginateon-sm">
-									<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{${#users.path(author)}(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
-									<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{${#users.path(author)}(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
-									<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{${#users.path(author)}(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
-								</ul>
-							</div>
+						<div class="col-sm-10">
+							<h3 th:text="${author}"></h3>
+							<pre th:utext="${author.description}"></pre>
 						</div>
-						<article th:each="article : ${articles}" class="wr-post-summary row">
-							<div class="col-sm-2" th:if="${article.cover ne null}">
-								<img th:src="@{${#medias.link(article.cover)}(w=120,h=120,m=1)}" class="wr-post-cover" />
-							</div>
-							<div class="col-sm-10" th:if="${article.cover ne null}">
-								<h1 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h1>
-								<time th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></time>
-							</div>
-							<div class="col-sm-12" th:if="${article.cover eq null}">
-								<h1 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h1>
-								<time th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></time>
-							</div>
-						</article>
 					</div>
-					<div class="col-md-3">
-						<div class="list-group" th:if="${category eq null}">
-							<a th:each="node : ${CATEGORY_TREE.rootNodes}" th:href="@{/category/__${node.category.code}__}" th:text="${node.category.name}" class="list-group-item">Link</a>
+					<div class="pagination-group pull-right">
+						<div class="pull-left pagination-summary"><span th:text="${pagination.numberOfFirstElement}"></span> - <span th:text="${pagination.numberOfLastElement}"></span> / <span th:text="${pagination.totalElements}"></span></div>
+						<div class="pull-right">
+							<ul class="pagination paginateon-sm">
+								<li th:classappend="${pagination.hasPreviousPage() ? '' : 'disabled'}"><a th:href="@{${#users.path(author)}(page=${pagination.previousPageNumber})}" th:text="#{Prev}">Prev</a></li>
+								<li th:each="p : ${pagination.getPageables(pageable)}" th:classappend="${p.pageNumber eq pagination.currentPageNumber ? 'active' : ''}"><a th:href="@{${#users.path(author)}(page=${p.pageNumber},size=${p.pageSize})}" th:text="${p.pageNumber + 1}"></a></li>
+								<li th:classappend="${pagination.hasNextPage() ? '' : 'disabled'}"><a th:href="@{${#users.path(author)}(page=${pagination.nextPageNumber})}" th:text="#{Next}">Next</a></li>
+							</ul>
 						</div>
-						<div class="list-group" th:if="${category ne null}">
-							<a th:each="category : ${category.children}" th:href="@{/category/__${category.code}__}" th:text="${category.name}" class="list-group-item">Link</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-9">
+					<article th:each="article : ${articles}" class="wr-post-summary row">
+						<div class="col-sm-2">
+							<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=120,h=120,m=1)}" class="wr-post-cover" />
+							<img th:unless="${article.cover ne null}" th:src="@{/resources/img/noimage.png}" style="width: 120px; height: 120px;" />
 						</div>
+						<div class="col-sm-10">
+							<h2 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h2>
+							<p th:text="${#posts.summary(article, 45)}"></p>
+							<p style="margin-bottom:5px"><time th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></time>&nbsp;&nbsp;&nbsp;
+								<a th:if="${article.author ne null}" class="wr-author"><span class="glyphicon glyphicon-user"></span> <span th:text="${article.author}"></span></a></p>
+							<span th:unless="${#lists.isEmpty(article.categories)}">
+								<a th:each="category : ${article.categories}" th:href="@{/category/__${category.code}__}" class="wr-category"> <span th:text="${category.name}">Link</span></a>
+							</span>&nbsp;&nbsp;
+							<span th:unless="${#lists.isEmpty(article.tags)}">
+								<a th:each="tag : ${article.tags}" th:href="@{/tag/__${tag}__}" class="wr-tag"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Link</span></span></a>&nbsp;&nbsp;
+							</span>
+						</div>
+					</article>
 					</div>
 				</div>
 			</div>

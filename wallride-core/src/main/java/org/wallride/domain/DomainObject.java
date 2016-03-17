@@ -18,6 +18,8 @@ package org.wallride.domain;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.lucene.analysis.cjk.CJKWidthFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.ja.JapaneseBaseFormFilterFactory;
@@ -101,6 +103,8 @@ public abstract class DomainObject<ID extends Serializable> implements Serializa
 		this.updatedBy = updatedBy;
 	}
 
+	public abstract String print();
+
 	@Override
 	public boolean equals(Object other) {
 		if (this == other) return true;
@@ -112,5 +116,10 @@ public abstract class DomainObject<ID extends Serializable> implements Serializa
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(getId()).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + " [id=" + getId() + "]";
 	}
 }
