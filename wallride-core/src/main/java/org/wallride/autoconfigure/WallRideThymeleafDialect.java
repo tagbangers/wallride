@@ -66,7 +66,7 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
 		Map<String, Object> objects = new HashMap<>();
 		objects.put("posts", new Posts(processingContext, postUtils, wallRideProperties));
-		objects.put("articles", new Articles(processingContext, articleUtils));
+		objects.put("searches", new Searches(processingContext, postUtils, pageUtils, articleUtils));
 		objects.put("pages", new Pages(processingContext, pageUtils));
 		objects.put("categorys", new Categorys(processingContext, categoryUtils));
 		objects.put("medias", new Medias(processingContext, wallRideProperties));

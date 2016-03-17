@@ -1,0 +1,125 @@
+/*
+ * Copyright 2014 Tagbangers, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.wallride.web.support;
+
+import org.springframework.data.domain.Page;
+import org.thymeleaf.context.IProcessingContext;
+import org.wallride.domain.Article;
+import org.wallride.model.ArticleSearchRequest;
+import org.wallride.support.ArticleUtils;
+import org.wallride.support.PageUtils;
+import org.wallride.support.PostUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+public class Searches {
+
+	private IProcessingContext processingContext;
+	private PostUtils postUtils;
+	private PageUtils pageUtils;
+	private ArticleUtils articleUtils;
+
+	public Searches(IProcessingContext processingContext, PostUtils postUtils, PageUtils pageUtils, ArticleUtils articleUtils) {
+		this.processingContext = processingContext;
+		this.postUtils = postUtils;
+		this.pageUtils = pageUtils;
+		this.articleUtils = articleUtils;
+	}
+
+	public List<Article> articles(Condition condition) {
+		Page<Article> result = articleUtils.search(condition.buildRequest(), condition.size);
+		return new ArrayList<>(result.getContent());
+	}
+
+	public Condition condition() {
+		return new Condition().size(1);
+	}
+
+	public class Condition {
+		private int size;
+
+		private String keyword;
+		private Collection<Long> categoryIds;
+		private Collection<String> categoryCodes;
+		private Collection<String> tagNames;
+		private Long authorId;
+		private String language;
+//		private Post.Status status;
+//		private LocalDateTime dateFrom;
+//		private LocalDateTime dateTo;
+
+		public Condition size(int size) {
+			this.size = size;
+			return this;
+		}
+
+		public Condition keyword(String keyword) {
+			this.keyword = keyword;
+			return this;
+		}
+
+		public Condition categoryIds(Long... values) {
+			List<Long> categoryIds = new ArrayList<>();
+			for (Long value : values) {
+				categoryIds.add(value);
+			}
+			this.categoryIds = categoryIds;
+			return this;
+		}
+
+		public Condition categoryCodes(String... values) {
+			List<String> categoryCodes = new ArrayList<>();
+			for (String value : values) {
+				categoryCodes.add(value);
+			}
+			this.categoryCodes = categoryCodes;
+			return this;
+		}
+
+		public Condition tagNames(String... values) {
+			List<String> tagNames = new ArrayList<>();
+			for (String value : values) {
+				tagNames.add(value);
+			}
+			this.tagNames = tagNames;
+			return this;
+		}
+
+		public Condition authorId(Long authorId) {
+			this.authorId = authorId;
+			return this;
+		}
+
+		public Condition language(String language) {
+			this.language = language;
+			return this;
+		}
+		
+		private ArticleSearchRequest buildRequest() {
+			ArticleSearchRequest request = new ArticleSearchRequest()
+					.withKeyword(this.keyword)
+					.withCategoryIds(this.categoryIds)
+					.withCategoryCodes(this.categoryCodes)
+					.withTagNames(this.tagNames)
+					.withAuthorId(this.authorId)
+					.withLanguage(this.language);
+			return request;
+		}
+	}
+}

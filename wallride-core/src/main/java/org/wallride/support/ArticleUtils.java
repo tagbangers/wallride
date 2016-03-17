@@ -30,10 +30,7 @@ public class ArticleUtils {
 		this.articleService = articleService;
 	}
 
-	public Page<Article> byCategoryAndTag(String categoryCode, String tagName, int size) {
-		ArticleSearchRequest request = new ArticleSearchRequest()
-				.withCategoryCodes(categoryCode)
-				.withTagNames(tagName);
+	public Page<Article> search(ArticleSearchRequest request, int size) {
 		return articleService.getArticles(request, new PageRequest(0, size));
 	}
 }
