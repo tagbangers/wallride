@@ -19,7 +19,6 @@ package org.wallride.model;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.wallride.domain.BlogLanguage;
 import org.wallride.domain.Post;
 
 import java.io.Serializable;
@@ -44,8 +43,8 @@ public class ArticleSearchRequest implements Serializable {
 		this.language = LocaleContextHolder.getLocale().getLanguage();
 	}
 
-	public ArticleSearchRequest(BlogLanguage blogLanguage) {
-		this.language = blogLanguage.getLanguage();
+	public ArticleSearchRequest(String language) {
+		this.language = language;
 	}
 
 	public String getKeyword() {

@@ -21,8 +21,6 @@ import org.thymeleaf.context.IProcessingContext;
 import org.wallride.domain.Article;
 import org.wallride.model.ArticleSearchRequest;
 import org.wallride.support.ArticleUtils;
-import org.wallride.support.PageUtils;
-import org.wallride.support.PostUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +54,6 @@ public class Articles {
 		private Collection<String> categoryCodes;
 		private Collection<String> tagNames;
 		private Long authorId;
-		private String language;
 //		private Post.Status status;
 //		private LocalDateTime dateFrom;
 //		private LocalDateTime dateTo;
@@ -103,19 +100,13 @@ public class Articles {
 			return this;
 		}
 
-		public Condition language(String language) {
-			this.language = language;
-			return this;
-		}
-
 		private ArticleSearchRequest buildArticleSearchRequest() {
-			ArticleSearchRequest request = new ArticleSearchRequest()
+			ArticleSearchRequest request = new ArticleSearchRequest(processingContext.getContext().getLocale().getLanguage())
 					.withKeyword(this.keyword)
 					.withCategoryIds(this.categoryIds)
 					.withCategoryCodes(this.categoryCodes)
 					.withTagNames(this.tagNames)
-					.withAuthorId(this.authorId)
-					.withLanguage(this.language);
+					.withAuthorId(this.authorId);
 			return request;
 		}
 	}
