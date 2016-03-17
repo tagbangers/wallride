@@ -68,7 +68,7 @@ public class Articles {
 			return this;
 		}
 
-		public Condition categoryIds(Long... values) {
+		public Condition category(Long... values) {
 			List<Long> categoryIds = new ArrayList<>();
 			for (Long value : values) {
 				categoryIds.add(value);
@@ -77,7 +77,7 @@ public class Articles {
 			return this;
 		}
 
-		public Condition categoryCodes(String... values) {
+		public Condition category(String... values) {
 			List<String> categoryCodes = new ArrayList<>();
 			for (String value : values) {
 				categoryCodes.add(value);
@@ -86,7 +86,7 @@ public class Articles {
 			return this;
 		}
 
-		public Condition tagNames(String... values) {
+		public Condition tag(String... values) {
 			List<String> tagNames = new ArrayList<>();
 			for (String value : values) {
 				tagNames.add(value);
@@ -95,7 +95,7 @@ public class Articles {
 			return this;
 		}
 
-		public Condition authorId(Long authorId) {
+		public Condition author(Long authorId) {
 			this.authorId = authorId;
 			return this;
 		}
