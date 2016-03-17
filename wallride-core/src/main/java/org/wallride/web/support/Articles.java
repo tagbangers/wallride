@@ -68,35 +68,35 @@ public class Articles {
 			return this;
 		}
 
-		public Condition category(Long... values) {
+		public Condition category(Long... ids) {
 			List<Long> categoryIds = new ArrayList<>();
-			for (Long value : values) {
+			for (Long value : ids) {
 				categoryIds.add(value);
 			}
 			this.categoryIds = categoryIds;
 			return this;
 		}
 
-		public Condition category(String... values) {
+		public Condition category(String... codes) {
 			List<String> categoryCodes = new ArrayList<>();
-			for (String value : values) {
+			for (String value : codes) {
 				categoryCodes.add(value);
 			}
 			this.categoryCodes = categoryCodes;
 			return this;
 		}
 
-		public Condition tag(String... values) {
+		public Condition tag(String... names) {
 			List<String> tagNames = new ArrayList<>();
-			for (String value : values) {
+			for (String value : names) {
 				tagNames.add(value);
 			}
 			this.tagNames = tagNames;
 			return this;
 		}
 
-		public Condition author(Long authorId) {
-			this.authorId = authorId;
+		public Condition author(Long id) {
+			this.authorId = id;
 			return this;
 		}
 
