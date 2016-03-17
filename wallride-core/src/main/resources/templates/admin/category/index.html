@@ -85,7 +85,7 @@
 										<div class="form-group">
 											<select name="parentId" class="form-control">
 												<option value="" th:text="#{SelectParentCategory}">Select Parent Category</option>
-												<option th:each="category : ${#categorys.getAllCategories(true)}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq parentId}"></option>
+												<option th:each="category : ${#categories.getAllCategories(true)}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq parentId}"></option>
 											</select>
 										</div>
 										<div class="form-group">
@@ -155,7 +155,7 @@
 										<div class="form-group">
 											<select name="parentId" class="form-control">
 												<option value="" th:text="#{SelectParentCategory}">Select Parent Category</option>
-												<option th:each="parent : ${#categorys.getAllCategories(true)}" th:if="${parent ne category}" th:value="${parent.id}" th:text="${parent.name}" th:selected="${parent eq category.parent}"></option>
+												<option th:each="parent : ${#categories.getAllCategories(true)}" th:if="${parent ne category}" th:value="${parent.id}" th:text="${parent.name}" th:selected="${parent eq category.parent}"></option>
 											</select>
 										</div>
 										<div class="form-group">

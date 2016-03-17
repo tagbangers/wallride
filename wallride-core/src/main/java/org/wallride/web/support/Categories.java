@@ -23,13 +23,13 @@ import org.wallride.support.CategoryUtils;
 
 import java.util.List;
 
-public class Categorys {
+public class Categories {
 
 	private IProcessingContext processingContext;
 
 	private CategoryUtils CategoryUtils;
 
-	public Categorys(IProcessingContext processingContext, CategoryUtils CategoryUtils) {
+	public Categories(IProcessingContext processingContext, CategoryUtils CategoryUtils) {
 		this.processingContext = processingContext;
 		this.CategoryUtils = CategoryUtils;
 	}
