@@ -122,6 +122,10 @@ public class Post extends DomainObject<Long> {
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private SortedSet<Tag> tags = new TreeSet<>();
 
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@SortNatural
+	private SortedSet<CustomFieldValue> customFieldValues = new TreeSet<>();
+
 	@OneToMany(mappedBy = "drafted", cascade = CascadeType.ALL)
 	@LazyCollection(LazyCollectionOption.EXTRA)
 	@SortNatural
@@ -257,6 +261,14 @@ public class Post extends DomainObject<Long> {
 		this.tags = tags;
 	}
 
+	public SortedSet<CustomFieldValue> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(SortedSet<CustomFieldValue> customFieldValues) {
+		this.customFieldValues = customFieldValues;
+	}
+
 	public Post getDrafted() {
 		return drafted;
 	}
@@ -318,7 +330,12 @@ public class Post extends DomainObject<Long> {
 	}
 
 	@Override
-	public String toString() {
+	public String print() {
 		return getTitle();
 	}
+
+//	@Override
+//	public String toString() {
+//		return getTitle();
+//	}
 }

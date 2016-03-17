@@ -28,6 +28,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.wallride.domain.CustomField;
+import org.wallride.service.CustomFieldService;
 import org.wallride.domain.Article;
 import org.wallride.domain.Category;
 import org.wallride.domain.Post;
@@ -43,6 +45,7 @@ import org.wallride.web.support.RestValidationErrorModel;
 import javax.inject.Inject;
 import javax.validation.groups.Default;
 import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 @RequestMapping("/{language}/articles/create")
@@ -57,11 +60,21 @@ public class ArticleCreateController {
 	private CategoryUtils categoryUtils;
 
 	@Inject
+	private CustomFieldService customFieldService;
+
+	@Inject
 	private MessageSourceAccessor messageSourceAccessor;
 
 	@ModelAttribute("form")
-	public ArticleCreateForm articleCreateForm() {
-		return new ArticleCreateForm();
+	public ArticleCreateForm articleCreateForm(
+			@PathVariable String language,
+			@RequestParam(required = false) String code) {
+		SortedSet<CustomField> customFields = customFieldService.getAllCustomFields(language);
+		ArticleCreateForm form = new ArticleCreateForm(customFields);
+		if (code != null) {
+			form.setCode(code);
+		}
+		return form;
 	}
 
 	@ModelAttribute("categoryNodes")

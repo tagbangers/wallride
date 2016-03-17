@@ -28,7 +28,7 @@ public class DomainObjectSelect2Model<ID extends Serializable> implements Serial
 	
 	public DomainObjectSelect2Model(DomainObject object) {
 		setId((ID) object.getId());
-		setText(object.toString());
+		setText(object.print());
 	}
 	
 	public DomainObjectSelect2Model(ID id, String text) {

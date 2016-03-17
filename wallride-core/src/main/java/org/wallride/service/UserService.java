@@ -45,6 +45,7 @@ import org.springframework.validation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.domain.Blog;
 import org.wallride.domain.PasswordResetToken;
 import org.wallride.domain.User;
@@ -162,7 +163,7 @@ public class UserService {
 		return passwordResetToken;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public User updateUser(UserUpdateRequest form, Errors errors, AuthorizedUser authorizedUser) throws ValidationException {
 		User user = userRepository.findOneForUpdateById(form.getId());
 		user.setName(form.getName());
@@ -174,7 +175,7 @@ public class UserService {
 		return user;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public User updateProfile(ProfileUpdateRequest request, AuthorizedUser updatedBy) {
 		User user = userRepository.findOneForUpdateById(request.getUserId());
 		if (user == null) {
@@ -203,7 +204,7 @@ public class UserService {
 		return userRepository.saveAndFlush(user);
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public User updatePassword(PasswordUpdateRequest request, PasswordResetToken passwordResetToken) {
 		User user = userRepository.findOneForUpdateById(request.getUserId());
 		if (user == null) {
@@ -255,7 +256,7 @@ public class UserService {
 		return user;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public User updatePassword(PasswordUpdateRequest request, AuthorizedUser updatedBy) {
 		User user = userRepository.findOneForUpdateById(request.getUserId());
 		if (user == null) {
@@ -268,14 +269,14 @@ public class UserService {
 		return userRepository.saveAndFlush(user);
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public User deleteUser(UserDeleteRequest form, BindingResult result) throws BindException {
 		User user = userRepository.findOneForUpdateById(form.getId());
 		userRepository.delete(user);
 		return user;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	@Transactional(propagation= Propagation.NOT_SUPPORTED)
 	public List<User> bulkDeleteUser(UserBulkDeleteRequest bulkDeleteForm, BindingResult result) {
 		List<User> users = new ArrayList<>();
@@ -311,7 +312,7 @@ public class UserService {
 		return users;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public List<UserInvitation> inviteUsers(UserInvitationCreateRequest form, BindingResult result, AuthorizedUser authorizedUser) throws MessagingException {
 		String[] recipients = StringUtils.commaDelimitedListToStringArray(form.getInvitees());
 
@@ -363,7 +364,7 @@ public class UserService {
 		return invitations;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public UserInvitation inviteAgain(UserInvitationResendRequest form, BindingResult result, AuthorizedUser authorizedUser) throws MessagingException {
 		LocalDateTime now = LocalDateTime.now();
 
@@ -403,7 +404,7 @@ public class UserService {
 		return invitation;
 	}
 
-	@CacheEvict(value="users", allEntries=true)
+	@CacheEvict(value = WallRideCacheConfiguration.USER_CACHE, allEntries = true)
 	public UserInvitation deleteUserInvitation(UserInvitationDeleteRequest request) {
 		UserInvitation invitation = userInvitationRepository.findOneForUpdateByToken(request.getToken());
 		userInvitationRepository.delete(invitation);

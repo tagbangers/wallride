@@ -39,7 +39,7 @@ import java.util.EnumSet;
 public class Hbm2ddl {
 
 	public static void main(String[] args) throws Exception {
-		String locationPattern = "classpath:/org/wallride/core/domain/*";
+		String locationPattern = "classpath:/org/wallride/domain/*";
 
 		final BootstrapServiceRegistry registry = new BootstrapServiceRegistryBuilder().build();
 		final MetadataSources metadataSources = new MetadataSources(registry);

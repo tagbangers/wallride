@@ -31,6 +31,7 @@ import org.wallride.service.CategoryService;
 import org.wallride.service.PageService;
 import org.wallride.support.CategoryUtils;
 import org.wallride.support.PageUtils;
+import org.wallride.support.PostUtils;
 import org.wallride.web.support.ExtendedThymeleafViewResolver;
 
 import javax.inject.Inject;
@@ -60,6 +61,11 @@ public class WallRideThymeleafConfiguration {
 	private Environment environment;
 
 	@Bean
+	public PostUtils postUtils(PageUtils pageUtils) {
+		return new PostUtils(pageUtils);
+	}
+
+	@Bean
 	public PageUtils pageUtils() {
 		return new PageUtils(pageService);
 	}
@@ -72,7 +78,9 @@ public class WallRideThymeleafConfiguration {
 	@Bean
 	public WallRideThymeleafDialect wallRideThymeleafDialect() {
 		WallRideThymeleafDialect dialect = new WallRideThymeleafDialect();
-		dialect.setPageUtils(pageUtils());
+		PageUtils pageUtils = pageUtils();
+		dialect.setPostUtils(postUtils(pageUtils));
+		dialect.setPageUtils(pageUtils);
 		dialect.setCategoryUtils(categoryUtils());
 		dialect.setWallRideProperties(wallRideProperties);
 		return dialect;

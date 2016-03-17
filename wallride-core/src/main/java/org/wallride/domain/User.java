@@ -165,6 +165,11 @@ public class User extends DomainObject<Long> {
 	}
 
 	@Override
+	public String print() {
+		return (getName() != null) ? getName().toString() : "";
+	}
+
+	@Override
 	public String toString() {
 		return (getName() != null) ? getName().toString() : "";
 	}

@@ -52,6 +52,49 @@ CREATE TABLE `category` (
 )
   ENGINE = InnoDB;
 
+create table `custom_field` (
+  `id` bigint not null auto_increment,
+  `idx` integer,
+  `code` varchar(200),
+  `language` varchar(3) not null,
+  `name` varchar(200),
+  `field_type` varchar(50) not null,
+  `default_value` varchar(200),
+  `description` longtext,
+  `created_at` datetime not null,
+  `created_by` varchar(100),
+  `updated_at` datetime not null,
+  `updated_by` varchar(100),
+  primary key (`id`)
+)
+  ENGINE=InnoDB;
+
+create table `custom_field_value` (
+  `id` bigint not null auto_increment,
+  `custom_field_id` bigint not null,
+  `post_id` bigint not null,
+  `string_value` varchar(300),
+  `text_value` longtext,
+  `date_value` date,
+  `datetime_value` datetime,
+  `number_value` bigint,
+  `created_at` datetime not null,
+  `created_by` varchar(100),
+  `updated_at` datetime not null,
+  `updated_by` varchar(100),
+  primary key (`id`)
+)
+  ENGINE=InnoDB;
+
+create table `custom_field_option` (
+  `custom_field_id` bigint not null,
+  `idx` integer not null,
+  `language` varchar(3) not null,
+  `name` varchar(200) not null,
+  primary key (`custom_field_id` , `idx`)
+)
+  ENGINE=InnoDB;
+
 CREATE TABLE `comment` (
   `id`          BIGINT       NOT NULL AUTO_INCREMENT,
   `post_id`     BIGINT       NOT NULL,
@@ -70,7 +113,7 @@ CREATE TABLE `comment` (
 
 CREATE TABLE `media` (
   `id`            VARCHAR(50) NOT NULL,
-  `mime_type`     VARCHAR(50) NOT NULL,
+  `mime_type`     VARCHAR(500) NOT NULL,
   `original_name` VARCHAR(500),
   `created_at`    DATETIME    NOT NULL,
   `created_by`    VARCHAR(100),
@@ -240,6 +283,8 @@ CREATE TABLE `user_role` (
 ALTER TABLE `blog` ADD CONSTRAINT UK_398ypeix0usuwxip7hl30tl95 UNIQUE (`code`);
 ALTER TABLE `blog_language` ADD CONSTRAINT `UKjvbtdcpruai93kkn9en48os1j` UNIQUE (`blog_id`, `language`);
 ALTER TABLE `category` ADD CONSTRAINT `UKbcyxs660s0fku8sf6pgy137ai` UNIQUE (`code`, `language`);
+ALTER TABLE `custom_field` ADD CONSTRAINT `UKix3po6weuk4wvhvc95n5rk5ch` UNIQUE (`code`, `language`);
+ALTER TABLE `custom_field_value` ADD CONSTRAINT `UKnn598oul2m13aiorw3e5clc1i` UNIQUE (`post_id`, `custom_field_id`);
 ALTER TABLE `popular_post` ADD CONSTRAINT `UKevl12yr4xxkydmkvigjq82iui` UNIQUE (`language`, `type`, `rank`);
 ALTER TABLE `post` ADD CONSTRAINT `UKl52i0qo9maim4jb28sahyaf02` UNIQUE (`code`, `language`);
 ALTER TABLE `tag` ADD CONSTRAINT `UKk25qstev2lpae13bk95lxny1y` UNIQUE (`name`, `language`);
@@ -248,6 +293,9 @@ ALTER TABLE `user` ADD CONSTRAINT UK_6ntlp6n5ltjg6hhxl66jj5u0l UNIQUE (`login_id
 ALTER TABLE `article` ADD CONSTRAINT `FK2v5gc16vlmfc3b7v9mug9p0nh` FOREIGN KEY (`id`) REFERENCES `post` (`id`);
 ALTER TABLE `blog_language` ADD CONSTRAINT `FKm26flfhreaktwyf5x7niter6u` FOREIGN KEY (`blog_id`) REFERENCES `blog` (`id`);
 ALTER TABLE `category` ADD CONSTRAINT `FKpqbj33aij72uwx8rwt086hvq2` FOREIGN KEY (`parent_id`) REFERENCES `category` (`id`);
+ALTER TABLE `custom_field_value` ADD CONSTRAINT `FK68g6fssy3gjj4jovfso18uysm` foreign key (`custom_field_id`) REFERENCES `custom_field` (`id`);
+ALTER TABLE `custom_field_value` ADD CONSTRAINT `FK814q6mnv98jdn8ubh5fkyy3sc` foreign key (`post_id`) REFERENCES `post` (`id`);
+ALTER TABLE `custom_field_option` ADD CONSTRAINT `FKjquafa57imfqsl50qxqm29txr` foreign key (`custom_field_id`) REFERENCES `custom_field` (`id`);
 ALTER TABLE `comment` ADD CONSTRAINT `FKg229tmp8ip9shg6ydifpc2mk6` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`);
 ALTER TABLE `comment` ADD CONSTRAINT `FKgxbwgh8hcc6k5f2q9vkmjvdps` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`);
 ALTER TABLE `navigation_item` ADD CONSTRAINT `FKo9pj7oh5oc36ia8f9flji199u` FOREIGN KEY (`parent_id`) REFERENCES `navigation_item` (`id`);

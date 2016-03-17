@@ -50,10 +50,13 @@ public class TagController {
 			HttpServletRequest servletRequest) {
 		Tag tag = tagService.getTagByName(name, blogLanguage.getLanguage());
 		if (tag == null) {
+			tag = tagService.getTagByName(name, blogLanguage.getBlog().getDefaultLanguage());
+		}
+		if (tag == null) {
 			throw new HttpNotFoundException();
 		}
 
-		PostSearchRequest request = new PostSearchRequest(blogLanguage.getLanguage());
+		PostSearchRequest request = new PostSearchRequest(tag.getLanguage());
 		request.withTagNames(name);
 
 		Page<Post> posts = postService.getPosts(request, pageable);

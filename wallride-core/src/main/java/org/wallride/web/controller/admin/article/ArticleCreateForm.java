@@ -17,19 +17,39 @@
 package org.wallride.web.controller.admin.article;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.wallride.domain.CustomField;
 import org.wallride.model.ArticleCreateRequest;
+import org.wallride.support.CodeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 @SuppressWarnings("serial")
 public class ArticleCreateForm implements Serializable {
 
+	public ArticleCreateForm() {
+	}
+
+	public ArticleCreateForm(SortedSet<CustomField> customFields) {
+		for (CustomField field : customFields) {
+			CustomFieldValueEditForm valueForm = new CustomFieldValueEditForm();
+			valueForm.setCustomFieldId(field.getId());
+			valueForm.setName(field.getName());
+			valueForm.setDescription(field.getDescription());
+			valueForm.setFieldType(field.getFieldType());
+			valueForm.setOptions(field.getOptions());
+			customFieldValues.add(valueForm);
+		}
+	}
+
 	interface GroupPublish {}
 
+	@CodeFormat
 	private String code;
 
 	private String coverId;
@@ -53,6 +73,8 @@ public class ArticleCreateForm implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
+
+	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 
 	@NotNull
 	private String language;
@@ -153,6 +175,14 @@ public class ArticleCreateForm implements Serializable {
 		this.seoKeywords = seoKeywords;
 	}
 
+	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+		return customFieldValues;
+	}
+
+	public void setCustomFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+		this.customFieldValues = customFieldValues;
+	}
+
 	public String getLanguage() {
 		return language;
 	}
@@ -176,6 +206,7 @@ public class ArticleCreateForm implements Serializable {
 				.seoTitle(seoTitle)
 				.seoDescription(seoDescription)
 				.seoKeywords(seoKeywords)
+				.customFieldValues(customFieldValues)
 				.language(language)
 				.build();
 	}

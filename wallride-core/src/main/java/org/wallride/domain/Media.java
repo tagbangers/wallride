@@ -41,7 +41,7 @@ public class Media extends DomainObject<String> {
 	@Column(length = 50)
 	private String id;
 
-	@Column(length = 50, nullable = false)
+	@Column(length = 500, nullable = false)
 	private String mimeType;
 
 	@Column(length = 500)
@@ -81,5 +81,10 @@ public class Media extends DomainObject<String> {
 
 	public void setPosts(List<Post> posts) {
 		this.posts = posts;
+	}
+
+	@Override
+	public String print() {
+		return getId() + " " + getOriginalName();
 	}
 }

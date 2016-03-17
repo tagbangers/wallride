@@ -1,16 +1,19 @@
 package org.wallride.autoconfigure;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
+import org.springframework.boot.context.web.OrderedHiddenHttpMethodFilter;
+import org.springframework.boot.context.web.OrderedHttpPutFormContentFilter;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.request.RequestContextListener;
-import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 import org.wallride.web.support.ExtendedUrlRewriteFilter;
@@ -39,31 +42,15 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
-	public FilterRegistrationBean characterEncodingFilter() {
-		CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-		characterEncodingFilter.setEncoding("UTF-8");
-		characterEncodingFilter.setForceEncoding(true);
-
-		FilterRegistrationBean registration = new FilterRegistrationBean();
-		registration.setName("characterEncodingFilter");
-		registration.setFilter(characterEncodingFilter);
-		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
-		registration.addUrlPatterns("/*");
-		registration.setOrder(1);
-		return registration;
+	@ConditionalOnMissingBean(HiddenHttpMethodFilter.class)
+	public OrderedHiddenHttpMethodFilter hiddenHttpMethodFilter() {
+		return new OrderedHiddenHttpMethodFilter();
 	}
 
 	@Bean
-	public FilterRegistrationBean hiddenHttpMethodFilter() {
-		HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
-
-		FilterRegistrationBean registration = new FilterRegistrationBean();
-		registration.setName("hiddenHttpMethodFilter");
-		registration.setFilter(hiddenHttpMethodFilter);
-		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD));
-		registration.addUrlPatterns("/*");
-		registration.setOrder(2);
-		return registration;
+	@ConditionalOnMissingBean(HttpPutFormContentFilter.class)
+	public OrderedHttpPutFormContentFilter httpPutFormContentFilter() {
+		return new OrderedHttpPutFormContentFilter();
 	}
 
 	@Bean
@@ -75,25 +62,8 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 		registration.setFilter(urlRewriteFilter);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
 		registration.addUrlPatterns("/*");
-		registration.setOrder(3);
+		registration.setOrder(0);
 		registration.getInitParameters().put("confPath", "classpath:/urlrewrite.xml");
-		return registration;
-	}
-
-	@Bean
-	public DispatcherServlet adminDispatcherServlet() {
-		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
-		context.setResourceLoader(getResourceLoader());
-		context.register(WebAdminConfiguration.class);
-		return new DispatcherServlet(context);
-	}
-
-	@Bean
-	public ServletRegistrationBean adminServletRegistrationBean() {
-		ServletRegistrationBean registration = new ServletRegistrationBean(adminDispatcherServlet());
-		registration.setName(ADMIN_SERVLET_NAME);
-		registration.setLoadOnStartup(1);
-		registration.addUrlMappings(ADMIN_SERVLET_PATH + "/*");
 		return registration;
 	}
 
@@ -109,8 +79,25 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	public ServletRegistrationBean guestServletRegistrationBean(DispatcherServlet dispatcherServlet) {
 		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
 		registration.setName(GUEST_SERVLET_NAME);
-		registration.setLoadOnStartup(2);
+		registration.setLoadOnStartup(1);
 		registration.addUrlMappings(GUEST_SERVLET_PATH + "/*");
+		return registration;
+	}
+
+	@Bean
+	public DispatcherServlet adminDispatcherServlet() {
+		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		context.setResourceLoader(getResourceLoader());
+		context.register(WebAdminConfiguration.class);
+		return new DispatcherServlet(context);
+	}
+
+	@Bean
+	public ServletRegistrationBean adminServletRegistrationBean() {
+		ServletRegistrationBean registration = new ServletRegistrationBean(adminDispatcherServlet());
+		registration.setName(ADMIN_SERVLET_NAME);
+		registration.setLoadOnStartup(2);
+		registration.addUrlMappings(ADMIN_SERVLET_PATH + "/*");
 		return registration;
 	}
 

@@ -25,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.domain.Article;
 import org.wallride.service.ArticleService;
@@ -54,10 +55,23 @@ public class ArticleDescribeController {
 			@PathVariable String language,
 			@RequestParam long id,
 			String query,
-			Model model) {
-		Article article = articleService.getArticleById(id, language);
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		Article article = articleService.getArticleById(id);
 		if (article == null) {
 			throw new HttpNotFoundException();
+		}
+
+		if (!article.getLanguage().equals(language)) {
+			Article target = articleService.getArticleByCode(article.getCode(), language);
+			if (target != null) {
+				redirectAttributes.addAttribute("id", target.getId());
+				return "redirect:/_admin/{language}/articles/describe?id={id}";
+			} else {
+				redirectAttributes.addFlashAttribute("original", article);
+				redirectAttributes.addAttribute("code", article.getCode());
+				return "redirect:/_admin/{language}/articles/create?code={code}";
+			}
 		}
 
 		MutablePropertyValues mpvs = new MutablePropertyValues(UriComponentsBuilder.newInstance().query(query).build().getQueryParams());

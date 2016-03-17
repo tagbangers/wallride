@@ -134,6 +134,11 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 		this.approved = approved;
 	}
 
+	@Override
+	public String print() {
+		return this.getClass().getName() + " " + getId();
+	}
+
 	public int compareTo(Comment comment) {
 		return new CompareToBuilder()
 				.append(getDate(), comment.getDate())

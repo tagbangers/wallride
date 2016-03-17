@@ -40,8 +40,12 @@ import javax.persistence.*;
 						@NamedAttributeNode("drafted"),
 						@NamedAttributeNode("categories"),
 						@NamedAttributeNode("tags"),
-						@NamedAttributeNode("relatedToPosts")
-				})
+						@NamedAttributeNode("relatedToPosts"),
+						@NamedAttributeNode(value = "customFieldValues", subgraph = "customFieldValue")},
+				subgraphs =  {
+						@NamedSubgraph(name = "customFieldValue",
+								attributeNodes = {
+										@NamedAttributeNode("customField")})})
 })
 @Table(name = "article")
 @DynamicInsert
@@ -54,6 +58,7 @@ public class Article extends Post implements Comparable<Article> {
 	public static final String SHALLOW_GRAPH_NAME = "ARTICLE_SHALLOW_GRAPH";
 	public static final String DEEP_GRAPH_NAME = "ARTICLE_DEEP_GRAPH";
 
+	@Override
 	public int compareTo(Article article) {
 		if (getDate() != null && article.getDate() == null) return 1;
 		if (getDate() == null && article.getDate() != null) return -1;

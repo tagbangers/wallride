@@ -38,6 +38,9 @@ public interface PageRepository extends JpaRepository<Page, Long>, PageRepositor
 	Page findOne(Specification<Page> spec);
 
 	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
+	Page findOneById(Long id);
+
+	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
 	Page findOneByIdAndLanguage(Long id, String language);
 
 	@EntityGraph(value = Page.DEEP_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
