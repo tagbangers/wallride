@@ -141,3 +141,12 @@ img.fr-dii {
     color: #aeaeae;
     background-color: transparent;
 }
+.container > .alert {
+    margin-top: 15px;
+}
+.alert + .page-header {
+    margin-top: 15px;
+}
+.alert .row .page-header {
+    margin-top: 0;
+}

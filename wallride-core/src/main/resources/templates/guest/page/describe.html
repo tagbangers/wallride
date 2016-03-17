@@ -37,11 +37,11 @@
 				<div class="alert alert-warning" th:if="${page.language ne #locale.language}">
 					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{LanguageNotSupported(${#messages.msg('Language.' + page.language)})}">Please note that this page is available only in English.</span>
 				</div>
+				<div class="page-header">
+					<h1 th:text="${page.title}"></h1>
+				</div>
 				<div class="row">
 					<article class="col-md-9">
-						<div class="page-header">
-							<h1 th:text="${page.title}"></h1>
-						</div>
 						<p th:utext="${#posts.body(page)}"></p>
 						<time></time>
 						<ul th:if="${page.tags}" class="list-inline">
