@@ -16,11 +16,11 @@
 
 package org.wallride.web.support;
 
+import com.mortennobel.imagescaling.AdvancedResizeOp;
+import com.mortennobel.imagescaling.DimensionConstrain;
+import com.mortennobel.imagescaling.ResampleFilters;
+import com.mortennobel.imagescaling.ResampleOp;
 import org.apache.commons.io.FileUtils;
-import org.im4java.core.ConvertCmd;
-import org.im4java.core.IM4JavaException;
-import org.im4java.core.IMOperation;
-import org.im4java.process.Pipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,6 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -38,13 +39,13 @@ import org.wallride.domain.Media;
 import org.wallride.repository.MediaRepository;
 import org.wallride.support.ExtendedResourceUtils;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -108,9 +109,12 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		if (length > Integer.MAX_VALUE) {
 			throw new IOException("Resource content too long (beyond Integer.MAX_VALUE): " + resource);
 		}
+
 		response.setContentLength((int) length);
 		response.setContentType(media.getMimeType());
-		response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + URLEncoder.encode(media.getOriginalName(), "UTF-8"));
+		if (!"image".equals(MediaType.parseMediaType(media.getMimeType()).getType())) {
+			response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + URLEncoder.encode(media.getOriginalName(), "UTF-8"));
+		}
 
 		FileCopyUtils.copy(resource.getInputStream(), response.getOutputStream());
 	}
@@ -152,46 +156,58 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 
 	private void resizeImage(Resource resource, File file, int width, int height, Media.ResizeMode mode) throws IOException {
 		long startTime = System.currentTimeMillis();
-		IMOperation op = new IMOperation();
-		op.addImage("-");
+
+		if (width <= 0) {
+			width = Integer.MAX_VALUE;
+		}
+		if (height <= 0) {
+			height = Integer.MAX_VALUE;
+		}
+
+		BufferedImage image = ImageIO.read(resource.getInputStream());
+
+		ResampleOp resampleOp;
+		BufferedImage resized;
+
 		switch (mode) {
 			case RESIZE:
-//				op.resize(width > 0 ? width : null, height > 0 ? height : null, ">");
-				op.thumbnail(width > 0 ? width : null, height > 0 ? height : null, ">");
-				op.quality(100d);
+				resampleOp = new ResampleOp(DimensionConstrain.createMaxDimension(width, height, true));
+				resampleOp.setFilter(ResampleFilters.getLanczos3Filter());
+				resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.Normal);
+				resized = resampleOp.filter(image, null);
+				ImageIO.write(resized, StringUtils.getFilenameExtension(file.getName()), file);
 				break;
 			case CROP:
-//				op.resize(width > 0 ? width : null, height > 0 ? height : null, "^");
-				op.thumbnail(width > 0 ? width : null, height > 0 ? height : null, "^");
-				op.quality(100d);
-				op.gravity("center");
-				op.crop(width, height, 0, 0);
+				int target = (width >= height) ? width : height;
+				float fraction;
+				if (image.getWidth() < image.getHeight()) {
+					fraction = (float) target / (float) image.getWidth();
+				} else {
+					fraction = (float) target / (float) image.getHeight();
+				}
+
+				if (fraction < 1) {
+					resampleOp = new ResampleOp(DimensionConstrain.createRelativeDimension(fraction));
+					resampleOp.setFilter(ResampleFilters.getLanczos3Filter());
+					resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.Normal);
+					resized = resampleOp.filter(image, null);
+				} else {
+					resized = image;
+				}
+
+				if (resized.getWidth() > width) {
+					resized = resized.getSubimage((resized.getWidth() - width) / 2, 0, width, resized.getHeight());
+				} else if (resized.getHeight() > height) {
+					resized = resized.getSubimage(0, (resized.getHeight() - height) / 2, resized.getWidth(), height);
+				}
+
+				ImageIO.write(resized, StringUtils.getFilenameExtension(file.getName()), file);
 				break;
 			default:
 				throw new IllegalStateException();
 		}
-		op.addImage("-");
-
-		try (FileOutputStream out = new FileOutputStream(file); InputStream in = resource.getInputStream();) {
-			Pipe pipe = new Pipe(in, out);
-
-			ConvertCmd convert = new ConvertCmd();
-//			convert.setSearchPath("C:\\Program Files\\ImageMagick-6.8.6-Q16");
-			convert.setInputProvider(pipe);
-			convert.setOutputConsumer(pipe);
-
-			convert.run(op);
-			out.close();
-		}
-		catch (InterruptedException e) {
-			throw new IOException(e);
-		}
-		catch (IM4JavaException e) {
-			throw new IOException(e);
-		}
 
 		long stopTime = System.currentTimeMillis();
 		logger.debug("Resized image: time [{}ms]", stopTime - startTime);
-//		return file;
 	}
 }
