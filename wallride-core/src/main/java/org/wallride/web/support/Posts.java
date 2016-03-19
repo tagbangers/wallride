@@ -181,7 +181,25 @@ public class Posts {
 				.filter(v -> v.getCustomField().getCode().equals(code))
 				.filter(v -> v.getCustomField().getLanguage().equals(post.getLanguage()))
 				.findFirst();
-		Optional value = target.map(CustomFieldValue::getValue);
-		return value.orElse(null);
+		if(target.isPresent()
+				&& target.get().getValue() != null
+				&& target.get().getCustomField().getFieldType().equals(CustomField.FieldType.HTML)) {
+			Document document = Jsoup.parse(target.get().getTextValue());
+			Elements elements = document.select("img");
+			for (Element element : elements) {
+				String src = element.attr("src");
+				if (src.startsWith(wallRideProperties.getMediaUrlPrefix())) {
+					String style = element.attr("style");
+					Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
+					Matcher matcher = pattern.matcher(element.attr("style"));
+					if (matcher.find()) {
+						String replaced = src + "?w=" + Integer.parseInt(matcher.group(1)) * 2;
+						element.attr("src", replaced);
+					}
+				}
+			}
+			return document.body().html();
+		}
+		return target.get().getValue();
 	}
 }
