@@ -211,10 +211,18 @@
 		</dependency>
 
 		<!-- im4java -->
+		<!--
 		<dependency>
 			<groupId>org.im4java</groupId>
 			<artifactId>im4java</artifactId>
 			<version>1.4.0</version>
+		</dependency>
+		-->
+		<!-- java image scaling -->
+		<dependency>
+			<groupId>com.mortennobel</groupId>
+			<artifactId>java-image-scaling</artifactId>
+			<version>0.8.6</version>
 		</dependency>
 
 		<!-- Jsoup -->
@@ -303,5 +311,5 @@
             <artifactId>jsrender</artifactId>
             <version>1.0.0-rc.70</version>
         </dependency>
-    </dependencies>
+	</dependencies>
 </project>
