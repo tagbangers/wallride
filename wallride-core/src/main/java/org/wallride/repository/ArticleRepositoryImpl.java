@@ -37,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.wallride.domain.Article;
+import org.wallride.domain.CustomField;
 import org.wallride.model.ArticleSearchRequest;
 
 import javax.persistence.EntityManager;
@@ -61,7 +62,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 				.setFetchMode("cover", FetchMode.JOIN)
 				.setFetchMode("user", FetchMode.JOIN)
 				.setFetchMode("categories", FetchMode.JOIN)
-				.setFetchMode("tags", FetchMode.JOIN);
+				.setFetchMode("tags", FetchMode.JOIN)
+				.setFetchMode("customFieldValues", FetchMode.JOIN)
+				.setFetchMode("customFieldValues.customField", FetchMode.JOIN);
 
 		FullTextQuery persistenceQuery = buildFullTextQuery(request, pageable, criteria);
 		int resultSize = persistenceQuery.getResultSize();
@@ -96,6 +99,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 			String[] fields = new String[] {
 					"title", "body",
 					"categories.name", "tags.name",
+					"customFieldValues.value"
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
 			parser.setDefaultOperator(QueryParser.Operator.AND);
@@ -153,6 +157,18 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 			BooleanJunction<BooleanJunction> subJunction = qb.bool();
 			for (String tagName : request.getTagNames()) {
 				subJunction.should(qb.phrase().onField("tags.name").sentence(tagName).createQuery());
+			}
+			junction.must(subJunction.createQuery());
+		}
+
+		if (!CollectionUtils.isEmpty(request.getCustomFields())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (CustomField key : request.getCustomFields().keySet()) {
+				List<Object> value = request.getCustomFields().get(key);
+				subJunction.should(qb.keyword().onField("customFieldValues.customField.id").matching(key.getId()).createQuery());
+				for(Object o : value) {
+					subJunction.must(qb.keyword().onField("customFieldValues."+ key.getFieldType().getValueType()).matching(o.toString()).createQuery());
+				}
 			}
 			junction.must(subJunction.createQuery());
 		}

@@ -154,6 +154,10 @@ public class CustomFieldService {
 		return customFieldRepository.findOneByNameAndLanguage(name, language);
 	}
 
+	public CustomField getCustomFieldByCode(String code, String language) {
+		return customFieldRepository.findOneByCodeAndLanguage(code, language);
+	}
+
 	public Page<CustomField> getCustomFields(CustomFieldSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
 		return getCustomFields(request, pageable);

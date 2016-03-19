@@ -19,12 +19,15 @@ package org.wallride.model;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.wallride.domain.CustomField;
 import org.wallride.domain.Post;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class ArticleSearchRequest implements Serializable {
 
@@ -35,6 +38,7 @@ public class ArticleSearchRequest implements Serializable {
 	private Collection<String> categoryCodes;
 	private Collection<Long> tagIds;
 	private Collection<String> tagNames;
+	private Map<CustomField, List<Object>> customFields;
 	private Long authorId;
 	private Post.Status status;
 	private String language;
@@ -194,6 +198,19 @@ public class ArticleSearchRequest implements Serializable {
 		return this;
 	}
 
+	public Map<CustomField, List<Object>> getCustomFields() {
+		return customFields;
+	}
+
+	public void setCustomFields(Map<CustomField, List<Object>> customFields) {
+		this.customFields = customFields;
+	}
+
+	public  ArticleSearchRequest withCustomFields(Map<CustomField, List<Object>> customFields) {
+		this.customFields = customFields;
+		return this;
+	}
+
 	public Long getAuthorId() {
 		return authorId;
 	}
@@ -247,6 +264,9 @@ public class ArticleSearchRequest implements Serializable {
 			return false;
 		}
 		if (!CollectionUtils.isEmpty(getTagNames())) {
+			return false;
+		}
+		if (!CollectionUtils.isEmpty(getCustomFields())) {
 			return false;
 		}
 		if (getAuthorId() != null) {
