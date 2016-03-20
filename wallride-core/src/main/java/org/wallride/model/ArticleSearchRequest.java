@@ -38,7 +38,7 @@ public class ArticleSearchRequest implements Serializable {
 	private Collection<String> categoryCodes;
 	private Collection<Long> tagIds;
 	private Collection<String> tagNames;
-	private Map<CustomField, List<Object>> customFields;
+	private Map<String, Object> customFields;
 	private Long authorId;
 	private Post.Status status;
 	private String language;
@@ -198,15 +198,15 @@ public class ArticleSearchRequest implements Serializable {
 		return this;
 	}
 
-	public Map<CustomField, List<Object>> getCustomFields() {
+	public Map<String, Object> getCustomFields() {
 		return customFields;
 	}
 
-	public void setCustomFields(Map<CustomField, List<Object>> customFields) {
+	public void setCustomFields(Map<String, Object> customFields) {
 		this.customFields = customFields;
 	}
 
-	public  ArticleSearchRequest withCustomFields(Map<CustomField, List<Object>> customFields) {
+	public  ArticleSearchRequest withCustomFields(Map<String, Object> customFields) {
 		this.customFields = customFields;
 		return this;
 	}

@@ -24,7 +24,10 @@ import org.wallride.model.ArticleSearchRequest;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public class ArticleSearchForm implements Serializable {
@@ -34,7 +37,7 @@ public class ArticleSearchForm implements Serializable {
 	private LocalDateTime dateTo;
 	private Collection<Long> categoryIds = new ArrayList<>();
 	private Collection<String> tagNames = new ArrayList<>();
-	private Map<String, List<Object>> customFields = new HashMap<>();
+	private Map<String, Object> customFields = new HashMap<>();
 	private Long authorId;
 	private String language;
 
@@ -78,11 +81,11 @@ public class ArticleSearchForm implements Serializable {
 		this.tagNames = tagNames;
 	}
 
-	public Map<String, List<Object>> getCustomFields() {
+	public Map<String, Object> getCustomFields() {
 		return customFields;
 	}
 
-	public void setCustomFields(Map<String, List<Object>> customFields) {
+	public void setCustomFields(Map<String, Object> customFields) {
 		this.customFields = customFields;
 	}
 
@@ -117,7 +120,7 @@ public class ArticleSearchForm implements Serializable {
 				.withDateTo(getDateTo())
 				.withCategoryIds(getCategoryIds())
 				.withTagNames(getTagNames())
-//				.withCustomFields(getCustomFields())
+				.withCustomFields(getCustomFields())
 				.withAuthorId(getAuthorId())
 				.withLanguage(getLanguage())
 				.withStatus(Post.Status.PUBLISHED);

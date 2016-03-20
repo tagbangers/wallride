@@ -43,6 +43,8 @@ import org.wallride.model.ArticleSearchRequest;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
@@ -162,25 +164,39 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		}
 
 		if (!CollectionUtils.isEmpty(request.getCustomFields())) {
-			BooleanJunction<BooleanJunction> subJunction = qb.bool();
-			for (CustomField key : request.getCustomFields().keySet()) {
-				List<Object> value = request.getCustomFields().get(key);
-				subJunction.should(qb.keyword().onField("customFieldValues.customField.id").matching(key.getId()).createQuery());
-				switch (key.getFieldType()) {
-				case TEXT:
-				case TEXTAREA:
-				case HTML:
-					for(Object o : value) {
-						subJunction.must(qb.phrase().onField("customFieldValues."+ key.getFieldType().getValueType()).sentence(o.toString()).createQuery());
-					}
-					break;
-				default:
-					for(Object o : value) {
-						subJunction.must(qb.keyword().onField("customFieldValues."+ key.getFieldType().getValueType()).matching(o.toString()).createQuery());
+			javax.persistence.Query query = entityManager.createQuery("from CustomField where language = :language and code in (:codes)", CustomField.class);
+			query.setParameter("language", request.getLanguage())
+					.setParameter("codes", request.getCustomFields().keySet());
+			List<CustomField> customFields = query.getResultList();
+
+			if (!CollectionUtils.isEmpty(customFields)) {
+				Map<String, CustomField> customFieldMap = customFields.stream()
+						.collect(Collectors.toMap(
+								CustomField::getCode,
+								Function.identity()
+						));
+
+				BooleanJunction<BooleanJunction> subJunction = qb.bool();
+				for (String key : request.getCustomFields().keySet()) {
+					List<Object> values = (List<Object>)request.getCustomFields().get(key);
+					CustomField target = customFieldMap.get(key);
+					subJunction.should(qb.keyword().onField("customFieldValues.customField.id").matching(target.getId()).createQuery());
+					switch (target.getFieldType()) {
+						case TEXT:
+						case TEXTAREA:
+						case HTML:
+							for(Object value : values) {
+								subJunction.must(qb.phrase().onField("customFieldValues." + target.getFieldType().getValueType()).sentence(value.toString()).createQuery());
+							}
+							break;
+						default:
+							for(Object value : values) {
+								subJunction.must(qb.keyword().onField("customFieldValues." + target.getFieldType().getValueType()).matching(value.toString()).createQuery());
+							}
 					}
 				}
+				junction.must(subJunction.createQuery());
 			}
-			junction.must(subJunction.createQuery());
 		}
 
 		if (request.getAuthorId() != null) {
