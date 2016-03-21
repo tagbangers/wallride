@@ -35,12 +35,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.wallride.domain.CustomField;
 import org.wallride.domain.Page;
 import org.wallride.model.PageSearchRequest;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PageRepositoryImpl implements PageRepositoryCustom {
@@ -134,6 +137,42 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 				subJunction.should(qb.phrase().onField("tags.name").sentence(tagName).createQuery());
 			}
 			junction.must(subJunction.createQuery());
+		}
+
+		if (!CollectionUtils.isEmpty(request.getCustomFields())) {
+			javax.persistence.Query query = entityManager.createQuery("from CustomField where language = :language and code in (:codes)", CustomField.class);
+			query.setParameter("language", request.getLanguage())
+					.setParameter("codes", request.getCustomFields().keySet());
+			List<CustomField> customFields = query.getResultList();
+
+			if (!CollectionUtils.isEmpty(customFields)) {
+				Map<String, CustomField> customFieldMap = customFields.stream()
+						.collect(Collectors.toMap(
+								CustomField::getCode,
+								Function.identity()
+						));
+
+				BooleanJunction<BooleanJunction> subJunction = qb.bool();
+				for (String key : request.getCustomFields().keySet()) {
+					List<Object> values = (List<Object>)request.getCustomFields().get(key);
+					CustomField target = customFieldMap.get(key);
+					subJunction.should(qb.keyword().onField("customFieldValues.customField.id").matching(target.getId()).createQuery());
+					switch (target.getFieldType()) {
+						case TEXT:
+						case TEXTAREA:
+						case HTML:
+							for(Object value : values) {
+								subJunction.must(qb.phrase().onField("customFieldValues." + target.getFieldType().getValueType()).sentence(value.toString()).createQuery());
+							}
+							break;
+						default:
+							for(Object value : values) {
+								subJunction.must(qb.keyword().onField("customFieldValues." + target.getFieldType().getValueType()).matching(value.toString()).createQuery());
+							}
+					}
+				}
+				junction.must(subJunction.createQuery());
+			}
 		}
 
 		if (request.getAuthorId() != null) {
