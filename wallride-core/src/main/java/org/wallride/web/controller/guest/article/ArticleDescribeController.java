@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,12 +29,14 @@ import org.wallride.domain.Article;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.domain.Comment;
 import org.wallride.domain.Post;
+import org.wallride.model.ArticleSearchRequest;
 import org.wallride.model.CommentSearchRequest;
 import org.wallride.service.ArticleService;
 import org.wallride.service.CommentService;
 import org.wallride.web.support.HttpNotFoundException;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}/{code:.+}")
@@ -82,6 +85,23 @@ public class ArticleDescribeController {
 
 		model.addAttribute("article", article);
 		model.addAttribute("comments", comments);
+		setBothSidesArticles(model, article);
 		return "article/describe";
+	}
+
+	protected Model setBothSidesArticles(Model model, Article article) {
+		List<Long> ids = articleService.getArticleIds(new ArticleSearchRequest());
+		if (!CollectionUtils.isEmpty(ids)) {
+			int index = ids.indexOf(article.getId());
+			if (index < ids.size() - 1) {
+				Article next = articleService.getArticleById(ids.get(index + 1));
+				model.addAttribute("next", next);
+			}
+			if (index > 0) {
+				Article prev = articleService.getArticleById(ids.get(index - 1));
+				model.addAttribute("prev", prev);
+			}
+		}
+		return model;
 	}
 }
