@@ -26,6 +26,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public class ArticleSearchForm implements Serializable {
@@ -35,6 +37,7 @@ public class ArticleSearchForm implements Serializable {
 	private LocalDateTime dateTo;
 	private Collection<Long> categoryIds = new ArrayList<>();
 	private Collection<String> tagNames = new ArrayList<>();
+	private Map<String, Object> customFields = new HashMap<>();
 	private Long authorId;
 	private String language;
 
@@ -78,6 +81,14 @@ public class ArticleSearchForm implements Serializable {
 		this.tagNames = tagNames;
 	}
 
+	public Map<String, Object> getCustomFields() {
+		return customFields;
+	}
+
+	public void setCustomFields(Map<String, Object> customFields) {
+		this.customFields = customFields;
+	}
+
 	public Long getAuthorId() {
 		return authorId;
 	}
@@ -103,14 +114,16 @@ public class ArticleSearchForm implements Serializable {
 
 	public ArticleSearchRequest toArticleSearchRequest() {
 		ArticleSearchRequest request = new ArticleSearchRequest();
-		request.setKeyword(getKeyword());
-		request.setDateFrom(getDateFrom());
-		request.setDateTo(getDateTo());
-		request.setCategoryIds(getCategoryIds());
-		request.setTagNames(getTagNames());
-		request.setAuthorId(getAuthorId());
-		request.setLanguage(getLanguage());
-		request.setStatus(Post.Status.PUBLISHED);
+		request
+				.withKeyword(getKeyword())
+				.withDateFrom(getDateFrom())
+				.withDateTo(getDateTo())
+				.withCategoryIds(getCategoryIds())
+				.withTagNames(getTagNames())
+				.withCustomFields(getCustomFields())
+				.withAuthorId(getAuthorId())
+				.withLanguage(getLanguage())
+				.withStatus(Post.Status.PUBLISHED);
 		return request;
 	}
 
@@ -125,6 +138,7 @@ public class ArticleSearchForm implements Serializable {
 				.append(getDateTo(), that.getDateTo())
 				.append(getCategoryIds(), that.getCategoryIds())
 				.append(getTagNames(), that.getTagNames())
+				.append(getCustomFields(), that.getCustomFields())
 				.append(getAuthorId(), that.getAuthorId())
 				.append(getLanguage(), that.getLanguage())
 				.isEquals();
@@ -138,6 +152,7 @@ public class ArticleSearchForm implements Serializable {
 				.append(getDateTo())
 				.append(getCategoryIds())
 				.append(getTagNames())
+				.append(getCustomFields())
 				.append(getAuthorId())
 				.append(getLanguage())
 				.toHashCode();

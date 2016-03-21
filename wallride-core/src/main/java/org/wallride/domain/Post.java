@@ -123,6 +123,7 @@ public class Post extends DomainObject<Long> {
 	private SortedSet<Tag> tags = new TreeSet<>();
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	@SortNatural
 	private SortedSet<CustomFieldValue> customFieldValues = new TreeSet<>();
 

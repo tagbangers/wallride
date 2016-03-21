@@ -34,8 +34,33 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	public static final String SHALLOW_GRAPH_NAME = "CUSTOM_FIELD_SHALLOW_GRAPH";
 	public static final String DEEP_GRAPH_NAME = "CUSTOM_FIELD_DEEP_GRAPH";
 
+	public static final String STRING_VALUE = "stringValue";
+	public static final String TEXT_VALUE = "textValue";
+	public static final String NUMBER_VALUE = "numberValue";
+	public static final String DATE_VALUE = "dateValue";
+	public static final String DATETIME_VALUE = "datetimeValue";
+
 	public enum FieldType {
-		UNDEFINED, TEXT, TEXTAREA, HTML, SELECTBOX, CHECKBOX, RADIO, NUMBER, DATE, DATETIME,
+		UNDEFINED(null),
+		TEXT(STRING_VALUE),
+		TEXTAREA(TEXT_VALUE),
+		HTML(TEXT_VALUE),
+		SELECTBOX(STRING_VALUE),
+		CHECKBOX(TEXT_VALUE),
+		RADIO(STRING_VALUE),
+		NUMBER(NUMBER_VALUE),
+		DATE(DATE_VALUE),
+		DATETIME(DATETIME_VALUE);
+
+		private String valueType;
+
+		private FieldType(String valueType) {
+			this.valueType = valueType;
+		}
+
+		public String getValueType() {
+			return valueType;
+		}
 	}
 
 	@Id

@@ -27,6 +27,7 @@ import org.wallride.domain.Post;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public class PageSearchRequest implements Serializable {
@@ -34,6 +35,7 @@ public class PageSearchRequest implements Serializable {
 	private String keyword;
 	private Collection<Long> tagIds;
 	private Collection<String> tagNames;
+	private Map<String, Object> customFields;
 	private Long authorId;
 	private Post.Status status;
 	private String language;
@@ -113,6 +115,19 @@ public class PageSearchRequest implements Serializable {
 		return this;
 	}
 
+	public Map<String, Object> getCustomFields() {
+		return customFields;
+	}
+
+	public void setCustomFields(Map<String, Object> customFields) {
+		this.customFields = customFields;
+	}
+
+	public PageSearchRequest withCustomFields(Map<String, Object> customFields) {
+		this.customFields = customFields;
+		return this;
+	}
+
 	public Long getAuthorId() {
 		return authorId;
 	}
@@ -156,7 +171,13 @@ public class PageSearchRequest implements Serializable {
 		if (StringUtils.hasText(getKeyword())) {
 			return false;
 		}
+		if (!CollectionUtils.isEmpty(getTagIds())) {
+			return false;
+		}
 		if (!CollectionUtils.isEmpty(getTagNames())) {
+			return false;
+		}
+		if (!CollectionUtils.isEmpty(getCustomFields())) {
 			return false;
 		}
 		if (getAuthorId() != null) {
