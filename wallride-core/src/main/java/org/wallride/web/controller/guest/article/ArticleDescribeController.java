@@ -64,7 +64,6 @@ public class ArticleDescribeController {
 		if (article == null) {
 			throw new HttpNotFoundException();
 		}
-
 		if (article.getStatus() != Post.Status.PUBLISHED) {
 			throw new HttpNotFoundException();
 		}
@@ -83,13 +82,6 @@ public class ArticleDescribeController {
 		request.setApproved(Boolean.TRUE);
 		Page<Comment> comments = commentService.getComments(request, new PageRequest(0, 1000));
 
-		model.addAttribute("article", article);
-		model.addAttribute("comments", comments);
-		setBothSidesArticles(model, article);
-		return "article/describe";
-	}
-
-	protected Model setBothSidesArticles(Model model, Article article) {
 		List<Long> ids = articleService.getArticleIds(new ArticleSearchRequest());
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(article.getId());
@@ -102,6 +94,8 @@ public class ArticleDescribeController {
 				model.addAttribute("prev", prev);
 			}
 		}
-		return model;
+		model.addAttribute("article", article);
+		model.addAttribute("comments", comments);
+		return "article/describe";
 	}
 }

@@ -95,13 +95,7 @@ public class PageDescribeController extends AbstractController {
 
 	protected ModelAndView createModelAndView(Page page) {
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("page/describe");
-		modelAndView.addObject("page", page);
-		setBothSidesPages(modelAndView, page);
-		return modelAndView;
-	}
 
-	protected ModelAndView setBothSidesPages(ModelAndView modelAndView, Page page) {
 		List<Long> ids = pageService.getPageIds(new PageSearchRequest());
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(page.getId());
@@ -114,6 +108,8 @@ public class PageDescribeController extends AbstractController {
 				modelAndView.addObject("prev", prev);
 			}
 		}
+		modelAndView.addObject("page", page);
+		modelAndView.setViewName("page/describe");
 		return modelAndView;
 	}
 }
