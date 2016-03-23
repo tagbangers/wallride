@@ -77,7 +77,7 @@
 			<dependency>
 				<groupId>org.wallride</groupId>
 				<artifactId>wallride-core</artifactId>
-				<version>1.0.0.M4</version>
+				<version>1.0.0.M5</version>
 			</dependency>
 
 			<!-- Spring -->
