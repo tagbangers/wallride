@@ -141,23 +141,7 @@ public class Posts {
 		if (!StringUtils.hasText(post.getBody())) {
 			return null;
 		}
-
-//		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
-		Document document = Jsoup.parse(post.getBody());
-		Elements elements = document.select("img");
-		for (Element element : elements) {
-			String src = element.attr("src");
-			if (src.startsWith(wallRideProperties.getMediaUrlPrefix())) {
-				String style = element.attr("style");
-				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
-				Matcher matcher = pattern.matcher(element.attr("style"));
-				if (matcher.find()) {
-					String replaced = src + "?w=" + Integer.parseInt(matcher.group(1)) * 2;
-					element.attr("src", replaced);
-				}
-			}
-		}
-		return document.body().html();
+		return parse(post.getBody());
 	}
 
 	public String summary(Post post, int length) {
@@ -180,26 +164,30 @@ public class Posts {
 		Optional<CustomFieldValue> target = post.getCustomFieldValues().stream()
 				.filter(v -> v.getCustomField().getCode().equals(code))
 				.filter(v -> v.getCustomField().getLanguage().equals(post.getLanguage()))
+				.filter(v -> v.getValue() != null)
 				.findFirst();
-		if(target.isPresent()
-				&& target.get().getValue() != null
-				&& target.get().getCustomField().getFieldType().equals(CustomField.FieldType.HTML)) {
-			Document document = Jsoup.parse(target.get().getTextValue());
-			Elements elements = document.select("img");
-			for (Element element : elements) {
-				String src = element.attr("src");
-				if (src.startsWith(wallRideProperties.getMediaUrlPrefix())) {
-					String style = element.attr("style");
-					Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
-					Matcher matcher = pattern.matcher(element.attr("style"));
-					if (matcher.find()) {
-						String replaced = src + "?w=" + Integer.parseInt(matcher.group(1)) * 2;
-						element.attr("src", replaced);
-					}
+		Object value = target.map(CustomFieldValue::getValue);
+		if (target.get().getCustomField().getFieldType().equals(CustomField.FieldType.HTML)) {
+			return parse(target.get().getTextValue());
+		}
+		return value;
+	}
+
+	protected String parse(String html) {
+		Document document = Jsoup.parse(html);
+		Elements elements = document.select("img");
+		for (Element element : elements) {
+			String src = element.attr("src");
+			if (src.startsWith(wallRideProperties.getMediaUrlPrefix())) {
+				String style = element.attr("style");
+				Pattern pattern = Pattern.compile("width: ([0-9]+)px;");
+				Matcher matcher = pattern.matcher(element.attr("style"));
+				if (matcher.find()) {
+					String replaced = src + "?w=" + Integer.parseInt(matcher.group(1)) * 2;
+					element.attr("src", replaced);
 				}
 			}
-			return document.body().html();
 		}
-		return target.get().getValue();
+		return document.body().html();
 	}
 }
