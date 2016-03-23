@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.domain.Article;
+import org.wallride.domain.Post;
 import org.wallride.service.ArticleService;
 import org.wallride.web.support.HttpNotFoundException;
 
@@ -92,7 +93,7 @@ public class ArticleDescribeController {
 		beanWrapper.setConversionService(conversionService);
 		beanWrapper.setPropertyValues(mpvs, true, true);
 		ArticleSearchForm form = (ArticleSearchForm) beanWrapper.getWrappedInstance();
-		List<Long> ids = articleService.getArticleIds(form.toArticleSearchRequest());
+		List<Long> ids = articleService.getArticleIds(form.toArticleSearchRequest().withStatus(Post.Status.PUBLISHED));
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(article.getId());
 			if (index < ids.size() - 1) {
