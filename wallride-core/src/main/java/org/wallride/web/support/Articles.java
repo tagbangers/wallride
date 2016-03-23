@@ -19,6 +19,7 @@ package org.wallride.web.support;
 import org.springframework.data.domain.Page;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.domain.Article;
+import org.wallride.domain.Post;
 import org.wallride.model.ArticleSearchRequest;
 import org.wallride.support.ArticleUtils;
 
@@ -54,7 +55,7 @@ public class Articles {
 		private Collection<String> categoryCodes;
 		private Collection<String> tagNames;
 		private Long authorId;
-//		private Post.Status status;
+		private Post.Status status = Post.Status.PUBLISHED;
 //		private LocalDateTime dateFrom;
 //		private LocalDateTime dateTo;
 
@@ -102,6 +103,7 @@ public class Articles {
 
 		private ArticleSearchRequest buildArticleSearchRequest() {
 			ArticleSearchRequest request = new ArticleSearchRequest(processingContext.getContext().getLocale().getLanguage())
+					.withStatus(this.status)
 					.withKeyword(this.keyword)
 					.withCategoryIds(this.categoryIds)
 					.withCategoryCodes(this.categoryCodes)
