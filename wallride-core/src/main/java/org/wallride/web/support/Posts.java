@@ -164,10 +164,9 @@ public class Posts {
 		Optional<CustomFieldValue> target = post.getCustomFieldValues().stream()
 				.filter(v -> v.getCustomField().getCode().equals(code))
 				.filter(v -> v.getCustomField().getLanguage().equals(post.getLanguage()))
-				.filter(v -> v.getValue() != null)
 				.findFirst();
-		Object value = target.map(CustomFieldValue::getValue);
-		if (target.get().getCustomField().getFieldType().equals(CustomField.FieldType.HTML)) {
+		Object value = target.map(CustomFieldValue::getValue).orElse(null);
+		if (value != null && target.get().getCustomField().getFieldType().equals(CustomField.FieldType.HTML)) {
 			return parse(target.get().getTextValue());
 		}
 		return value;
