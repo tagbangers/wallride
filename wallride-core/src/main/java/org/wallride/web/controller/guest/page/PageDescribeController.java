@@ -96,7 +96,7 @@ public class PageDescribeController extends AbstractController {
 	protected ModelAndView createModelAndView(Page page) {
 		ModelAndView modelAndView = new ModelAndView();
 
-		List<Long> ids = pageService.getPageIds(new PageSearchRequest());
+		List<Long> ids = pageService.getPageIds(new PageSearchRequest().withStatus(Post.Status.PUBLISHED));
 		if (!CollectionUtils.isEmpty(ids)) {
 			int index = ids.indexOf(page.getId());
 			if (index < ids.size() - 1) {
