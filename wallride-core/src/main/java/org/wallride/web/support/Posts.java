@@ -21,6 +21,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IProcessingContext;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.*;
@@ -110,7 +112,13 @@ public class Posts {
 	}
 
 	public String ogImage(Post post) {
-		return null; //TODO
+		String path = thumbnail(post);
+		if (path == null) {
+			return null;
+		}
+		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentContextPath();
+		builder.path(path);
+		return builder.buildAndExpand().encode().toUriString();
 	}
 
 	public String title(Post post) {
