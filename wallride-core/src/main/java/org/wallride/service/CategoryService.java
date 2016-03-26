@@ -188,7 +188,7 @@ public class CategoryService {
 
 	public List<Category> getCategories(String language, boolean includeNoArticle) {
 		if (includeNoArticle) {
-			return categoryRepository.findAllByLanguageOrderByLftAsc(language);
+			return categoryRepository.findAllDistinctByLanguageOrderByLftAsc(language);
 		} else {
 			return categoryRepository.findAll(CategorySpecifications.hasArticle(language), new Sort(Category_.lft.getName()));
 		}

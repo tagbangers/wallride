@@ -21,7 +21,10 @@ import org.wallride.domain.Category;
 import org.wallride.model.TreeNode;
 import org.wallride.service.CategoryService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 public class CategoryUtils {
 
@@ -44,7 +47,7 @@ public class CategoryUtils {
 	}
 
 	public List<TreeNode<Category>> getNodes(boolean includeNoArticle) {
-		Collection<Category> categories = new TreeSet<>(categoryService.getCategories(LocaleContextHolder.getLocale().getLanguage(), includeNoArticle));
+		Collection<Category> categories = categoryService.getCategories(LocaleContextHolder.getLocale().getLanguage(), includeNoArticle);
 
 		List<TreeNode<Category>> rootNodes = new ArrayList<>();
 		Iterator<Category> i = categories.iterator();
