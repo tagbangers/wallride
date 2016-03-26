@@ -178,13 +178,9 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 				ImageIO.write(resized, StringUtils.getFilenameExtension(file.getName()), file);
 				break;
 			case CROP:
-				int target = (width >= height) ? width : height;
-				float fraction;
-				if (image.getWidth() < image.getHeight()) {
-					fraction = (float) target / (float) image.getWidth();
-				} else {
-					fraction = (float) target / (float) image.getHeight();
-				}
+				float wr = (float) width / (float) image.getWidth();
+				float hr = (float) height / (float) image.getHeight();
+				float fraction = (wr > hr) ? wr : hr;
 
 				if (fraction < 1) {
 					resampleOp = new ResampleOp(DimensionConstrain.createRelativeDimension(fraction));
