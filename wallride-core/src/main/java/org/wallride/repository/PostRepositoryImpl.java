@@ -136,6 +136,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				.setFetchMode("cover", FetchMode.JOIN)
 				.setFetchMode("tags", FetchMode.JOIN)
 				.setFetchMode("categories", FetchMode.JOIN)
+				.setFetchMode("customFieldValues", FetchMode.JOIN)
+				.setFetchMode("customFieldValues.customField", FetchMode.JOIN)
 				.setFetchMode("author", FetchMode.JOIN);
 
 		Sort sort = new Sort(
