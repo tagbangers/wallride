@@ -27,8 +27,15 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.wallride.service.BlogService;
 import org.wallride.service.PageService;
+import org.wallride.web.controller.guest.FeedController;
 import org.wallride.web.controller.guest.IndexController;
+import org.wallride.web.controller.guest.SearchController;
+import org.wallride.web.controller.guest.TagController;
+import org.wallride.web.controller.guest.article.ArticleDescribeController;
+import org.wallride.web.controller.guest.article.ArticleIndexController;
+import org.wallride.web.controller.guest.comment.CommentRestController;
 import org.wallride.web.controller.guest.page.PageDescribeController;
+import org.wallride.web.controller.guest.user.*;
 import org.wallride.web.support.DefaultModelAttributeInterceptor;
 import org.wallride.web.support.SetupRedirectInterceptor;
 
@@ -68,5 +75,77 @@ public class WebGuestConfiguration {
 	@ConditionalOnMissingBean
 	public PageDescribeController pageDescribeController() {
 		return new PageDescribeController(blogService, pageService);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ArticleDescribeController articleDescribeController() {
+		return new ArticleDescribeController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ArticleIndexController articleIndexController() {
+		return new ArticleIndexController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public CommentRestController commentRestController() {
+		return new CommentRestController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public LoginController loginController() {
+		return new LoginController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public PasswordResetController passwordResetController() {
+		return new PasswordResetController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public PasswordUpdateController passwordUpdateController() {
+		return new PasswordUpdateController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ProfileUpdateController profileUpdateController() {
+		return new ProfileUpdateController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public SignupController signupController() {
+		return new SignupController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public FeedController feedController() {
+		return new FeedController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public IndexController indexController() {
+		return new IndexController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public SearchController searchController() {
+		return new SearchController();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public TagController tagController() {
+		return new TagController();
 	}
 }

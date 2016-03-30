@@ -19,7 +19,6 @@ package org.wallride.web.controller.guest.article;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +37,6 @@ import org.wallride.web.support.HttpNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 
-@Controller
 @RequestMapping("/{year:[0-9]{4}}/{month:[0-9]{2}}/{day:[0-9]{2}}/{code:.+}")
 public class ArticleDescribeController {
 

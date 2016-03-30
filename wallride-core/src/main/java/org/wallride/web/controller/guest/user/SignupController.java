@@ -16,7 +16,6 @@
 
 package org.wallride.web.controller.guest.user;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,7 +30,6 @@ import org.wallride.service.SignupService;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-@Controller
 @RequestMapping("/signup")
 public class SignupController {
 

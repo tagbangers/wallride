@@ -18,7 +18,6 @@ package org.wallride.web.controller.guest.user;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
@@ -34,7 +33,6 @@ import org.wallride.support.AuthorizedUser;
 
 import javax.inject.Inject;
 
-@Controller
 @RequestMapping("/settings/password")
 public class PasswordUpdateController {
 
