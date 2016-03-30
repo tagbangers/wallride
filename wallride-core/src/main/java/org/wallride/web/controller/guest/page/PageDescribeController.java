@@ -17,6 +17,7 @@
 package org.wallride.web.controller.guest.page;
 
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,6 +27,7 @@ import org.wallride.domain.Blog;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.domain.Page;
 import org.wallride.domain.Post;
+import org.wallride.model.PageSearchRequest;
 import org.wallride.service.BlogService;
 import org.wallride.service.PageService;
 import org.wallride.web.support.BlogLanguageMethodArgumentResolver;
@@ -34,6 +36,7 @@ import org.wallride.web.support.LanguageUrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 public class PageDescribeController extends AbstractController {
@@ -92,8 +95,21 @@ public class PageDescribeController extends AbstractController {
 
 	protected ModelAndView createModelAndView(Page page) {
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("page/describe");
+
+		List<Long> ids = pageService.getPageIds(new PageSearchRequest().withStatus(Post.Status.PUBLISHED));
+		if (!CollectionUtils.isEmpty(ids)) {
+			int index = ids.indexOf(page.getId());
+			if (index < ids.size() - 1) {
+				Page next = pageService.getPageById(ids.get(index + 1));
+				modelAndView.addObject("next", next);
+			}
+			if (index > 0) {
+				Page prev = pageService.getPageById(ids.get(index - 1));
+				modelAndView.addObject("prev", prev);
+			}
+		}
 		modelAndView.addObject("page", page);
+		modelAndView.setViewName("page/describe");
 		return modelAndView;
 	}
 }

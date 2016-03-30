@@ -1,6 +1,6 @@
 WallRide
 ========
-WallRide is a multilingual easy-to-customize open source CMS made by Java,
+WallRide is a multilingual easy-to-customize open source CMS made by 100% pure Java,
 using [Spring Framework](http://projects.spring.io/spring-framework/), [Hibernate](http://hibernate.org/) and [Thymeleaf](http://www.thymeleaf.org/).
 
 WallRide focuses on sophisticated UI, simple and clean source code

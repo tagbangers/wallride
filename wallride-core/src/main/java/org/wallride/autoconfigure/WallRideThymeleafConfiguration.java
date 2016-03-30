@@ -17,6 +17,7 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -86,6 +87,7 @@ public class WallRideThymeleafConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	public WallRideThymeleafDialect wallRideThymeleafDialect() {
 		WallRideThymeleafDialect dialect = new WallRideThymeleafDialect();
 		ArticleUtils articleUtils = articleUtils();

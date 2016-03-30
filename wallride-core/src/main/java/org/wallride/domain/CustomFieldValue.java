@@ -33,7 +33,7 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 	private CustomField customField;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+//	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Post post;
 
 	@Column(length = 300)
