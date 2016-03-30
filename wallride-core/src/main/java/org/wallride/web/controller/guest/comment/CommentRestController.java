@@ -36,7 +36,6 @@ import org.wallride.web.support.RestValidationErrorModel;
 
 import javax.inject.Inject;
 
-@RestController
 @RequestMapping("/comments")
 public class CommentRestController {
 
