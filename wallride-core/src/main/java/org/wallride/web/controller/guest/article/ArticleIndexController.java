@@ -19,6 +19,7 @@ package org.wallride.web.controller.guest.article;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
+@Controller
 public class ArticleIndexController {
 
 //	/article/[:yyyy]/[:mm]/[:dd]/[:code]

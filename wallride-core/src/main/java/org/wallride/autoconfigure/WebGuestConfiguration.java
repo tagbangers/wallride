@@ -19,7 +19,6 @@ package org.wallride.autoconfigure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.accept.ContentNegotiationManager;
@@ -40,7 +39,6 @@ import org.wallride.web.support.DefaultModelAttributeInterceptor;
 import org.wallride.web.support.SetupRedirectInterceptor;
 
 @Configuration
-@ComponentScan(basePackageClasses = IndexController.class)
 public class WebGuestConfiguration {
 
 	@Autowired

@@ -16,6 +16,7 @@
 
 package org.wallride.web.controller.guest.user;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
@@ -35,6 +36,7 @@ import org.wallride.service.UserService;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 
+@Controller
 @RequestMapping("/password-reset")
 public class PasswordResetController {
 

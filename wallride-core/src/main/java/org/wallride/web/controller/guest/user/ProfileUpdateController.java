@@ -16,6 +16,7 @@
 
 package org.wallride.web.controller.guest.user;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -32,6 +33,7 @@ import org.wallride.support.AuthorizedUser;
 
 import javax.inject.Inject;
 
+@Controller
 @RequestMapping("/settings/profile")
 public class ProfileUpdateController {
 
