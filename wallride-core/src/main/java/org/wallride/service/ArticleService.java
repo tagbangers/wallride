@@ -589,6 +589,7 @@ public class ArticleService {
 		return getArticles(request, pageable);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public Page<Article> getArticles(ArticleSearchRequest request, Pageable pageable) {
 		return articleRepository.search(request, pageable);
 	}
