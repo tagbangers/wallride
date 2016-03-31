@@ -643,6 +643,7 @@ public class ArticleService {
 		return articleRepository.findOneByIdAndLanguage(id, language);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public Article getArticleByCode(String code, String language) {
 		return articleRepository.findOneByCodeAndLanguage(code, language);
 	}

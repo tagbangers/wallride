@@ -36,7 +36,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.Media;
-import org.wallride.repository.MediaRepository;
+import org.wallride.service.MediaService;
 import org.wallride.support.ExtendedResourceUtils;
 
 import javax.imageio.ImageIO;
@@ -53,9 +53,8 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 
 	private WallRideProperties wallRideProperties;
 
-//	private BlogService blogService;
+	private MediaService mediaService;
 
-	private MediaRepository mediaRepository;
 	private ResourceLoader resourceLoader;
 
 	private static Logger logger = LoggerFactory.getLogger(MediaHttpRequestHandler.class);
@@ -64,12 +63,8 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		this.wallRideProperties = wallRideProperties;
 	}
 
-//	public void setBlogService(BlogService blogService) {
-//		this.blogService = blogService;
-//	}
-
-	public void setMediaRepository(MediaRepository mediaRepository) {
-		this.mediaRepository = mediaRepository;
+	public void setMediaService(MediaService mediaService) {
+		this.mediaService = mediaService;
 	}
 
 	public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -88,7 +83,7 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		String key = (String) pathVariables.get("key");
 
-		Media media = mediaRepository.findOneById(key);
+		Media media = mediaService.getMedia(key);
 		int width = ServletRequestUtils.getIntParameter(request, "w", 0);
 		int height = ServletRequestUtils.getIntParameter(request, "h", 0);
 		int mode = ServletRequestUtils.getIntParameter(request, "m", 0);

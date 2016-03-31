@@ -23,6 +23,8 @@ import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
+import org.infinispan.eviction.EvictionStrategy;
+import org.infinispan.eviction.EvictionType;
 import org.infinispan.hibernate.search.impl.DefaultCacheManagerService;
 import org.infinispan.lucene.LuceneKey2StringMapper;
 import org.infinispan.manager.DefaultCacheManager;
@@ -167,7 +169,11 @@ public class WallRideCacheConfiguration extends CachingConfigurerSupport {
 		ConfigurationBuilder cacheBuilder = new ConfigurationBuilder();
 		cacheBuilder
 			.clustering()
-				.cacheMode(CacheMode.INVALIDATION_SYNC);
+				.cacheMode(CacheMode.INVALIDATION_SYNC)
+				.eviction()
+					.type(EvictionType.COUNT)
+					.strategy(EvictionStrategy.LIRS)
+					.size(1000);
 //				.indexing()
 //					.index(Index.NONE);
 		// @formatter:on

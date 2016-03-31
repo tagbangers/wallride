@@ -16,18 +16,20 @@
 
 package org.wallride.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.wallride.autoconfigure.WallRideCacheConfiguration;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.Media;
 import org.wallride.repository.MediaRepository;
 import org.wallride.support.ExtendedResourceUtils;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,16 +37,13 @@ import java.util.List;
 @Transactional(rollbackFor=Exception.class)
 public class MediaService {
 
-//	@Inject
-//	private BlogService blogService;
-
-	@Inject
+	@Autowired
 	private ResourceLoader resourceLoader;
 
-	@Inject
+	@Autowired
 	private WallRideProperties wallRideProperties;
 
-	@javax.annotation.Resource
+	@Autowired
 	private MediaRepository mediaRepository;
 
 	public Media createMedia(MultipartFile file) {
@@ -71,6 +70,7 @@ public class MediaService {
 		return mediaRepository.findAll(new Sort(new Sort.Order(Sort.Direction.DESC, "createdAt")));
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.MEDIA_CACHE)
 	public Media getMedia(String id) {
 		return mediaRepository.findOneById(id);
 	}

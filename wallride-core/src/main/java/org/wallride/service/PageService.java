@@ -635,6 +635,7 @@ public class PageService {
 		return pageRepository.findOneByIdAndLanguage(id, language);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)
 	public Page getPageByCode(String code, String language) {
 		return pageRepository.findOneByCodeAndLanguage(code, language);
 	}

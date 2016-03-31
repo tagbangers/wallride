@@ -17,6 +17,9 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebMvcProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -38,8 +41,8 @@ import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
-import org.wallride.repository.MediaRepository;
 import org.wallride.service.BlogService;
+import org.wallride.service.MediaService;
 import org.wallride.support.CodeFormatAnnotationFormatterFactory;
 import org.wallride.web.support.*;
 
@@ -48,12 +51,16 @@ import java.text.ParseException;
 import java.util.*;
 
 @Configuration
+@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
 public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 
 	private static final String CLASSPATH_RESOURCE_LOCATION = "classpath:/resources/guest/";
 
 	@Autowired
 	private WallRideProperties wallRideProperties;
+
+	@Autowired
+	private ResourceProperties resourceProperties = new ResourceProperties();
 
 	@Autowired
 	private MessageCodesResolver messageCodesResolver;
@@ -65,14 +72,15 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 	private BlogService blogService;
 
 	@Autowired
-	private MediaRepository mediaRepository;
+	private MediaService mediaService;
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/**").addResourceLocations(
-				wallRideProperties.getHome() + "themes/default/resources/",
-				CLASSPATH_RESOURCE_LOCATION);
-		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+		Integer cachePeriod = this.resourceProperties.getCachePeriod();
+		registry.addResourceHandler("/resources/**").addResourceLocations(wallRideProperties.getHome() + "themes/default/resources/", CLASSPATH_RESOURCE_LOCATION)
+				.setCachePeriod(cachePeriod);
+		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/")
+				.setCachePeriod(cachePeriod);
 		registry.setOrder(Integer.MIN_VALUE);
 	}
 
@@ -137,8 +145,7 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
 		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
 		mediaHttpRequestHandler.setWallRideProperties(wallRideProperties);
-//		mediaHttpRequestHandler.setBlogService(blogService);
-		mediaHttpRequestHandler.setMediaRepository(mediaRepository);
+		mediaHttpRequestHandler.setMediaService(mediaService);
 		mediaHttpRequestHandler.setResourceLoader(resourceLoader);
 		mediaHttpRequestHandler.setCacheSeconds(86400);
 
