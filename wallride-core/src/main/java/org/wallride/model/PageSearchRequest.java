@@ -18,6 +18,7 @@ package org.wallride.model;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.logging.Log;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -35,6 +36,8 @@ public class PageSearchRequest implements Serializable {
 	private String keyword;
 	private Collection<Long> tagIds;
 	private Collection<String> tagNames;
+	private Collection<Long> categoryIds;
+	private Collection<String> categoryCodes;
 	private Map<String, Object> customFields;
 	private Long authorId;
 	private Post.Status status;
@@ -46,6 +49,10 @@ public class PageSearchRequest implements Serializable {
 
 	public PageSearchRequest(BlogLanguage blogLanguage) {
 		this.language = blogLanguage.getLanguage();
+	}
+
+	public PageSearchRequest(String language) {
+		this.language = language;
 	}
 
 	public String getKeyword() {
@@ -115,6 +122,61 @@ public class PageSearchRequest implements Serializable {
 		return this;
 	}
 
+
+	public Collection<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(Collection<Long> categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
+	public PageSearchRequest withCategoryIds(Long... categoryIds) {
+		if (getCategoryIds() == null) {
+			setCategoryIds(new ArrayList<>(categoryIds.length));
+		}
+		for (Long value : categoryIds) {
+			getCategoryIds().add(value);
+		}
+		return this;
+	}
+
+	public PageSearchRequest withCategoryIds(Collection<Long> categoryIds) {
+		if (categoryIds == null) {
+			this.categoryIds = null;
+		} else {
+			this.categoryIds = new ArrayList<>(categoryIds);
+		}
+		return this;
+	}
+
+	public Collection<String> getCategoryCodes() {
+		return categoryCodes;
+	}
+
+
+	public void setCategoryCodes(Collection<String> categoryCodes) {
+		this.categoryCodes = categoryCodes;
+	}
+
+	public PageSearchRequest withCategoryCodes(String... categoryCodes) {
+		if (getCategoryCodes() == null) {
+			setCategoryCodes(new ArrayList<>(categoryCodes.length));
+		}
+		for (String value : categoryCodes) {
+			getCategoryCodes().add(value);
+		}
+		return this;
+	}
+
+	public PageSearchRequest withCategoryCodes(Collection<String> categoryCodes) {
+		if (categoryCodes == null) {
+			this.categoryCodes = null;
+		} else {
+			this.categoryCodes = categoryCodes;
+		}
+		return this;
+	}
 	public Map<String, Object> getCustomFields() {
 		return customFields;
 	}
