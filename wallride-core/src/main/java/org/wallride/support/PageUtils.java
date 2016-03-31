@@ -16,6 +16,7 @@
 
 package org.wallride.support;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import org.wallride.domain.Page;
 import org.wallride.domain.Post;
@@ -127,5 +128,9 @@ public class PageUtils {
 
 	public List<Page> getSiblings(Page page, boolean includeUnpublished) {
 		return pageService.getSiblingPages(page, includeUnpublished);
+	}
+
+	public org.springframework.data.domain.Page<Page> search(PageSearchRequest request, int size) {
+		return pageService.getPages(request, new PageRequest(0, size));
 	}
 }

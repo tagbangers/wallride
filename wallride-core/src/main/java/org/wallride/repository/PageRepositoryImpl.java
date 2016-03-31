@@ -47,7 +47,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PageRepositoryImpl implements PageRepositoryCustom {
-	
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -122,6 +122,21 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 		if (request.getStatus() != null) {
 			junction.must(qb.keyword().onField("status").matching(request.getStatus()).createQuery());
+		}
+
+		if (!CollectionUtils.isEmpty(request.getCategoryIds())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (long categoryId : request.getCategoryIds()) {
+				subJunction.should(qb.keyword().onField("categories.id").matching(categoryId).createQuery());
+			}
+			junction.must(subJunction.createQuery());
+		}
+		if (!CollectionUtils.isEmpty(request.getCategoryCodes())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (String categoryCode : request.getCategoryCodes()) {
+				subJunction.should(qb.keyword().onField("categories.code").matching(categoryCode).createQuery());
+			}
+			junction.must(subJunction.createQuery());
 		}
 
 		if (!CollectionUtils.isEmpty(request.getTagIds())) {
