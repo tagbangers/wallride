@@ -45,7 +45,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
 	List<Category> findAll(Specification<Category> spec, Sort sort);
 
 	@EntityGraph(value = Category.SHALLOW_GRAPH_NAME, type = EntityGraph.EntityGraphType.FETCH)
-	List<Category> findAllByLanguageOrderByLftAsc(String language);
+	List<Category> findAllDistinctByLanguageOrderByLftAsc(String language);
 
 	@Query("select coalesce(max(rgt), 0) from Category ")
 	int findMaxRgt();

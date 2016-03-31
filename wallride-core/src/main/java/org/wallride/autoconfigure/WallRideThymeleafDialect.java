@@ -42,20 +42,40 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 
 	private WallRideProperties wallRideProperties;
 
+	public PostUtils getPostUtils() {
+		return postUtils;
+	}
+
 	public void setPostUtils(PostUtils postUtils) {
 		this.postUtils = postUtils;
+	}
+
+	public ArticleUtils getArticleUtils() {
+		return articleUtils;
 	}
 
 	public void setArticleUtils(ArticleUtils articleUtils) {
 		this.articleUtils = articleUtils;
 	}
 
+	public PageUtils getPageUtils() {
+		return pageUtils;
+	}
+
 	public void setPageUtils(PageUtils pageUtils) {
 		this.pageUtils = pageUtils;
 	}
 
+	public CategoryUtils getCategoryUtils() {
+		return categoryUtils;
+	}
+
 	public void setCategoryUtils(CategoryUtils categoryUtils) {
 		this.categoryUtils = categoryUtils;
+	}
+
+	public WallRideProperties getWallRideProperties() {
+		return wallRideProperties;
 	}
 
 	public void setWallRideProperties(WallRideProperties wallRideProperties) {
@@ -65,14 +85,42 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 	@Override
 	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
 		Map<String, Object> objects = new HashMap<>();
-		objects.put("posts", new Posts(processingContext, postUtils, wallRideProperties));
-		objects.put("articles", new Articles(processingContext, articleUtils));
-		objects.put("pages", new Pages(processingContext, pageUtils));
-		objects.put("categories", new Categories(processingContext, categoryUtils));
-		objects.put("medias", new Medias(processingContext, wallRideProperties));
-		objects.put("users", new Users(processingContext, wallRideProperties));
-		objects.put("devices", new Devices(processingContext, new LiteDeviceResolver()));
+		objects.put("posts", createPosts(processingContext));
+		objects.put("articles", createArticles(processingContext));
+		objects.put("pages", createPages(processingContext));
+		objects.put("categories", createCategories(processingContext));
+		objects.put("medias", createMedias(processingContext));
+		objects.put("users", createUsers(processingContext));
+		objects.put("devices", createDevices(processingContext));
 		return Collections.unmodifiableMap(objects);
+	}
+
+	protected Posts createPosts(IProcessingContext processingContext) {
+		return new Posts(processingContext, postUtils, wallRideProperties);
+	}
+
+	protected Articles createArticles(IProcessingContext processingContext) {
+		return new Articles(processingContext, articleUtils);
+	}
+
+	protected Pages createPages(IProcessingContext processingContext) {
+		return new Pages(processingContext, pageUtils);
+	}
+
+	protected Categories createCategories(IProcessingContext processingContext) {
+		return new Categories(processingContext, categoryUtils);
+	}
+
+	protected Medias createMedias(IProcessingContext processingContext) {
+		return new Medias(processingContext, wallRideProperties);
+	}
+
+	protected Users createUsers(IProcessingContext processingContext) {
+		return new Users(processingContext, wallRideProperties);
+	}
+
+	protected Devices createDevices(IProcessingContext processingContext) {
+		return new Devices(processingContext, new LiteDeviceResolver());
 	}
 
 	@Override

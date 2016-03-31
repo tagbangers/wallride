@@ -30,6 +30,8 @@ public class CategorySpecifications {
 
 	public static Specification<Category> hasArticle(String language) {
 		return (root, query, cb) -> {
+			query.distinct(true);
+
 			Subquery<Long> subquery = query.subquery(Long.class);
 			Root<Article> a = subquery.from(Article.class);
 			Join<Article, Category> c = a.join(Article_.categories, JoinType.INNER);
