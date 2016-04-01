@@ -64,6 +64,8 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 				.setFetchMode("author", FetchMode.JOIN)
 				.setFetchMode("categories", FetchMode.JOIN)
 				.setFetchMode("tags", FetchMode.JOIN)
+				.setFetchMode("customFieldValues", FetchMode.JOIN)
+				.setFetchMode("customFieldValues.customField", FetchMode.JOIN)
 				.setFetchMode("parent", FetchMode.JOIN)
 				.setFetchMode("children", FetchMode.JOIN);
 
