@@ -61,7 +61,7 @@
 		<infinispan.version>8.1.0.Final</infinispan.version>
 		<infinispan-spring4.version>8.1.0.Alpha2</infinispan-spring4.version>
 		<lucene.version>5.3.0</lucene.version>
-		<amazonaws-version>1.10.30</amazonaws-version>
+		<amazonaws-version>1.10.66</amazonaws-version>
 	</properties>
 
 	<modules>
