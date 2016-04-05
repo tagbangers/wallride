@@ -19,10 +19,8 @@ package org.wallride.domain;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Index;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -50,6 +48,8 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -65,7 +65,11 @@ public class Comment extends DomainObject<Long> implements Comparable<Comment> {
 	private String authorName;
 
 	@Column(nullable = false)
-	@Field
+	@Fields({
+			@Field,
+			@Field(name = "sortDate", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	})
+	@SortableField(forField = "sortDate")
 	private LocalDateTime date;
 
 	@Lob

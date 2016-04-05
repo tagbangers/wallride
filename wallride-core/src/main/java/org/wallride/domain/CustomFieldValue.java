@@ -4,10 +4,7 @@ package org.wallride.domain;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -25,11 +22,13 @@ public class CustomFieldValue extends DomainObject<Long> implements Comparable<C
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
-	@JoinColumn(name="custom_field_id")
+	@JoinColumn(name = "custom_field_id")
 	private CustomField customField;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

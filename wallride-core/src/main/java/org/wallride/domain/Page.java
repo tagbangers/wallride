@@ -18,9 +18,7 @@ package org.wallride.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -64,7 +62,11 @@ public class Page extends Post implements Comparable<Page> {
 	public static final String DEEP_GRAPH_NAME = "PAGE_DEEP_GRAPH";
 
 	@Column(nullable=false)
-	@Field
+	@Fields({
+			@Field,
+			@Field(name = "sortLft", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	})
+	@SortableField(forField = "sortLft")
 	private int lft;
 
 	@Column(nullable=false)
