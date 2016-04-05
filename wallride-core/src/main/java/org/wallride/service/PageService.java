@@ -110,7 +110,7 @@ public class PageService {
 		if (!status.equals(Post.Status.DRAFT)) {
 			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null) {
-				throw new DuplicateCodeException(request.getCode());
+				throw new DuplicateCodeException(code);
 			}
 		}
 
@@ -341,9 +341,9 @@ public class PageService {
 			}
 		}
 		if (!page.getStatus().equals(Post.Status.DRAFT)) {
-			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null && !duplicate.equals(page)) {
-				throw new DuplicateCodeException(request.getCode());
+				throw new DuplicateCodeException(code);
 			}
 		}
 
