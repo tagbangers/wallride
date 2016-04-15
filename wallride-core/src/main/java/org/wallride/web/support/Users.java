@@ -19,7 +19,7 @@ package org.wallride.web.support;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.Blog;
 import org.wallride.domain.User;
@@ -29,12 +29,12 @@ import java.util.Map;
 
 public class Users {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 
 	private WallRideProperties wallRideProperties;
 
-	public Users(IProcessingContext processingContext, WallRideProperties wallRideProperties) {
-		this.processingContext = processingContext;
+	public Users(IExpressionContext context, WallRideProperties wallRideProperties) {
+		this.context = context;
 		this.wallRideProperties = wallRideProperties;
 	}
 
@@ -71,9 +71,9 @@ public class Users {
 	}
 
 	public String title(User user) {
-		Blog blog = (Blog) processingContext.getContext().getVariables().get("BLOG");
+		Blog blog = (Blog) context.getVariable("BLOG");
 		return String.format("%s | %s",
 				user.getNickname(),
-				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
+				blog.getTitle(context.getLocale().getLanguage()));
 	}
 }

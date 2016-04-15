@@ -17,7 +17,7 @@
 package org.wallride.web.support;
 
 import org.springframework.data.domain.Page;
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.wallride.domain.Article;
 import org.wallride.domain.Post;
 import org.wallride.model.ArticleSearchRequest;
@@ -29,11 +29,11 @@ import java.util.List;
 
 public class Articles {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 	private ArticleUtils articleUtils;
 
-	public Articles(IProcessingContext processingContext, ArticleUtils articleUtils) {
-		this.processingContext = processingContext;
+	public Articles(IExpressionContext context, ArticleUtils articleUtils) {
+		this.context = context;
 		this.articleUtils = articleUtils;
 	}
 
@@ -102,7 +102,7 @@ public class Articles {
 		}
 
 		private ArticleSearchRequest buildArticleSearchRequest() {
-			ArticleSearchRequest request = new ArticleSearchRequest(processingContext.getContext().getLocale().getLanguage())
+			ArticleSearchRequest request = new ArticleSearchRequest(context.getLocale().getLanguage())
 					.withStatus(this.status)
 					.withKeyword(this.keyword)
 					.withCategoryIds(this.categoryIds)

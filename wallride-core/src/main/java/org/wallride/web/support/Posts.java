@@ -23,7 +23,7 @@ import org.jsoup.select.Elements;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.*;
 import org.wallride.support.PostUtils;
@@ -34,14 +34,14 @@ import java.util.regex.Pattern;
 
 public class Posts {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 
 	private PostUtils postUtils;
 
 	private WallRideProperties wallRideProperties;
 
-	public Posts(IProcessingContext processingContext, PostUtils postUtils, WallRideProperties wallRideProperties) {
-		this.processingContext = processingContext;
+	public Posts(IExpressionContext context, PostUtils postUtils, WallRideProperties wallRideProperties) {
+		this.context = context;
 		this.postUtils = postUtils;
 		this.wallRideProperties = wallRideProperties;
 	}
@@ -91,8 +91,8 @@ public class Posts {
 	}
 
 	public String ogSiteName(Post post) {
-		Blog blog = (Blog) processingContext.getContext().getVariables().get("BLOG");
-		return blog.getTitle(processingContext.getContext().getLocale().getLanguage());
+		Blog blog = (Blog) context.getVariable("BLOG");
+		return blog.getTitle(context.getLocale().getLanguage());
 	}
 
 	public String ogTitle(Post post) {
@@ -125,10 +125,10 @@ public class Posts {
 		if (post.getSeo() != null && post.getSeo().getTitle() != null) {
 			return post.getSeo().getTitle();
 		}
-		Blog blog = (Blog) processingContext.getContext().getVariables().get("BLOG");
+		Blog blog = (Blog) context.getVariable("BLOG");
 		return String.format("%s | %s",
 				post.getTitle(),
-				blog.getTitle(processingContext.getContext().getLocale().getLanguage()));
+				blog.getTitle(context.getLocale().getLanguage()));
 	}
 
 	public String thumbnail(Post post) {

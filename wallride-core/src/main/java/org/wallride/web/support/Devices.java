@@ -18,17 +18,17 @@ package org.wallride.web.support;
 
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceResolver;
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.context.IWebContext;
 
 public class Devices {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 
 	private DeviceResolver deviceResolver;
 
-	public Devices (IProcessingContext processingContext, DeviceResolver deviceResolver) {
-		this.processingContext = processingContext;
+	public Devices (IExpressionContext context, DeviceResolver deviceResolver) {
+		this.context = context;
 		this.deviceResolver = deviceResolver;
 	}
 
@@ -45,6 +45,6 @@ public class Devices {
 	}
 
 	private Device resolveDevice() {
-		return deviceResolver.resolveDevice(((IWebContext) processingContext.getContext()).getHttpServletRequest());
+		return deviceResolver.resolveDevice(((IWebContext) context).getRequest());
 	}
 }

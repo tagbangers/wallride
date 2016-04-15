@@ -16,14 +16,13 @@
 
 package org.wallride.web.support;
 
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.wallride.domain.Page;
 import org.wallride.domain.Post;
 import org.wallride.model.PageSearchRequest;
 import org.wallride.model.TreeNode;
 import org.wallride.support.PageUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,12 +30,12 @@ import java.util.Map;
 
 public class Pages {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 
 	private PageUtils pageUtils;
 
-	public Pages(IProcessingContext processingContext, PageUtils pageUtils) {
-		this.processingContext = processingContext;
+	public Pages(IExpressionContext context, PageUtils pageUtils) {
+		this.context = context;
 		this.pageUtils = pageUtils;
 	}
 
@@ -134,7 +133,7 @@ public class Pages {
 		}
 
 		private PageSearchRequest buildPageSearchRequest() {
-			PageSearchRequest request = new PageSearchRequest(processingContext.getContext().getLocale().getLanguage())
+			PageSearchRequest request = new PageSearchRequest(context.getLocale().getLanguage())
 					.withKeyword(this.keyword)
 					.withCategoryIds(this.categoryIds)
 					.withCategoryCodes(this.categoryCodes)
