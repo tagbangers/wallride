@@ -19,6 +19,7 @@ package org.wallride.autoconfigure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -27,7 +28,7 @@ import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templateresolver.TemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.wallride.service.ArticleService;
 import org.wallride.service.CategoryService;
 import org.wallride.service.PageService;
@@ -46,6 +47,9 @@ import java.util.Set;
 public class WallRideThymeleafConfiguration {
 
 	@Autowired
+	private ApplicationContext applicationContext;
+
+	@Autowired
 	private WallRideProperties wallRideProperties;
 
 	@Autowired
@@ -56,9 +60,6 @@ public class WallRideThymeleafConfiguration {
 
 	@Autowired
 	private CategoryService categoryService;
-
-	@Inject
-	private WallRideResourceResourceResolver wallRideResourceResourceResolver;
 
 	@Inject
 	private ThymeleafProperties thymeleafProperties;
@@ -101,9 +102,10 @@ public class WallRideThymeleafConfiguration {
 	}
 
 	@Bean(name = {"defaultTemplateResolver", "homePathTemplateResolver"})
-	public TemplateResolver homePathTemplateResolver() {
-		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(wallRideResourceResourceResolver);
+	public ITemplateResolver homePathTemplateResolver() {
+		WallRideResourceTemplateResolver resolver = new WallRideResourceTemplateResolver();
+//		resolver.setResourceResolver(wallRideResourceResourceResolver);
+		resolver.setApplicationContext(applicationContext);
 		resolver.setPrefix(wallRideProperties.getHome() + "themes/default/templates/");
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
@@ -114,9 +116,10 @@ public class WallRideThymeleafConfiguration {
 	}
 
 	@Bean
-	public TemplateResolver classPathTemplateResolver() {
-		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(wallRideResourceResourceResolver);
+	public ITemplateResolver classPathTemplateResolver() {
+		WallRideResourceTemplateResolver resolver = new WallRideResourceTemplateResolver();
+//		resolver.setResourceResolver(wallRideResourceResourceResolver);
+		resolver.setApplicationContext(applicationContext);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.guest"));
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
@@ -130,7 +133,7 @@ public class WallRideThymeleafConfiguration {
 	public SpringTemplateEngine templateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
 //		engine.setTemplateResolver(templateResolver());
-		Set<TemplateResolver> templateResolvers = new LinkedHashSet<>();
+		Set<ITemplateResolver> templateResolvers = new LinkedHashSet<>();
 		templateResolvers.add(homePathTemplateResolver());
 		templateResolvers.add(classPathTemplateResolver());
 		engine.setTemplateResolvers(templateResolvers);

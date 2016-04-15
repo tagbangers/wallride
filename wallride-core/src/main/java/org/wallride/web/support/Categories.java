@@ -16,7 +16,7 @@
 
 package org.wallride.web.support;
 
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.wallride.domain.Category;
 import org.wallride.model.TreeNode;
 import org.wallride.support.CategoryUtils;
@@ -25,12 +25,12 @@ import java.util.List;
 
 public class Categories {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 
 	private CategoryUtils CategoryUtils;
 
-	public Categories(IProcessingContext processingContext, CategoryUtils CategoryUtils) {
-		this.processingContext = processingContext;
+	public Categories(IExpressionContext context, CategoryUtils CategoryUtils) {
+		this.context = context;
 		this.CategoryUtils = CategoryUtils;
 	}
 
