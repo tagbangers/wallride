@@ -20,8 +20,9 @@ import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ArticleCreateRequest implements Serializable {
@@ -38,7 +39,7 @@ public class ArticleCreateRequest implements Serializable {
 	private String seoTitle;
 	private String seoDescription;
 	private String seoKeywords;
-	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 	private String language;
 
 	public String getCode() {
@@ -89,7 +90,7 @@ public class ArticleCreateRequest implements Serializable {
 		return seoKeywords;
 	}
 
-	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
 		return customFieldValues;
 	}
 
@@ -111,7 +112,7 @@ public class ArticleCreateRequest implements Serializable {
 		private String seoTitle;
 		private String seoDescription;
 		private String seoKeywords;
-		private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
+		private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 		private String language;
 
 		public Builder() {
@@ -177,7 +178,7 @@ public class ArticleCreateRequest implements Serializable {
 			return this;
 		}
 
-		public Builder customFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+		public Builder customFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
 			this.customFieldValues = customFieldValues;
 			return this;
 		}

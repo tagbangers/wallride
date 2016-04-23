@@ -30,6 +30,7 @@ import org.wallride.model.PageUpdateRequest;
 import org.wallride.support.CodeFormat;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -70,6 +71,7 @@ public class PageEditForm implements Serializable {
 	private String seoDescription;
 	private String seoKeywords;
 
+	@Valid
 	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 //	private Post.Status status;

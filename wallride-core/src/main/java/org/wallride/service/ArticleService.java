@@ -249,7 +249,7 @@ public class ArticleService {
 						.seoTitle(request.getSeoTitle())
 						.seoDescription(request.getSeoDescription())
 						.seoKeywords(request.getSeoKeywords())
-						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
+						.customFieldValues(new ArrayList<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createArticle(createRequest, Post.Status.DRAFT, authorizedUser);

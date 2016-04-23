@@ -29,6 +29,7 @@ import org.wallride.domain.Tag;
 import org.wallride.model.ArticleUpdateRequest;
 import org.wallride.support.CodeFormat;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -67,6 +68,7 @@ public class ArticleEditForm implements Serializable {
 	private String seoDescription;
 	private String seoKeywords;
 
+	@Valid
 	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	@NotNull

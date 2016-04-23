@@ -90,7 +90,6 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 		expressionObjectFactory.setPageUtils(pageUtils);
 		expressionObjectFactory.setCategoryUtils(categoryUtils);
 		expressionObjectFactory.setWallRideProperties(wallRideProperties);
-		expressionObjectFactory.setPostUtils(postUtils);
 		return expressionObjectFactory;
 	}
 }
