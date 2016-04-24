@@ -109,7 +109,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(Category.class);
 
-		Sort sort = new Sort(new SortField("name", SortField.Type.STRING));
+		Sort sort = new Sort(new SortField("sortName", SortField.Type.STRING));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Category.class)

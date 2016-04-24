@@ -20,9 +20,8 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SortNatural;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Index;
 
 import javax.persistence.*;
 import java.util.SortedSet;
@@ -38,10 +37,16 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@Column(length = 200, nullable = false)
-	@Field
+	@Fields({
+			@Field,
+			@Field(name = "sortName", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	})
+	@SortableField(forField = "sortName")
 	private String name;
 
 	@Column(length = 3, nullable = false)
@@ -100,11 +105,6 @@ public class Tag extends DomainObject<Long> implements Comparable<Tag> {
 //	public int getArticleCount() {
 //		return articleCount;
 //	}
-
-	@Field(analyze = Analyze.NO)
-	public String getSortKey() {
-		return getName();
-	}
 
 	@Override
 	public String print() {

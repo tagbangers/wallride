@@ -108,15 +108,15 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 			if (pageable.getSort().getOrderFor("date") != null) {
 				Order order = pageable.getSort().getOrderFor("date");
 				sort = new Sort(
-						new SortField("date", SortField.Type.STRING, order.getDirection().equals(Direction.DESC)),
-						new SortField("id", SortField.Type.LONG, order.getDirection().equals(Direction.DESC)));
+						new SortField("sortDate", SortField.Type.STRING, order.getDirection().equals(Direction.DESC)),
+						new SortField("sortId", SortField.Type.LONG, order.getDirection().equals(Direction.DESC)));
 			}
 		}
 
 		if (sort == null) {
 			sort = new Sort(
-					new SortField("date", SortField.Type.STRING),
-					new SortField("id", SortField.Type.LONG));
+					new SortField("sortDate", SortField.Type.STRING),
+					new SortField("sortId", SortField.Type.LONG));
 		}
 
 		FullTextQuery persistenceQuery = fullTextEntityManager

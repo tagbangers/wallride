@@ -174,7 +174,7 @@ public class WallRideCacheConfiguration extends CachingConfigurerSupport {
 		ConfigurationBuilder cacheBuilder = new ConfigurationBuilder();
 		cacheBuilder
 			.clustering()
-				.cacheMode(CacheMode.INVALIDATION_SYNC)
+				.cacheMode(CacheMode.REPL_SYNC)
 				.eviction()
 					.type(EvictionType.COUNT)
 					.strategy(EvictionStrategy.LIRS)

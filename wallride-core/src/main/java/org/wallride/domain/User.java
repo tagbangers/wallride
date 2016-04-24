@@ -19,10 +19,7 @@ package org.wallride.domain;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SortNatural;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
 import org.springframework.util.DigestUtils;
 
 import javax.persistence.*;
@@ -59,6 +56,8 @@ public class User extends DomainObject<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@Column(length = 100, nullable = false, unique = true)

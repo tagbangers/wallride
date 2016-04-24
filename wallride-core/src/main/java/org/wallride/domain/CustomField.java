@@ -7,6 +7,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SortNatural;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
@@ -54,7 +55,7 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 
 		private String valueType;
 
-		private FieldType(String valueType) {
+		FieldType(String valueType) {
 			this.valueType = valueType;
 		}
 
@@ -65,6 +66,8 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@Column

@@ -113,9 +113,9 @@ public class ArticleService {
 		}
 
 		if (!status.equals(Post.Status.DRAFT)) {
-			Post duplicate = postRepository.findOneByCodeAndLanguage(request.getCode(), request.getLanguage());
+			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null) {
-				throw new DuplicateCodeException(request.getCode());
+				throw new DuplicateCodeException(code);
 			}
 		}
 
@@ -341,7 +341,7 @@ public class ArticleService {
 		if (!article.getStatus().equals(Post.Status.DRAFT)) {
 			Post duplicate = postRepository.findOneByCodeAndLanguage(code, request.getLanguage());
 			if (duplicate != null && !duplicate.equals(article)) {
-				throw new DuplicateCodeException(request.getCode());
+				throw new DuplicateCodeException(code);
 			}
 		}
 

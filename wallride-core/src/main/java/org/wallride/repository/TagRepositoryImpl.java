@@ -89,7 +89,7 @@ public class TagRepositoryImpl implements TagRepositoryCustom {
 		Session session = (Session) entityManager.getDelegate();
 		Criteria criteria = session.createCriteria(Tag.class);
 
-		Sort sort = new Sort(new SortField("sortKey", SortField.Type.STRING));
+		Sort sort = new Sort(new SortField("sortName", SortField.Type.STRING));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Tag.class)

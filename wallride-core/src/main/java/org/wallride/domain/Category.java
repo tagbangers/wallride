@@ -19,8 +19,8 @@ package org.wallride.domain;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SortNatural;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Index;
 
 import javax.persistence.*;
 import java.util.List;
@@ -51,6 +51,8 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@Column(length = 200, nullable = false)
@@ -62,7 +64,11 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 	private String language;
 
 	@Column(length = 200, nullable = false)
-	@Field
+	@Fields({
+			@Field,
+			@Field(name = "sortName", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	})
+	@SortableField(forField = "sortName")
 	private String name;
 
 	@Lob

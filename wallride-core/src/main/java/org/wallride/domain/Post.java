@@ -17,10 +17,8 @@
 package org.wallride.domain;
 
 import org.hibernate.annotations.*;
-import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Index;
 
 import javax.persistence.CascadeType;
 import javax.persistence.*;
@@ -57,6 +55,8 @@ public class Post extends DomainObject<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@Column(length = 200)
@@ -82,7 +82,11 @@ public class Post extends DomainObject<Long> {
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	private Seo seo = new Seo();
 
-	@Field
+	@Fields({
+			@Field,
+			@Field(name = "sortDate", analyze = Analyze.NO, index = Index.NO)
+	})
+	@SortableField(forField = "sortDate")
 	private LocalDateTime date;
 
 	@ManyToOne

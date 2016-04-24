@@ -19,9 +19,7 @@ package org.wallride.domain;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
 
 import javax.persistence.*;
 
@@ -40,6 +38,8 @@ public class PopularPost extends DomainObject<Long> implements Comparable<Popula
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Field(name = "sortId", analyze = Analyze.NO, index = org.hibernate.search.annotations.Index.NO)
+	@SortableField(forField = "sortId")
 	private long id;
 
 	@Column(length = 3, nullable = false)

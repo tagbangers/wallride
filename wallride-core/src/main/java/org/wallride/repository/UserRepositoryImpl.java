@@ -115,7 +115,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
 		Query searchQuery = junction.createQuery();
 
-		Sort sort = new Sort(new SortField("id", SortField.Type.STRING, false));
+		Sort sort = new Sort(new SortField("sortId", SortField.Type.LONG, false));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, User.class)

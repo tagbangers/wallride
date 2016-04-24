@@ -198,7 +198,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 		Query searchQuery = junction.createQuery();
 
-		Sort sort = new Sort(new SortField("lft", SortField.Type.INT));
+		Sort sort = new Sort(new SortField("sortLft", SortField.Type.INT));
 
 		FullTextQuery persistenceQuery = fullTextEntityManager
 				.createFullTextQuery(searchQuery, Page.class)
