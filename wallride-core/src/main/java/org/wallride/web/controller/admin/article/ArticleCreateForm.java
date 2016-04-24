@@ -21,13 +21,11 @@ import org.wallride.domain.CustomField;
 import org.wallride.model.ArticleCreateRequest;
 import org.wallride.support.CodeFormat;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class ArticleCreateForm implements Serializable {
@@ -74,7 +72,8 @@ public class ArticleCreateForm implements Serializable {
 	private String seoDescription;
 	private String seoKeywords;
 
-	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
+	@Valid
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	@NotNull
 	private String language;
@@ -175,11 +174,11 @@ public class ArticleCreateForm implements Serializable {
 		this.seoKeywords = seoKeywords;
 	}
 
-	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
 		return customFieldValues;
 	}
 
-	public void setCustomFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
 		this.customFieldValues = customFieldValues;
 	}
 

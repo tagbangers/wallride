@@ -22,6 +22,7 @@ import org.wallride.model.PageCreateRequest;
 import org.wallride.support.CodeFormat;
 import org.wallride.web.controller.admin.article.CustomFieldValueEditForm;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -78,6 +79,7 @@ public class PageCreateForm implements Serializable {
 
 //	private Post.Status status;
 
+	@Valid
 	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
 
 	@NotNull
