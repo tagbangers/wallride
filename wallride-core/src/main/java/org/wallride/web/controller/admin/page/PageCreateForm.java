@@ -26,10 +26,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class PageCreateForm implements Serializable {
@@ -80,7 +77,7 @@ public class PageCreateForm implements Serializable {
 //	private Post.Status status;
 
 	@Valid
-	private Set<CustomFieldValueEditForm> customFieldValues = new LinkedHashSet<>();
+	private List<CustomFieldValueEditForm> customFieldValues = new ArrayList<>();
 
 	@NotNull
 	private String language;
@@ -189,15 +186,15 @@ public class PageCreateForm implements Serializable {
 		this.seoKeywords = seoKeywords;
 	}
 
-	public Set<CustomFieldValueEditForm> getCustomFieldValues() {
+	public List<CustomFieldValueEditForm> getCustomFieldValues() {
 		return customFieldValues;
 	}
 
-	public void setCustomFieldValues(Set<CustomFieldValueEditForm> customFieldValues) {
+	public void setCustomFieldValues(List<CustomFieldValueEditForm> customFieldValues) {
 		this.customFieldValues = customFieldValues;
 	}
 
-	//	public Post.Status getStatus() {
+//	public Post.Status getStatus() {
 //		return status;
 //	}
 //
