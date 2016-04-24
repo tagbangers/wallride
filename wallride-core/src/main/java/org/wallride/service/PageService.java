@@ -261,7 +261,7 @@ public class PageService {
 						.seoTitle(request.getSeoTitle())
 						.seoDescription(request.getSeoDescription())
 						.seoKeywords(request.getSeoKeywords())
-						.customFieldValues(new LinkedHashSet<>(request.getCustomFieldValues()))
+						.customFieldValues(new ArrayList<>(request.getCustomFieldValues()))
 						.language(request.getLanguage())
 						.build();
 				draft = createPage(createRequest, Post.Status.DRAFT, authorizedUser);
