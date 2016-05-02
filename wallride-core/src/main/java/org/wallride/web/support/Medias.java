@@ -16,18 +16,18 @@
 
 package org.wallride.web.support;
 
-import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.IExpressionContext;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.Media;
 
 public class Medias {
 
-	private IProcessingContext processingContext;
+	private IExpressionContext context;
 
 	private WallRideProperties wallRideProperties;
 
-	public Medias(IProcessingContext processingContext, WallRideProperties wallRideProperties) {
-		this.processingContext = processingContext;
+	public Medias(IExpressionContext context, WallRideProperties wallRideProperties) {
+		this.context = context;
 		this.wallRideProperties = wallRideProperties;
 	}
 

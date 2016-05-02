@@ -51,10 +51,10 @@ import org.wallride.service.BlogService;
 @ComponentScan(basePackageClasses = BlogService.class)
 public class WallRideAutoConfiguration {
 
-	@Bean
-	public WallRideResourceResourceResolver wallRideResourceResourceResolver() {
-		return new WallRideResourceResourceResolver();
-	}
+//	@Bean
+//	public WallRideResourceResourceResolver wallRideResourceResourceResolver() {
+//		return new WallRideResourceResourceResolver();
+//	}
 
 	@Bean
 	public AmazonS3 amazonS3() {
