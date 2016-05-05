@@ -180,7 +180,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 				for (String key : request.getCustomFields().keySet()) {
 					List<Object> values = (List<Object>)request.getCustomFields().get(key);
 					CustomField target = customFieldMap.get(key);
-					subJunction.should(qb.keyword().onField("customFieldValues.customField.id").matching(target.getId()).createQuery());
+					subJunction.must(qb.keyword().onField("customFieldValues.customField.id").matching(target.getId()).createQuery());
 					switch (target.getFieldType()) {
 						case TEXT:
 						case TEXTAREA:
