@@ -16,6 +16,7 @@
 
 package org.wallride.service;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -226,7 +227,11 @@ public class PageService {
 				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
 				value.setPost(page);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					value.setTextValue(String.join(",", valueForm.getTextValues()));
+					if (!ArrayUtils.isEmpty(valueForm.getTextValues())) {
+						value.setTextValue(String.join(",", valueForm.getTextValues()));
+					} else {
+						value.setTextValue(null);
+					}
 				} else {
 					value.setTextValue(valueForm.getTextValue());
 				}
@@ -234,7 +239,9 @@ public class PageService {
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
-				page.getCustomFieldValues().add(value);
+				if (!value.isEmpty()) {
+					page.getCustomFieldValues().add(value);
+				}
 			}
 		}
 
@@ -473,7 +480,11 @@ public class PageService {
 				value.setCustomField(customField);
 				value.setPost(page);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					value.setTextValue(String.join(",", valueForm.getTextValues()));
+					if (!ArrayUtils.isEmpty(valueForm.getTextValues())) {
+						value.setTextValue(String.join(",", valueForm.getTextValues()));
+					} else {
+						value.setTextValue(null);
+					}
 				} else {
 					value.setTextValue(valueForm.getTextValue());
 				}
@@ -481,7 +492,9 @@ public class PageService {
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
-				fieldValues.add(value);
+				if (!value.isEmpty()) {
+					fieldValues.add(value);
+				}
 			}
 		}
 		page.setCustomFieldValues(fieldValues);
