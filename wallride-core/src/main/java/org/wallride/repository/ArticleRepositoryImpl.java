@@ -180,20 +180,21 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 				for (String key : request.getCustomFields().keySet()) {
 					List<Object> values = (List<Object>)request.getCustomFields().get(key);
 					CustomField target = customFieldMap.get(key);
-					subJunction.must(qb.keyword().onField("customFieldValues.customField.id").matching(target.getId()).createQuery());
+					BooleanJunction<BooleanJunction> customFieldJunction = qb.bool();
 					switch (target.getFieldType()) {
 						case TEXT:
 						case TEXTAREA:
 						case HTML:
 							for(Object value : values) {
-								subJunction.must(qb.phrase().onField("customFieldValues." + target.getFieldType().getValueType()).sentence(value.toString()).createQuery());
+								customFieldJunction.should(qb.phrase().onField("customFieldValues." + key).ignoreFieldBridge().sentence(value.toString()).createQuery());
 							}
 							break;
 						default:
 							for(Object value : values) {
-								subJunction.must(qb.keyword().onField("customFieldValues." + target.getFieldType().getValueType()).matching(value.toString()).createQuery());
+								customFieldJunction.should(qb.keyword().onField("customFieldValues." + key).ignoreFieldBridge().matching(value.toString()).createQuery());
 							}
 					}
+					subJunction.must(customFieldJunction.createQuery());
 				}
 				junction.must(subJunction.createQuery());
 			}
