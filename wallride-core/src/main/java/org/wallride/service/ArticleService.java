@@ -215,7 +215,11 @@ public class ArticleService {
 				value.setCustomField(entityManager.getReference(CustomField.class, valueForm.getCustomFieldId()));
 				value.setPost(article);
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
-					value.setTextValue(String.join(",", valueForm.getTextValues()));
+					if (!ArrayUtils.isEmpty(valueForm.getTextValues())) {
+						value.setTextValue(String.join(",", valueForm.getTextValues()));
+					} else {
+						value.setTextValue(null);
+					}
 				} else {
 					value.setTextValue(valueForm.getTextValue());
 				}
@@ -223,10 +227,11 @@ public class ArticleService {
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
-				article.getCustomFieldValues().add(value);
+				if (!value.isEmpty()) {
+					article.getCustomFieldValues().add(value);
+				}
 			}
 		}
-
 		return articleRepository.save(article);
 	}
 
@@ -434,14 +439,15 @@ public class ArticleService {
 		article.setUpdatedAt(now);
 		article.setUpdatedBy(authorizedUser.toString());
 
-		SortedSet<CustomFieldValue> fieldValues = new TreeSet<>();
 		Map<CustomField, CustomFieldValue> valueMap = new LinkedHashMap<>();
 		for (CustomFieldValue value : article.getCustomFieldValues()) {
 			valueMap.put(value.getCustomField(), value);
 		}
 
 		article.getCustomFieldValues().clear();
+		SortedSet<CustomFieldValue> fieldValues = null;
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
+			fieldValues = new TreeSet<>();
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
 				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
 				CustomFieldValue value = valueMap.get(customField);
@@ -453,6 +459,8 @@ public class ArticleService {
 				if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
 					if (!ArrayUtils.isEmpty(valueForm.getTextValues())) {
 						value.setTextValue(String.join(",", valueForm.getTextValues()));
+					} else {
+						value.setTextValue(null);
 					}
 				} else {
 					value.setTextValue(valueForm.getTextValue());
@@ -461,7 +469,9 @@ public class ArticleService {
 				value.setNumberValue(valueForm.getNumberValue());
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
-				fieldValues.add(value);
+				if (!value.isEmpty()) {
+					fieldValues.add(value);
+				}
 			}
 		}
 		article.setCustomFieldValues(fieldValues);
