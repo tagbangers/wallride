@@ -14,7 +14,9 @@ public class CustomFieldValuesBridge implements FieldBridge {
 		Collection<CustomFieldValue> customFieldValues = (Collection<CustomFieldValue>) value;
 		if (customFieldValues != null) {
 			for (CustomFieldValue cfv : customFieldValues) {
-				luceneOptions.addFieldToDocument(name + "." + cfv.getCustomField().getCode(), cfv.getValue().toString(), document);
+				if (cfv.getValue() != null) {
+					luceneOptions.addFieldToDocument(name + "." + cfv.getCustomField().getCode(), cfv.getValue().toString(), document);
+				}
 			}
 		}
 	}
