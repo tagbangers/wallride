@@ -445,9 +445,7 @@ public class ArticleService {
 		}
 
 		article.getCustomFieldValues().clear();
-		SortedSet<CustomFieldValue> fieldValues = null;
 		if (!CollectionUtils.isEmpty(request.getCustomFieldValues())) {
-			fieldValues = new TreeSet<>();
 			for (CustomFieldValueEditForm valueForm : request.getCustomFieldValues()) {
 				CustomField customField = entityManager.getReference(CustomField.class, valueForm.getCustomFieldId());
 				CustomFieldValue value = valueMap.get(customField);
@@ -470,11 +468,10 @@ public class ArticleService {
 				value.setDateValue(valueForm.getDateValue());
 				value.setDatetimeValue(valueForm.getDatetimeValue());
 				if (!value.isEmpty()) {
-					fieldValues.add(value);
+					article.getCustomFieldValues().add(value);
 				}
 			}
 		}
-		article.setCustomFieldValues(fieldValues);
 
 		return articleRepository.save(article);
 	}
