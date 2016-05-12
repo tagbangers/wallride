@@ -19,6 +19,7 @@ package org.wallride.domain;
 import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.*;
 import org.hibernate.search.annotations.Index;
+import org.wallride.support.CustomFieldValuesBridge;
 
 import javax.persistence.CascadeType;
 import javax.persistence.*;
@@ -127,8 +128,9 @@ public class Post extends DomainObject<Long> {
 	private SortedSet<Tag> tags = new TreeSet<>();
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	@SortNatural
+//	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@Field(bridge = @FieldBridge(impl = CustomFieldValuesBridge.class))
 	private SortedSet<CustomFieldValue> customFieldValues = new TreeSet<>();
 
 	@OneToMany(mappedBy = "drafted", cascade = CascadeType.ALL)
