@@ -36,6 +36,7 @@ public class ArticleSearchForm implements Serializable {
 	private LocalDateTime dateFrom;
 	private LocalDateTime dateTo;
 	private Collection<Long> categoryIds = new ArrayList<>();
+	private Collection<String> categoryCodes = new ArrayList<>();
 	private Collection<String> tagNames = new ArrayList<>();
 	private Map<String, Object> customFields = new HashMap<>();
 	private Long authorId;
@@ -71,6 +72,14 @@ public class ArticleSearchForm implements Serializable {
 
 	public void setCategoryIds(Collection<Long> categoryIds) {
 		this.categoryIds = categoryIds;
+	}
+
+	public Collection<String> getCategoryCodes() {
+		return categoryCodes;
+	}
+
+	public void setCategoryCodes(Collection<String> categoryCodes) {
+		this.categoryCodes = categoryCodes;
 	}
 
 	public Collection<String> getTagNames() {
@@ -119,6 +128,7 @@ public class ArticleSearchForm implements Serializable {
 				.withDateFrom(getDateFrom())
 				.withDateTo(getDateTo())
 				.withCategoryIds(getCategoryIds())
+				.withCategoryCodes(getCategoryCodes())
 				.withTagNames(getTagNames())
 				.withCustomFields(getCustomFields())
 				.withAuthorId(getAuthorId())
@@ -137,6 +147,7 @@ public class ArticleSearchForm implements Serializable {
 				.append(getDateFrom(), that.getDateFrom())
 				.append(getDateTo(), that.getDateTo())
 				.append(getCategoryIds(), that.getCategoryIds())
+				.append(getCategoryCodes(), that.getCategoryCodes())
 				.append(getTagNames(), that.getTagNames())
 				.append(getCustomFields(), that.getCustomFields())
 				.append(getAuthorId(), that.getAuthorId())
@@ -151,6 +162,7 @@ public class ArticleSearchForm implements Serializable {
 				.append(getDateFrom())
 				.append(getDateTo())
 				.append(getCategoryIds())
+				.append(getCategoryCodes())
 				.append(getTagNames())
 				.append(getCustomFields())
 				.append(getAuthorId())
