@@ -186,12 +186,12 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 						case TEXTAREA:
 						case HTML:
 							for(Object value : values) {
-								customFieldJunction.should(qb.phrase().onField("customFieldValues." + key).ignoreFieldBridge().sentence(value.toString()).createQuery());
+								customFieldJunction.must(qb.keyword().onField("customFieldValues." + key).ignoreFieldBridge().matching(value.toString()).createQuery());
 							}
 							break;
 						default:
 							for(Object value : values) {
-								customFieldJunction.should(qb.keyword().onField("customFieldValues." + key).ignoreFieldBridge().matching(value.toString()).createQuery());
+								customFieldJunction.must(qb.phrase().onField("customFieldValues." + key).ignoreFieldBridge().sentence(value.toString()).createQuery());
 							}
 					}
 					subJunction.must(customFieldJunction.createQuery());
