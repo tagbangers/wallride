@@ -34,6 +34,7 @@
 									<option th:value="SCHEDULED"><span th:text="#{Post.Status.SCHEDULED}">Published</span> <span th:text="${'(' + countScheduled + ')'}">(0)</span></option>
 									<option th:value="DRAFT"><span th:text="#{Post.Status.DRAFT}">Published</span> <span th:text="${'(' + countDraft + ')'}">(0)</span></option>
 								</select>
+								<input type="hidden" class="select2" th:field="*{categoryId}" th:attr="data-url=@{__${ADMIN_PATH}__/categories/select}" th:placeholder="#{Categories}"/>
 								<input type="hidden" class="select2" th:field="*{tagId}" th:attr="data-url=@{__${ADMIN_PATH}__/tags/select}" th:placeholder="#{Tags}"/>
 								<input type="hidden" class="select2" th:field="*{authorId}" th:attr="data-url=@{__${ADMIN_PATH}__/users/select}" th:placeholder="#{Author}" />
 								<input type="text" name="keyword" th:value="*{keyword}" class="form-control" th:attr="placeholder=#{Keywords}" />
@@ -121,6 +122,8 @@
 											<th class="wr-tr-checkbox" style="width:40px"><input type="checkbox" /></th>
 											<th th:text="#{Status}">Status</th>
 											<th th:text="#{Title}">Title</th>
+											<th th:text="#{Categories}">Categories</th>
+											<th th:text="#{Tags}">Tags</th>
 											<th th:text="#{Author}">Author</th>
 											<th th:text="#{Date}">Date</th>
 											<th class="text-right" th:text="#{Views}">Views</th>
@@ -131,8 +134,10 @@
 										<tr th:each="page : ${pages}" th:attr="data-href=@{__${ADMIN_PATH}__/pages/describe(id=${page.id},query=${query})}" class="clickable">
 											<td class="wr-tr-checkbox" style="width:40px"><input type="checkbox" name="ids" th:value="${page.id}" /></td>
 											<td th:class="'wr-post-status-' + ${page.status}" th:text="${#messages.msg('Post.Status.' + page.status)}">Status</td>
-											<td th:text="${page.title?:'(No Titled)'}" style="font-weight: bold;">事務所移転のお知らせ</td>
-											<td><a th:href="@{__${ADMIN_PATH}__/users/describe(id=${page.author.id})}" th:text="${page.author}">Author</a></td>
+											<td th:text="${page.title?:'(No Titled)'}" style="font-weight: bold;">Title</td>
+											<td><th:block th:each="category : ${page.categories}"><a th:href="@{__${ADMIN_PATH}__/pages/index(categoryId=${category.id})}" th:text="${category}"></a> <span th:unless="${categoryStat.last}">&nbsp; | &nbsp;</span></th:block></td>
+											<td><th:block th:each="tag : ${page.tags}"><a th:href="@{__${ADMIN_PATH}__/pages/index(tagId=${tag.id})}" th:text="${tag}"></a> <span th:unless="${tagStat.last}">&nbsp; | &nbsp;</span></th:block></td>
+											<td><a th:href="@{__${ADMIN_PATH}__/pages/index(authorId=${page.author.id})}" th:text="${page.author}">Author</a></td>
 											<td th:text="${page.date ne null ? #temporals.format(page.date, 'yyyy/MM/dd (E) HH:mm', #locale) : ''}">yyyy/mm/dd (E)</td>
 											<td class="text-right" th:text="${page.views}">0</td>
 											<td class="text-center"><a th:attr="href=@{__${ADMIN_PATH}__/pages/edit(id=${page.id},query=${query})}"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></td>
