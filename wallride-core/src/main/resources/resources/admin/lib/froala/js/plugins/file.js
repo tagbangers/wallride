@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -92,13 +92,13 @@
      */
     function showProgressBar () {
       var $popup = editor.popups.get('file.insert');
-      if ($popup) {
-        $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
-        $popup.find('.fr-file-progress-bar-layer').addClass('fr-active');
-        $popup.find('.fr-buttons').hide();
+      if (!$popup) $popup = _initInsertPopup();
 
-        _setProgressMessage('Uploading', 0);
-      }
+      $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
+      $popup.find('.fr-file-progress-bar-layer').addClass('fr-active');
+      $popup.find('.fr-buttons').hide();
+
+      _setProgressMessage('Uploading', 0);
     }
 
     /**
@@ -144,6 +144,7 @@
      * Show error message to the user.
      */
     function _showErrorMessage (message) {
+      showProgressBar();
       var $popup = editor.popups.get('file.insert');
       var $layer = $popup.find('.fr-file-progress-bar-layer');
       $layer.addClass('fr-error')
@@ -288,6 +289,14 @@
       }, response]);
     }
 
+    /**
+     * File upload aborted.
+     */
+    function _fileUploadAborted () {
+      editor.edit.on();
+      hideProgressBar(true);
+    }
+
     function upload (files) {
       // Check if we should cancel the file upload.
       if (editor.events.trigger('file.beforeUpload', [files]) === false) {
@@ -328,13 +337,17 @@
             form_data.append('Content-Type', file.type);
 
             for (key in editor.opts.fileUploadToS3.params) {
-              form_data.append(key, editor.opts.fileUploadToS3.params[key]);
+              if (editor.opts.fileUploadToS3.params.hasOwnProperty(key)) {
+                form_data.append(key, editor.opts.fileUploadToS3.params[key]);
+              }
             }
           }
 
           // Add upload params.
           for (key in editor.opts.fileUploadParams) {
-            form_data.append(key, editor.opts.fileUploadParams[key]);
+            if (editor.opts.fileUploadParams.hasOwnProperty(key)) {
+              form_data.append(key, editor.opts.fileUploadParams[key]);
+            }
           }
 
           // Set the file in the request.
@@ -353,9 +366,19 @@
           };
           xhr.onerror = _fileUploadError;
           xhr.upload.onprogress = _fileUploadProgress;
+          xhr.onabort = _fileUploadAborted;
 
           showProgressBar();
           editor.edit.off();
+
+          var $popup = editor.popups.get('file.insert');
+          if ($popup) {
+            $popup.off('abortUpload').on('abortUpload', function () {
+              if (xhr.readyState != 4) {
+                xhr.abort();
+              }
+            })
+          }
 
           // Send data.
           xhr.send(form_data);
@@ -385,13 +408,15 @@
 
         var dt = e.originalEvent.dataTransfer;
         if (dt && dt.files) {
-          upload(dt.files);
+          var inst = $popup.data('instance') || editor;
+          inst.file.upload(dt.files);
         }
       }, true);
 
       editor.events.$on($popup, 'change', '.fr-file-upload-layer input[type="file"]', function () {
         if (this.files) {
-          upload(this.files);
+          var inst = $popup.data('instance') || editor;
+          inst.file.upload(this.files);
         }
 
         // Else IE 9 case.
@@ -482,6 +507,21 @@
     function _initEvents() {
       // Drop inside the editor.
       editor.events.on('drop', _drop);
+
+      editor.events.$on(editor.$win, 'keydown', function (e) {
+        var key_code = e.which;
+        var $popup = editor.popups.get('file.insert');
+        if ($popup && key_code == $.FE.KEYCODE.ESC) {
+          $popup.trigger('abortUpload');
+        }
+      });
+
+      editor.events.on('destroy', function () {
+        var $popup = editor.popups.get('file.insert');
+        if ($popup) {
+          $popup.trigger('abortUpload');
+        }
+      });
     }
 
     function back () {

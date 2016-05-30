@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['hr'] = {
 
     // Tables
     "Insert Table": "Umetni tablicu",
-    "Header": "Zaglavlje",
+    "Table Header": "Zaglavlje tablice",
+    "Remove Table": "Izbri\u0161i tablicu",
+    "Table Style": "Tablica stil",
+    "Horizontal Align": "Horizontalna poravnanje",
     "Row": "Red",
     "Insert row above": "Umetni red iznad",
     "Insert row below": "Umetni red ispod",
@@ -128,8 +131,6 @@ $.FE.LANGUAGE['hr'] = {
     "Align Middle": "Poravnaj po sredini",
     "Align Bottom": "Poravnaj na dno",
     "Cell Style": "Stil polja",
-    "Table Header": "Zaglavlje tablice",
-    "Remove Table": "Izbri\u0161i tablicu",
 
     // Files
     "Upload File": "Prijenos datoteke",

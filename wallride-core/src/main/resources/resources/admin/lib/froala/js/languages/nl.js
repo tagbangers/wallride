@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['nl'] = {
 
     // Tables
     "Insert Table": "Tabel invoegen",
-    "Header": "Hoofd",
+    "Table Header": "Tabel hoofd",
+    "Remove Table": "Verwijder tafel",
+    "Table Style": "Tabelstijl",
+    "Horizontal Align": "Horizontale uitlijning",
     "Row": "Rij",
     "Insert row above": "Voeg rij boven toe",
     "Insert row below": "Voeg rij onder toe",
@@ -120,7 +123,7 @@ $.FE.LANGUAGE['nl'] = {
     "Horizontal split": "Horizontaal splitsen",
     "Vertical split": "Verticaal splitsen",
     "Cell Background": "Cel achtergrond",
-    "Vertical Align": "Verticaal uitlijnen",
+    "Vertical Align": "Verticaal uitlijning",
     "Top": "Top",
     "Middle": "Midden",
     "Bottom": "Bodem",

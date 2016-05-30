@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -54,10 +54,10 @@
 
   $.FE.VIDEO_PROVIDERS = [
     {
-      test_regex: /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/,
+      test_regex: /^.*((youtu.be)|(youtube.com))\/((v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))?\??v?=?([^#\&\?]*).*/,
       url_regex: /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/)?([0-9a-zA-Z_\-]+)(.+)?/g,
       url_text: '//www.youtube.com/embed/$1',
-      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>'
+      html: '<iframe width="640" height="360" src="{url}?wmode=opaque" frameborder="0" allowfullscreen></iframe>'
     },
     {
       test_regex: /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/,
@@ -84,6 +84,8 @@
       html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" allowtransparency="true"></iframe>'
     }
   ];
+
+  $.FE.VIDEO_EMBED_REGEX = /^\W*((<iframe.*><\/iframe>)|(<embed.*>))\W*$/i;
 
   $.FE.PLUGINS.video = function (editor) {
     var $overlay;
@@ -143,7 +145,6 @@
     function _initInsertPopup (delayed) {
       if (delayed) {
         editor.popups.onRefresh('video.insert', _refreshInsertPopup);
-        editor.popups.onHide('video.insert', _hideInsertPopup);
 
         return true;
       }
@@ -230,12 +231,6 @@
     }
 
     /**
-     * Hide video insert popup.
-     */
-    function _hideInsertPopup () {
-    }
-
-    /**
      * Insert video embedded object.
      */
     function insert (embedded_code) {
@@ -293,7 +288,7 @@
         code = $popup.find('.fr-video-embed-layer textarea').val() || '';
       }
 
-      if (code.length === 0) {
+      if (code.length === 0 || !$.FE.VIDEO_EMBED_REGEX.test(code)) {
         editor.events.trigger('video.codeError', [code]);
       }
       else {
@@ -440,9 +435,11 @@
       // Shared destroy.
       editor.events.on('shared.destroy', function () {
         $video_resizer.html('').removeData().remove();
+        $video_resizer = null;
 
         if (editor.opts.videoResize) {
           $overlay.remove();
+          $overlay = null;
         }
       }, true);
 
@@ -586,7 +583,7 @@
     function _initEditPopup () {
       // Image buttons.
       var video_buttons = '';
-      if (editor.opts.videoEditButtons.length > 1) {
+      if (editor.opts.videoEditButtons.length >= 1) {
         video_buttons += '<div class="fr-buttons">';
         video_buttons += editor.button.buildList(editor.opts.videoEditButtons);
         video_buttons += '</div>';
@@ -1065,7 +1062,9 @@
       var c = '<ul class="fr-dropdown-list">';
       var options =  $.FE.COMMANDS.videoAlign.options;
       for (var val in options) {
-        c += '<li><a class="fr-command fr-title" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+        if (options.hasOwnProperty(val)) {
+          c += '<li><a class="fr-command fr-title" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+        }
       }
       c += '</ul>';
 

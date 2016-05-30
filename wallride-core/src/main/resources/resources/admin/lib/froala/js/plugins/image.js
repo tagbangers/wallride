@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -55,6 +55,7 @@
     imageAllowedTypes: ['jpeg', 'jpg', 'png', 'gif', 'svg+xml'],
     imageResize: true,
     imageResizeWithPercent: false,
+    imageRoundPercent: false,
     imageDefaultWidth: 300,
     imageDefaultAlign: 'center',
     imageDefaultDisplay: 'block',
@@ -66,7 +67,10 @@
     imageMove: true,
     imageMultipleStyles: true,
     imageTextNear: true,
-    imagePaste: true
+    imagePaste: true,
+    imagePasteProcess: false,
+    imageMinWidth: 16,
+    imageOutputSize: false
   });
 
   $.FE.PLUGINS.image = function (editor) {
@@ -166,28 +170,53 @@
 
     function _convertStyleToClasses ($img) {
       if (!$img.hasClass('fr-dii') && !$img.hasClass('fr-dib')) {
+        // Set float to none.
         var flt = $img.css('float');
         $img.css('float', 'none');
+
+        // Image has display block.
         if ($img.css('display') == 'block') {
+          // Set float to the initial value.
           $img.css('float', flt);
-          if (parseInt($img.css('margin-left'), 10) === 0 && ($img.attr('style') || '').indexOf('margin-right: auto') >= 0) {
-            $img.addClass('fr-fil');
-          } else if (parseInt($img.css('margin-right'), 10) === 0 && ($img.attr('style') || '').indexOf('margin-left: auto') >= 0) {
-            $img.addClass('fr-fir');
+
+          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0) {
+            // Margin left is 0.
+            // Margin right is auto.
+            if (parseInt($img.css('margin-left'), 10) === 0 && ($img.attr('style') || '').indexOf('margin-right: auto') >= 0) {
+              $img.addClass('fr-fil');
+            }
+
+            // Margin left is auto.
+            // Margin right is 0.
+            else if (parseInt($img.css('margin-right'), 10) === 0 && ($img.attr('style') || '').indexOf('margin-left: auto') >= 0) {
+              $img.addClass('fr-fir');
+            }
           }
 
           $img.addClass('fr-dib');
-        } else {
+        }
+
+        // Display inline.
+        else {
+          // Set float.
           $img.css('float', flt);
-          if ($img.css('float') == 'left') {
-            $img.addClass('fr-fil');
-          } else if ($img.css('float') == 'right') {
-            $img.addClass('fr-fir');
+
+          if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0) {
+            // Float left.
+            if ($img.css('float') == 'left') {
+              $img.addClass('fr-fil');
+            }
+
+            // Float right.
+            else if ($img.css('float') == 'right') {
+              $img.addClass('fr-fir');
+            }
           }
 
           $img.addClass('fr-dii');
         }
 
+        // Reset inline style.
         $img.css('margin', '');
         $img.css('float', '');
         $img.css('display', '');
@@ -195,15 +224,6 @@
         $img.css('position', '');
         $img.css('overflow', '');
         $img.css('vertical-align', '');
-      }
-
-      if ($img.attr('width')) {
-        $img.css('width', $img.width());
-        $img.removeAttr('width');
-      }
-
-      if (!editor.opts.imageTextNear) {
-        $img.removeClass('fr-dii').addClass('fr-dib');
       }
     }
 
@@ -215,10 +235,25 @@
       var images = editor.$el.get(0).tagName == 'IMG' ? [editor.$el.get(0)] : editor.$el.get(0).querySelectorAll('img');
 
       for (var i = 0; i < images.length; i++) {
-        _convertStyleToClasses($(images[i]));
+        var $img = $(images[i]);
+
+        if (editor.opts.imageEditButtons.indexOf('imageAlign') >= 0 || editor.opts.imageEditButtons.indexOf('imageDisplay') >= 0) {
+          _convertStyleToClasses($img);
+        }
+
+        // Set width if it has width.
+        if ($img.attr('width')) {
+          $img.css('width', $img.width());
+          $img.removeAttr('width');
+        }
+
+        // Do not allow text near image.
+        if (!editor.opts.imageTextNear) {
+          $img.removeClass('fr-dii').addClass('fr-dib');
+        }
 
         if (editor.opts.iframe) {
-          $(images[i]).on('load', editor.size.syncIframe);
+          $img.on('load', editor.size.syncIframe);
         }
       }
     }
@@ -239,6 +274,8 @@
         image_srcs.push(c_images[i].getAttribute('src'));
 
         $(c_images[i]).toggleClass('fr-draggable', editor.opts.imageMove);
+        if (c_images[i].className === '') c_images[i].removeAttribute('class');
+        if (c_images[i].getAttribute('style') === '') c_images[i].removeAttribute('style');
       }
 
       // Loop previous images and check their src.
@@ -261,19 +298,22 @@
     function _repositionResizer () {
       if (!$image_resizer) _initImageResizer();
 
-      (editor.$wp || $(editor.opts.scrollableContainer)).append($image_resizer);
+      var $container = editor.$wp || $(editor.opts.scrollableContainer);
+
+      $container.append($image_resizer);
       $image_resizer.data('instance', editor);
 
-      var wrap_correction_top = !editor.$wp ? -1 : editor.$wp.scrollTop() - (editor.$wp.offset().top + 1);
-      var wrap_correction_left = !editor.$wp ? -1 : editor.$wp.scrollLeft() - (editor.$wp.offset().left + 1);
+      var wrap_correction_top = $container.scrollTop() - (($container.css('position') != 'static' ? $container.offset().top : 0));
+      var wrap_correction_left = $container.scrollLeft() - (($container.css('position') != 'static' ? $container.offset().left : 0));
 
-      if (editor.$wp) wrap_correction_left -= editor.helpers.getPX(editor.$wp.css('border-left-width'));
+      wrap_correction_left -= editor.helpers.getPX($container.css('border-left-width'));
+      wrap_correction_top -= editor.helpers.getPX($container.css('border-top-width'));
 
       $image_resizer
-        .css('top', editor.opts.iframe ? $current_image.offset().top - 1 : $current_image.offset().top + wrap_correction_top)
-        .css('left', editor.opts.iframe ? $current_image.offset().left - 1 : $current_image.offset().left + wrap_correction_left)
-        .css('width', $current_image.outerWidth())
-        .css('height', $current_image.outerHeight())
+        .css('top', (editor.opts.iframe ? $current_image.offset().top : $current_image.offset().top + wrap_correction_top) - 1)
+        .css('left', (editor.opts.iframe ? $current_image.offset().left : $current_image.offset().left + wrap_correction_left) - 1)
+        .css('width', $current_image.get(0).getBoundingClientRect().width)
+        .css('height', $current_image.get(0).getBoundingClientRect().height)
         .addClass('fr-active')
     }
 
@@ -288,7 +328,6 @@
     /**
      * Mouse down to start resize.
      */
-
     function _handlerMousedown (e) {
       // Check if resizer belongs to current instance.
       if (!editor.core.sameInstance($image_resizer)) return true;
@@ -303,6 +342,18 @@
       $handler = $(this);
       $handler.data('start-x', e.pageX || e.originalEvent.touches[0].pageX);
       $handler.data('start-width', $current_image.width());
+      $handler.data('start-height', $current_image.height());
+
+      // Set current width.
+      var width = $current_image.width();
+      if (editor.opts.imageResizeWithPercent) {
+        var p_node = $current_image.parentsUntil(editor.$el, editor.html.blockTagsQuery()).get(0) || editor.$el.get(0);
+
+        $current_image.css('width', (width / $(p_node).outerWidth() * 100).toFixed(2) + '%');
+      } else {
+        $current_image.css('width', width);
+      }
+
       $overlay.show();
 
       editor.popups.hideAll();
@@ -339,14 +390,20 @@
         }
 
         if (editor.opts.imageResizeWithPercent) {
-          var p_node = $current_image.parentsUntil(editor.$el, editor.html.blockTagsQuery()).get(0);
+          var p_node = $current_image.parentsUntil(editor.$el, editor.html.blockTagsQuery()).get(0) || editor.$el.get(0);
 
-          $current_image.css('width', ((width + diff_x) / $(p_node).outerWidth() * 100).toFixed(2) + '%');
+          width = ((width + diff_x) / $(p_node).outerWidth() * 100).toFixed(2);
+          if (editor.opts.imageRoundPercent) width = Math.round(width);
+
+          $current_image.css('width', width + '%');
+          $current_image.css('height', '').removeAttr('height');
         } else {
-          $current_image.css('width', width + diff_x);
-        }
+          if (width + diff_x >= editor.opts.imageMinWidth) {
+            $current_image.css('width', width + diff_x);
+          }
 
-        $current_image.css('height', '').removeAttr('height');
+          $current_image.css('height', $handler.data('start-height') * $current_image.width() / $handler.data('start-width'));
+        }
 
         _repositionResizer();
 
@@ -433,14 +490,23 @@
      * Show progress bar.
      */
 
-    function showProgressBar () {
+    function showProgressBar (no_message) {
       var $popup = editor.popups.get('image.insert');
+      if (!$popup) $popup = _initInsertPopup();
 
-      if ($popup) {
-        $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
-        $popup.find('.fr-image-progress-bar-layer').addClass('fr-active');
-        $popup.find('.fr-buttons').hide();
+      $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
+      $popup.find('.fr-image-progress-bar-layer').addClass('fr-active');
+      $popup.find('.fr-buttons').hide();
 
+      if ($current_image) {
+        editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
+        var left = $current_image.offset().left + $current_image.width() / 2;
+        var top = $current_image.offset().top + $current_image.height();
+
+        editor.popups.show('image.insert', left, top, $current_image.outerHeight());
+      }
+
+      if (typeof no_message == 'undefined') {
         _setProgressMessage('Uploading', 0);
       }
     }
@@ -448,7 +514,6 @@
     /**
      * Hide progress bar.
      */
-
     function hideProgressBar (dismiss) {
       var $popup = editor.popups.get('image.insert');
 
@@ -495,6 +560,7 @@
      */
 
     function _showErrorMessage (message) {
+      showProgressBar();
       var $popup = editor.popups.get('image.insert');
       var $layer = $popup.find('.fr-image-progress-bar-layer');
       $layer.addClass('fr-error')
@@ -518,6 +584,10 @@
       }
     }
 
+    function _editImg ($img) {
+      _edit.call($img.get(0));
+    }
+
     function _loadedCallback () {
       var $img = $(this);
 
@@ -530,7 +600,7 @@
         $img.next().remove();
       }
 
-      $img.trigger('click').trigger('touchend');
+      _editImg($img);
 
       editor.events.trigger('image.loaded', [$img]);
     }
@@ -552,11 +622,17 @@
           var old_src = $existing_img.data('fr-old-src');
 
           if (editor.$wp) {
-            $img = $existing_img.clone().removeData('fr-old-src');
-            if (old_src) $existing_img.attr('src', old_src);
-            $existing_img.removeClass('fr-uploading');
-            $existing_img.replaceWith($img);
+            // Clone existing image.
+            $img = $existing_img.clone().removeData('fr-old-src').removeClass('fr-uploading');
+
+            // Remove load event.
             $img.off('load');
+
+            // Set new SRC.
+            if (old_src) $existing_img.attr('src', old_src);
+
+            // Replace existing image with its clone.
+            $existing_img.replaceWith($img);
           } else {
             $img = $existing_img;
           }
@@ -573,8 +649,10 @@
           // Set new data.
           if (typeof data != 'undefined') {
             for (attr in data) {
-              if (attr != 'link') {
-                $img.attr('data-' + attr, data[attr]);
+              if (data.hasOwnProperty(attr)) {
+                if (attr != 'link') {
+                  $img.attr('data-' + attr, data[attr]);
+                }
               }
             }
           }
@@ -582,10 +660,12 @@
           $img.on('load', _loadedCallback);
           $img.attr('src', link);
           editor.edit.on();
+          _syncImages();
           editor.undo.saveStep();
           editor.events.trigger(old_src ? 'image.replaced' : 'image.inserted', [$img, response]);
         } else {
           $img = _addImage(link, data, _loadedCallback);
+          _syncImages();
           editor.undo.saveStep();
           editor.events.trigger('image.inserted', [$img, response]);
         }
@@ -709,19 +789,21 @@
       var attr;
       if (data && typeof data != 'undefined') {
         for (attr in data) {
-          if (attr != 'link') {
-            data_str += ' data-' + attr + '="' + data[attr] + '"';
+          if (data.hasOwnProperty(attr)) {
+            if (attr != 'link') {
+              data_str += ' data-' + attr + '="' + data[attr] + '"';
+            }
           }
         }
       }
 
-      var width = editor.opts.imageDefaultWidth || 'auto';
+      var width = editor.opts.imageDefaultWidth;
       if (width && width != 'auto' && ('' + width).indexOf('px') < 0 && ('' + width).indexOf('%') < 0) {
         width = width + 'px';
       }
 
       // Create image object and set the load event.
-      var $img = $('<img class="fr-di' + (editor.opts.imageDefaultDisplay[0]) + (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') + '" src="' + link + '"' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '>');
+      var $img = $('<img class="' + (editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : '') + '" src="' + link + '"' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '>');
 
       $img.on('load', loadCallback);
 
@@ -749,6 +831,17 @@
       return $img;
     }
 
+    /**
+     * Image upload aborted.
+     */
+    function _imageUploadAborted () {
+      editor.edit.on();
+      hideProgressBar(true);
+    }
+
+    /**
+     * Start the uploading process.
+     */
     function _startUpload (xhr, form_data, image) {
       function _sendRequest () {
         var $img = $(this);
@@ -764,13 +857,11 @@
         editor.placeholder.refresh();
 
         // Select the image.
-        if (!$img.is($current_image)) $img.trigger('click').trigger('touchend');
+        if (!$img.is($current_image)) _editImg($img);
 
         _repositionResizer();
-        _showEditPopup();
-        replace();
         showProgressBar();
-        replace();
+
         editor.edit.off();
 
         // Set upload events.
@@ -779,6 +870,14 @@
         };
         xhr.onerror = _imageUploadError;
         xhr.upload.onprogress = _imageUploadProgress;
+        xhr.onabort = _imageUploadAborted;
+
+        // Set abort event.
+        $img.off('abortUpload').on('abortUpload', function () {
+          if (xhr.readyState != 4) {
+            xhr.abort();
+          }
+        });
 
         // Send data.
         xhr.send(form_data);
@@ -787,17 +886,21 @@
       var reader = new FileReader();
       var $img;
       reader.addEventListener('load', function () {
-        // Convert image to local blob.
-        var binary = atob(reader.result.split(',')[1]);
-        var array = [];
-        for (var i = 0; i < binary.length; i++) {
-          array.push(binary.charCodeAt(i));
-        }
+        var link = reader.result;
 
-        // Get local image link.
-        var link = window.URL.createObjectURL(new Blob([new Uint8Array(array)], {
-          type: 'image/jpeg'
-        }));
+        if (reader.result.indexOf('svg+xml') < 0) {
+          // Convert image to local blob.
+          var binary = atob(reader.result.split(',')[1]);
+          var array = [];
+          for (var i = 0; i < binary.length; i++) {
+            array.push(binary.charCodeAt(i));
+          }
+
+          // Get local image link.
+          link = window.URL.createObjectURL(new Blob([new Uint8Array(array)], {
+            type: 'image/jpeg'
+          }));
+        }
 
         // No image.
         if (!$current_image) {
@@ -858,13 +961,17 @@
             form_data.append('Content-Type', image.type);
 
             for (key in editor.opts.imageUploadToS3.params) {
-              form_data.append(key, editor.opts.imageUploadToS3.params[key]);
+              if (editor.opts.imageUploadToS3.params.hasOwnProperty(key)) {
+                form_data.append(key, editor.opts.imageUploadToS3.params[key]);
+              }
             }
           }
 
           // Add upload params.
           for (key in editor.opts.imageUploadParams) {
-            form_data.append(key, editor.opts.imageUploadParams[key]);
+            if (editor.opts.imageUploadParams.hasOwnProperty(key)) {
+              form_data.append(key, editor.opts.imageUploadParams[key]);
+            }
           }
 
           // Set the image in the request.
@@ -909,13 +1016,18 @@
         var dt = e.originalEvent.dataTransfer;
         if (dt && dt.files) {
           var inst = $popup.data('instance') || editor;
+          inst.events.disableBlur();
           inst.image.upload(dt.files);
+          inst.events.enableBlur();
         }
       });
 
       editor.events.$on($popup, 'change', '.fr-image-upload-layer input[type="file"]', function () {
         if (this.files) {
           var inst = $popup.data('instance') || editor;
+          inst.events.disableBlur();
+          $popup.find('input:focus').blur();
+          inst.events.enableBlur();
           inst.image.upload(this.files);
         }
         // Else IE 9 case.
@@ -943,10 +1055,10 @@
             // Show the image insert popup.
             var $popup = editor.popups.get('image.insert');
             if (!$popup) $popup = _initInsertPopup();
+
             editor.popups.setContainer('image.insert', $(editor.opts.scrollableContainer));
             editor.popups.show('image.insert', e.originalEvent.pageX, e.originalEvent.pageY);
             showProgressBar();
-            editor.popups.show('image.insert', e.originalEvent.pageX, e.originalEvent.pageY);
 
             // Upload images.
             upload(dt.files);
@@ -961,9 +1073,64 @@
       }
     }
 
+    function _placeCursor () {
+      var t;
+      var p_node;
+      var r = editor.selection.ranges(0);
+      if (r.collapsed && r.startContainer.nodeType == Node.ELEMENT_NODE) {
+        // Click after image.
+        if (r.startContainer.childNodes.length == r.startOffset) {
+          t = r.startContainer.childNodes[r.startOffset - 1];
+          if (t && t.tagName == 'IMG' && $(t).css('display') == 'block') {
+            // Check if image is last node.
+            p_node = editor.node.blockParent(t);
+            if (p_node && editor.html.defaultTag()) {
+              if (!p_node.nextSibling) {
+                if (['TD', 'TH'].indexOf(p_node.tagName) < 0) {
+                  $(p_node).after('<' + editor.html.defaultTag() + '><br>' + $.FE.MARKERS + '</' + editor.html.defaultTag() + '>');
+                }
+                else {
+                  $(img).after('<br>' + $.FE.MARKERS);
+                }
+                editor.selection.restore();
+              }
+            }
+            else if (!p_node) {
+              $(t).after('<br>' + $.FE.MARKERS);
+              editor.selection.restore();
+            }
+          }
+        }
+        else if (r.startOffset === 0 && r.startContainer.childNodes.length > r.startOffset) {
+          t = r.startContainer.childNodes[r.startOffset];
+          if (t && t.tagName == 'IMG' && $(t).css('display') == 'block') {
+            // Check if image is last node.
+            p_node = editor.node.blockParent(t);
+            if (p_node && editor.html.defaultTag()) {
+              if (!p_node.previousSibling) {
+                if (['TD', 'TH'].indexOf(p_node.tagName) < 0) {
+                  $(p_node).before('<' + editor.html.defaultTag() + '><br>' + $.FE.MARKERS + '</' + editor.html.defaultTag() + '>');
+                }
+                else {
+                  $(img).before('<br>' + $.FE.MARKERS);
+                }
+                editor.selection.restore();
+              }
+            }
+            else if (!p_node) {
+              $(t).before($.FE.MARKERS + '<br>');
+              editor.selection.restore();
+            }
+          }
+        }
+      }
+    }
+
     function _initEvents () {
       // Mouse down on image. It might start move.
-      editor.events.$on(editor.$el, editor._mousedown, editor.$el.get(0).tagName == 'IMG' ? null : 'img', function (e) {
+      editor.events.$on(editor.$el, editor._mousedown, editor.$el.get(0).tagName == 'IMG' ? null : 'img:not([contenteditable="false"])', function (e) {
+        if ($(this).parents('[contenteditable="false"]:not(.fr-element):not(body)').length) return true;
+
         editor.selection.clear();
 
         mousedown = true;
@@ -980,7 +1147,9 @@
       });
 
       // Mouse up on an image prevent move.
-      editor.events.$on(editor.$el, editor._mouseup, editor.$el.get(0).tagName == 'IMG' ? null : 'img', function (e) {
+      editor.events.$on(editor.$el, editor._mouseup, editor.$el.get(0).tagName == 'IMG' ? null : 'img:not([contenteditable="false"])', function (e) {
+        if ($(this).parents('[contenteditable="false"]:not(.fr-element):not(body)').length) return true;
+
         if (mousedown) {
           mousedown = false;
 
@@ -994,18 +1163,39 @@
         }
       });
 
+      // Show image popup when it was selected.
+      editor.events.on('keyup', function (e) {
+        if (e.shiftKey && editor.selection.text().replace(/\n/g, '') === '') {
+          var s_el = editor.selection.element();
+          var e_el = editor.selection.endElement();
+          if (s_el && s_el.tagName == 'IMG') {
+            _editImg($(s_el));
+          }
+          else if (e_el && e_el.tagName == 'IMG') {
+            _editImg($(e_el));
+          }
+        }
+      }, true);
+
       // Drop inside the editor.
       editor.events.on('drop', _drop);
 
       editor.events.on('mousedown window.mousedown', _markExit);
       editor.events.on('window.touchmove', _unmarkExit);
 
-      editor.events.on('mouseup window.mouseup', _exitEdit);
+      editor.events.on('mouseup window.mouseup', function () {
+        if ($current_image) {
+          _exitEdit();
+          return false;
+        }
+      });
       editor.events.on('commands.mousedown', function ($btn) {
         if ($btn.parents('.fr-toolbar').length > 0) {
           _exitEdit();
         }
       });
+
+      editor.events.on('mouseup', _placeCursor);
 
       editor.events.on('blur image.hideResizer commands.undo commands.redo element.dropped', function () {
         mousedown = false;
@@ -1157,10 +1347,8 @@
       if ($current_image) {
         var $popup = editor.popups.get('image.alt');
         $current_image.attr('alt', alt || $popup.find('input').val() || '');
-        $popup.find('input').blur();
-        setTimeout(function () {
-          $current_image.trigger('click').trigger('touchend');
-        }, editor.helpers.isAndroid() ? 50 : 0);
+        $popup.find('input:focus').blur();
+        _editImg($current_image);
       }
     }
 
@@ -1241,10 +1429,8 @@
         $current_image.css('width', width || $popup.find('input[name="width"]').val());
         $current_image.css('height', height || $popup.find('input[name="height"]').val());
 
-        $popup.find('input').blur();
-        setTimeout(function () {
-          $current_image.trigger('click').trigger('touchend');
-        }, editor.helpers.isAndroid() ? 50 : 0);
+        $popup.find('input:focus').blur();
+        _editImg($current_image);
       }
     }
 
@@ -1351,16 +1537,25 @@
       // Shared destroy.
       editor.events.on('shared.destroy', function () {
         $image_resizer.html('').removeData().remove();
+        $image_resizer = null;
 
         if (editor.opts.imageResize) {
           $overlay.remove();
+          $overlay = null;
         }
       }, true);
 
       // Window resize. Exit from edit.
       if (!editor.helpers.isMobile()) {
-        editor.events.$on($(editor.o_win), 'resize.image', function () {
-          _exitEdit(true);
+        editor.events.$on($(editor.o_win), 'resize', function () {
+          if ($current_image && !$current_image.hasClass('fr-uploading')) {
+            _exitEdit(true);
+          }
+          else if ($current_image) {
+            _repositionResizer();
+            replace();
+            showProgressBar(false);
+          }
         });
       }
 
@@ -1391,16 +1586,15 @@
             $img.removeAttr('src');
           } else {
             if ($img.get(0).parentNode.tagName == 'A') {
-              editor.selection.setBefore($img.get(0).parentNode) || editor.selection.setAfter($img.get(0).parentNode);
+              editor.selection.setBefore($img.get(0).parentNode) || editor.selection.setAfter($img.get(0).parentNode) || $img.parent().after($.FE.MARKERS);
               $($img.get(0).parentNode).remove();
             } else {
-              editor.selection.setBefore($img.get(0)) || editor.selection.setAfter($img.get(0));
+              editor.selection.setBefore($img.get(0)) || editor.selection.setAfter($img.get(0)) || $img.after($.FE.MARKERS);
               $img.remove();
             }
 
-            editor.selection.restore();
-
             editor.html.fillEmptyBlocks();
+            editor.selection.restore();
           }
 
           editor.undo.saveStep();
@@ -1420,10 +1614,10 @@
         editor.$el.addClass('fr-view');
       }
 
-      editor.events.$on(editor.$el, editor.helpers.isMobile() && !editor.helpers.isWindowsPhone() ? 'touchend' : 'click', editor.$el.get(0).tagName == 'IMG' ? null : 'img', _edit);
+      editor.events.$on(editor.$el, editor.helpers.isMobile() && !editor.helpers.isWindowsPhone() ? 'touchend' : 'click', editor.$el.get(0).tagName == 'IMG' ? null : 'img:not([contenteditable="false"])', _edit);
 
       if (editor.helpers.isMobile()) {
-        editor.events.$on(editor.$el, 'touchstart', editor.$el.get(0).tagName == 'IMG' ? null : 'img', function () {
+        editor.events.$on(editor.$el, 'touchstart', editor.$el.get(0).tagName == 'IMG' ? null : 'img:not([contenteditable="false"])', function () {
           touchScroll = false;
         })
 
@@ -1432,16 +1626,20 @@
         });
       }
 
-      editor.events.on('window.keydown', function (e) {
+      editor.events.on('window.keydown keydown', function (e) {
         var key_code = e.which;
         if ($current_image && (key_code == $.FE.KEYCODE.BACKSPACE || key_code == $.FE.KEYCODE.DELETE)) {
           e.preventDefault();
+          e.stopPropagation();
           remove();
           return false;
         }
 
         if ($current_image && key_code == $.FE.KEYCODE.ESC) {
+          var $img = $current_image;
           _exitEdit(true);
+          editor.selection.setAfter($img.get(0));
+          editor.selection.restore();
           e.preventDefault();
           return false;
         }
@@ -1459,20 +1657,57 @@
           e.preventDefault();
           return false;
         }
-      })
+      });
+
+      // Check if image is uploading to abort it.
+      editor.events.$on(editor.$win, 'keydown', function (e) {
+        var key_code = e.which;
+        if ($current_image && $current_image.hasClass('fr-uploading') && key_code == $.FE.KEYCODE.ESC) {
+          $current_image.trigger('abortUpload');
+        }
+      });
+
+      editor.events.on('destroy', function () {
+        if ($current_image && $current_image.hasClass('fr-uploading')) {
+          $current_image.trigger('abortUpload');
+        }
+      });
 
       editor.events.on('paste.before', _clipboardPaste);
       editor.events.on('paste.beforeCleanup', _clipboardPasteCleanup);
       editor.events.on('paste.after', _uploadPastedImages);
 
       editor.events.on('html.set', _refreshImageList);
+      editor.events.on('html.inserted', _refreshImageList);
       _refreshImageList();
+      editor.events.on('destroy', function () {
+        images = [];
+      })
 
       editor.events.on('html.get', function (html) {
         html = html.replace(/<(img)((?:[\w\W]*?))class="([\w\W]*?)(fr-uploading|fr-error)([\w\W]*?)"((?:[\w\W]*?))>/g, '');
 
         return html;
-      })
+      });
+
+      if (editor.opts.imageOutputSize) {
+        var imgs;
+
+        editor.events.on('html.beforeGet', function () {
+          imgs = editor.$el.get(0).querySelectorAll('img')
+          for (var i = 0; i < imgs.length; i++) {
+            imgs[i].setAttribute('width', $(imgs[i]).width());
+            imgs[i].setAttribute('height', $(imgs[i]).height());
+          }
+        });
+
+        editor.events.on('html.afterGet', function () {
+          for (var i = 0; i < imgs.length; i++) {
+            imgs[i].removeAttribute('width');
+            imgs[i].removeAttribute('height');
+          }
+        });
+      }
 
       if (editor.opts.iframe) {
         editor.events.on('image.loaded', editor.size.syncIframe);
@@ -1483,11 +1718,11 @@
         editor.events.on('contentChanged', _syncImages);
       }
 
-      editor.events.$on($(editor.o_win), 'orientationchange.image.' + editor.id, function () {
+      editor.events.$on($(editor.o_win), 'orientationchange.image', function () {
         setTimeout(function () {
           var $current_image = get();
           if ($current_image) {
-            $current_image.trigger('click').trigger('touchend');
+            _editImg($current_image);
           }
         }, 0);
       });
@@ -1511,19 +1746,23 @@
       } else {
         // Safari won't work https://bugs.webkit.org/show_bug.cgi?id=49141
         editor.$el.find('img[data-fr-image-pasted]').each(function (index, img) {
+          if (editor.opts.imagePasteProcess) {
+            var width = editor.opts.imageDefaultWidth;
+            if (width && width != 'auto') {
+              width = width + (editor.opts.imageResizeWithPercent ? '%' : 'px');
+            }
+            $(img).css('width', width);
+
+            $(img)
+              .removeClass('fr-dii fr-dib fr-fir fr-fil')
+              .addClass((editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : ''));
+          }
+
           // Data images.
           if (img.src.indexOf('data:') === 0) {
             if (editor.events.trigger('image.beforePasteUpload', [img]) === false) {
               return false;
             }
-
-            var width = editor.opts.imageDefaultWidth || 'auto';
-            if (width != 'auto') {
-              width = width + (editor.opts.imageResizeWithPercent ? '%' : 'px');
-            }
-            $(img).css('width', width);
-
-            $(img).addClass('fr-dib');
 
             // Show the progress bar.
             $current_image = $(img);
@@ -1572,12 +1811,12 @@
               var result = e.target.result;
 
               // Default width.
-              var width = editor.opts.imageDefaultWidth || 'auto';
+              var width = editor.opts.imageDefaultWidth;
               if (width && width != 'auto' && ('' + width).indexOf('px') < 0 && ('' + width).indexOf('%') < 0) {
                 width = width + 'px';
               }
 
-              editor.html.insert('<img data-fr-image-pasted="true" class="fr-di' + (editor.opts.imageDefaultDisplay[0]) + (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') + '" src="' + result + '"' + (width ? ' style="width: ' + width + ';"' : '') + '>');
+              editor.html.insert('<img data-fr-image-pasted="true" class="' + (editor.opts.imageDefaultDisplay ? 'fr-di' + editor.opts.imageDefaultDisplay[0] : '') + (editor.opts.imageDefaultAlign ? (editor.opts.imageDefaultAlign != 'center' ? ' fr-fi' + editor.opts.imageDefaultAlign[0] : '') : '') + '" src="' + result + '"' + (width ? ' style="width: ' + width + ';"' : '') + '>');
 
               editor.events.trigger('paste.after');
             };
@@ -1601,11 +1840,13 @@
     var touchScroll;
 
     function _edit (e) {
+      if ($(this).parents('[contenteditable="false"]:not(.fr-element):not(body)').length) return true;
+
       if (e && e.type == 'touchend' && touchScroll) {
         return true;
       }
 
-      if (editor.edit.isDisabled()) {
+      if (e && editor.edit.isDisabled()) {
         e.stopPropagation();
         e.preventDefault();
         return false;
@@ -1619,8 +1860,11 @@
       }
 
       editor.toolbar.disable();
-      e.stopPropagation();
-      e.preventDefault();
+
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
 
       // Hide keyboard.
       if (editor.helpers.isMobile()) {
@@ -1642,10 +1886,6 @@
       editor.button.bulkRefresh();
 
       editor.events.trigger('video.hideResizer');
-
-      if (editor.helpers.isIOS()) {
-        setTimeout(_showEditPopup, 100);
-      }
     }
 
     /**
@@ -1797,7 +2037,8 @@
      */
     function back () {
       if ($current_image) {
-        $current_image.trigger('click').trigger('touchend');
+        $('.fr-popup input:focus').blur();
+        _editImg($current_image);
       } else {
         editor.events.disableBlur();
         editor.selection.restore();
@@ -1820,19 +2061,22 @@
      * Apply specific style.
      */
 
-    function applyStyle (val) {
+    function applyStyle (val, imageStyles, multipleStyles) {
+      if (typeof imageStyles == 'undefined') imageStyles = editor.opts.imageStyles;
+      if (typeof multipleStyles == 'undefined') multipleStyles = editor.opts.imageMultipleStyles;
+
       if (!$current_image) return false;
 
       // Remove multiple styles.
-      if (!editor.opts.imageMultipleStyles) {
-        var styles = Object.keys(editor.opts.imageStyles);
+      if (!multipleStyles) {
+        var styles = Object.keys(imageStyles);
         styles.splice(styles.indexOf(val), 1);
         $current_image.removeClass(styles.join(' '));
       }
 
       $current_image.toggleClass(val);
 
-      $current_image.trigger('click').trigger('touchend');
+      _editImg($current_image);
     }
 
     return {
@@ -1860,7 +2104,8 @@
       showSizePopup: showSizePopup,
       setAlt: setAlt,
       setSize: setSize,
-      exitEdit: _exitEdit
+      exitEdit: _exitEdit,
+      edit: _editImg
     }
   }
 
@@ -1868,7 +2113,7 @@
   $.FE.DefineIcon('insertImage', {
     NAME: 'image'
   });
-  $.FE.RegisterShortcut(80, 'insertImage');
+  $.FE.RegisterShortcut($.FE.KEYCODE.P, 'insertImage', null, 'I');
   $.FE.RegisterCommand('insertImage', {
     title: 'Insert Image',
     undo: false,
@@ -1934,7 +2179,7 @@
       if (!$current_image) {
         $btn.text(this.language.translate('Insert'));
       } else {
-        $btn.text('Replace');
+        $btn.text(this.language.translate('Replace'));
       }
     }
   })
@@ -1977,7 +2222,9 @@
       var c = '<ul class="fr-dropdown-list">';
       var options = $.FE.COMMANDS.imageAlign.options;
       for (var val in options) {
-        c += '<li><a class="fr-command fr-title" data-cmd="imageAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+        if (options.hasOwnProperty(val)) {
+          c += '<li><a class="fr-command fr-title" data-cmd="imageAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+        }
       }
       c += '</ul>';
 
@@ -2062,7 +2309,9 @@
       var c = '<ul class="fr-dropdown-list">';
       var options = this.opts.imageStyles;
       for (var cls in options) {
-        c += '<li><a class="fr-command" data-cmd="imageStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+        if (options.hasOwnProperty(cls)) {
+          c += '<li><a class="fr-command" data-cmd="imageStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+        }
       }
       c += '</ul>';
 
@@ -2122,6 +2371,8 @@
   $.FE.RegisterCommand('imageSetSize', {
     undo: true,
     focus: false,
+    title: 'Update',
+    refreshAfterCallback: false,
     callback: function () {
       this.image.setSize();
     }

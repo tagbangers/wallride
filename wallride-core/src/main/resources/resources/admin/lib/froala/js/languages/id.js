@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,11 @@ $.FE.LANGUAGE['id'] = {
 
     // Tables
     "Insert Table": "Sisipkan tabel",
-    "Header": "Header",
+    "Table Header": "Header tabel",
+    "Remove Table": "Hapus tabel",
+    "Table Style": "Gaya tabel",
+    "Horizontal Align": "Menyelaraskan horisontal",
+
     "Row": "Baris",
     "Insert row above": "Sisipkan baris di atas",
     "Insert row below": "Sisipkan baris di bawah",

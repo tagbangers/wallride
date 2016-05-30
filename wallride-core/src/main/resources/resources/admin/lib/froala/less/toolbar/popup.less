@@ -32,6 +32,10 @@
 
   .fr-hs {
     display: block !important;
+
+    &.fr-hidden {
+      display: none !important;
+    }
   }
 
   .fr-input-line {
@@ -49,6 +53,7 @@
       background: rgba(0, 0, 0, 0);
       position: relative;
       z-index: 2;
+      .box-sizing(border-box);
 
       &:focus {
         border-bottom: solid 2px @ui-color;
@@ -56,7 +61,7 @@
       }
     }
 
-    input + span, textarea + span {
+    input + label, textarea + label {
       position: absolute;
       top: 0;
       left: 0;
@@ -66,11 +71,11 @@
       z-index: 1;
     }
 
-    input.fr-not-empty:focus + span, textarea.fr-not-empty:focus + span {
+    input.fr-not-empty:focus + label, textarea.fr-not-empty:focus + label {
       color: @ui-color;
     }
 
-    input.fr-not-empty + span, textarea.fr-not-empty + span {
+    input.fr-not-empty + label, textarea.fr-not-empty + label {
       color: @input-label-color;
     }
   }
@@ -239,15 +244,13 @@
     }
 
     .fr-input-line {
-      input + span, textarea + span {
+      input + label, textarea + label {
         left: auto;
         right: 0;
       }
     }
   }
-}
 
-.fr-popup.fr-desktop {
   .fr-arrow {
     width: 0;
     height: 0;
@@ -266,9 +269,7 @@
       top: auto;
       bottom: ((-@arrow-size * 2) + 1);
       border-bottom: 0;
-      border-top-color: inherit;
-      border-top-style: solid;
-      border-top-width: @arrow-size;
+      border-top: @arrow-size solid @ui-border-color;
     }
   }
 }

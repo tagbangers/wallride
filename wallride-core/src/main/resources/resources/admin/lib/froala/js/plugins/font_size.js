@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -42,11 +42,11 @@
 
   $.FE.PLUGINS.fontSize = function (editor) {
     function apply (val) {
-      editor.commands.applyProperty('font-size', val + 'px');
+      editor.format.applyStyle('font-size', val);
     }
 
     function refreshOnShow($btn, $dropdown) {
-      var val = editor.helpers.getPX($(editor.selection.element()).css('font-size'));
+      var val = $(editor.selection.element()).css('font-size');
       $dropdown.find('.fr-command.fr-active').removeClass('fr-active');
       $dropdown.find('.fr-command[data-param1="' + val + '"]').addClass('fr-active');
 
@@ -90,7 +90,7 @@
       var options =  this.opts.fontSize;
       for (var i = 0; i < options.length; i++) {
         var val = options[i];
-        c += '<li><a class="fr-command" data-cmd="fontSize" data-param1="' + val + '" title="' + val + '">' + val + '</a></li>';
+        c += '<li><a class="fr-command" data-cmd="fontSize" data-param1="' + val + 'px" title="' + val + '">' + val + '</a></li>';
       }
       c += '</ul>';
 

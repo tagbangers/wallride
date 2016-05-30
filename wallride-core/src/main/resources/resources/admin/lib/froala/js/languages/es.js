@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['es'] = {
 
     // Tables
     "Insert Table": "Insertar tabla",
-    "Header": "Encabezamiento",
+    "Table Header": "Encabezado de la tabla",
+    "Remove Table": "Retire la tabla",
+    "Table Style": "Estilo de tabla",
+    "Horizontal Align": "Alinear horizontal",
     "Row": "Fila",
     "Insert row above": "Insertar fila antes",
     "Insert row below": "Insertar fila despu\u00e9s",
@@ -120,7 +123,7 @@ $.FE.LANGUAGE['es'] = {
     "Horizontal split": "Divisi\u00f3n horizontal",
     "Vertical split": "Divisi\u00f3n vertical",
     "Cell Background": "Fondo de la celda",
-    "Vertical Align": "Alinear Vertical",
+    "Vertical Align": "Alinear vertical",
     "Top": "Cima",
     "Middle": "Medio",
     "Bottom": "Del fondo",

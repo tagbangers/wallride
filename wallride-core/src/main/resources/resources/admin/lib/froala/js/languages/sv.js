@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['sv'] = {
 
     // Tables
     "Insert Table": "Infoga tabell",
-    "Header": "Header",
+    "Table Header": "Tabell huvud",
+    "Remove Table": "Ta bort tabellen",
+    "Table Style": "Tabellformat",
+    "Horizontal Align": "Horisontell justering",
     "Row": "Rad",
     "Insert row above": "Infoga rad f\u00f6re",
     "Insert row below": "Infoga rad efter",

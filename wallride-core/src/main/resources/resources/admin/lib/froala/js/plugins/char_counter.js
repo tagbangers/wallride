@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -127,15 +127,17 @@
 
       editor.events.on('keydown', _checkCharNumber, true);
       editor.events.on('paste.afterCleanup', _checkCharNumberOnPaste);
-      editor.events.on('keyup', _updateCharNumber);
-      editor.events.on('contentChanged', _updateCharNumber);
-      editor.events.on('charCounter.update', _updateCharNumber);
+      editor.events.on('keyup contentChanged', function () {
+        editor.events.trigger('charCounter.update');
+      });
 
-      _updateCharNumber();
+      editor.events.on('charCounter.update', _updateCharNumber);
+      editor.events.trigger('charCounter.update');
 
       editor.events.on('destroy', function () {
         $(editor.o_win).off('resize.char' + editor.id);
         $counter.removeData().remove();
+        $counter = null;
       });
     }
 

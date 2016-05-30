@@ -1,5 +1,4 @@
-.fr-element,
-.fr-element:focus {
+.fr-element, .fr-element:focus {
   outline: 0px solid transparent;
 }
 
@@ -8,13 +7,14 @@
   color: @editor-text;
   padding: @editor-padding;
   .box-sizing(border-box);
+  overflow-x: auto;
+  min-height: (20px + (2 * @editor-padding));
 }
 
 .fr-element {
   background: transparent;
   position: relative;
   z-index: 2;
-  overflow-x: auto;
 
   // CSS rule for iPad not being able to select sometimes.
   -webkit-user-select: auto;
@@ -22,10 +22,6 @@
   // Fix bootstrap select.
   a {
     .user-select(auto);
-  }
-
-  img {
-    max-width: calc(100% - (2 * @image-margin));
   }
 
   &.fr-disabled {
