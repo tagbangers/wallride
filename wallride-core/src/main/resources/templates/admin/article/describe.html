@@ -16,6 +16,7 @@
 							</div>
 							<div class="pull-left">
 								<h1 th:text="${article.title}?:'(No Titled)'">(No Titled)</h1>
+								<p class="small"><a th:href="@{__${WEBSITE_PATH}____${#posts.path(article)}__}" th:text="@{__${WEBSITE_PATH}____${#posts.path(article)}__}" th:if="${#strings.toString(article.status) eq 'PUBLISHED'}" target="_blank"></a></p>
 							</div>
 						</div>
 						<div class="col-sm-3">
@@ -25,12 +26,12 @@
 										<span th:if="${#strings.toString(article.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
 										<span th:if="${#strings.toString(article.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
 										<span th:if="${#strings.toString(article.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + article.status)}">Published</span>
-										<a th:href="@{__${WEBSITE_PATH}__/__${#temporals.format(article.date, 'yyyy/MM/dd')}__/{code}(code=${article.code})}" th:if="${#strings.toString(article.status) eq 'PUBLISHED'}" target="_blank">
+										<a th:href="@{__${WEBSITE_PATH}____${#posts.path(article)}__}" th:if="${#strings.toString(article.status) eq 'PUBLISHED'}" target="_blank">
 											<span class="glyphicon glyphicon-globe"></span>
 											<span th:text="${#messages.msg('Post.Status.' + article.status)}">Published</span>
 										</a>
 									</div>
-									<p class="publish-date"><span th:if="${article.date ne null}" th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></span></p>
+									<p class="small"><span th:if="${article.date ne null}" th:text="${#temporals.format(article.date, 'yyyy/MM/dd HH:mm')}"></span></p>
 								</div>
 							</div>
 							<div class="pull-right">
@@ -73,8 +74,8 @@
 							<dl class="tools clearfix">
 								<dt th:text="#{Categories}">Categories</dt>
 								<dd>
-								<ul class="list-unstyled">
-									<li th:each="category : ${article.categories}" th:text="${category.name}">Category Name</li>
+								<ul class="list-unstyled list-inline">
+									<li th:each="category : ${article.categories}"><a th:href="@{__${ADMIN_PATH}__/articles/index(categoryId=${category.id})}" th:text="${category.name}">Category Name</a></li>
 								</ul>
 								</dd>
 							</dl>
@@ -82,7 +83,7 @@
 								<dt th:text="#{Tags}">Tags</dt>
 								<dd>
 									<ul class="list-unstyled list-inline list-inline-tag">
-										<li th:each="tag : ${article.tags}"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}"></span></span></li>
+										<li th:each="tag : ${article.tags}"><a th:href="@{__${ADMIN_PATH}__/articles/index(tagId=${tag.id})}"><span class="label label-default"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}"></span></span></a></li>
 									</ul>
 								</dd>
 							</dl>

@@ -29,6 +29,7 @@ import java.io.Serializable;
 public class PageSearchForm implements Serializable {
 	
 	private String keyword;
+	private Long categoryId;
 	private Long tagId;
 	private Long authorId;
 	private Post.Status status;
@@ -39,6 +40,14 @@ public class PageSearchForm implements Serializable {
 	
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public Long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
 	}
 
 	public Long getTagId() {
@@ -85,6 +94,9 @@ public class PageSearchForm implements Serializable {
 	public PageSearchRequest toPageSearchRequest() {
 		PageSearchRequest request = new PageSearchRequest();
 		request.withKeyword(getKeyword());
+		if (getCategoryId() != null) {
+			request.withCategoryIds(getCategoryId());
+		}
 		if (getTagId() != null) {
 			request.withTagIds(getTagId());
 		}
@@ -98,6 +110,9 @@ public class PageSearchForm implements Serializable {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		if (StringUtils.hasText(keyword)) {
 			params.add("keyword", keyword);
+		}
+		if (categoryId != null) {
+			params.add("categoryId", Long.toString(categoryId));
 		}
 		if (tagId != null) {
 			params.add("tagId", Long.toString(tagId));
