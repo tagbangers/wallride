@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -94,7 +94,7 @@
         return null;
       }
       else if (editor.$el.get(0).tagName == 'A' && editor.core.hasFocus()) {
-        return editor.$el;
+        return editor.$el.get(0);
       }
       else {
         if ($current_image && $current_image.get(0).parentNode && $current_image.get(0).parentNode.tagName == 'A') {
@@ -166,7 +166,7 @@
     }
 
     function _edit (e) {
-      editor.popups.hide('link.edit');
+      _hideEditPopup();
 
       setTimeout (function () {
         // No event passed.
@@ -178,8 +178,18 @@
           if (link && !$current_image) {
             if (editor.image) {
               var contents = editor.node.contents(link);
+
+              // https://github.com/froala/wysiwyg-editor/issues/1103
               if (contents.length == 1 && contents[0].tagName == 'IMG') {
-                $(contents[0]).trigger('click');
+                var range = editor.selection.ranges(0);
+                if (range.startOffset === 0 && range.endOffset === 0) {
+                  $(link).before($.FE.MARKERS);
+                }
+                else {
+                  $(link).after($.FE.MARKERS);
+                }
+
+                editor.selection.restore();
                 return false;
               }
             }
@@ -216,7 +226,7 @@
     }
 
     function _initEditPopup () {
-      // Image buttons.
+      // Link buttons.
       var link_buttons = '';
       if (editor.opts.linkEditButtons.length > 1) {
         if (editor.$el.get(0).tagName == 'A' && editor.opts.linkEditButtons.indexOf('linkRemove') >= 0) {
@@ -344,8 +354,10 @@
 
       // Add any additional fields.
       for (var attr in editor.opts.linkAttributes) {
-        var placeholder = editor.opts.linkAttributes[attr];
-        input_layer += '<div class="fr-input-line"><input name="' + attr + '" type="text" class="fr-link-attr" placeholder="' + editor.language.translate(placeholder) + '" tabIndex="' + (++tab_idx) + '"></div>';
+        if (editor.opts.linkAttributes.hasOwnProperty(attr)) {
+          var placeholder = editor.opts.linkAttributes[attr];
+          input_layer += '<div class="fr-input-line"><input name="' + attr + '" type="text" class="fr-link-attr" placeholder="' + editor.language.translate(placeholder) + '" tabIndex="' + (++tab_idx) + '"></div>';
+        }
       }
 
       if (!editor.opts.linkAlwaysBlank) {
@@ -386,7 +398,7 @@
 
       if ($current_image && link) {
         $current_image.unwrap();
-        $current_image.trigger('click');
+        editor.image.edit($current_image);
       }
       else if (link) {
         editor.selection.save();
@@ -405,6 +417,10 @@
       });
 
       editor.events.on('window.mouseup', _edit);
+
+      if (editor.helpers.isMobile()) {
+        editor.events.$on(editor.$doc, 'selectionchange', _edit);
+      }
 
       _initInsertPopup(true);
 
@@ -428,7 +444,7 @@
         if (link[$input.attr('name')]) {
           $input.val(link[$input.attr('name')]);
         }
-        else {
+        else if ($input.attr('name') != 'text') {
           $input.val('');
         }
       }
@@ -530,16 +546,19 @@
 
       // Convert email address.
       if (editor.opts.linkConvertEmailAddress) {
-        var regex = /^[\w._]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/i;
+        var regex = /^[\w._]+@[a-z\u00a1-\uffff0-9_-]+?\.[a-z\u00a1-\uffff0-9]{2,}$/i;
 
-        if (regex.test(href) && href.indexOf('mailto:') !== 0) {
+        if (regex.test(href) && !/^mailto:.*/i.test(href)) {
           href = 'mailto:' + href;
         }
       }
 
       // Add autoprefix.
-      if (href.indexOf('tel:') !== 0 && href.indexOf('sms:') !== 0 && href.indexOf('mailto:') !== 0 && href.indexOf('notes:') !== 0 && href.indexOf('data:image') !== 0 && editor.opts.linkAutoPrefix !== '' && !/^(https?:|ftps?:|)\/\//.test(href)) {
-        href = editor.opts.linkAutoPrefix + href;
+      if (editor.opts.linkAutoPrefix !== '' && !/^(mailto|tel|sms|notes|data):.*/i.test(href) && !/^data:image.*/i.test(href) && !/^(https?:|ftps?:|)\/\//i.test(href)) {
+        // Do prefix only if starting character is not absolute.
+        if (['/', '{', '[', '#', '('].indexOf((href || '')[0]) < 0) {
+          href = editor.opts.linkAutoPrefix + href;
+        }
       }
 
       // Sanitize the URL.
@@ -569,8 +588,10 @@
         // Clear attributes.
         var a_list = editor.node.rawAttributes(link);
         for (var attr in a_list) {
-          if (attr != 'class' && attr != 'style') {
-            $link.removeAttr(attr);
+          if (a_list.hasOwnProperty(attr)) {
+            if (attr != 'class' && attr != 'style') {
+              $link.removeAttr(attr);
+            }
           }
         }
 
@@ -598,7 +619,7 @@
         // We don't have any image selected.
         if (!$current_image) {
           // Remove current links.
-          editor.doc.execCommand('unlink', false, false);
+          editor.format.remove('a');
 
           // Nothing is selected.
           if (editor.selection.isCollapsed()) {
@@ -607,7 +628,7 @@
             editor.selection.restore();
           }
           else {
-            if (text.length > 0 && text != editor.selection.text()) {
+            if (text.length > 0 && text != editor.selection.text().replace(/\n/g, '')) {
               editor.selection.remove();
               editor.html.insert('<a href="' + href + '">' + $.FE.START_MARKER + text + $.FE.END_MARKER + '</a>');
               editor.selection.restore();
@@ -616,7 +637,7 @@
               _split();
 
               // Add link.
-              editor.doc.execCommand('createLink', false, href);
+              editor.format.apply('a', { href: href });
             }
           }
         }
@@ -645,12 +666,12 @@
 
       // Hide popup and try to edit.
       if (!$current_image) {
-        editor.popups.get('link.insert');
         _edit();
       }
       else {
-        $current_image.trigger('touchstart');
-        $current_image.trigger(editor.helpers.isMobile() ? 'touchend' : 'click');
+        var $pop = editor.popups.get('link.insert');
+        $pop.find('input:focus').blur();
+        editor.image.edit($current_image);
       }
     }
 
@@ -665,6 +686,7 @@
         if (!editor.popups.isVisible('link.insert')) {
           editor.popups.refresh('link.insert');
           editor.selection.save();
+
           if (editor.helpers.isMobile()) {
             editor.events.disableBlur();
             editor.$el.blur();
@@ -705,7 +727,7 @@
         }
       }
       else {
-        $current_image.trigger('click').trigger('touchend');
+        editor.image.back();
       }
     }
 
@@ -728,18 +750,23 @@
     /**
      * Apply specific style.
      */
-    function applyStyle (val) {
+    function applyStyle (val, linkStyles, multipleStyles) {
+      if (typeof multipleStyles == 'undefined') multipleStyles = editor.opts.linkMultipleStyles;
+      if (typeof linkStyles == 'undefined') linkStyles = editor.opts.linkStyles;
+
       var link = get();
       if (!link) return false;
 
       // Remove multiple styles.
-      if (!editor.opts.linkMultipleStyles) {
-        var styles = Object.keys(editor.opts.linkStyles);
+      if (!multipleStyles) {
+        var styles = Object.keys(linkStyles);
         styles.splice(styles.indexOf(val), 1);
         $(link).removeClass(styles.join(' '));
       }
 
       $(link).toggleClass(val);
+
+      _edit();
     }
 
     return {
@@ -760,7 +787,7 @@
 
   // Register the link command.
   $.FE.DefineIcon('insertLink', { NAME: 'link' });
-  $.FE.RegisterShortcut(75, 'insertLink');
+  $.FE.RegisterShortcut($.FE.KEYCODE.K, 'insertLink', null, 'K');
   $.FE.RegisterCommand('insertLink', {
     title: 'Insert Link',
     undo: false,
@@ -943,7 +970,9 @@
       var c = '<ul class="fr-dropdown-list">';
       var options =  this.opts.linkStyles;
       for (var cls in options) {
-        c += '<li><a class="fr-command" data-cmd="linkStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+        if (options.hasOwnProperty(cls)) {
+          c += '<li><a class="fr-command" data-cmd="linkStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+        }
       }
       c += '</ul>';
 

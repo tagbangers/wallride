@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -41,6 +41,11 @@
 
   $.FE.PLUGINS.draggable = function (editor) {
     function _dragStart (e) {
+      // Image with link.
+      if (e.target && e.target.tagName == 'A' && e.target.childNodes.length == 1 && e.target.childNodes[0].tagName == 'IMG') {
+        e.target = e.target.childNodes[0];
+      }
+
       if (!$(e.target).hasClass('fr-draggable')) {
         e.preventDefault();
         return false;
@@ -94,7 +99,7 @@
           top_offset++;
           top_tag = editor.doc.elementFromPoint(e.originalEvent.pageX - editor.win.pageXOffset, e.originalEvent.pageY - editor.win.pageYOffset - top_offset);
         }
-        if (!_tagOK(top_tag) || (editor.$el.find(top_tag).length === 0 && top_tag != $draggable_helper.get(0))) { top_tag = null; }
+        if (!_tagOK(top_tag) || ($draggable_helper && editor.$el.find(top_tag).length === 0 && top_tag != $draggable_helper.get(0))) { top_tag = null; }
 
         // Look below for the closest tag.
         var bottom_offset = 0;
@@ -104,7 +109,7 @@
           bottom_tag = editor.doc.elementFromPoint(e.originalEvent.pageX - editor.win.pageXOffset, e.originalEvent.pageY - editor.win.pageYOffset + bottom_offset);
         }
 
-        if (!_tagOK(bottom_tag) || (editor.$el.find(bottom_tag).length === 0  && bottom_tag != $draggable_helper.get(0))) { bottom_tag = null; }
+        if (!_tagOK(bottom_tag) || ($draggable_helper &&  editor.$el.find(bottom_tag).length === 0  && bottom_tag != $draggable_helper.get(0))) { bottom_tag = null; }
 
         if (bottom_tag == null && top_tag) tag_under = top_tag;
         else if (bottom_tag && top_tag == null) tag_under = bottom_tag;
@@ -143,6 +148,7 @@
 
           editor.events.on('shared.destroy', function () {
             $draggable_helper.html('').removeData().remove();
+            $draggable_helper = null;
           }, true);
         }
 
@@ -209,6 +215,10 @@
 
         _positionHelper(e);
       }
+
+      else if (!_getDraggedEl() && (editor.browser.msie || editor.browser.edge)) {
+        e.preventDefault();
+      }
     }
 
     function _dragEnter (e) {
@@ -232,6 +242,22 @@
 
         if ($draggable_helper && !$draggable_helper.hasClass('fr-visible')) {
           $draggedEl.removeClass('fr-dragging');
+        }
+      }
+
+      if ($draggable_helper && editor.$box.find($draggable_helper).length) {
+        $draggable_helper.removeClass('fr-visible');
+      }
+    }
+
+    function _getDraggedEl () {
+      var $draggedEl = null;
+
+      // Search of the instance we're dragging from.
+      for (var i = 0; i < $.FE.INSTANCES.length; i++) {
+        $draggedEl = $.FE.INSTANCES[i].$el.find('.fr-dragging');
+        if ($draggedEl.length) {
+          return $draggedEl.get(0);
         }
       }
     }
@@ -271,32 +297,42 @@
           editor.undo.saveStep();
         }
 
+        // Image with link.
+        var $droppedEl = $draggedEl;
+        if ($draggedEl.parent().is('A')) {
+          $droppedEl = $draggedEl.parent();
+        }
+
         // Replace marker with the dragged element.
         if (!editor.core.isEmpty()) {
           var $marker = editor.$el.find('.fr-marker');
-          $marker.replaceWith($draggedEl);
+          $marker.replaceWith($droppedEl);
           $draggedEl.after($.FE.MARKERS);
           editor.selection.restore();
         }
         else {
-          editor.$el.html($draggedEl);
+          editor.$el.html($droppedEl);
         }
 
         $draggedEl.removeClass('fr-dragging');
-        editor.$el.find(editor.html.emptyBlockTagsQuery()).remove();
+        editor.$el.find(editor.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
         editor.html.wrap();
+        editor.html.fillEmptyBlocks();
         editor.undo.saveStep();
+
+        if (editor.opts.iframe) editor.size.syncIframe();
 
         // Mark changes in the original instance as well.
         if (inst != editor) {
           inst.popups.hideAll();
-          inst.$el.find(editor.html.emptyBlockTagsQuery()).remove();
+          inst.$el.find(editor.html.emptyBlockTagsQuery()).not('TD, TH, LI, .fr-inner').remove();
           inst.html.wrap();
+          inst.html.fillEmptyBlocks();
           inst.undo.saveStep();
           inst.events.trigger('element.dropped');
-        }
 
-        if (editor.opts.iframe) editor.size.syncIframe();
+          if (inst.opts.iframe) inst.size.syncIframe();
+        }
 
         editor.events.trigger('element.dropped', [$draggedEl]);
 

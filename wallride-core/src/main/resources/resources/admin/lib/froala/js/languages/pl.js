@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['pl'] = {
 
     // Tables
     "Insert Table": "Wstaw tabel\u0119",
-    "Header": "Nag\u0142\u00f3wek",
+    "Table Header": "Nag\u0142\u00f3wek tabeli",
+    "Remove Table": "Usu\u0144 tabel\u0119",
+    "Table Style": "Styl tabeli",
+    "Horizontal Align": "Wyr\u00f3wnaj poziomy",
     "Row": "Wiersz",
     "Insert row above": "Wstaw wiersz przed",
     "Insert row below": "Wstaw wiersz po",

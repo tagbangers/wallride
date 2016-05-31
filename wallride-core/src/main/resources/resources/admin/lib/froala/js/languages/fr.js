@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['fr'] = {
 
     // Tables
     "Insert Table": "Ins\u00e9rer un tableau",
-    "Header": "Ent\u00eate",
+    "Table Header": "Ent\u00eate de tableau",
+    "Remove Table": "Effacer le tableau",
+    "Table Style": "Style de tableau",
+    "Horizontal Align": "Aligner horizontale",
     "Row": "Ligne",
     "Insert row above": "Ins\u00e9rer une ligne avant",
     "Insert row below": "Ins\u00e9rer une ligne apr\u00e8s",

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -178,7 +178,7 @@
     function format(tag_name) {
       // Wrap.
       editor.selection.save();
-      editor.html.wrap(true, true);
+      editor.html.wrap(true, true, true, true);
       editor.selection.restore();
 
       var blocks = editor.selection.blocks();

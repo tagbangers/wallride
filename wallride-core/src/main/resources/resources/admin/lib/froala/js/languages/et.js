@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -106,7 +106,10 @@ $.FE.LANGUAGE['et'] = {
 
     // Tables
     "Insert Table": "Sisesta tabel",
-    "Header": "P\u00e4ise kaudu",
+    "Table Header": "Tabel p\u00e4ise kaudu",
+    "Remove Table": "Eemalda tabel",
+    "Table Style": "Tabel stiili",
+    "Horizontal Align": "Horisontaalne joonda",
     "Row": "Rida",
     "Insert row above": "Sisesta rida \u00fcles",
     "Insert row below": "Sisesta rida alla",

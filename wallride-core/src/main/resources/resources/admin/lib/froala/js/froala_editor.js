@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -68,9 +68,22 @@
       if (this.opts.initOnClick) {
         this.load($.FE.MODULES);
 
-        this.$el.on('mousedown.init dragenter.init focus.init', $.proxy(function (e) {
-          if (e.which === 1) {
-            this.$el.off('mousedown.init dragenter.init focus.init');
+        // https://github.com/froala/wysiwyg-editor/issues/1207.
+        this.$el.on('touchstart.init', function () {
+          $(this).data('touched', true);
+        });
+
+        this.$el.on('touchmove.init', function () {
+          $(this).removeData('touched');
+        })
+
+        this.$el.on('mousedown.init touchend.init dragenter.init focus.init', $.proxy(function (e) {
+          if (e.type == 'touchend' && !this.$el.data('touched')) {
+            return true;
+          }
+
+          if (e.which === 1 || e.which === 0) {
+            this.$el.off('mousedown.init touchstart.init touchmove.init touchend.init dragenter.init focus.init');
 
             this.load($.FE.MODULES);
             this.load($.FE.PLUGINS);
@@ -79,6 +92,12 @@
             if (target && target.tagName == 'IMG') $(target).trigger('mousedown');
 
             if (typeof this.ul == 'undefined') this.destroy();
+
+            if (e.type == 'touchend' && this.image && e.originalEvent && e.originalEvent.target && $(e.originalEvent.target).is('img')) {
+              setTimeout($.proxy(function () {
+                this.image.edit($(e.originalEvent.target));
+              }, this), 100);
+            }
 
             this.events.trigger('initialized');
           }
@@ -108,7 +127,7 @@
 
   FE.PLUGINS = {};
 
-  FE.VERSION = '2.2.1';
+  FE.VERSION = '2.3.0';
 
   FE.INSTANCES = [];
 
@@ -220,16 +239,18 @@
   FE.prototype.load = function (module_list) {
     // Bind modules to the current instance and tear them up.
     for (var m_name in module_list) {
-      if (this[m_name]) continue;
+      if (module_list.hasOwnProperty(m_name)) {
+        if (this[m_name]) continue;
 
-      // Do not include plugin.
-      if ($.FE.PLUGINS[m_name] && this.opts.pluginsEnabled.indexOf(m_name) < 0) continue;
+        // Do not include plugin.
+        if ($.FE.PLUGINS[m_name] && this.opts.pluginsEnabled.indexOf(m_name) < 0) continue;
 
-      this[m_name] = new module_list[m_name](this);
-      if (this[m_name]._init) {
-        this[m_name]._init();
-        if (this.opts.initOnClick && m_name == 'core') {
-          return false;
+        this[m_name] = new module_list[m_name](this);
+        if (this[m_name]._init) {
+          this[m_name]._init();
+          if (this.opts.initOnClick && m_name == 'core') {
+            return false;
+          }
         }
       }
     }
@@ -237,25 +258,31 @@
 
   // Do destroy.
   FE.prototype.destroy = function () {
-    if (this.edit.isDisabled()) return false;
-
     this.shared.count--;
 
     this.events.$off();
 
-    this.events.trigger('destroy');
-    this.events.trigger('shared.destroy');
+    // HTML.
+    var html = this.html.get();
+
+    this.events.trigger('destroy', [], true);
+    this.events.trigger('shared.destroy', undefined, true);
 
     // Remove shared.
     if (this.shared.count === 0) {
       for (var k in this.shared) {
-        delete this.shared[k];
+        if (this.shared.hasOwnProperty(k)) {
+          delete this.shared[k];
+        }
       }
     }
 
     this.$oel.parents('form').off('.' + this.id);
     this.$oel.off('click.popup');
     this.$oel.removeData('froala.editor');
+
+    // Destroy editor basic elements.
+    this.core.destroy(html);
 
     $.FE.INSTANCES.splice($.FE.INSTANCES.indexOf(this), 1);
   }
@@ -352,13 +379,13 @@
       if (el.querySelectorAll($.FE.VOID_ELEMENTS.join(',')).length - el.querySelectorAll('br').length) return false;
 
       // Look for empty allowed tags.
-      if (el.querySelectorAll(editor.opts.htmlAllowedEmptyTags.join(',')).length) return false;
+      if (el.querySelectorAll(editor.opts.htmlAllowedEmptyTags.join(':not(.fr-marker),') + ':not(.fr-marker)').length) return false;
 
       // Look for block tags.
       if (el.querySelectorAll($.FE.BLOCK_TAGS.join(',')).length > 1) return false;
 
       // Look for do not wrap tags.
-      if (el.querySelectorAll(editor.opts.htmlDoNotWrapTags.join(',')).length) return false;
+      if (el.querySelectorAll(editor.opts.htmlDoNotWrapTags.join(':not(.fr-marker),') + ':not(.fr-marker)').length) return false;
 
       // Get element contents.
       var contents = getContents(el);
@@ -376,7 +403,7 @@
 
         if (node.nodeType == Node.TEXT_NODE && node.textContent.length == 0) continue;
 
-        if (node.tagName != 'BR' && (node.textContent || '').replace(/\u200B/gi, '').length > 0) return false;
+        if (node.tagName != 'BR' && (node.textContent || '').replace(/\u200B/gi, '').replace(/\n/g, '').length > 0) return false;
 
         if (has_br) {
           return false;
@@ -522,6 +549,13 @@
     }
 
     /**
+     * Check if the node is the editable element.
+     */
+    function isDeletable (node) {
+      return node && node.className && (node.className || '').indexOf('fr-deletable') >= 0;
+    }
+
+    /**
      * Check if the node has focus.
      */
     function hasFocus (node) {
@@ -529,7 +563,8 @@
     }
 
     function isEditable (node) {
-      return !node.getAttribute || node.getAttribute('contenteditable') != 'false';
+      return (!node.getAttribute || node.getAttribute('contenteditable') != 'false')
+                && ['STYLE', 'SCRIPT'].indexOf(node.tagName) < 0;
     }
 
     return {
@@ -548,7 +583,8 @@
       contents: getContents,
       isVoid: isVoid,
       hasFocus: hasFocus,
-      isEditable: isEditable
+      isEditable: isEditable,
+      isDeletable: isDeletable
     }
   };
 
@@ -576,34 +612,48 @@
     function _removeInvisible (node) {
       if (node.className && node.className.indexOf('fr-marker') >= 0) return false;
 
+      // Get node contents.
       var contents = editor.node.contents(node);
       var markers = [];
       var i;
 
-      // Get markers.
+      // Loop through contents.
       for (i = 0; i < contents.length; i++) {
-        if (contents[i].className && contents[i].className.indexOf('fr-marker') >= 0) {
-          markers.push(contents[i]);
-        }
-      }
-
-      // Reasess contents.
-      if (contents.length - markers.length == 1 && node.textContent.replace(/\u200b/g, '').length === 0) {
-        for (i = 0; i < markers.length; i++) {
-          node.parentNode.insertBefore(markers[i].cloneNode(true), node);
-        }
-        node.parentNode.removeChild(node);
-        return false;
-      }
-
-      for (i = 0; i < contents.length; i++) {
-        if (contents[i].nodeType == Node.ELEMENT_NODE) {
+        // If node is not void.
+        if (contents[i].nodeType == Node.ELEMENT_NODE && !editor.node.isVoid(contents[i])) {
+          // There are invisible spaces.
           if (contents[i].textContent.replace(/\u200b/g, '').length != contents[i].textContent.length) {
+            // Do remove invisible spaces.
             _removeInvisible(contents[i]);
           }
         }
+
+        // If node is text node, replace invisible spaces.
         else if (contents[i].nodeType == Node.TEXT_NODE) {
           contents[i].textContent = contents[i].textContent.replace(/\u200b/g, '');
+        }
+      }
+
+      // Reasess contents after cleaning invisible spaces.
+      if (node.nodeType == Node.ELEMENT_NODE && !editor.node.isVoid(node)) {
+        node.normalize();
+        contents = editor.node.contents(node);
+        markers = node.querySelectorAll('.fr-marker');
+
+        // All we have left are markers.
+        if (contents.length - markers.length == 0) {
+          // Make sure contents are all markers.
+          for (i = 0; i < contents.length; i++) {
+            if ((contents[i].className || '').indexOf('fr-marker') < 0) {
+              return false;
+            }
+          }
+
+          for (i = 0; i < markers.length; i++) {
+            node.parentNode.insertBefore(markers[i].cloneNode(true), node);
+          }
+          node.parentNode.removeChild(node);
+          return false;
         }
       }
     }
@@ -661,8 +711,10 @@
       var nm;
 
       for (nm in attrs) {
-        if (!nm.match(allowedAttrsRE)) {
-          delete attrs[nm];
+        if (attrs.hasOwnProperty(nm)) {
+          if (!nm.match(allowedAttrsRE)) {
+            delete attrs[nm];
+          }
         }
       }
 
@@ -905,21 +957,32 @@
 
       // Make sure the TH lives inside thead.
       for (var i = 0; i < trs.length; i++) {
-        if (trs[i].querySelectorAll('th').length) {
-          var tr = trs[i];
-
-          while (tr && tr.tagName != 'TABLE' && tr.tagName != 'THEAD') {
-            tr = tr.parentNode;
+        // Search for th inside tr.
+        var children = trs[i].children;
+        var ok = true;
+        for (var j = 0; j < children.length; j++) {
+          if (children[j].tagName != 'TH') {
+            ok = false;
+            break;
           }
-
-          var thead = tr;
-          if (thead.tagName != 'THEAD') {
-            thead = editor.doc.createElement('THEAD');
-            tr.insertBefore(thead, tr.firstChild);
-          }
-
-          thead.appendChild(trs[i]);
         }
+
+        // If there is something else than TH.
+        if (ok == false || children.length == 0) continue;
+
+        var tr = trs[i];
+
+        while (tr && tr.tagName != 'TABLE' && tr.tagName != 'THEAD') {
+          tr = tr.parentNode;
+        }
+
+        var thead = tr;
+        if (thead.tagName != 'THEAD') {
+          thead = editor.doc.createElement('THEAD');
+          tr.insertBefore(thead, tr.firstChild);
+        }
+
+        thead.appendChild(trs[i]);
       }
     }
 
@@ -929,6 +992,7 @@
       for (var i = 0; i < tbls.length; i++) {
         var prev_node = tbls[i].previousSibling;
 
+        // Get previous sibling.
         while (prev_node && prev_node.nodeType == Node.TEXT_NODE && prev_node.textContent.length == 0) {
           prev_node = prev_node.previousSibling;
         }
@@ -1261,7 +1325,7 @@
     }
 
     function isURL (url) {
-      if (!/^(https?:|ftps?:|)\/\//.test(url)) return false;
+      if (!/^(https?:|ftps?:|)\/\//i.test(url)) return false;
 
       url = String(url)
               .replace(/</g, '%3C')
@@ -1270,15 +1334,15 @@
               .replace(/ /g, '%20');
 
 
-      var test_reg = /(http|ftp|https):\/\/[\w-]+(\.[\w-]*)*([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/gi;
+      var test_reg = /(http|ftp|https):\/\/[a-z\u00a1-\uffff0-9]+(\.[a-z\u00a1-\uffff0-9]*)*([a-z\u00a1-\uffff0-9.,@?^=%&amp;:\/~+#-]*[a-z\u00a1-\uffff0-9@?^=%&amp;\/~+#-])?/gi;
 
       return test_reg.test(url);
     }
 
     // Sanitize URL.
     function sanitizeURL (url) {
-      if (/^(https?:|ftps?:|)\/\//.test(url)) {
-        if (!isURL(url)) {
+      if (/^(https?:|ftps?:|)\/\//i.test(url)) {
+        if (!isURL(url) && !isURL('http:' + url)) {
           return '';
         }
       }
@@ -1287,13 +1351,13 @@
                   .replace(/%23/g, '#')
                   .replace(/%2F/g, '/')
                   .replace(/%25/g, '%')
-                  .replace(/mailto%3A/g, 'mailto:')
-                  .replace(/file%3A/g, 'file:')
-                  .replace(/sms%3A/g, 'sms:')
-                  .replace(/tel%3A/g, 'tel:')
-                  .replace(/notes%3A/g, 'notes:')
-                  .replace(/data%3Aimage/g, 'data:image')
-                  .replace(/webkit-fake-url%3A/g, 'webkit-fake-url:')
+                  .replace(/mailto%3A/gi, 'mailto:')
+                  .replace(/file%3A/gi, 'file:')
+                  .replace(/sms%3A/gi, 'sms:')
+                  .replace(/tel%3A/gi, 'tel:')
+                  .replace(/notes%3A/gi, 'notes:')
+                  .replace(/data%3Aimage/gi, 'data:image')
+                  .replace(/webkit-fake-url%3A/gi, 'webkit-fake-url:')
                   .replace(/%3F/g, '?')
                   .replace(/%3D/g, '=')
                   .replace(/%26/g, '&')
@@ -1301,7 +1365,11 @@
                   .replace(/%2C/g, ',')
                   .replace(/%3B/g, ';')
                   .replace(/%2B/g, '+')
-                  .replace(/%40/g, '@');
+                  .replace(/%40/g, '@')
+                  .replace(/%5B/g, '[')
+                  .replace(/%5D/g, ']')
+                  .replace(/%7B/g, '{')
+                  .replace(/%7D/g, '}');
       }
 
       return url;
@@ -1373,6 +1441,18 @@
     }
 
     /**
+     * Check if is mac.
+     */
+    var is_mac = null;
+    function isMac () {
+      if (is_mac == null) {
+        is_mac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;;
+      }
+
+      return is_mac;
+    }
+
+    /**
      * Tear up.
      */
     function _init () {
@@ -1382,6 +1462,7 @@
     return {
       _init: _init,
       isIOS: isIOS,
+      isMac: isMac,
       isAndroid: isAndroid,
       isBlackberry: isBlackberry,
       isWindowsPhone: isWindowsPhone,
@@ -1421,7 +1502,7 @@
 
       on('mousedown', function () {
         for (var i = 0; i < $.FE.INSTANCES.length; i++) {
-          if ($.FE.INSTANCES[i] != editor) {
+          if ($.FE.INSTANCES[i] != editor && $.FE.INSTANCES[i].popups && $.FE.INSTANCES[i].popups.areVisible()) {
             $.FE.INSTANCES[i].$el.find('.fr-marker').remove();
           }
         }
@@ -1445,7 +1526,7 @@
         trigger('window.mouseup', [e]);
       });
 
-      _assignEvent(editor.$win, 'keydown keyup touchmove', function (e) {
+      _assignEvent(editor.$win, 'keydown keyup touchmove touchend', function (e) {
         trigger('window.' + e.type, [e]);
       });
     }
@@ -1460,9 +1541,18 @@
       if (typeof do_focus == 'undefined') do_focus = true;
       if (!editor.$wp) return false;
 
+      // Focus the editor window.
+      if (editor.helpers.isIOS()) {
+        editor.$win.get(0).focus();
+      }
+
       // If there is no focus, then force focus.
       if (!editor.core.hasFocus() && do_focus) {
+        var st = editor.$win.scrollTop();
         editor.$el.focus();
+        if (st != editor.$win.scrollTop()) {
+          editor.$win.scrollTop(st);
+        }
         return false;
       }
 
@@ -1624,20 +1714,22 @@
      */
     function bindClick ($element, selector, handler) {
       $on($element, editor._mousedown, selector, function (e) {
-        _buttonMouseDown(e);
+        if (!editor.edit.isDisabled()) _buttonMouseDown(e);
       }, true);
 
       $on($element, editor._mouseup + ' ' + editor._move, selector, function (e) {
-        _buttonMouseUp(e, handler);
+        if (!editor.edit.isDisabled()) _buttonMouseUp(e, handler);
       }, true);
 
       $on($element, 'mousedown click mouseup', selector, function (e) {
-        e.stopPropagation();
+        if (!editor.edit.isDisabled()) e.stopPropagation();
       }, true);
 
       on('window.mouseup', function () {
-        $element.find(selector).removeClass('fr-selected');
-        enableBlur();
+        if (!editor.edit.isDisabled()) {
+          $element.find(selector).removeClass('fr-selected');
+          enableBlur();
+        }
       });
     }
 
@@ -1701,9 +1793,11 @@
 
 		function $off () {
       _$off($_events, editor.id);
+      $_events = [];
 
       if (editor.shared.count == 0) {
   			_$off(editor.shared.$_events, editor.sid);
+        editor.shared.$_events = null;
       }
 		}
 
@@ -1779,13 +1873,17 @@
     function _destroy () {
       // Clear the events list.
       for (var k in _events) {
-        delete _events[k];
+        if (_events.hasOwnProperty(k)) {
+          delete _events[k];
+        }
       }
     }
 
     function _sharedDestroy () {
-      for (var k in _events) {
-        delete editor.shared._events[k];
+      for (var k in editor.shared._events) {
+        if (editor.shared._events.hasOwnProperty(k)) {
+          delete editor.shared._events[k];
+        }
       }
     }
 
@@ -1899,6 +1997,9 @@
 
         var dom_marker = editor.$el.find('span.fr-marker[data-type="' + marker + '"][data-id="' + id + '"]').get(0);
 
+        // If image is at the top of the editor in an empty P
+        // and floated to right, the text will be pushed down
+        // when trying to insert an image.
         if (dom_marker) dom_marker.style.display = 'none';
         return dom_marker;
       }
@@ -2236,6 +2337,17 @@
                 node_found = true;
               }
             }
+            // Browser sees selection at the beginning of the next node.
+            else if (!range.collapsed && node.childNodes.length > 0 && node.childNodes[range.endOffset]) {
+              var child = node.childNodes[range.endOffset].previousSibling;
+
+              if (child.nodeType == Node.ELEMENT_NODE) {
+                if (child && child.textContent.replace(/\u200B/g, '') === text().replace(/\u200B/g, '')) {
+                  node = child;
+                  node_found = true;
+                }
+              }
+            }
 
             if (!node_found && node.childNodes.length > 0 && $(node.childNodes[node.childNodes.length - 1]).text() === text() && ['BR', 'IMG', 'HR'].indexOf(node.childNodes[node.childNodes.length - 1].tagName) < 0) {
               node = node.childNodes[node.childNodes.length - 1];
@@ -2262,7 +2374,6 @@
         }
       }
       catch (ex) {
-
       }
 
       return editor.$el.get(0);
@@ -2341,11 +2452,15 @@
             }
 
             // Add node to the list.
-            if (editor.node.isBlock(next_node) && was_into.indexOf(next_node) < 0 && blks.indexOf(next_node) < 0) blks.push(next_node);
+            if (editor.node.isBlock(next_node) && was_into.indexOf(next_node) < 0 && blks.indexOf(next_node) < 0) {
+              if (next_node !== end_node || range.endOffset > 0) {
+                blks.push(next_node);
+              }
+            }
           }
 
           // Add the end node.
-          if (editor.node.isBlock(end_node) && blks.indexOf(end_node) < 0) blks.push(end_node);
+          if (editor.node.isBlock(end_node) && blks.indexOf(end_node) < 0 && range.endOffset > 0) blks.push(end_node);
 
           // Check for the parent node of the end node.
           var block_parent = editor.node.blockParent(end_node);
@@ -2505,8 +2620,8 @@
                 }
               }
 
-              if (prev_node && editor.node.isVoid(prev_node)) prev_node = null;
-              if (next_node && editor.node.isVoid(next_node)) next_node = null;
+              if (prev_node && (editor.node.isVoid(prev_node) || editor.node.isBlock(prev_node))) prev_node = null;
+              if (next_node && (editor.node.isVoid(next_node) || editor.node.isBlock(next_node))) next_node = null;
 
               // Previous node and next node are both text.
               if (prev_node && next_node && prev_node.nodeType == Node.TEXT_NODE && next_node.nodeType == Node.TEXT_NODE) {
@@ -2520,7 +2635,7 @@
                 $(next_node).remove();
 
                 // Normalize spaces.
-                editor.html.normalizeSpaces(prev_node);
+                editor.spaces.normalize(prev_node);
 
                 // Restore position.
                 range.setStart(prev_node, len);
@@ -2534,7 +2649,7 @@
                 $(end_marker).remove();
 
                 // Normalize spaces.
-                editor.html.normalizeSpaces(next_node);
+                editor.spaces.normalize(next_node);
 
                 ghost = $(editor.doc.createTextNode('\u200B'));
                 $(next_node).before(ghost);
@@ -2550,7 +2665,7 @@
                 $(end_marker).remove();
 
                 // Normalize spaces.
-                editor.html.normalizeSpaces(prev_node);
+                editor.spaces.normalize(prev_node);
 
                 ghost = $(editor.doc.createTextNode('\u200B'));
                 $(prev_node).after(ghost);
@@ -2585,8 +2700,16 @@
                   ghost = $(editor.doc.createTextNode('\u200B'));
                 }
 
-                x = _normalizedMarker(start_marker, range, true) || ($(start_marker).before(ghost) && range.setStartBefore(start_marker));
-                y = _normalizedMarker(end_marker, range, false) || ($(end_marker).after(ghost) && range.setEndAfter(end_marker));
+                // https://github.com/froala/wysiwyg-editor/issues/1120
+                var p_node = start_marker.previousSibling;
+                if (p_node && p_node.style && editor.win.getComputedStyle(p_node).display == 'block' && !editor.opts.enter == $.FE.ENTER_BR) {
+                  range.setEndAfter(p_node);
+                  range.setStartAfter(p_node);
+                }
+                else {
+                  x = _normalizedMarker(start_marker, range, true) || ($(start_marker).before(ghost) && range.setStartBefore(start_marker));
+                  y = _normalizedMarker(end_marker, range, false) || ($(end_marker).after(ghost) && range.setEndAfter(end_marker));
+                }
               }
 
               if (typeof x == 'function') x();
@@ -2601,7 +2724,12 @@
           ghost.remove();
         }
 
-        sel.addRange(range);
+        try {
+          sel.addRange(range);
+        }
+        catch (ex) {
+          console.warn ('ADD RANGE', ex);
+        }
       }
 
       // Remove used markers.
@@ -2624,7 +2752,7 @@
          $(prev_node).remove();
          $(marker).remove();
 
-         editor.html.normalizeSpaces(next_node);
+         editor.spaces.normalize(next_node);
 
          return function () {
            range.setStart(next_node, len);
@@ -2635,7 +2763,7 @@
           $(next_node).remove();
           $(marker).remove();
 
-          editor.html.normalizeSpaces(prev_node);
+          editor.spaces.normalize(prev_node);
 
           return function () {
             range.setEnd(prev_node, len);
@@ -2647,13 +2775,13 @@
         var len = prev_node.textContent.length;
 
         if (start) {
-          editor.html.normalizeSpaces(prev_node);
+          editor.spaces.normalize(prev_node);
           return function () {
             range.setStart(prev_node, len);
           }
         }
         else {
-          editor.html.normalizeSpaces(prev_node);
+          editor.spaces.normalize(prev_node);
           return function () {
             range.setEnd(prev_node, len);
           }
@@ -2663,13 +2791,13 @@
       // Next node is text node.
       else if (next_node && !prev_node && next_node.nodeType == Node.TEXT_NODE) {
         if (start) {
-          editor.html.normalizeSpaces(next_node);
+          editor.spaces.normalize(next_node);
           return function () {
             range.setStart(next_node, 0);
           }
         }
         else {
-          editor.html.normalizeSpaces(next_node);
+          editor.spaces.normalize(next_node);
           return function () {
             range.setEnd(next_node, 0);
           }
@@ -2818,8 +2946,9 @@
             should_delete = _processNodeDelete($(node), should_delete);
           }
           else {
+            // TD, TH or inner, then go further.
             if (['TD', 'TH'].indexOf(node.tagName) < 0 && !$(node).hasClass('fr-inner')) {
-              if (!editor.opts.keepFormatOnDelete || should_delete > 1 || editor.$el.find('[data-first]').length > 0) {
+              if (!editor.opts.keepFormatOnDelete || editor.$el.find('[data-first]').length > 0) {
                 $(node).remove();
               }
               else {
@@ -2878,6 +3007,8 @@
      * Remove the current selection html.
      */
     function remove () {
+      if (isCollapsed()) return true;
+
       save();
 
       // Get the previous sibling normalized.
@@ -2908,7 +3039,7 @@
       var start_markers = editor.$el.find('.fr-marker[data-type="true"]');
       for (var i = 0; i < start_markers.length; i++) {
         var sm = start_markers[i];
-        while (!_prevSibling(sm) && !editor.node.isBlock(sm.parentNode)) {
+        while (!_prevSibling(sm) && !editor.node.isBlock(sm.parentNode) && !editor.$el.is(sm.parentNode)) {
           $(sm.parentNode).before(sm);
         }
       }
@@ -2917,7 +3048,12 @@
       var end_markers = editor.$el.find('.fr-marker[data-type="false"]');
       for (var i = 0; i < end_markers.length; i++) {
         var em = end_markers[i];
-        while (!_nextSibling(em) && !editor.node.isBlock(em.parentNode)) {
+        while (!_nextSibling(em) && !editor.node.isBlock(em.parentNode) && !editor.$el.is(em.parentNode)) {
+          $(em.parentNode).after(em);
+        }
+
+        // Last node is empty and has a BR in it.
+        if (em.parentNode && editor.node.isBlock(em.parentNode) && editor.node.isEmpty(em.parentNode) && !editor.$el.is(em.parentNode)) {
           $(em.parentNode).after(em);
         }
       }
@@ -2973,6 +3109,18 @@
                 var start_parent = editor.node.blockParent(start_marker);
                 var end_parent = editor.node.blockParent(end_marker);
 
+                // https://github.com/froala/wysiwyg-editor/issues/1233
+                var list_start = false;
+                var list_end = false;
+                if (start_parent && ['UL', 'OL'].indexOf(start_parent.tagName) >= 0) {
+                  start_parent = null;
+                  list_start = true;
+                }
+                if (end_parent && ['UL', 'OL'].indexOf(end_parent.tagName) >= 0) {
+                  end_parent = null;
+                  list_end = true;
+                }
+
                 // Move end marker next to start marker.
                 $(start_marker).after(end_marker);
 
@@ -2981,7 +3129,7 @@
                 }
 
                 // The block parent of the start marker is the element itself.
-                else if (start_parent == null) {
+                else if (start_parent == null && !list_start) {
                   var deep_parent = editor.node.deepestParent(start_marker);
 
                   // There is a parent for the marker. Move the end html to it.
@@ -2998,7 +3146,7 @@
                 }
 
                 // End marker is inside element. We don't merge in table.
-                else if (end_parent == null && $(start_parent).parentsUntil(editor.$el, 'table').length == 0) {
+                else if (end_parent == null && !list_end && $(start_parent).parentsUntil(editor.$el, 'table').length == 0) {
                   // Get the node that has a next sibling.
                   var next_node = start_parent;
                   while (!next_node.nextSibling && next_node.parentNode != editor.$el.get(0)) {
@@ -3012,10 +3160,14 @@
                     $(start_parent).append(next_node);
                     next_node = tmp_node;
                   }
+
+                  if (next_node && next_node.tagName == 'BR') {
+                    $(next_node).remove();
+                  }
                 }
 
                 // Join end block with start block.
-                else if ($(start_parent).parentsUntil(editor.$el, 'table').length == 0 && $(end_parent).parentsUntil(editor.$el, 'table').length == 0) {
+                else if (start_parent && end_parent && $(start_parent).parentsUntil(editor.$el, 'table').length == 0 && $(end_parent).parentsUntil(editor.$el, 'table').length == 0) {
                   $(start_parent).append($(end_parent).html());
                   $(end_parent).remove();
                 }
@@ -3037,7 +3189,7 @@
       editor.html.cleanEmptyTags(true);
       editor.clean.lists();
 
-      editor.html.normalizeSpaces();
+      editor.spaces.normalize();
       restore();
     }
 
@@ -3134,12 +3286,161 @@
   };
 
 
+  $.FE.MODULES.spaces = function (editor) {
+    function _remove (node) {
+      var next = node.nextSibling || node.parentNode;
+
+      node.parentNode.removeChild(node);
+
+      return next;
+    }
+
+    function _next (prev, current) {
+      if ((prev && prev.parentNode === current) || current.nodeName === 'PRE') {
+        return current.nextSibling || current.parentNode;
+      }
+
+      return current.firstChild || current.nextSibling || current.parentNode;
+    }
+
+    // Adaptation of MIT https://github.com/lucthev/collapse-whitespace.
+    function collapse (elem) {
+      if (!elem.firstChild || elem.nodeName === 'PRE') return;
+
+      var prevText = null;
+
+      var prev = null;
+      var node = _next(prev, elem);
+
+      // Go deep while current node is not elem.
+      while (node !== elem) {
+        // Current node is text node.
+        if (node.nodeType === Node.TEXT_NODE) {
+          // Collapse spaces.
+          var text = node.data.replace(/[ \r\n\t]+/g, ' ');
+
+          // No previous text or previous text ends with space.
+          // No previous voide.
+          // Current text starts with space.
+          if ((!prevText || / $/.test(prevText.data)) && text[0] === ' ') {
+            // Remove starting space.
+            text = text.substr(1);
+          }
+
+          // `text` might be empty at this point.
+          if (!text || text.length == 0) {
+            node = _remove(node);
+            continue;
+          }
+
+          // Set new text.
+          node.data = text;
+
+          // Set previous text node as current node.
+          prevText = node;
+        }
+
+        // Current node is element node.
+        else if (node.nodeType === Node.ELEMENT_NODE) {
+          // Block or BR.
+          if (editor.node.isBlock(node) || editor.node.isVoid(node)) {
+            // If there was a previous text collapse ending spaces;
+            if (prevText && prevText.data) {
+              prevText.data = prevText.data.replace(/ $/, '');
+            }
+
+            prevText = null;
+          }
+          else if (node.textContent.length == 0) {
+            prevText = node;
+          }
+        }
+
+        var nextNode = _next(prev, node);
+        prev = node;
+        node = nextNode;
+      }
+
+      // There is previous text.
+      if (prevText && prevText.data) {
+        // Remove ending.
+        prevText.data = prevText.data.replace(/ $/, '')
+
+        // If text is left empty, remove it.
+        if (!prevText.data) {
+          _remove(prevText);
+        }
+      }
+    }
+
+    function normalize (node, browser_way) {
+      if (typeof node == 'undefined' || !node) node = editor.$el.get(0);
+      if (typeof browser_way == 'undefined') browser_way = false;
+
+      if (browser_way) {
+        collapse(node);
+      }
+
+      // Ignore contenteditable.
+      if (node.getAttribute && node.getAttribute('contenteditable') == 'false') return;
+
+      if (node.nodeType == Node.ELEMENT_NODE && ['STYLE', 'SCRIPT', 'HEAD'].indexOf(node.tagName) < 0) {
+        var contents = editor.node.contents(node);
+        for (var i = contents.length - 1; i >= 0 ; i--) {
+          if (contents[i].tagName != Node.ELEMENT_NODE || (contents[i].className || '').indexOf('fr-marker') < 0) {
+            normalize(contents[i]);
+          }
+        }
+      }
+      else if (node.nodeType == Node.TEXT_NODE && node.textContent.length > 0) {
+        var prev_node = node.previousSibling;
+        var next_node = node.nextSibling;
+        var txt = node.textContent;
+
+        // Convert all non breaking to breaking spaces.
+        txt = txt.replace(new RegExp($.FE.UNICODE_NBSP, 'g'), ' ');
+
+        var new_text = '';
+        for (var t = 0; t < txt.length; t++) {
+          if (txt.charCodeAt(t) == 32 && (t === 0 || new_text.charCodeAt(t - 1) == 32)) {
+            new_text += $.FE.UNICODE_NBSP;
+          }
+          else {
+            new_text += txt[t];
+          }
+        }
+
+        // Ending spaces should be NBSP or spaces before block tags.
+        if (!node.nextSibling || editor.node.isBlock(node.nextSibling) || (node.nextSibling.nodeType == Node.ELEMENT_NODE && editor.win.getComputedStyle(node.nextSibling).display == 'block')) {
+          new_text = new_text.replace(/ $/, $.FE.UNICODE_NBSP);
+        }
+
+        // Previous sibling is not void or block.
+        if (node.previousSibling && !editor.node.isVoid(node.previousSibling) && !editor.node.isBlock(node.previousSibling)) {
+          new_text = new_text.replace(/^\u00A0([^ $])/, ' $1');
+        }
+
+        // Convert middle nbsp to spaces.
+        new_text = new_text.replace(/([^ \u00A0])\u00A0([^ \u00A0])/g, '$1 $2');
+
+        if (node.textContent != new_text) {
+          node.textContent = new_text;
+        }
+      }
+    }
+
+    return {
+      normalize: normalize
+    }
+  };
+
+
   $.FE.UNICODE_NBSP = String.fromCharCode(160);
 
   // Void Elements http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
   $.FE.VOID_ELEMENTS = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
 
-  $.FE.BLOCK_TAGS = ['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'blockquote', 'ul', 'ol', 'li', 'table', 'td', 'th', 'thead', 'tfoot', 'tbody', 'tr', 'hr', 'dl', 'dt', 'dd', 'form'];
+  $.FE.BLOCK_TAGS = ['address', 'article', 'aside', 'audio', 'blockquote', 'canvas', 'dd', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'li', 'main', 'nav', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul', 'video'];
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -3169,21 +3470,31 @@
 
       // Check if there are empty block tags with markers.
       for (var i = 0; i < els.length; i++) {
+        // There are void elements tags.
+        if (els[i].querySelectorAll($.FE.VOID_ELEMENTS.join(',')).length > 0) continue;
+
+        // There are other empty elements.
+        if (els[i].querySelectorAll(editor.opts.htmlAllowedEmptyTags.join(':not(.fr-marker),') + ':not(.fr-marker)').length > 0) continue;
+
+        // There are other block tags.
+        if (els[i].querySelectorAll(blockTagsQuery()).length > 0) continue;
+
+        // We're checking text from here on.
         var contents = editor.node.contents(els[i]);
 
         var found = false;
         for (var j = 0; j < contents.length; j++) {
           if (contents[j].nodeType == Node.COMMENT_NODE) continue;
 
-          // Element node or void element.
-          if ((contents[j].nodeType == Node.ELEMENT_NODE && ($.FE.VOID_ELEMENTS.indexOf(contents[j].tagName.toLowerCase()) >= 0 || contents[j].querySelectorAll(editor.opts.htmlAllowedEmptyTags.join(',')).length > 0)) || (contents[j].textContent && contents[j].textContent.replace(/\u200B/g, '').length > 0)) {
+          // Text node that is not empty.
+          if (contents[j].textContent && contents[j].textContent.replace(/\u200B/g, '').replace(/\n/g, '').length > 0) {
             found = true;
             break;
           }
         }
 
         // Make sure we don't add TABLE and TD at the same time for instance.
-        if (!found && els[i].querySelectorAll(blockTagsQuery()).length === 0) empty_blocks.push(els[i]);
+        if (!found) empty_blocks.push(els[i]);
       }
 
       return empty_blocks;
@@ -3249,7 +3560,7 @@
           var node = contents[i];
 
           // Current node is a block node.
-          if (node.nodeType == Node.ELEMENT_NODE && (editor.node.isBlock(node) || $(node).is(editor.opts.htmlDoNotWrapTags.join(',')))) {
+          if (node.nodeType == Node.ELEMENT_NODE && (editor.node.isBlock(node) || ($(node).is(editor.opts.htmlDoNotWrapTags.join(',')) && !$(node).hasClass('fr-marker')))) {
             $anchor = null;
           }
 
@@ -3320,19 +3631,22 @@
     /**
      * Wrap the direct content inside the default block tag.
      */
-    function _wrap (temp, tables, blockquote) {
+    function _wrap (temp, tables, blockquote, inner) {
       if (!editor.$wp) return false;
 
       if (typeof temp == 'undefined') temp = false;
       if (typeof tables == 'undefined') tables = false;
       if (typeof blockquote == 'undefined') blockquote = false;
+      if (typeof inner == 'undefined') inner = false;
 
       // Wrap element.
       _wrapElement(editor.$el, temp);
 
-      editor.$el.find('.fr-inner').each (function () {
-        _wrapElement($(this), temp);
-      })
+      if (inner) {
+        editor.$el.find('.fr-inner').each (function () {
+          _wrapElement($(this), temp);
+        })
+      }
 
       // Wrap table contents.
       if (tables) {
@@ -3375,8 +3689,18 @@
       var blocks = emptyBlocks();
       for (var i = 0; i < blocks.length; i++) {
         var block = blocks[i];
-        if (block.getAttribute('contenteditable') != "false" && block.querySelectorAll(editor.opts.htmlAllowedEmptyTags.join(',')).length == 0 && !editor.node.isVoid(block)) {
-          block.appendChild(editor.doc.createElement('br'));
+        if (block.getAttribute('contenteditable') != "false" &&
+            block.querySelectorAll(editor.opts.htmlAllowedEmptyTags.join(':not(.fr-marker),') + ':not(.fr-marker)').length == 0 &&
+            !editor.node.isVoid(block)) {
+          if (block.tagName != 'TABLE') block.appendChild(editor.doc.createElement('br'));
+        }
+      }
+
+      // Fix for https://github.com/froala/wysiwyg-editor/issues/1166#issuecomment-204549406.
+      if (editor.browser.msie && editor.opts.enter == $.FE.ENTER_BR) {
+        var contents = editor.node.contents(editor.$el.get(0));
+        if (contents.length && contents[contents.length - 1].nodeType == Node.TEXT_NODE) {
+          editor.$el.append('<br>');
         }
       }
     }
@@ -3393,8 +3717,10 @@
      */
     function cleanBlankSpaces (node) {
       if (typeof node == 'undefined') node = editor.$el.get(0);
+      if (node && ['SCRIPT', 'STYLE', 'PRE'].indexOf(node.tagName) >= 0) return false;
 
       var contents = editor.node.contents(node);
+
       // Loop contents.
       for (var i = contents.length - 1; i >= 0; i--) {
         // Content is text and node is block.
@@ -3408,21 +3734,28 @@
           contents[i].textContent = contents[i].textContent.replace(/\n/g, ' ');
 
           // Replace begin/end spaces.
-          contents[i].textContent = contents[i].textContent.replace(/^  /g, ' ');
-          contents[i].textContent = contents[i].textContent.replace(/  $/g, ' ');
+          contents[i].textContent = contents[i].textContent.replace(/^[ ]{2,}/g, ' ');
+          contents[i].textContent = contents[i].textContent.replace(/[ ]{2,}$/g, ' ');
 
-          // No previous siblings.
-          if (!contents[i].previousSibling) {
-            contents[i].textContent = contents[i].textContent.replace(/^ */,'');
-          }
+          if (editor.node.isBlock(node) || editor.node.isElement(node)) {
+            // No previous siblings.
+            if (!contents[i].previousSibling) {
+              contents[i].textContent = contents[i].textContent.replace(/^ */,'');
+            }
 
-          // No next siblings.
-          if (!contents[i].nextSibling) {
-            contents[i].textContent = contents[i].textContent.replace(/ *$/,'');
-          }
+            // No next siblings.
+            if (!contents[i].nextSibling) {
+              contents[i].textContent = contents[i].textContent.replace(/ *$/,'');
+            }
 
-          if (contents[i].previousSibling && contents[i].nextSibling && contents[i].textContent == ' ') {
-            contents[i].textContent = "\n";
+            if (contents[i].previousSibling && contents[i].nextSibling && contents[i].textContent == ' ') {
+              if (contents[i].previousSibling && contents[i].nextSibling && editor.node.isBlock(contents[i].previousSibling) && editor.node.isBlock(contents[i].nextSibling)) {
+                contents[i].textContent = '';
+              }
+              else {
+                contents[i].textContent = "\n";
+              }
+            }
           }
         }
         else {
@@ -3433,53 +3766,6 @@
 
     function _isBlock (node) {
       return node && (editor.node.isBlock(node) || ['STYLE', 'SCRIPT', 'HEAD', 'BR', 'HR'].indexOf(node.tagName) >= 0 || node.nodeType == Node.COMMENT_NODE);
-    }
-
-    /**
-     * Make sure spaces always render propely.
-     */
-    function normalizeSpaces (node) {
-      if (typeof node == 'undefined') node = editor.$el.get(0);
-
-      if (node.nodeType == Node.ELEMENT_NODE && ['STYLE', 'SCRIPT', 'HEAD'].indexOf(node.tagName) < 0) {
-        var contents = editor.node.contents(node);
-        for (var i = contents.length - 1; i >= 0 ; i--) {
-          if ((contents[i].className || '').indexOf('fr-marker') < 0) {
-            normalizeSpaces(contents[i]);
-          }
-        }
-      }
-      else if (node.nodeType == Node.TEXT_NODE && node.textContent.length > 0) {
-        var prev_node = node.previousSibling;
-        var next_node = node.nextSibling;
-
-        if (_isBlock(prev_node) && _isBlock(next_node) && node.textContent.trim().length === 0) {
-          $(node).remove();
-        }
-        else {
-          var txt = node.textContent;
-          txt = txt.replace(new RegExp($.FE.UNICODE_NBSP, 'g'), ' ');
-
-          var new_text = ''
-          for (var t = 0; t < txt.length; t++) {
-            if (txt.charCodeAt(t) == 32 && (t === 0 || new_text.charCodeAt(t - 1) == 32)) {
-              new_text += $.FE.UNICODE_NBSP;
-            }
-            else {
-              new_text += txt[t];
-            }
-          }
-
-          if (!node.nextSibling) new_text = new_text.replace(/ $/, $.FE.UNICODE_NBSP);
-          if (node.previousSibling && !editor.node.isVoid(node.previousSibling)) new_text = new_text.replace(/^\u00A0([^ $])/, ' $1');
-
-          new_text = new_text.replace(/([^ \u00A0])\u00A0([^ \u00A0])/g, '$1 $2');
-
-          if (node.textContent != new_text) {
-            node.textContent = new_text;
-          }
-        }
-      }
     }
 
     function doNormalize (node) {
@@ -3592,10 +3878,10 @@
       cleanEmptyTags();
 
       // Normalize spaces.
-      normalizeSpaces();
+      editor.spaces.normalize(null, true);
 
       // Add BR tag where it is necessary.
-      fillEmptyBlocks();
+      editor.html.fillEmptyBlocks();
 
       // Clean quotes.
       editor.clean.quotes();
@@ -3624,7 +3910,7 @@
         if (defaultTag() != null) {
           // There is no block tag inside the editor.
           if (editor.$el.get(0).querySelectorAll(blockTagsQuery()).length === 0 &&
-               editor.$el.get(0).querySelectorAll(editor.opts.htmlDoNotWrapTags.join(',')).length === 0) {
+               editor.$el.get(0).querySelectorAll(editor.opts.htmlDoNotWrapTags.join(':not(.fr-marker),') + ':not(.fr-marker)').length === 0) {
             if (editor.core.hasFocus()) {
               editor.$el.html('<' + defaultTag() + '>' + $.FE.MARKERS + '<br/></' + defaultTag() + '>');
               editor.selection.restore();
@@ -3666,9 +3952,7 @@
      * Set HTML.
      */
     function set (html) {
-      var clean_html = editor.clean.html(html, [], [], editor.opts.fullPage);
-
-      clean_html = clean_html.replace(/\r|\n/g, ' ');
+      var clean_html = editor.clean.html(html || '', [], [], editor.opts.fullPage);
 
       if (!editor.opts.fullPage) {
         editor.$el.html(clean_html);
@@ -3682,13 +3966,30 @@
         var head_html = extractNode(clean_html, 'head') || '<title></title>';
         var head_attrs = extractNodeAttrs(clean_html, 'head');
 
+        // Get HTML that might be in <head> other than meta tags.
+        // https://github.com/froala/wysiwyg-editor/issues/1208
+        var head_bad_html = $('<div>')
+                              .append(head_html)
+                              .find('base, link, meta, noscript, script, style, template, title')
+                              .remove().end()
+                              .html().trim();
+
+        // Filter and keep only meta tags in <head>.
+        // https://html.spec.whatwg.org/multipage/dom.html#metadata-content-2
+        head_html = $('<div>')
+                              .append(head_html)
+                              .find('base, link, meta, noscript, script, style, template, title')
+                              .map(function () {
+                                return this.outerHTML;
+                              }).toArray().join('');
+
         // Get DOCTYPE.
         var doctype = extractDoctype(clean_html);
 
         // Get HTML attributes.
         var html_attrs = extractNodeAttrs(clean_html, 'html');
 
-        editor.$el.html(body_html);
+        editor.$el.html(head_bad_html + '\n' + body_html);
         editor.node.clearAttributes(editor.$el.get(0));
         editor.$el.attr(body_attrs);
 
@@ -3707,6 +4008,7 @@
       }
 
       // Make sure the content is editable.
+      var disabled = editor.edit.isDisabled();
       editor.edit.on();
 
       editor.core.injectStyle(editor.opts.iframeStyle);
@@ -3726,6 +4028,8 @@
         });
       }
 
+      if (disabled) editor.edit.off();
+
       editor.events.trigger('html.set');
     }
 
@@ -3733,6 +4037,13 @@
      * Get HTML.
      */
     function get (keep_markers, keep_classes) {
+      if (!editor.$wp) {
+        return editor.$oel.clone()
+                .removeClass('fr-view')
+                .removeAttr('contenteditable')
+                .get(0).outerHTML;
+      }
+
       var html = '';
 
       editor.events.trigger('html.beforeGet');
@@ -3817,8 +4128,12 @@
                     // Compute specification.
                     var spec = head_style * 1000 + specifity(rules[idx].selectorText);
 
+                    // Get CSS text of the rule.
                     var css_text = rules[idx].style.cssText.split(';');
+
+                    // Get each rule.
                     for (var k = 0; k < css_text.length; k++) {
+                      // Rule.
                       var rule = css_text[k].trim().split(':')[0];
                       if (!elms_info[elms[j]][rule]) {
                         elms_info[elms[j]][rule] = 0;
@@ -3828,10 +4143,12 @@
                         }
                       }
 
+                      // Current spec is higher than the existing one.
                       if (spec >= elms_info[elms[j]][rule]) {
                         elms_info[elms[j]][rule] = spec;
+
                         if (css_text[k].trim().length) {
-                          elms[j].setAttribute('style', (elms[j].getAttribute('style') || '') + css_text[k] + ';');
+                          elms[j].style[rule.trim()] = css_text[k].trim().split(':')[1].trim();
                         }
                       }
                     }
@@ -3847,18 +4164,6 @@
           if (updated_elms[i].getAttribute('class')) {
             updated_elms[i].setAttribute('fr-original-class', updated_elms[i].getAttribute('class'));
             updated_elms[i].removeAttribute('class');
-          }
-
-          var style = updated_elms[i].getAttribute('style');
-          if (style) {
-            updated_elms[i].setAttribute('style', style.split(';').sort(function (a, b) {
-              a = a.split(':')[0];
-              b = b.split(':')[0];
-
-              if (a == '' || b == '') return -1;
-
-              return a.localeCompare(b);
-            }).join('; ').trim());
           }
         }
       }
@@ -3901,6 +4206,7 @@
       // Clean helpers.
       if (editor.opts.fullPage) {
         html = html.replace(/<style data-fr-style="true">(?:[\w\W]*?)<\/style>/g, '');
+        html = html.replace(/<link(?:[\w\W]*?)data-fr-style="true"(?:[\w\W]*?)>/g, '');
         html = html.replace(/<style(?:[\w\W]*?)class="firebugResetStyles"(?:[\w\W]*?)>(?:[\w\W]*?)<\/style>/g, '');
         html = html.replace(/<body((?:[\w\W]*?)) spellcheck="true"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, '<body$1$2>$3</body>');
         html = html.replace(/<body((?:[\w\W]*?)) contenteditable="(true|false)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, '<body$1$3>$4</body>');
@@ -4067,17 +4373,20 @@
         // Insert a marker.
         var marker = editor.markers.insert();
 
-        if (!marker) return false;
-
-        // Check if HTML contains block tags and if so then break the current HTML.
-        var deep_parent;
-        if ((_hasBlockTags(clean_html) || do_split) && (deep_parent = editor.node.deepestParent(marker))) {
-          var marker = editor.markers.split();
-          if (!marker) return false;
-          $(marker).replaceWith(clean_html);
+        if (!marker) {
+          editor.$el.append(clean_html);
         }
         else {
-          $(marker).replaceWith(clean_html);
+          // Check if HTML contains block tags and if so then break the current HTML.
+          var deep_parent;
+          if ((_hasBlockTags(clean_html) || do_split) && (deep_parent = editor.node.deepestParent(marker))) {
+            var marker = editor.markers.split();
+            if (!marker) return false;
+            $(marker).replaceWith(clean_html);
+          }
+          else {
+            $(marker).replaceWith(clean_html);
+          }
         }
       }
 
@@ -4136,7 +4445,6 @@
       fillEmptyBlocks: fillEmptyBlocks,
       cleanEmptyTags: cleanEmptyTags,
       cleanWhiteTags: cleanWhiteTags,
-      normalizeSpaces: normalizeSpaces,
       doNormalize: doNormalize,
       cleanBlankSpaces: cleanBlankSpaces,
       blocks: blocks,
@@ -4286,7 +4594,7 @@
       var margin_top = 0;
       var contents = editor.node.contents(editor.$el.get(0));
       if (contents.length && contents[0].nodeType == Node.ELEMENT_NODE) {
-        margin_top = editor.helpers.getPX($(contents[0]).css('margin-top'));
+        if (!editor.opts.toolbarInline) margin_top = editor.helpers.getPX($(contents[0]).css('margin-top'));
         editor.$placeholder.css('font-size', $(contents[0]).css('font-size'));
         editor.$placeholder.css('line-height', $(contents[0]).css('line-height'));
       }
@@ -4297,7 +4605,7 @@
 
       editor.$wp.addClass('show-placeholder');
       editor.$placeholder
-        .css('margin-top', margin_top)
+        .css('margin-top', Math.max(editor.helpers.getPX(editor.$el.css('margin-top')), margin_top))
         .text(editor.language.translate(editor.opts.placeholderText || editor.$oel.attr('placeholder') || ''));
     }
 
@@ -4359,6 +4667,18 @@
 
         }
       }
+
+      if (editor.browser.msie) {
+        try {
+          editor.doc.body.addEventListener('mscontrolselect', function (e) {
+            e.preventDefault();
+            return false;
+          });
+        }
+        catch (ex) {
+
+        }
+      }
     }
 
     var disabled = false;
@@ -4373,6 +4693,9 @@
         if (editor.$tb) editor.$tb.removeClass('fr-disabled');
         disableDesign();
       }
+      else if (editor.$el.is('a')) {
+        editor.$el.attr('contenteditable', true);
+      }
 
       disabled = false;
     }
@@ -4384,7 +4707,10 @@
       if (editor.$wp) {
         editor.$el.attr('contenteditable', false);
         editor.$el.addClass('fr-disabled');
-        editor.$tb.addClass('fr-disabled');
+        if (editor.$tb) editor.$tb.addClass('fr-disabled');
+      }
+      else if (editor.$el.is('a')) {
+        editor.$el.attr('contenteditable', false);
       }
 
       disabled = true;
@@ -4413,7 +4739,8 @@
     requestHeaders: {},
     useClasses: true,
     spellcheck: true,
-    iframeStyle: 'html{margin: 0px;}body{padding:10px;background:transparent;color:#000000;position:relative;z-index: 2;-webkit-user-select:auto;margin:0px;overflow:hidden;}body:after{content:"";clear:both;display:block}',
+    iframeStyle: 'html{margin: 0px;}body{padding:10px;background:transparent;color:#000000;position:relative;z-index: 2;-webkit-user-select:auto;margin:0px;overflow:hidden;min-height:20px;}body:after{content:"";display:block;clear:both;}',
+    iframeStyleFiles: [],
     direction: 'auto',
     zIndex: 1,
     disableRightClick: false,
@@ -4425,7 +4752,12 @@
   $.FE.MODULES.core = function(editor) {
     function injectStyle(style) {
       if (editor.opts.iframe) {
+        editor.$head.find('style[data-fr-style], link[data-fr-style]').remove();
         editor.$head.append('<style data-fr-style="true">' + style + '</style>');
+
+        for (var i = 0; i < editor.opts.iframeStyleFiles.length; i++) {
+          editor.$head.append('<link data-fr-style="true" rel="stylesheet" href="' + editor.opts.iframeStyleFiles[i] + '">');
+        }
       }
     }
 
@@ -4447,6 +4779,7 @@
 
       if (editor.opts.iframe) {
         editor.$iframe.addClass('fr-iframe');
+        editor.$html.find('body').addClass('fr-view');
 
         for (var i = 0; i < editor.o_doc.styleSheets.length; i++) {
           var rules;
@@ -4527,23 +4860,28 @@
 
       // Set headers.
       for (var header in editor.opts.requestHeaders) {
-        xhr.setRequestHeader(header, editor.opts.requestHeaders[header]);
+        if (editor.opts.requestHeaders.hasOwnProperty(header)) {
+          xhr.setRequestHeader(header, editor.opts.requestHeaders[header]);
+        }
       }
 
       return xhr;
     }
 
-    function _destroy() {
+    function _destroy (html) {
       if (editor.$oel.get(0).tagName == 'TEXTAREA') {
-        editor.$oel.val(editor.html.get());
+        editor.$oel.val(html);
       }
 
       if (editor.$wp) {
         if (editor.$oel.get(0).tagName == 'TEXTAREA') {
+          editor.$el.html('');
+          editor.$wp.html('');
           editor.$box.replaceWith(editor.$oel);
           editor.$oel.show();
         } else {
-          editor.$wp.replaceWith(editor.html.get());
+          editor.$wp.replaceWith(html);
+          editor.$el.html('');
           editor.$box.removeClass('fr-view fr-ltr fr-box ' + (editor.opts.editorClass || ''));
 
           if (editor.opts.theme) {
@@ -4551,9 +4889,14 @@
           }
         }
       }
+
+      this.$wp = null;
+      this.$el = null;
+      this.$box = null;
     }
 
     function hasFocus() {
+      if (editor.browser.mozilla && editor.helpers.isMobile()) return editor.selection.inEditor();
       return editor.node.hasFocus(editor.$el.get(0)) || editor.$el.find('*:focus').length > 0;
     }
 
@@ -4591,7 +4934,7 @@
 
         // Disable right click.
         if (editor.opts.disableRightClick) {
-          editor.evens.$on(editor.$el, 'contextmenu', function(e) {
+          editor.events.$on(editor.$el, 'contextmenu', function(e) {
             if (e.button == 2) {
               return false;
             }
@@ -4611,10 +4954,6 @@
         e.stopPropagation();
       });
 
-      // Options.
-      editor.events.trigger('init');
-      editor.events.on('destroy', _destroy);
-
       if (editor.$oel.get(0).tagName == 'TEXTAREA') {
         // Sync on contentChanged.
         editor.events.on('contentChanged', function() {
@@ -4632,10 +4971,22 @@
 
         editor.$oel.val(editor.html.get());
       }
+
+      // iOS focus fix.
+      if (editor.helpers.isIOS()) {
+        editor.events.$on(editor.$doc, 'selectionchange', function () {
+          if (!editor.$doc.get(0).hasFocus()) {
+            editor.$win.get(0).focus();
+          }
+        });
+      }
+
+      editor.events.trigger('init');
     }
 
     return {
       _init: _init,
+      destroy: _destroy,
       isEmpty: isEmpty,
       getXHR: getXHR,
       injectStyle: injectStyle,
@@ -4645,25 +4996,540 @@
   }
 
 
+  'use strict';
+
+  $.FE.MODULES.format = function (editor) {
+    /**
+     * Create open tag string.
+     */
+    function _openTag (tag, attrs) {
+      var str = '<' + tag;
+
+      for (var key in attrs) {
+        if (attrs.hasOwnProperty(key)) {
+          str += ' ' + key + '="' + attrs[key] + '"';
+        }
+      }
+
+      str += '>';
+
+      return str;
+    }
+
+    /**
+     * Create close tag string.
+     */
+    function _closeTag (tag) {
+      return '</' + tag + '>';
+    }
+
+    /**
+     * Create query for the current format.
+     */
+    function _query (tag, attrs) {
+      var selector = tag;
+
+      for (var key in attrs) {
+        if (attrs.hasOwnProperty(key)) {
+          if (key == 'id') tag += '#' + attrs[key];
+          else if (key == 'class') tag += '.' + attrs[key];
+          else tag += '[' + key + '="' + attrs[key] + '"]';
+        }
+      }
+
+      return selector;
+    }
+
+    /**
+     * Test matching element.
+     */
+    function _matches (el, selector) {
+      if (!el || el.nodeType != Node.ELEMENT_NODE) return false;
+
+      return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
+    }
+
+    /**
+     * Apply format to the current node till we find a marker.
+     */
+    function _processNodeFormat (start_node, tag, attrs) {
+      // No start node.
+      if (!start_node) return;
+
+      // If we are in a block process starting with the first child.
+      if (editor.node.isBlock(start_node)) {
+        _processNodeFormat(start_node.firstChild, tag, attrs);
+        return false;
+      }
+
+      // Create new element.
+      var $span = $(_openTag(tag, attrs)).insertBefore(start_node);
+
+      // Start with the next sibling of the current node.
+      var node = start_node;
+
+      // Search while there is a next node.
+      // Next node is not marker.
+      // Next node does not contain marker.
+      while (node && !$(node).is('.fr-marker') && $(node).find('.fr-marker').length == 0) {
+        var tmp = node;
+        node = node.nextSibling;
+        $span.append(tmp);
+      }
+
+      // If there is no node left at the right look at parent siblings.
+      if (!node) {
+        var p_node = $span.get(0).parentNode;
+        while (p_node && !p_node.nextSibling && !editor.node.isElement(p_node)) {
+          p_node = p_node.parentNode;
+        }
+
+        if (p_node) {
+          var sibling = p_node.nextSibling;
+          if (sibling) {
+            // Parent sibling is block then look next.
+            if (!editor.node.isBlock(sibling)) {
+              _processNodeFormat(sibling, tag, attrs);
+            }
+            else {
+              _processNodeFormat(sibling.firstChild, tag, attrs);
+            }
+          }
+        }
+      }
+      // Start processing child nodes if there is a marker.
+      else if ($(node).find('.fr-marker').length) {
+        _processNodeFormat(node.firstChild, tag, attrs);
+      }
+
+      if ($span.is(':empty')) {
+        $span.remove();
+      }
+    }
+
+    /**
+     * Apply tag format.
+     */
+    function apply (tag, attrs) {
+      if (typeof attrs == 'undefined') attrs = {};
+      if (attrs.style) {
+        delete attrs.style;
+      }
+
+      // Selection is collapsed.
+      if (editor.selection.isCollapsed()) {
+        editor.markers.insert();
+        var $marker = editor.$el.find('.fr-marker');
+        $marker.replaceWith(_openTag(tag, attrs) + $.FE.INVISIBLE_SPACE + $.FE.MARKERS + _closeTag(tag));
+        editor.selection.restore();
+      }
+
+      // Selection is not collapsed.
+      else {
+        editor.selection.save();
+
+        // Check if selection can be deleted.
+        var start_marker = editor.$el.find('.fr-marker[data-type="true"]').get(0).nextSibling;
+        _processNodeFormat(start_marker, tag, attrs);
+
+        // Clean inner spans.
+        var inner_spans;
+        do {
+          inner_spans = editor.$el.find(_query(tag, attrs) + ' > ' + _query(tag, attrs));
+          inner_spans.each (function () {
+            $(this).replaceWith(this.innerHTML);
+          });
+        } while (inner_spans.length);
+
+        editor.$el.get(0).normalize();
+
+        // Have markers inside the new tag.
+        var markers = editor.$el.get(0).querySelectorAll('.fr-marker');
+        for (var i = 0; i < markers.length; i++) {
+          var $mk = $(markers[i]);
+          if ($mk.data('type') == true) {
+            if (_matches($mk.next().get(0), _query(tag, attrs))) {
+              $mk.next().prepend($mk);
+            }
+          }
+          else {
+            if (_matches($mk.prev().get(0), _query(tag, attrs))) {
+              $mk.prev().append($mk);
+            }
+          }
+        }
+
+        editor.selection.restore();
+      }
+    }
+
+    /**
+     * Split at current node the parents with tag.
+     */
+    function _split ($node, tag, attrs) {
+      // Check if current node has parents which match our tag.
+      if ($node.parents(tag).length || typeof tag == 'undefined') {
+        var close_str = '';
+        var open_str = '';
+        var $p_node = $node.parent();
+
+        // Do not split when parent is block.
+        if ($p_node.is(editor.$el) || editor.node.isBlock($p_node.get(0))) return false;
+
+        // Check undefined so that we
+        while ((typeof tag == 'undefined' && !editor.node.isBlock($p_node.parent().get(0))) || (typeof tag != 'undefined' && !_matches($p_node.get(0), _query(tag, attrs)))) {
+          close_str = close_str + editor.node.closeTagString($p_node.get(0));
+          open_str = editor.node.openTagString($p_node.get(0)) + open_str;
+          $p_node = $p_node.parent();
+        }
+
+        // Node STR.
+        var node_str = $node.get(0).outerHTML;
+
+        // Replace node with marker.
+        $node.replaceWith('<span id="mark"></span>');
+
+        // Rebuild the HTML for the node.
+        var p_html = $p_node.html().replace(/<span id="mark"><\/span>/, close_str + editor.node.closeTagString($p_node.get(0)) + open_str + node_str + close_str + editor.node.openTagString($p_node.get(0)) + open_str);
+        $p_node.replaceWith(editor.node.openTagString($p_node.get(0)) + p_html + editor.node.closeTagString($p_node.get(0)));
+
+        return true;
+      }
+
+      return false;
+    }
+
+    /**
+     * Process node remove.
+     */
+    function _processNodeRemove ($node, should_remove, tag, attrs) {
+      // Get contents.
+      var contents = editor.node.contents($node.get(0));
+
+      // Loop contents.
+      for (var i = 0; i < contents.length; i++) {
+        var node = contents[i];
+
+        // We found a marker => change should_remove flag.
+        if ($(node).hasClass('fr-marker')) {
+          should_remove = (should_remove + 1) % 2;
+        }
+        // We should remove.
+        else if (should_remove) {
+          // Check if we have a marker inside it.
+          if ($(node).find('.fr-marker').length > 0) {
+            should_remove = _processNodeRemove($(node), should_remove, tag, attrs);
+          }
+          // Remove everything starting with the most inner nodes.
+          else {
+            $($(node).find(tag || '*').get().reverse()).each(function() {
+              if (!editor.node.isBlock(this) && !editor.node.isVoid(this)) {
+                $(this).replaceWith(this.innerHTML);
+              }
+            });
+
+            // Check inner nodes.
+            if ((typeof tag == 'undefined' && node.nodeType == Node.ELEMENT_NODE && !editor.node.isVoid(node) && !editor.node.isBlock(node)) || _matches(node, _query(tag, attrs))) {
+              $(node).replaceWith(node.innerHTML);
+            }
+          }
+        }
+        else {
+          // There is a marker.
+          if ($(node).find('.fr-marker').length > 0) {
+            should_remove = _processNodeRemove($(node), should_remove, tag, attrs);
+          }
+        }
+      }
+
+      return should_remove;
+    }
+
+    /**
+     * Remove tag.
+     */
+    function remove (tag, attrs) {
+      if (typeof attrs == 'undefined') attrs = {};
+      if (attrs.style) {
+        delete attrs.style;
+      }
+
+      var collapsed = editor.selection.isCollapsed();
+      editor.selection.save();
+
+      // Split at start and end marker.
+      var reassess = true;
+      while (reassess) {
+        reassess = false;
+        var markers = editor.$el.find('.fr-marker');
+        for (var i = 0; i < markers.length; i++) {
+          if (_split($(markers[i]), tag, attrs)) {
+            reassess = true;
+            break;
+          }
+        }
+      }
+
+      // Remove format between markers.
+      _processNodeRemove(editor.$el, 0, tag, attrs);
+
+      // Selection is collapsed => add invisible spaces.
+      if (collapsed) {
+        editor.$el.find('.fr-marker').before($.FE.INVISIBLE_SPACE).after($.FE.INVISIBLE_SPACE);
+      }
+
+      editor.html.cleanEmptyTags();
+
+      editor.$el.get(0).normalize();
+      editor.selection.restore();
+    }
+
+    /**
+     * Toggle format.
+     */
+    function toggle (tag, attrs) {
+      if (is(tag, attrs)) {
+        remove(tag, attrs);
+      }
+      else {
+        apply(tag, attrs);
+      }
+    }
+
+    /**
+     * Clean format.
+     */
+    function _cleanFormat (elem, prop) {
+      var $elem = $(elem);
+      $elem.css(prop, '');
+
+      if ($elem.attr('style') === '') {
+        $elem.replaceWith($elem.html());
+      }
+    }
+
+    /**
+     * Filter spans with specific property.
+     */
+    function _filterSpans (elem, prop) {
+      return $(elem).attr('style').indexOf(prop + ':') === 0 || $(elem).attr('style').indexOf(';' + prop + ':') >= 0 || $(elem).attr('style').indexOf('; ' + prop + ':') >= 0;
+    };
+
+    /**
+     * Apply inline style.
+     */
+    function applyStyle (prop, val) {
+      // Selection is collapsed.
+      if (editor.selection.isCollapsed()) {
+        editor.markers.insert();
+        var $marker = editor.$el.find('.fr-marker');
+        var $parent = $marker.parent();
+
+        // https://github.com/froala/wysiwyg-editor/issues/1084
+        if (editor.node.openTagString($parent.get(0)) == '<span style="' + prop + ': ' + $parent.css(prop) + ';">' && editor.node.isEmpty($parent.get(0))) {
+          $parent.replaceWith('<span style="' + prop + ': ' + val + ';">' + $.FE.INVISIBLE_SPACE + $.FE.MARKERS + '</span>');
+        }
+        else if (editor.node.isEmpty($parent.get(0)) && $parent.is('span')) {
+          $marker.replaceWith($.FE.MARKERS);
+          $parent.css(prop, val);
+        }
+        else {
+          $marker.replaceWith('<span style="' + prop + ': ' + val + ';">' + $.FE.INVISIBLE_SPACE + $.FE.MARKERS + '</span>');
+        }
+
+        editor.selection.restore();
+      }
+      else {
+        editor.selection.save();
+
+        // Check if selection can be deleted.
+        var start_marker = editor.$el.find('.fr-marker[data-type="true"]').get(0).nextSibling;
+
+        var attrs = { 'class': 'fr-unprocessed' };
+        if (val) attrs.style = prop + ': ' + val + ';'
+        _processNodeFormat(start_marker, 'span', attrs);
+
+        editor.$el.find('.fr-marker + .fr-unprocessed').each(function () {
+          $(this).prepend($(this).prev());
+        });
+
+        editor.$el.find('.fr-unprocessed + .fr-marker').each(function () {
+          $(this).prev().append(this);
+        });
+
+        while (editor.$el.find('span.fr-unprocessed').length > 0) {
+          var $span = editor.$el.find('span.fr-unprocessed:first').removeClass('fr-unprocessed');
+
+          // Look at parent node to see if we can merge with it.
+          $span.parent().get(0).normalize();
+          if ($span.parent().is('span') && $span.parent().get(0).childNodes.length == 1) {
+            $span.parent().css(prop, val);
+            var $child = $span;
+            $span = $span.parent();
+            $child.replaceWith($child.html());
+          }
+
+          // Replace in reverse order to take care of the inner spans first.
+          var inner_spans = $span.find('span');
+          for (var i = inner_spans.length - 1; i >= 0; i--) {
+            _cleanFormat(inner_spans[i], prop);
+          }
+
+          // Look at parents with the same property.
+          var $outer_span = $span.parentsUntil(editor.$el, 'span[style]').filter(function() {
+            return _filterSpans(this, prop);
+          });
+
+          if ($outer_span.length) {
+            var c_str = '';
+            var o_str = '';
+            var ic_str = '';
+            var io_str = '';
+            var c_node = $span.get(0);
+
+            do {
+              c_node = c_node.parentNode;
+              c_str = c_str + editor.node.closeTagString(c_node);
+              o_str = editor.node.openTagString(c_node) + o_str;
+
+              // Inner close and open.
+              if ($outer_span.get(0) != c_node) {
+                ic_str = ic_str + editor.node.closeTagString(c_node);
+                io_str = editor.node.openTagString(c_node) + io_str;
+              }
+            } while ($outer_span.get(0) != c_node);
+
+            // Build breaking string.
+            var str = c_str + editor.node.openTagString($outer_span.clone().css(prop, val || '').get(0)) + io_str + $span.html() + ic_str + '</span>' + o_str;
+            $span.replaceWith('<span id="fr-break"></span>');
+            var html = $outer_span.get(0).outerHTML;
+
+            // Replace the outer node.
+            $($outer_span.get(0)).replaceWith(html.replace(/<span id="fr-break"><\/span>/g, str));
+          }
+        }
+
+        editor.html.cleanEmptyTags();
+
+        editor.$el.find('span[style=""]').removeAttr('style');
+        editor.$el.find('span[class=""]').removeAttr('class');
+
+        editor.$el.find('span').each(function () {
+          if (!this.attributes || this.attributes.length == 0) {
+            $(this).replaceWith(this.innerHTML);
+          }
+        });
+
+        // Join current spans together if they are one next to each other.
+        var just_spans = editor.$el.find('span[style] + span[style]');
+        for (i = 0; i < just_spans.length; i++) {
+          var $x = $(just_spans[i]);
+          var $p = $(just_spans[i]).prev();
+
+          if (editor.node.openTagString($x.get(0)) == editor.node.openTagString($p.get(0))) {
+            $x.prepend($p.html());
+            $p.remove();
+          }
+        }
+
+        editor.$el.get(0).normalize();
+        editor.selection.restore();
+      }
+    }
+
+    /**
+     * Remove inline style.
+     */
+    function removeStyle (prop) {
+      applyStyle(prop, null);
+    }
+
+    /**
+     * Get the current state.
+     */
+    function is (tag, attrs) {
+      if (typeof attrs == 'undefined') attrs = {};
+      if (attrs.style) {
+        delete attrs.style;
+      }
+
+      var range = editor.selection.ranges(0);
+      var el = range.startContainer;
+      if (el.nodeType == Node.ELEMENT_NODE) {
+        // Search for node deeper.
+        if (el.childNodes.length > 0 && el.childNodes[range.startOffset]) {
+          el = el.childNodes[range.startOffset];
+        }
+      }
+
+      // Check first childs.
+      var f_child = el;
+      while (f_child && f_child.nodeType == Node.ELEMENT_NODE && !_matches(f_child, _query(tag, attrs))) {
+        f_child = f_child.firstChild;
+      }
+
+      if (f_child && f_child.nodeType == Node.ELEMENT_NODE && _matches(f_child, _query(tag, attrs))) return true;
+
+      // Check parents.
+      var p_node = el;
+      if (p_node && p_node.nodeType != Node.ELEMENT_NODE) p_node = p_node.parentNode;
+      while (p_node && p_node.nodeType == Node.ELEMENT_NODE && p_node != editor.$el.get(0) && !_matches(p_node, _query(tag, attrs))) {
+        p_node = p_node.parentNode;
+      }
+
+      if (p_node && p_node.nodeType == Node.ELEMENT_NODE && p_node != editor.$el.get(0) && _matches(p_node, _query(tag, attrs))) return true;
+
+      return false;
+    }
+
+    return {
+      is: is,
+      toggle: toggle,
+      apply: apply,
+      remove: remove,
+      applyStyle: applyStyle,
+      removeStyle: removeStyle
+    }
+  }
+
+
 
   $.FE.COMMANDS = {
     bold: {
-      title: 'Bold'
+      title: 'Bold',
+      refresh: function ($btn) {
+        $btn.toggleClass('fr-active', this.format.is('strong'));
+      }
     },
     italic: {
-      title: 'Italic'
+      title: 'Italic',
+      refresh: function ($btn) {
+        $btn.toggleClass('fr-active', this.format.is('em'));
+      }
     },
     underline: {
-      title: 'Underline'
+      title: 'Underline',
+      refresh: function ($btn) {
+        $btn.toggleClass('fr-active', this.format.is('u'));
+      }
     },
     strikeThrough: {
-      title: 'Strikethrough'
+      title: 'Strikethrough',
+      refresh: function ($btn) {
+        $btn.toggleClass('fr-active', this.format.is('s'));
+      }
     },
     subscript: {
-      title: 'Subscript'
+      title: 'Subscript',
+      refresh: function ($btn) {
+        $btn.toggleClass('fr-active', this.format.is('sub'));
+      }
     },
     superscript: {
-      title: 'Superscript'
+      title: 'Superscript',
+      refresh: function ($btn) {
+        $btn.toggleClass('fr-active', this.format.is('sup'));
+      }
     },
     outdent: {
       title: 'Decrease Indent'
@@ -4750,7 +5616,15 @@
       insertHR: function () {
         editor.selection.remove();
 
-        editor.html.insert('<hr id="fr-just">');
+        var empty = '';
+        if (editor.core.isEmpty()) {
+          empty = '<br>';
+          if (editor.html.defaultTag()) {
+            empty = '<' + editor.html.defaultTag() + '>' + empty + '</' + editor.html.defaultTag() + '>';
+          }
+        }
+
+        editor.html.insert('<hr id="fr-just">' + empty);
 
         var $hr = editor.$el.find('hr#fr-just');
         $hr.removeAttr('id');
@@ -4761,28 +5635,7 @@
       },
 
       clearFormatting: function () {
-        if (editor.browser.msie || editor.browser.edge) {
-          var clean = function (prop) {
-            editor.commands.applyProperty(prop, '#123456');
-            editor.selection.save();
-            editor.$el.find('span:not(.fr-marker)').each(function (index, span) {
-              var $span = $(span);
-              var color = $span.css(prop);
-
-              if (color === '#123456' || editor.helpers.RGBToHex(color) === '#123456') {
-                $span.replaceWith($span.html());
-              }
-            });
-            editor.selection.restore();
-          }
-
-
-          clean('color');
-          clean('background-color');
-        }
-
-        editor.doc.execCommand('removeFormat', false, false);
-        editor.doc.execCommand('unlink', false, false);
+        editor.format.remove();
       },
 
       selectAll: function () {
@@ -4832,55 +5685,12 @@
      * Exex default.
      */
     function _execCommand(cmd, tag) {
-      // Selection is collapsed and state is not active.
-      if (editor.selection.isCollapsed() && editor.doc.queryCommandState(cmd) === false) {
-        editor.markers.insert();
-        var $marker = editor.$el.find('.fr-marker');
-        $marker.replaceWith('<' + tag + '>' + $.FE.INVISIBLE_SPACE + $.FE.MARKERS + '</' + tag + '>')
-        editor.selection.restore();
-      }
-      else {
-        var el = editor.selection.element();
-
-        // Selection is collapsed.
-        // State is active.
-        // Current tag is empty.
-        if (editor.selection.isCollapsed() && editor.doc.queryCommandState(cmd) === true && el.tagName == tag.toUpperCase() && (el.textContent || '').replace(/\u200B/g, '').length === 0) {
-          $(el).replaceWith($.FE.MARKERS);
-          editor.selection.restore();
-        }
-        else {
-          var spans = editor.$el.find('span');
-
-          var selection_saved = false;
-          if (editor.doc.queryCommandState(cmd) === false && !editor.browser.chrome) {
-            editor.selection.save();
-            selection_saved = true;
-          }
-          editor.doc.execCommand(cmd, false, false);
-
-          if (selection_saved) editor.selection.restore();
-
-          var new_spans = editor.$el.find('span[style]').not(spans).filter(function () {
-            return $(this).attr('style').indexOf('font-weight: normal') >= 0;
-          });
-
-          if (new_spans.length) {
-            editor.selection.save();
-            new_spans.each(function () {
-              $(this).replaceWith($(this).html());
-            });
-            editor.selection.restore();
-          }
-
-          editor.clean.toHTML5();
-        }
-      }
+      editor.format.toggle(tag);
     }
 
     function _processIndent(indent) {
       editor.selection.save();
-      editor.html.wrap(true, true);
+      editor.html.wrap(true, true, true, true);
       editor.selection.restore();
 
       var blocks = editor.selection.blocks();
@@ -4903,146 +5713,6 @@
       editor.selection.restore();
     }
 
-    /**
-     * Preserve font size.
-     */
-    function _saveFontSize() {
-      // Check if the el has font size.
-      var hasFontSizeSet = function ($el) {
-        return $el.attr('style').indexOf('font-size') >= 0;
-      }
-
-      editor.$el.find('[style]').each (function () {
-        var $el = $(this);
-
-        if (hasFontSizeSet($el)) {
-          $el.attr('data-font-size', $el.css('font-size'));
-          $el.css('font-size', '');
-        }
-      })
-    }
-
-    /**
-     * Restore font size.
-     */
-    function _restoreFontSize() {
-      editor.$el.find('[data-font-size]').each (function () {
-        var $el = $(this);
-
-        $el.css('font-size', $el.attr('data-font-size'));
-        $el.removeAttr('data-font-size');
-      })
-    }
-
-    function _clearBlankSpans () {
-      // Remove spans with no style.
-      editor.$el.find('span').each(function () {
-        if (editor.node.attributes(this) === '') {
-          $(this).replaceWith($(this).html());
-        }
-      })
-    }
-
-    function applyProperty (prop, val) {
-      if (editor.selection.isCollapsed()) {
-        editor.markers.insert();
-        var $marker = editor.$el.find('.fr-marker');
-        $marker.replaceWith('<span style="' + prop + ': ' + val + ';">' + $.FE.INVISIBLE_SPACE + $.FE.MARKERS + '</span>')
-        editor.selection.restore();
-      }
-      else {
-        _saveFontSize();
-
-        // Apply format.
-        editor.doc.execCommand('fontSize', false, 4);
-
-        editor.selection.save();
-
-        _restoreFontSize();
-
-        // Clean font.
-        var clean_format = function (elem) {
-          var $elem = $(elem);
-          $elem.css(prop, '');
-
-          if ($elem.attr('style') === '') {
-            $elem.replaceWith($elem.html());
-          }
-        }
-
-        var filter_spans = function () {
-          return $(this).attr('style').indexOf(prop + ':') === 0 || $(this).attr('style').indexOf(';' + prop + ':') >= 0 || $(this).attr('style').indexOf('; ' + prop + ':') >= 0;
-        };
-
-        var i;
-
-        // Replace font with spans.
-        while (editor.$el.find('font').length > 0) {
-          var $font = editor.$el.find('font:first');
-          var $span = $('<span class="fr-just" style="' + prop + ': ' + val + ';">' + $font.html() + '</span>');
-          $font.replaceWith($span);
-
-          // Replace in reverse order to take care of the inner spans first.
-          var inner_spans = $span.find('span');
-          for (i = inner_spans.length - 1; i >= 0; i--) {
-            clean_format(inner_spans[i]);
-          }
-
-          // Look at parents with the same property.
-          var $outer_span = $span.parentsUntil(editor.$el, 'span[style]').filter(filter_spans);
-          if ($outer_span.length) {
-            var c_str = '';
-            var o_str = '';
-            var ic_str = '';
-            var io_str = '';
-            var c_node = $span.get(0);
-            do {
-              c_node = c_node.parentNode;
-              c_str = c_str + editor.node.closeTagString(c_node);
-              o_str = editor.node.openTagString(c_node) + o_str;
-
-              // Inner close and open.
-              if ($outer_span.get(0) != c_node) {
-                ic_str = ic_str + editor.node.closeTagString(c_node);
-                io_str = editor.node.openTagString(c_node) + io_str;
-              }
-            } while ($outer_span.get(0) != c_node);
-
-            // Build breaking string.
-            var str = c_str + '<span class="fr-just" style="' + prop + ': ' + val + ';">' + io_str + $span.html() + ic_str + '</span>' + o_str;
-            $span.replaceWith('<span id="fr-break"></span>');
-            var html = $outer_span.get(0).outerHTML;
-
-            // Replace the outer node.
-            $outer_span.replaceWith(html.replace(/<span id="fr-break"><\/span>/g, str));
-          }
-        }
-
-        editor.html.cleanEmptyTags();
-        _clearBlankSpans();
-
-        // Join current spans together if they are one next to each other.
-        var just_spans = editor.$el.find('.fr-just + .fr-just');
-        for (i = 0; i < just_spans.length; i++) {
-          var $s = $(just_spans[i]);
-          $s.prepend($s.prev().html());
-          $s.prev().remove();
-        }
-
-        editor.$el.find('.fr-marker + .fr-just').each(function () {
-          $(this).prepend($(this).prev());
-        })
-
-        editor.$el.find('.fr-just + .fr-marker').each(function () {
-          $(this).append($(this).next());
-        })
-
-        editor.$el.find('.fr-just').removeAttr('class');
-
-        editor.selection.restore();
-      }
-    }
-
     function callExec (k) {
       return function () {
         exec(k);
@@ -5051,12 +5721,13 @@
 
     var resp = {};
     for (var k in mapping) {
-      resp[k] = callExec(k);
+      if (mapping.hasOwnProperty(k)) {
+        resp[k] = callExec(k);
+      }
     }
 
     return $.extend(resp, {
-      exec: exec,
-      applyProperty: applyProperty
+      exec: exec
     });
   };
 
@@ -5231,15 +5902,26 @@
     function _endEnter (marker) {
       var li = _firstParentLI(marker);
 
-      var str = $.FE.MARKERS;
+      var end_str = $.FE.MARKERS;
+      var start_str = '';
       var node = marker;
+
+      var add_invisible = false;
       while (node != li) {
         node = node.parentNode;
 
         var cls = (node.tagName == 'A' && editor.cursor.isAtEnd(marker, node)) ? 'fr-to-remove' : '';
 
-        str = editor.node.openTagString($(node).clone().addClass(cls).get(0)) + str + editor.node.closeTagString(node);
+        if (!add_invisible && node != li && !editor.node.isBlock(node)) {
+          add_invisible = true;
+          start_str = start_str + $.FE.INVISIBLE_SPACE;
+        }
+
+        start_str = editor.node.openTagString($(node).clone().addClass(cls).get(0)) + start_str;
+        end_str = end_str + editor.node.closeTagString(node);
       }
+
+      var str = start_str + end_str;
 
       $(marker).remove();
       $(li).after(str);
@@ -5466,6 +6148,7 @@
      * Check if node is at the end of a block tag.
      */
     function _atEnd (node) {
+      if (!node) return false;
       if (editor.node.isBlock(node)) return true;
       if (node.nextSibling) return false;
 
@@ -5476,6 +6159,7 @@
      * Check if node is at the start of a block tag.
      */
     function _atStart (node) {
+      if (!node) return false;
       if (editor.node.isBlock(node)) return true;
       if (node.previousSibling) return false;
 
@@ -5536,55 +6220,61 @@
         if (editor.node.isBlock(deep_parent) && editor.node.isEditable(deep_parent)) {
           // There is a previous node.
           if (prev_node && $.FE.NO_DELETE_TAGS.indexOf(prev_node.tagName) < 0) {
-            // Previous node is a block tag.
-            if (editor.node.isEditable(prev_node)) {
-              if (editor.node.isBlock(prev_node)) {
-                if (editor.node.isEmpty(prev_node) && !editor.node.isList(prev_node)) {
-                  $(prev_node).remove();
-                }
-                else {
-                  if (editor.node.isList(prev_node)) {
-                    prev_node = $(prev_node).find('li:last').get(0);
+            if (editor.node.isDeletable(prev_node)) {
+              $(prev_node).remove();
+              $(marker).replaceWith($.FE.MARKERS);
+            }
+            else {
+              // Previous node is a block tag.
+              if (editor.node.isEditable(prev_node)) {
+                if (editor.node.isBlock(prev_node)) {
+                  if (editor.node.isEmpty(prev_node) && !editor.node.isList(prev_node)) {
+                    $(prev_node).remove();
                   }
+                  else {
+                    if (editor.node.isList(prev_node)) {
+                      prev_node = $(prev_node).find('li:last').get(0);
+                    }
 
-                  // Remove last BR.
-                  contents = editor.node.contents(prev_node);
-                  if (contents.length && contents[contents.length - 1].tagName == 'BR') {
-                    $(contents[contents.length - 1]).remove();
-                  }
-
-                  // Prev node is blockquote but the current one isn't.
-                  if (prev_node.tagName == 'BLOCKQUOTE' && deep_parent.tagName != 'BLOCKQUOTE') {
+                    // Remove last BR.
                     contents = editor.node.contents(prev_node);
-                    while (contents.length && editor.node.isBlock(contents[contents.length - 1])) {
-                      prev_node = contents[contents.length - 1];
+                    if (contents.length && contents[contents.length - 1].tagName == 'BR') {
+                      $(contents[contents.length - 1]).remove();
+                    }
+
+                    // Prev node is blockquote but the current one isn't.
+                    if (prev_node.tagName == 'BLOCKQUOTE' && deep_parent.tagName != 'BLOCKQUOTE') {
                       contents = editor.node.contents(prev_node);
+                      while (contents.length && editor.node.isBlock(contents[contents.length - 1])) {
+                        prev_node = contents[contents.length - 1];
+                        contents = editor.node.contents(prev_node);
+                      }
                     }
-                  }
-                  // Prev node is not blockquote, but the current one is.
-                  else if (prev_node.tagName != 'BLOCKQUOTE' && deep_parent.tagName == 'BLOCKQUOTE') {
-                    contents = editor.node.contents(deep_parent);
-                    while (contents.length && editor.node.isBlock(contents[0])) {
-                      deep_parent = contents[0];
+                    // Prev node is not blockquote, but the current one is.
+                    else if (prev_node.tagName != 'BLOCKQUOTE' && deep_parent.tagName == 'BLOCKQUOTE') {
                       contents = editor.node.contents(deep_parent);
+                      while (contents.length && editor.node.isBlock(contents[0])) {
+                        deep_parent = contents[0];
+                        contents = editor.node.contents(deep_parent);
+                      }
                     }
+
+                    $(marker).replaceWith($.FE.MARKERS);
+                    $(prev_node).append(editor.node.isEmpty(deep_parent) ? $.FE.MARKERS : deep_parent.innerHTML);
+                    $(deep_parent).remove();
                   }
-
-                  $(marker).replaceWith($.FE.MARKERS);
-                  $(prev_node).append(editor.node.isEmpty(deep_parent) ? $.FE.MARKERS : deep_parent.innerHTML);
-                  $(deep_parent).remove();
-                }
-              }
-              else {
-                $(marker).replaceWith($.FE.MARKERS);
-
-                if (deep_parent.tagName == 'BLOCKQUOTE' && prev_node.nodeType == Node.ELEMENT_NODE) {
-                  $(prev_node).remove();
                 }
                 else {
-                  $(prev_node).after(editor.node.isEmpty(deep_parent) ? '' : $(deep_parent).html());
-                  $(deep_parent).remove();
-                  if (prev_node.tagName == 'BR') $(prev_node).remove();
+                  $(marker).replaceWith($.FE.MARKERS);
+
+                  if (deep_parent.tagName == 'BLOCKQUOTE' && prev_node.nodeType == Node.ELEMENT_NODE) {
+                    $(prev_node).remove();
+                  }
+                  else {
+                    $(prev_node).after(editor.node.isEmpty(deep_parent) ? '' : $(deep_parent).html());
+                    $(deep_parent).remove();
+                    if (prev_node.tagName == 'BR') $(prev_node).remove();
+                  }
                 }
               }
             }
@@ -5611,24 +6301,24 @@
       // Get the parent node that has a prev sibling.
       while (!prev_node.previousSibling) {
         prev_node = prev_node.parentNode;
+
+        if (editor.node.isElement(prev_node)) return false;
       }
       prev_node = prev_node.previousSibling;
 
       // Not block tag.
       var contents;
-      if (!editor.node.isBlock(prev_node)) {
+      if (!editor.node.isBlock(prev_node) && editor.node.isEditable(prev_node)) {
         contents = editor.node.contents(prev_node);
 
         // Previous node is text.
-        while (prev_node.nodeType != Node.TEXT_NODE && contents.length && !$(prev_node).is('[contenteditable=\'false\']')) {
+        while (prev_node.nodeType != Node.TEXT_NODE && !editor.node.isDeletable(prev_node) && contents.length && editor.node.isEditable(prev_node)) {
           prev_node = contents[contents.length - 1];
           contents = editor.node.contents(prev_node);
         }
 
         if (prev_node.nodeType == Node.TEXT_NODE) {
           if (editor.helpers.isIOS()) return true;
-
-          $(prev_node).after($.FE.MARKERS);
 
           var txt = prev_node.textContent;
           var len = txt.length - 1;
@@ -5645,6 +6335,25 @@
           if (prev_node.textContent.length && prev_node.textContent.charCodeAt(prev_node.textContent.length - 1) == 55357) {
             prev_node.textContent = prev_node.textContent.substr(0, prev_node.textContent.length - 1);
           }
+
+          // Remove node if empty.
+          if (prev_node.textContent.length == 0) {
+            if (prev_node.parentNode.childNodes.length == 2 && prev_node.parentNode == marker.parentNode && !editor.node.isBlock(prev_node.parentNode) && !editor.node.isElement(prev_node.parentNode)) {
+              $(prev_node.parentNode).after($.FE.MARKERS);
+              $(prev_node.parentNode).remove();
+            }
+            else {
+              $(prev_node).after($.FE.MARKERS);
+              prev_node.parentNode.removeChild(prev_node);
+            }
+          }
+          else {
+            $(prev_node).after($.FE.MARKERS);
+          }
+        }
+        else if (editor.node.isDeletable(prev_node)) {
+          $(prev_node).after($.FE.MARKERS);
+          $(prev_node).remove();
         }
         else {
           if (editor.events.trigger('node.remove', [$(prev_node)]) !== false) {
@@ -5655,7 +6364,7 @@
       }
 
       // Block tag but we are allowed to delete it.
-      else if ($.FE.NO_DELETE_TAGS.indexOf(prev_node.tagName) < 0) {
+      else if ($.FE.NO_DELETE_TAGS.indexOf(prev_node.tagName) < 0 && editor.node.isEditable(prev_node)) {
         if (editor.node.isEmpty(prev_node) && !editor.node.isList(prev_node)) {
           $(prev_node).remove();
           $(marker).replaceWith($.FE.MARKERS);
@@ -5692,6 +6401,12 @@
           if (next_node && next_node.tagName == 'BR') $(next_node).remove();
 
           $(marker).remove();
+        }
+      }
+
+      else {
+        if (marker.nextSibling && marker.nextSibling.tagName == 'BR') {
+          $(marker.nextSibling).remove();
         }
       }
     }
@@ -5753,7 +6468,7 @@
       editor.html.cleanEmptyTags();
       editor.clean.quotes();
       editor.clean.lists();
-      editor.html.normalizeSpaces();
+      editor.spaces.normalize();
       editor.selection.restore();
 
       return do_default;
@@ -5779,86 +6494,92 @@
         var contents;
 
         // We are inside a block tag.
-        if (editor.node.isBlock(deep_parent) && editor.node.isEditable(deep_parent)) {
+        if (editor.node.isBlock(deep_parent) && (editor.node.isEditable(deep_parent) || editor.node.isDeletable(deep_parent))) {
           // There is a next node.
           if (next_node && $.FE.NO_DELETE_TAGS.indexOf(next_node.tagName) < 0) {
-            // Next node is a block tag.
-            if (editor.node.isBlock(next_node) && editor.node.isEditable(next_node)) {
-              // Next node is a list.
-              if (editor.node.isList(next_node)) {
-                // Current block tag is empty.
-                if (editor.node.isEmpty(deep_parent, true)) {
-                  $(deep_parent).remove();
+            if (editor.node.isDeletable(next_node)) {
+              $(next_node).remove();
+              $(marker).replaceWith($.FE.MARKERS);
+            }
+            else {
+              // Next node is a block tag.
+              if (editor.node.isBlock(next_node) && editor.node.isEditable(next_node)) {
+                // Next node is a list.
+                if (editor.node.isList(next_node)) {
+                  // Current block tag is empty.
+                  if (editor.node.isEmpty(deep_parent, true)) {
+                    $(deep_parent).remove();
 
-                  $(next_node).find('li:first').prepend($.FE.MARKERS);
+                    $(next_node).find('li:first').prepend($.FE.MARKERS);
+                  }
+                  else {
+                    var $li = $(next_node).find('li:first');
+
+                    if (deep_parent.tagName == 'BLOCKQUOTE') {
+                      contents = editor.node.contents(deep_parent);
+                      if (contents.length && editor.node.isBlock(contents[contents.length - 1])) {
+                        deep_parent = contents[contents.length - 1];
+                      }
+                    }
+
+                    // There are no nested lists.
+                    if ($li.find('ul, ol').length === 0) {
+                      $(marker).replaceWith($.FE.MARKERS);
+
+                      // Remove any nodes that might be wrapped.
+                      $li.find(editor.html.blockTagsQuery()).not('ol, ul, table').each (function () {
+                        if (this.parentNode == $li.get(0)) {
+                          $(this).replaceWith($(this).html() + (editor.node.isEmpty(this) ? '' : '<br>'));
+                        }
+                      });
+
+                      $(deep_parent).append(editor.node.contents($li.get(0)));
+                      $li.remove();
+
+                      if ($(next_node).find('li').length === 0) $(next_node).remove();
+                    }
+                  }
                 }
                 else {
-                  var $li = $(next_node).find('li:first');
+                  // Remove last BR.
+                  contents = editor.node.contents(next_node);
+                  if (contents.length && contents[0].tagName == 'BR') {
+                    $(contents[0]).remove();
+                  }
 
-                  if (deep_parent.tagName == 'BLOCKQUOTE') {
+                  if (next_node.tagName != 'BLOCKQUOTE' && deep_parent.tagName == 'BLOCKQUOTE') {
                     contents = editor.node.contents(deep_parent);
-                    if (contents.length && editor.node.isBlock(contents[contents.length - 1])) {
+                    while (contents.length && editor.node.isBlock(contents[contents.length - 1])) {
                       deep_parent = contents[contents.length - 1];
+                      contents = editor.node.contents(deep_parent);
+                    }
+                  }
+                  else if (next_node.tagName == 'BLOCKQUOTE' && deep_parent.tagName != 'BLOCKQUOTE') {
+                    contents = editor.node.contents(next_node);
+                    while (contents.length && editor.node.isBlock(contents[0])) {
+                      next_node = contents[0];
+                      contents = editor.node.contents(next_node);
                     }
                   }
 
-                  // There are no nested lists.
-                  if ($li.find('ul, ol').length === 0) {
-                    $(marker).replaceWith($.FE.MARKERS);
-
-                    // Remove any nodes that might be wrapped.
-                    $li.find(editor.html.blockTagsQuery()).not('ol, ul, table').each (function () {
-                      if (this.parentNode == $li.get(0)) {
-                        $(this).replaceWith($(this).html() + (editor.node.isEmpty(this) ? '' : '<br>'));
-                      }
-                    });
-
-                    $(deep_parent).append(editor.node.contents($li.get(0)));
-                    $li.remove();
-
-                    if ($(next_node).find('li').length === 0) $(next_node).remove();
-                  }
+                  $(marker).replaceWith($.FE.MARKERS);
+                  $(deep_parent).append(next_node.innerHTML);
+                  $(next_node).remove();
                 }
               }
               else {
-                // Remove last BR.
-                contents = editor.node.contents(next_node);
-                if (contents.length && contents[0].tagName == 'BR') {
-                  $(contents[0]).remove();
-                }
-
-                if (next_node.tagName != 'BLOCKQUOTE' && deep_parent.tagName == 'BLOCKQUOTE') {
-                  contents = editor.node.contents(deep_parent);
-                  while (contents.length && editor.node.isBlock(contents[contents.length - 1])) {
-                    deep_parent = contents[contents.length - 1];
-                    contents = editor.node.contents(deep_parent);
-                  }
-                }
-                else if (next_node.tagName == 'BLOCKQUOTE' && deep_parent.tagName != 'BLOCKQUOTE') {
-                  contents = editor.node.contents(next_node);
-                  while (contents.length && editor.node.isBlock(contents[0])) {
-                    next_node = contents[0];
-                    contents = editor.node.contents(next_node);
-                  }
-                }
-
                 $(marker).replaceWith($.FE.MARKERS);
-                $(deep_parent).append(next_node.innerHTML);
-                $(next_node).remove();
-              }
-            }
-            else {
-              $(marker).replaceWith($.FE.MARKERS);
 
-              // var next_node = next_node.nextSibling;
-              while (next_node && next_node.tagName !== 'BR' && !editor.node.isBlock(next_node) && editor.node.isEditable(next_node)) {
-                var copy_node = next_node;
-                next_node = next_node.nextSibling;
-                $(deep_parent).append(copy_node);
-              }
+                // var next_node = next_node.nextSibling;
+                while (next_node && next_node.tagName !== 'BR' && !editor.node.isBlock(next_node) && editor.node.isEditable(next_node)) {
+                  var copy_node = next_node;
+                  next_node = next_node.nextSibling;
+                  $(deep_parent).append(copy_node);
+                }
 
-              if (next_node && next_node.tagName == 'BR' && editor.node.isEditable(next_node)) {
-                $(next_node).remove();
+                if (next_node && next_node.tagName == 'BR' && editor.node.isEditable(next_node)) {
+                  $(next_node).remove();
+                }
               }
             }
           }
@@ -5884,6 +6605,8 @@
       // Get the parent node that has a next sibling.
       while (!next_node.nextSibling) {
         next_node = next_node.parentNode;
+
+        if (editor.node.isElement(next_node)) return false;
       }
       next_node = next_node.nextSibling;
 
@@ -5897,6 +6620,7 @@
               $(next_node.previousSibling).remove();
             }
             else {
+              $(next_node).remove();
               return;
             }
           }
@@ -5925,7 +6649,7 @@
         contents = editor.node.contents(next_node);
 
         // Next node is text.
-        while (next_node.nodeType != Node.TEXT_NODE && contents.length && editor.node.isEditable(next_node)) {
+        while (next_node.nodeType != Node.TEXT_NODE && contents.length && !editor.node.isDeletable(next_node) && editor.node.isEditable(next_node)) {
           next_node = contents[0];
           contents = editor.node.contents(next_node);
         }
@@ -5940,6 +6664,10 @@
             next_node.textContent = next_node.textContent.substring(1, next_node.textContent.length);
           }
         }
+        else if (editor.node.isDeletable(next_node)) {
+          $(next_node).before($.FE.MARKERS);
+          $(next_node).remove();
+        }
         else {
           if (editor.events.trigger('node.remove', [$(next_node)]) !== false) {
             $(next_node).before($.FE.MARKERS);
@@ -5951,46 +6679,52 @@
       }
 
       // Block tag.
-      else if ($.FE.NO_DELETE_TAGS.indexOf(next_node.tagName) < 0) {
-        if (editor.node.isList(next_node)) {
-          // There is a previous sibling.
-          if (marker.previousSibling) {
-            $(next_node).find('li:first').prepend(marker);
-            editor.cursorLists._backspace(marker);
-          }
-
-          // No previous sibling.
-          else {
-            $(next_node).find('li:first').prepend($.FE.MARKERS);
-            $(marker).remove()
-          }
+      else if ($.FE.NO_DELETE_TAGS.indexOf(next_node.tagName) < 0 && (editor.node.isEditable(next_node) || editor.node.isDeletable(next_node))) {
+        if (editor.node.isDeletable(next_node)) {
+          $(marker).replaceWith($.FE.MARKERS);
+          $(next_node).remove();
         }
         else {
-          contents = editor.node.contents(next_node);
-          if (contents && contents[0].tagName == 'BR') {
-            $(contents[0]).remove();
-          }
-
-          // Deal with blockquote.
-          if (contents && next_node.tagName == 'BLOCKQUOTE') {
-            var node = contents[0];
-            $(marker).before($.FE.MARKERS);
-            while (node && node.tagName != 'BR') {
-              var tmp = node;
-              node = node.nextSibling;
-              $(marker).before(tmp);
+          if (editor.node.isList(next_node)) {
+            // There is a previous sibling.
+            if (marker.previousSibling) {
+              $(next_node).find('li:first').prepend(marker);
+              editor.cursorLists._backspace(marker);
             }
 
-            if (node && node.tagName == 'BR') {
-              $(node).remove();
+            // No previous sibling.
+            else {
+              $(next_node).find('li:first').prepend($.FE.MARKERS);
+              $(marker).remove();
             }
           }
           else {
-            $(marker)
-              .after($(next_node).html())
-              .after($.FE.MARKERS);
+            contents = editor.node.contents(next_node);
+            if (contents && contents[0].tagName == 'BR') {
+              $(contents[0]).remove();
+            }
 
-            $(next_node).remove();
+            // Deal with blockquote.
+            if (contents && next_node.tagName == 'BLOCKQUOTE') {
+              var node = contents[0];
+              $(marker).before($.FE.MARKERS);
+              while (node && node.tagName != 'BR') {
+                var tmp = node;
+                node = node.nextSibling;
+                $(marker).before(tmp);
+              }
+
+              if (node && node.tagName == 'BR') {
+                $(node).remove();
+              }
+            }
+            else {
+              $(marker)
+                .after($(next_node).html())
+                .after($.FE.MARKERS);
+
+              $(next_node).remove();
+            }
           }
         }
       }
@@ -6041,7 +6775,7 @@
       editor.html.cleanEmptyTags();
       editor.clean.quotes();
       editor.clean.lists();
-      editor.html.normalizeSpaces();
+      editor.spaces.normalize();
       editor.selection.restore();
     }
 
@@ -6363,7 +7097,7 @@
       editor.html.fillEmptyBlocks();
       editor.html.cleanEmptyTags();
       editor.clean.lists();
-      editor.html.normalizeSpaces();
+      editor.spaces.normalize();
       editor.selection.restore();
     }
 
@@ -6616,7 +7350,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         // Start container is text and last char before cursor is space.
         if (start_container && start_container.nodeType == Node.TEXT_NODE && start_offset <= start_container.textContent.length && start_offset > 0 && start_container.textContent.charCodeAt(start_offset - 1) == 32) {
           editor.selection.save();
-          editor.html.normalizeSpaces();
+          editor.spaces.normalize();
           editor.selection.restore();
         }
       }
@@ -6712,7 +7446,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // 1. Selection is full.
       // 2. Del key is hit, editor is empty and there is keepFormatOnDelete.
-      if ((editor.selection.isFull() && !editor.opts.keepFormatOnDelete) || (del_key && editor.placeholder.isVisible() && editor.opts.keepFormatOnDelete)) {
+      if ((editor.selection.isFull() && !editor.opts.keepFormatOnDelete && !editor.placeholder.isVisible()) || (del_key && editor.placeholder.isVisible() && editor.opts.keepFormatOnDelete)) {
         if (char_key || del_key) {
           var default_tag = editor.html.defaultTag();
           if (default_tag) {
@@ -6721,9 +7455,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           else {
             editor.$el.html($.FE.MARKERS + '<br/>');
           }
-        }
 
-        editor.selection.restore();
+          editor.selection.restore();
+
+          if (!isCharacter(key_code)) {
+            e.preventDefault();
+            return true;
+          }
+        }
       }
 
       // ENTER.
@@ -6737,12 +7476,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       }
 
       // Backspace.
-      else if (key_code == $.FE.KEYCODE.BACKSPACE && !ctrlKey(e)) {
+      else if (key_code == $.FE.KEYCODE.BACKSPACE && !ctrlKey(e) && !e.altKey && !editor.placeholder.isVisible()) {
         _backspace(e);
       }
 
       // Delete.
-      else if (key_code == $.FE.KEYCODE.DELETE && !ctrlKey(e)) {
+      else if (key_code == $.FE.KEYCODE.DELETE && !ctrlKey(e) && !e.altKey && !editor.placeholder.isVisible()) {
         _del(e);
       }
 
@@ -6784,9 +7523,16 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         // Make sure we scroll bottom.
         info = editor.position.getBoundingRect().top;
 
+        // https://github.com/froala/wysiwyg-editor/issues/834.
+        if (editor.opts.toolbarBottom) info += editor.opts.toolbarStickyOffset;
+
+        if (editor.helpers.isIOS()) info -= $(editor.o_win).scrollTop();
+
         if (editor.opts.iframe) {
           info += editor.$iframe.offset().top;
         }
+
+        info += editor.opts.toolbarStickyOffset;
 
         if (info > editor.o_win.innerHeight - 20) {
           $(editor.o_win).scrollTop(info + $(editor.o_win).scrollTop() - editor.o_win.innerHeight + 20);
@@ -6794,6 +7540,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
         // Make sure we scroll top.
         info = editor.position.getBoundingRect().top;
+
+        // https://github.com/froala/wysiwyg-editor/issues/834.
+        if (!editor.opts.toolbarBottom) info -= editor.opts.toolbarStickyOffset;
+
+        if (editor.helpers.isIOS()) info -= $(editor.o_win).scrollTop();
+
         if (editor.opts.iframe) {
           info += editor.$iframe.offset().top;
         }
@@ -6804,6 +7556,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       else {
         // Make sure we scroll bottom.
         info = editor.position.getBoundingRect().top;
+        if (editor.helpers.isIOS()) info -= $(editor.o_win).scrollTop();
 
         if (editor.opts.iframe) {
           info += editor.$iframe.offset().top;
@@ -6821,9 +7574,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     function _mapKeyUp (e) {
       // IME IE.
       if (IME) return false;
-      if (!editor.selection.isCollapsed()) return false;
+      if (!editor.selection.isCollapsed()) return true;
 
-      if (e && (e.which == $.FE.KEYCODE.ENTER || e.which == $.FE.KEYCODE.BACKSPACE)) {
+      if (e && (e.which == $.FE.KEYCODE.ENTER || e.which == $.FE.KEYCODE.BACKSPACE || (e.which >= 37 && e.which <= 40 && !editor.browser.msie))) {
         if (!(e.which == $.FE.KEYCODE.BACKSPACE && regular_backspace)) _positionCaret();
       }
 
@@ -6842,6 +7595,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           }
         }
       }
+      var els = [];
 
       for (var i = 0; i < brs.length; i++) {
         var br = brs[i];
@@ -6859,11 +7613,15 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         // Parent node has text.
         // Previous node has text.
         if (prev_node && parent_node && prev_node.tagName != 'BR' && !editor.node.isBlock(prev_node) && !next_node && $(parent_node).text().replace(/\u200B/g, '').length > 0 && $(prev_node).text().length > 0) {
-          editor.selection.save();
-          $(br).remove();
-          editor.selection.restore();
+          // Fix for https://github.com/froala/wysiwyg-editor/issues/1166#issuecomment-204549406.
+          if (!(editor.$el.is(parent_node) && !next_node && editor.opts.enter == $.FE.ENTER_BR && editor.browser.msie)) {
+            editor.selection.save();
+            $(br).remove();
+            editor.selection.restore();
+          }
         }
       }
+      brs = [];
 
       // Remove invisible space where possible.
       var has_invisible = function (node) {
@@ -6891,7 +7649,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       // https://github.com/froala/wysiwyg-editor/issues/1011
       if (!editor.browser.mozilla && editor.html.doNormalize()) {
         editor.selection.save();
-        editor.html.normalizeSpaces();
+        editor.spaces.normalize();
         editor.selection.restore();
       }
     }
@@ -6958,7 +7716,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     var _temp_snapshot;
     function _typingKeyDown (e) {
       var keycode = e.which;
-      if (ctrlKey(e) || (keycode >= 37 && keycode <= 40)) return true;
+      if (ctrlKey(e) || (keycode >= 37 && keycode <= 40) || (!isCharacter(keycode) && keycode != $.FE.KEYCODE.DELETE && keycode != $.FE.KEYCODE.BACKSPACE && keycode != $.FE.KEYCODE.ENTER)) return true;
 
       if (!_typing_timeout) {
         _temp_snapshot = editor.snapshot.get();
@@ -7141,8 +7899,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // Remove and store the editable content
       if (!$paste_div) {
-        $paste_div = $('<div contenteditable="true" style="position: fixed; top: 0; left: -9999px; height: 100%; width: 0; z-index: 9999; line-height: 140%;" tabindex="-1"></div>');
+        $paste_div = $('<div contenteditable="true" style="position: fixed; top: 0; left: -9999px; height: 100%; width: 0; word-break: break-all; overflow:hidden; z-index: 9999; line-height: 140%;" tabindex="-1"></div>');
         editor.$box.after($paste_div);
+
+        editor.events.on('destroy', function () {
+          $paste_div.remove();
+        })
       }
       else {
         $paste_div.html('');
@@ -7286,7 +8048,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       });
 
       // Remove with the content.
-      $($div.find('*').not('p, div, h1, h2, h3, h4, h5, h6, pre, blockquote, ul, ol, li, table, tbody, thead, tr, td, br').get().reverse()).each (function () {
+      $($div.find('*').not('p, div, h1, h2, h3, h4, h5, h6, pre, blockquote, ul, ol, li, table, tbody, thead, tr, td, br, img').get().reverse()).each (function () {
         $(this).replaceWith($(this).html());
       });
 
@@ -7383,7 +8145,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       if (clipboard_html !== '') {
         // Normalize spaces.
         var $tmp = $('<div>').html(clipboard_html);
-        editor.html.normalizeSpaces($tmp.get(0));
+        editor.spaces.normalize($tmp.get(0));
         $tmp.find('span').each (function () {
           if (this.attributes.length == 0) {
             $(this).replaceWith(this.innerHTML);
@@ -7398,6 +8160,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         })
 
         clipboard_html = $tmp.html();
+
+        console.log (clipboard_html)
 
         // Insert HTML.
         editor.html.insert(clipboard_html, true);
@@ -7437,7 +8201,19 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       var divs = $div.find('> div:not([style]), td > div, th > div, li > div');
       while (divs.length) {
         var $dv = $(divs[divs.length - 1]);
-        $dv.replaceWith($dv.html() + '<br>');
+
+        if (editor.html.defaultTag() && editor.html.defaultTag() != 'DIV') {
+          $dv.replaceWith('<' + editor.html.defaultTag() + '>' + $dv.html() + '</' + editor.html.defaultTag() + '>' );
+        }
+        else if (!editor.html.defaultTag()) {
+          if (!$dv.find('*:last').is('br')) {
+            $dv.replaceWith($dv.html() + '<br>');
+          }
+          else {
+            $dv.replaceWith($dv.html());
+          }
+        }
+
         divs = $div.find('> div:not([style]), td > div, th > div, li > div');
       }
 
@@ -7485,1420 +8261,78 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
   };
 
 
-  $.FE.MODULES.tooltip = function (editor) {
-    function hide () {
-      if (editor.$tooltip) editor.$tooltip.removeClass('fr-visible').css('left', '-3000px');
-    }
-
-    function to ($el, above) {
-      if (!$el.data('title')) {
-        $el.data('title', $el.attr('title'));
-      }
-
-      if (!$el.data('title')) return false;
-
-      if (!editor.$tooltip) _init();
-
-      $el.removeAttr('title');
-      editor.$tooltip.text($el.data('title'));
-      editor.$tooltip.addClass('fr-visible');
-
-      var left = $el.offset().left + ($el.outerWidth() - editor.$tooltip.outerWidth()) / 2;
-
-      // Normalize screen position.
-      if (left < 0) left = 0;
-      if (left + editor.$tooltip.outerWidth() > $(editor.o_win).width()) {
-        left = $(editor.o_win).width() - editor.$tooltip.outerWidth();
-      }
-
-      if (typeof above == 'undefined') above = editor.opts.toolbarBottom;
-      var top = !above ? $el.offset().top + $el.outerHeight() : $el.offset().top - editor.$tooltip.height();
-
-      editor.$tooltip.css('left', left);
-      editor.$tooltip.css('top', top);
-    }
-
-    function bind ($el, selector, above) {
-      if (!editor.helpers.isMobile()) {
-        editor.events.$on($el, 'mouseenter', selector, function (e) {
-          if (!$(e.currentTarget).hasClass('fr-disabled')) {
-            to($(e.currentTarget), above);
-          }
-        }, true);
-
-        editor.events.$on($el, 'mouseleave ' + editor._mousedown + ' ' + editor._mouseup, selector, function (e) {
-          hide();
-        }, true);
-      }
-    }
-
-    function _init () {
-      if (!editor.helpers.isMobile()) {
-        if (!editor.shared.$tooltip) {
-          editor.shared.$tooltip = $('<div class="fr-tooltip"></div>');
-
-          editor.$tooltip = editor.shared.$tooltip;
-
-          if (editor.opts.theme) {
-            editor.$tooltip.addClass(editor.opts.theme + '-theme');
-          }
-
-          $(editor.o_doc).find('body').append(editor.$tooltip);
-        }
-        else {
-          editor.$tooltip = editor.shared.$tooltip;
-        }
-
-        editor.events.on('shared.destroy', function () {
-          editor.$tooltip.html('').removeData().remove();
-        }, true);
-      }
-    }
-
-    return {
-      hide: hide,
-      to: to,
-      bind: bind
-    }
-  };
-
-
-  $.FE.ICON_DEFAULT_TEMPLATE = 'font_awesome';
-
-  $.FE.ICON_TEMPLATES = {
-    font_awesome: '<i class="fa fa-[NAME]"></i>',
-    text: '<span style="text-align: center;">[NAME]</span>',
-    image: '<img src=[SRC] alt=[ALT] />'
-  }
-
-  $.FE.ICONS = {
-    bold: {NAME: 'bold'},
-    italic: {NAME: 'italic'},
-    underline: {NAME: 'underline'},
-    strikeThrough: {NAME: 'strikethrough'},
-    subscript: {NAME: 'subscript'},
-    superscript: {NAME: 'superscript'},
-    color: {NAME: 'tint'},
-    outdent: {NAME: 'outdent'},
-    indent: {NAME: 'indent'},
-    undo: {NAME: 'rotate-left'},
-    redo: {NAME: 'rotate-right'},
-    insertHR: {NAME: 'minus'},
-    clearFormatting: {NAME: 'eraser'},
-    selectAll: {NAME: 'mouse-pointer'}
-  }
-
-  $.FE.DefineIconTemplate = function (name, options) {
-    $.FE.ICON_TEMPLATES[name] = options;
-  }
-
-  $.FE.DefineIcon = function (name, options) {
-    $.FE.ICONS[name] = options;
-  }
-
-  $.FE.MODULES.icon = function (editor) {
-    function create (command) {
-      var icon = null;
-      var info = $.FE.ICONS[command];
-      if (typeof info != 'undefined') {
-        var template = info.template || $.FE.ICON_DEFAULT_TEMPLATE;
-        if (template && (template = $.FE.ICON_TEMPLATES[template])) {
-          icon = template.replace(/\[([a-zA-Z]*)\]/g, function (str, a1) {
-            return (a1 == 'NAME' ? (info[a1] || command) : info[a1]);
-          });
-        }
-      }
-
-      return (icon || command);
-    }
-
-    return {
-      create: create
-    }
-  };
-
-
-  $.FE.MODULES.button = function (editor) {
-    var buttons = [];
-
-    if (editor.opts.toolbarInline || editor.opts.toolbarContainer) {
-      if (!editor.shared.buttons) editor.shared.buttons = [];
-      buttons = editor.shared.buttons;
-    }
-
-    /**
-     * Click was made on a dropdown button.
-     */
-    function _dropdownButtonClick (e) {
-      // Get current btn and dropdown.
-      var $btn = $(e.currentTarget);
-      var $dropdown = $btn.next();
-
-      var active = $btn.hasClass('fr-active');
-      var mobile = editor.helpers.isMobile();
-
-      var $active_dropdowns = $('.fr-dropdown.fr-active').not($btn);
-
-      var inst = $btn.parents('.fr-toolbar, .fr-popup').data('instance') || editor;
-
-      // Hide keyboard. We need the entire space.
-      if (inst.helpers.isIOS() && inst.find('.fr-marker').length == 0) {
-        inst.save();
-        inst.clear();
-        inst.restore();
-      }
-
-      // Dropdown is not active.
-      if (!active) {
-        // Call refresh on show.
-        var cmd = $btn.data('cmd');
-        $dropdown.find('.fr-command').removeClass('fr-active');
-        if ($.FE.COMMANDS[cmd] && $.FE.COMMANDS[cmd].refreshOnShow) {
-          $.FE.COMMANDS[cmd].refreshOnShow.apply(inst, [$btn, $dropdown]);
-        }
-
-        $dropdown.css('left', $btn.offset().left - $btn.parent().offset().left - (editor.opts.direction == 'rtl' ? $dropdown.width() - $btn.outerWidth() : 0));
-
-        if (!editor.opts.toolbarBottom) {
-          $dropdown.css('top', $btn.position().top + $btn.outerHeight());
-        }
-        else {
-          $dropdown.css('bottom', editor.$tb.height() - $btn.position().top);
-        }
-      }
-
-      // Blink and activate.
-      $btn.addClass('fr-blink').toggleClass('fr-active');
-      setTimeout (function () {
-        $btn.removeClass('fr-blink');
-      }, 300);
-
-      // Check if it exceeds window on the right.
-      if ($dropdown.offset().left + $dropdown.outerWidth() > $(editor.opts.scrollableContainer).offset().left +  $(editor.opts.scrollableContainer).outerWidth()) {
-        $dropdown.css('margin-left', -($dropdown.offset().left + $dropdown.outerWidth() - $(editor.opts.scrollableContainer).offset().left - $(editor.opts.scrollableContainer).outerWidth()))
-      }
-
-      // Hide dropdowns that might be active.
-      $active_dropdowns.removeClass('fr-active');
-      $active_dropdowns.parent('.fr-toolbar').css('zIndex', '');
-
-      if ($btn.parents('.fr-popup').length == 0) {
-        if ($btn.hasClass('fr-active')) {
-          editor.$tb.css('zIndex', 5);
-        }
-        else {
-          editor.$tb.css('zIndex', '');
-        }
-      }
-    }
-
-    function exec ($btn) {
-      // Blink.
-      $btn.addClass('fr-blink');
-      setTimeout (function () {
-        $btn.removeClass('fr-blink');
-      }, 500);
-
-      // Get command, value and additional params.
-      var cmd = $btn.data('cmd');
-      var params = [];
-      while (typeof $btn.data('param' + (params.length + 1)) != 'undefined') {
-        params.push($btn.data('param' + (params.length + 1)));
-      }
-
-      // Hide dropdowns that might be active including the current one.
-      var $active_dropdowns = $('.fr-dropdown.fr-active');
-      if ($active_dropdowns.length) {
-        $active_dropdowns.removeClass('fr-active');
-
-        $active_dropdowns.parent('.fr-toolbar').css('zIndex', '');
-      }
-
-      // Call the command.
-      $btn.parents('.fr-popup, .fr-toolbar').data('instance').commands.exec(cmd, params);
-    }
-
-    /**
-     * Click was made on a command button.
-     */
-    function _commandButtonClick (e) {
-      var $btn = $(e.currentTarget);
-      exec($btn);
-    }
-
-    function _click (e) {
-      var $btn = $(e.currentTarget);
-
-      var inst = $btn.parents('.fr-popup, .fr-toolbar').data('instance');
-
-      if ($btn.parents('.fr-popup').length == 0 && !$btn.data('popup')) {
-        inst.popups.hideAll();
-      }
-
-      // Popups are visible, but not in the current instance.
-      if (inst.popups.areVisible() && !inst.popups.areVisible(inst)) {
-        // Hide markers in other instances.
-        for (var i = 0; i < $.FE.INSTANCES.length; i++) {
-          if ($.FE.INSTANCES[i] != inst) {
-            $.FE.INSTANCES[i].$el.find('.fr-marker').remove();
-          }
-        }
-
-        inst.popups.hideAll();
-      }
-
-      // Dropdown button.
-      if ($btn.hasClass('fr-dropdown')) {
-        _dropdownButtonClick(e);
-      }
-
-      // Regular button.
-      else {
-        _commandButtonClick(e);
-
-        if ($.FE.COMMANDS[$btn.data('cmd')] && $.FE.COMMANDS[$btn.data('cmd')].refreshAfterCallback != false) {
-          inst.button.bulkRefresh();
-        }
-      }
-    }
-
-    function _hideActiveDropdowns ($el) {
-      var $active_dropdowns = $el.find('.fr-dropdown.fr-active');
-
-      if ($active_dropdowns.length) {
-        $active_dropdowns.removeClass('fr-active');
-
-        $active_dropdowns.parent('.fr-toolbar').css('zIndex', '');
-      }
-    }
-
-    /**
-     * Click in the dropdown menu.
-     */
-    function _dropdownMenuClick (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    /**
-     * Click on the dropdown wrapper.
-     */
-    function _dropdownWrapperClick (e) {
-      e.stopPropagation();
-
-      if (editor.opts.toolbarInline) return false;
-    }
-
-    /**
-     * Bind callbacks for commands.
-     */
-    function bindCommands ($el, tooltipAbove) {
-      editor.events.bindClick($el, '.fr-command:not(.fr-disabled)', _click);
-
-      // Click on the dropdown menu.
-      editor.events.$on($el, editor._mousedown + ' ' + editor._mouseup + ' ' + editor._move, '.fr-dropdown-menu', _dropdownMenuClick, true);
-
-      // Click on the dropdown wrapper.
-      editor.events.$on($el, editor._mousedown + ' ' + editor._mouseup + ' ' + editor._move, '.fr-dropdown-menu .fr-dropdown-wrapper', _dropdownWrapperClick, true);
-
-      // Hide dropdowns that might be active.
-      var _document = $el.get(0).ownerDocument;
-      var _window = 'defaultView' in _document ? _document.defaultView : _document.parentWindow;
-      var hideDropdowns = function (e) {
-        if (!e || (e.type == editor._mouseup && e.target != $('html').get(0)) || (e.type == 'keydown' && ((editor.keys.isCharacter(e.which) && !editor.keys.ctrlKey(e)) || e.which == $.FE.KEYCODE.ESC))) {
-          _hideActiveDropdowns($el);
-        }
-      }
-      editor.events.$on($(_window), editor._mouseup + ' resize keydown', hideDropdowns, true);
-
-      if (editor.opts.iframe) {
-        editor.events.$on(editor.$win, editor._mouseup, hideDropdowns, true);
-      }
-
-      // Add refresh.
-      $.merge(buttons, $el.find('.fr-btn').toArray());
-
-      // Assing tooltips to buttons.
-      editor.tooltip.bind($el, '.fr-btn, .fr-title', tooltipAbove);
-    }
-
-    /**
-     * Create the content for dropdown.
-     */
-    function _content (command, info) {
-      var c = '';
-
-      if (info.html) {
-        if (typeof info.html == 'function') {
-          c += info.html.call(editor);
-        }
-        else {
-          c += info.html;
-        }
-      }
-      else {
-        var options = info.options;
-        if (typeof options == 'function') options = options();
-
-        c += '<ul class="fr-dropdown-list">';
-        for (var val in options) {
-          c += '<li><a class="fr-command" data-cmd="' + command + '" data-param1="' + val + '" title="' + options[val] + '">' + editor.language.translate(options[val]) + '</a></li>';
-        }
-        c += '</ul>';
-      }
-
-      return c;
-    }
-
-    /**
-     * Create button.
-     */
-    function _build (command, info, visible) {
-      var display_selection = info.displaySelection;
-      if (typeof display_selection == 'function') {
-        display_selection = display_selection(editor);
-      }
-
-      var icon;
-      if (display_selection) {
-        var default_selection = (typeof info.defaultSelection == 'function' ? info.defaultSelection(editor) : info.defaultSelection);
-        icon = '<span style="width:' + (info.displaySelectionWidth || 100) + 'px">' + (default_selection || editor.language.translate(info.title)) + '</span>';
-      }
-      else {
-        icon = editor.icon.create(info.icon || command)
-      }
-
-      var popup = info.popup ? ' data-popup="true"' : '';
-
-      var btn = '<button type="button" tabindex="-1" title="' + (editor.language.translate(info.title) || '') + '" class="fr-command fr-btn' + (info.type == 'dropdown' ? ' fr-dropdown' : '') + (info.back ? ' fr-back' : '') + (info.disabled ? ' fr-disabled' : '') + (!visible ? ' fr-hidden' : '') + '" data-cmd="' + command + '"' + popup + '>' + icon + '</button>';
-
-      if (info.type == 'dropdown') {
-        // Build dropdown.
-        var dropdown = '<div class="fr-dropdown-menu"><div class="fr-dropdown-wrapper"><div class="fr-dropdown-content" tabindex="-1">';
-
-        dropdown += _content(command, info);
-
-        dropdown += '</div></div></div>';
-
-        btn += dropdown;
-      }
-
-      return btn;
-    }
-
-    function buildList (buttons, visible_buttons) {
-      var str = '';
-      for (var i = 0; i < buttons.length; i++) {
-        var cmd_name = buttons[i];
-        var cmd_info = $.FE.COMMANDS[cmd_name];
-
-        if (cmd_info && typeof cmd_info.plugin !== 'undefined' && editor.opts.pluginsEnabled.indexOf(cmd_info.plugin) < 0) continue;
-
-        if (cmd_info) {
-          var visible = typeof visible_buttons != 'undefined' ? visible_buttons.indexOf(cmd_name) >= 0 : true;
-          str += _build(cmd_name, cmd_info, visible);
-        }
-        else if (cmd_name == '|') {
-          str += '<div class="fr-separator fr-vs"></div>';
-        }
-        else if (cmd_name == '-') {
-          str += '<div class="fr-separator fr-hs"></div>';
-        }
-      }
-
-      return str;
-    }
-
-    function refresh ($btn) {
-      var inst = editor.$tb ? (editor.$tb.data('instance') || editor) : editor;
-
-      var cmd = $btn.data('cmd');
-
-      var $dropdown;
-      if (!$btn.hasClass('fr-dropdown')) $btn.removeClass('fr-active');
-      else $dropdown = $btn.next();
-
-      if ($.FE.COMMANDS[cmd] && $.FE.COMMANDS[cmd].refresh) {
-       $.FE.COMMANDS[cmd].refresh.apply(inst, [$btn, $dropdown]);
-      }
-      else if (editor.refresh[cmd]) {
-        inst.refresh[cmd]($btn, $dropdown);
-      }
-      else {
-        inst.refresh.default($btn, cmd);
-      }
-    }
-
-    /**
-     * Do buttons refresh.
-     */
-    function bulkRefresh () {
-      var inst = editor.$tb ? (editor.$tb.data('instance') || editor) : editor;
-
-      // Check the refresh event.
-      if (editor.events.trigger('buttons.refresh') == false) return true;
-
-      setTimeout(function () {
-        var focused = (inst.selection.inEditor() && inst.core.hasFocus());
-
-        for (var i = 0; i < buttons.length; i++) {
-          var $btn = $(buttons[i]);
-          var cmd = $btn.data('cmd');
-          if ($btn.parents('.fr-popup').length == 0) {
-            if (focused || ($.FE.COMMANDS[cmd] && $.FE.COMMANDS[cmd].forcedRefresh)) {
-              inst.button.refresh($btn);
-            }
-            else {
-              if (!$btn.hasClass('fr-dropdown')) $btn.removeClass('fr-active');
-            }
-          }
-          else if ($btn.parents('.fr-popup').is(':visible')) {
-            inst.button.refresh($btn);
-          }
-        }
-      }, 0);
-    }
-
-    /**
-     * Initialize.
-     */
-    function _init () {
-      // Assign refresh and do refresh.
-      if (editor.opts.toolbarInline) {
-        editor.events.on('toolbar.show', bulkRefresh);
-      }
-      else {
-        editor.events.on('mouseup', bulkRefresh);
-        editor.events.on('keyup', bulkRefresh);
-        editor.events.on('blur', bulkRefresh);
-        editor.events.on('focus', bulkRefresh);
-        editor.events.on('contentChanged', bulkRefresh);
-      }
-    }
-
-    return {
-      _init: _init,
-      buildList: buildList,
-      bindCommands: bindCommands,
-      refresh: refresh,
-      bulkRefresh: bulkRefresh,
-      exec: exec
-    }
-  };
-
-
-  $.FE.MODULES.position = function (editor) {
-    /**
-    * Get bounding rect around selection.
-    *
-    */
-    function getBoundingRect () {
-      var boundingRect;
-
-      var range = editor.selection.ranges(0);
-      if (range && range.collapsed && editor.selection.inEditor()) {
-        var remove = false;
-        if (editor.$el.find('.fr-marker').length == 0) {
-          editor.selection.save();
-          remove = true;
-        }
-
-        var $marker = editor.$el.find('.fr-marker:first');
-        $marker.css('display', 'inline');
-        $marker.css('line-height', '');
-        var offset = $marker.offset();
-        var height = $marker.outerHeight();
-        $marker.css('display', 'none');
-        $marker.css('line-height', 0);
-
-        boundingRect = {}
-        boundingRect.left = offset.left;
-        boundingRect.width = 0;
-        boundingRect.height = height;
-        boundingRect.top = offset.top - $(editor.o_win).scrollTop();
-        boundingRect.right = 1;
-        boundingRect.bottom = 1;
-        boundingRect.ok = true;
-
-        if (remove) editor.selection.restore();
-      }
-      else if (range) {
-        boundingRect = range.getBoundingClientRect();
-      }
-
-      return boundingRect;
-    }
-
-    /**
-     * Normalize top positioning.
-     */
-    function _topNormalized ($el, top, obj_height) {
-      var height = $el.outerHeight();
-
-      if (!editor.helpers.isMobile() && editor.$tb && $el.parent().get(0) != editor.$tb.get(0)) {
-        // 1. Parent offset + toolbar top + toolbar height > document height.
-        // 2. Selection doesn't go above the screen.
-        var p_height = $el.parent().height() - 20 - (editor.opts.toolbarBottom ? editor.$tb.outerHeight() : 0);
-        var p_offset = $el.parent().offset().top;
-        var new_top = top - height - (obj_height || 0);
-
-        if ($el.parent().get(0) == $(editor.opts.scrollableContainer).get(0)) p_offset = p_offset - $el.parent().position().top;
-
-        if (p_offset + top + height > $(editor.o_doc).outerHeight() && $el.parent().offset().top + new_top > 0) {
-          top = new_top;
-          $el.addClass('fr-above');
-        }
-        else {
-          $el.removeClass('fr-above');
-        }
-      }
-
-      return top;
-    }
-
-    /**
-     * Normalize left position.
-     */
-    function _leftNormalized ($el, left) {
-      var width = $el.outerWidth();
-
-      // Normalize right.
-      if ($el.parent().offset().left + left + width > $(editor.opts.scrollableContainer).width() - 10) {
-       left = $(editor.opts.scrollableContainer).width() - width - 10 - $el.parent().offset().left + $(editor.opts.scrollableContainer).offset().left;
-      }
-
-      // Normalize left.
-      if ($el.parent().offset().left + left < $(editor.opts.scrollableContainer).offset().left) {
-        left = 10 - $el.parent().offset().left + $(editor.opts.scrollableContainer).offset().left;
-      }
-
-      return left;
-    }
-
-    /**
-     * Place editor below selection.
-     */
-    function forSelection ($el) {
-      var selection_rect = getBoundingRect();
-
-      $el.css('top', 0).css('left', 0);
-
-      var top = selection_rect.top + selection_rect.height;
-      var left = selection_rect.left + selection_rect.width / 2 - $el.outerWidth() / 2 + $(editor.o_win).scrollLeft();
-
-      if (!editor.opts.iframe) {
-        top += $(editor.o_win).scrollTop();
-      }
-
-      at(left, top, $el, selection_rect.height);
-    }
-
-    /**
-     * Position element at the specified position.
-     */
-    function at (left, top, $el, obj_height) {
-      var $container = $el.data('container');
-
-      if ($container && $container.get(0).tagName != 'BODY') {
-        if (left) left -= $container.offset().left;
-        if (top) top -= $container.offset().top - $container.scrollTop();
-      }
-
-      // Apply iframe correction.
-      if (editor.opts.iframe && $container && editor.$tb && $container.get(0) != editor.$tb.get(0)) {
-        if (left) left += editor.$iframe.offset().left;
-        if (top) top += editor.$iframe.offset().top;
-      }
-
-      var new_left = _leftNormalized($el, left);
-
-      if (left) {
-        // Set the new left.
-        $el.css('left', new_left);
-
-        // Normalize arrow.
-        var $arrow = $el.find('.fr-arrow');
-        if (!$arrow.data('margin-left')) $arrow.data('margin-left', editor.helpers.getPX($arrow.css('margin-left')));
-        $arrow.css('margin-left', left - new_left + $arrow.data('margin-left'));
-      }
-
-      if (top) $el.css('top', _topNormalized($el, top, obj_height));
-    }
-
-    /**
-     * Special case for update sticky on iOS.
-     */
-    function _updateIOSSticky (el) {
-      var $el = $(el);
-      var is_on = $el.is('.fr-sticky-on');
-      var prev_top = $el.data('sticky-top');
-      var scheduled_top = $el.data('sticky-scheduled');
-
-      // Create a dummy div that we show then sticky is on.
-			if (typeof prev_top == 'undefined') {
-        $el.data('sticky-top', 0);
-        var $dummy = $('<div class="fr-sticky-dummy" style="height: ' + $el.outerHeight() + 'px;"></div>');
-			  editor.$box.prepend($dummy);
-			}
-
-      // Position sticky doesn't work when the keyboard is on the screen.
-      if (editor.core.hasFocus() || editor.$tb.find('input:visible:focus').length > 0) {
-        // Get the current scroll.
-        var x_scroll = $(window).scrollTop();
-
-        // Get the current top.
-        // We make sure that we keep it within the editable box.
-        var x_top = Math.min(Math.max(x_scroll - editor.$tb.parent().offset().top, 0), editor.$tb.parent().outerHeight() - $el.outerHeight());
-
-        // Not the same top and different than the already scheduled.
-        if (x_top != prev_top && x_top != scheduled_top) {
-          // Clear any too soon change to avoid flickering.
-          clearTimeout($el.data('sticky-timeout'));
-
-          // Store the current scheduled top.
-          $el.data('sticky-scheduled', x_top);
-
-          // Hide the toolbar for a rich experience.
-          if ($el.outerHeight() < x_scroll - editor.$tb.parent().offset().top) {
-            $el.addClass('fr-opacity-0');
-          }
-
-          // Set the timeout for changing top.
-          // Based on the test 100ms seems to be the best timeout.
-          $el.data('sticky-timeout', setTimeout(function () {
-            // Get the current top.
-            var c_scroll = $(window).scrollTop();
-            var c_top = Math.min(Math.max(c_scroll - editor.$tb.parent().offset().top, 0), editor.$tb.parent().outerHeight() - $el.outerHeight());
-
-            if (c_top > 0 && editor.$tb.parent().get(0).tagName == 'BODY') c_top += editor.$tb.parent().position().top;
-
-            // Don't update if it is not different than the prev top.
-            if (c_top != prev_top) {
-              $el.css('top', Math.max(c_top, 0));
-
-              if (editor.$tb.hasClass('fr-inline')) {
-                $el.css('top', x_scroll);
-              }
-
-              $el.data('sticky-top', c_top);
-              $el.data('sticky-scheduled', c_top);
-            }
-
-            // Show toolbar.
-            $el.removeClass('fr-opacity-0');
-
-            if (editor.$tb.hasClass('fr-inline')) editor.toolbar.show();
-          }, 100));
-        }
-
-        // Turn on sticky mode.
-        if (!is_on) {
-          $el.css('top', '0');
-          $el.width(editor.$tb.parent().width());
-          $el.addClass('fr-sticky-on');
-          editor.$box.addClass('fr-sticky-box');
-        }
-      }
-
-      // Turn off sticky mode.
-      else {
-        clearTimeout($(el).css('sticky-timeout'));
-        $el.css('top', '0');
-        $el.css('position', '');
-        $el.width('');
-        $el.data('sticky-top', 0);
-        $el.removeClass('fr-sticky-on');
-        editor.$box.removeClass('fr-sticky-box');
-
-        if (editor.$tb.hasClass('fr-inline')) editor.toolbar.hide();
-      }
-    }
-
-    /**
-     * Update sticky location for browsers that don't support sticky.
-     * https://github.com/filamentgroup/fixed-sticky
-     *
-     * The MIT License (MIT)
-     *
-     * Copyright (c) 2013 Filament Group
-     */
-    function _updateSticky (el) {
-      if( !el.offsetWidth ) { return; }
-
-			var el_top;
-			var el_bottom;
-      var $el = $(el);
-      var height = $el.outerHeight();
-
-      var position = $el.data('sticky-position');
-
-      // Viewport height.
-      var viewport_height = $(editor.opts.scrollableContainer == 'body' ? editor.o_win : editor.opts.scrollableContainer).outerHeight();
-
-      var scrollable_top = 0;
-      var scrollable_bottom = 0;
-      if (editor.opts.scrollableContainer !== 'body') {
-        scrollable_top = $(editor.opts.scrollableContainer).offset().top;
-        scrollable_bottom = $(editor.o_win).outerHeight() - scrollable_top - viewport_height;
-      }
-
-      var offset_top = editor.opts.scrollableContainer == 'body' ? $(editor.o_win).scrollTop() : scrollable_top;
-
-			var is_on = $el.is('.fr-sticky-on');
-
-      // Decide parent.
-      if (!$el.data('sticky-parent')) {
-        $el.data('sticky-parent', $el.parent());
-      }
-      var $parent = $el.data('sticky-parent');
-		  var parent_top = $parent.offset().top;
-			var parent_height = $parent.outerHeight();
-
-
-			if (!$el.data('sticky-offset')) {
-				$el.data('sticky-offset', true);
-				$el.after('<div class="fr-sticky-dummy" style="height: ' + height + 'px;"></div>');
-			}
-
-      // Detect position placement.
-      if (!position) {
-				// Some browsers require fixed/absolute to report accurate top/left values.
-				var skip_setting_fixed = $el.css('top') !== 'auto' || $el.css('bottom') !== 'auto';
-
-        // Set to position fixed for a split of second.
-				if(!skip_setting_fixed) {
-					$el.css('position', 'fixed');
-				}
-
-        // Find position.
-				position = {
-					top: $el.css('top') !== 'auto',
-					bottom: $el.css('bottom') !== 'auto'
-				};
-
-        // Remove position fixed.
-				if(!skip_setting_fixed) {
-					$el.css('position', '');
-				}
-
-        // Store position.
-				$el.data('sticky-position', position);
-
-        $el.data('top', $el.css('top'));
-        $el.data('bottom', $el.css('bottom'));
-  		}
-
-      // Detect if is OK to fix at the top.
-			var isFixedToTop = function () {
-				// 1. Top condition.
-        // 2. Bottom condition.
-				return parent_top <  offset_top + el_top &&
-                parent_top + parent_height - height >= offset_top + el_top;
-			}
-
-      // Detect if it is OK to fix at the bottom.
-			var isFixedToBottom = function () {
-				return parent_top + height < offset_top + viewport_height - el_bottom &&
-        				parent_top + parent_height > offset_top + viewport_height - el_bottom ;
-			}
-
-			el_top = editor.helpers.getPX($el.data('top'));
-			el_bottom = editor.helpers.getPX($el.data('bottom'));
-
-      var at_top = (position.top && isFixedToTop());
-      var at_bottom = (position.bottom && isFixedToBottom());
-
-      // Should be fixed.
-			if (at_top || at_bottom) {
-        $el.css('width', $parent.width() + 'px');
-
-        if (!is_on) {
-					$el.addClass('fr-sticky-on')
-          $el.removeClass('fr-sticky-off');
-
-          if ($el.css('top')) {
-            if ($el.data('top') != 'auto') {
-              $el.css('top', editor.helpers.getPX($el.data('top')) + scrollable_top);
-            }
-            else {
-              $el.data('top', 'auto');
-            }
-          }
-
-          if ($el.css('bottom')) {
-            if ($el.data('bottom') != 'auto') {
-              $el.css('bottom', editor.helpers.getPX($el.data('bottom')) + scrollable_bottom);
-            }
-            else {
-              $el.css('bottom', 'auto');
-            }
-          }
-				}
-			}
-
-      // Shouldn't be fixed.
-      else {
-				if (!$el.hasClass('fr-sticky-off')) {
-          // Reset.
-          $el.width('');
-          $el.removeClass('fr-sticky-on');
-          $el.addClass('fr-sticky-off');
-
-          if ($el.css('top') && $el.css('top') != 'auto') {
-            $el.css('top', 0);
-          }
-          if ($el.css('bottom')) $el.css('bottom', 0);
-				}
-      }
-    }
-
-   /**
-    * Test if browser supports sticky.
-    * https://github.com/filamentgroup/fixed-sticky
-    *
-    * The MIT License (MIT)
-    *
-    * Copyright (c) 2013 Filament Group
-    */
-    function _testSticky () {
-      var el = document.createElement('test');
-  		var mStyle = el.style;
-
-			mStyle.cssText = 'position:' + [ '-webkit-', '-moz-', '-ms-', '-o-', '' ].join('sticky; position:') + ' sticky;';
-
-  		return mStyle['position'].indexOf('sticky') !== -1 && !editor.helpers.isIOS() && !editor.helpers.isAndroid();
-    }
-
-    /**
-     * Initialize sticky position.
-     */
-    function _initSticky () {
-      if (!_testSticky()) {
-        editor._stickyElements = [];
-
-        // iOS special case.
-        if (editor.helpers.isIOS()) {
-          // Use an animation frame to make sure we're always OK with the updates.
-          var animate = function () {
-            editor.helpers.requestAnimationFrame()(animate);
-
-            for (var i = 0; i < editor._stickyElements.length; i++) {
-              _updateIOSSticky(editor._stickyElements[i]);
-            }
-          };
-          animate();
-
-          // Hide toolbar on touchmove. This is very useful on iOS versions < 8.
-          editor.events.$on($(editor.o_win), 'scroll', function () {
-            if (editor.core.hasFocus()) {
-              for (var i = 0; i < editor._stickyElements.length; i++) {
-                var $el = $(editor._stickyElements[i]);
-                var $parent = $el.parent();
-                var c_scroll = $(window).scrollTop();
-
-                if ($el.outerHeight() < c_scroll - $parent.offset().top) {
-                  $el.addClass('fr-opacity-0');
-                  $el.data('sticky-top', -1);
-                  $el.data('sticky-scheduled', -1);
-                }
-              }
-            }
-          }, true);
-        }
-
-        // Default case. Do the updates on scroll.
-        else {
-          editor.events.$on($(editor.opts.scrollableContainer == 'body' ? editor.o_win : editor.opts.scrollableContainer), 'scroll', refresh, true);
-          editor.events.$on($(editor.o_win), 'resize', refresh, true);
-
-          editor.events.on('initialized', refresh);
-          editor.events.on('focus', refresh);
-
-          editor.events.$on($(editor.o_win), 'resize', 'textarea', refresh, true);
-        }
-      }
-    }
-
-    function refresh () {
-      for (var i = 0; i < editor._stickyElements.length; i++) {
-        _updateSticky(editor._stickyElements[i]);
-      }
-    }
-
-    /**
-     * Mark element as sticky.
-     */
-    function addSticky ($el) {
-      $el.addClass('fr-sticky');
-
-      if (editor.helpers.isIOS()) $el.addClass('fr-sticky-ios');
-
-      if (!_testSticky()) {
-        editor._stickyElements.push($el.get(0));
-      }
-    }
-
-    function _init () {
-      _initSticky();
-    }
-
-    return {
-      _init: _init,
-      forSelection: forSelection,
-      addSticky: addSticky,
-      refresh: refresh,
-      at: at,
-      getBoundingRect: getBoundingRect
-    }
-  };
-
-
-  // Extend defaults.
   $.extend($.FE.DEFAULTS, {
-    toolbarBottom: false,
-    toolbarButtons: ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html'],
-    toolbarButtonsXS: ['bold', 'italic', 'fontFamily', 'fontSize', '|', 'undo', 'redo'],
-    toolbarButtonsSM: ['bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'insertLink', 'insertImage', 'table', '|', 'undo', 'redo'],
-    toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
-    toolbarContainer: null,
-    toolbarInline: false,
-    toolbarSticky: true,
-    toolbarStickyOffset: 0,
-    toolbarVisibleWithoutSelection: false
+    shortcutsEnabled: ['show', 'bold', 'italic', 'underline', 'strikeThrough', 'indent', 'outdent', 'undo', 'redo'],
+    shortcutsHint: true
   });
 
-  $.FE.MODULES.toolbar = function (editor) {
-    var _document, _window;
+  $.FE.SHORTCUTS_MAP = {};
 
-    // Create a button map for each screen size.
-    var _buttons_map = [];
-    _buttons_map[$.FE.XS] = editor.opts.toolbarButtonsXS || editor.opts.toolbarButtons;
-    _buttons_map[$.FE.SM] = editor.opts.toolbarButtonsSM || editor.opts.toolbarButtons;
-    _buttons_map[$.FE.MD] = editor.opts.toolbarButtonsMD || editor.opts.toolbarButtons;
-    _buttons_map[$.FE.LG] = editor.opts.toolbarButtons;
-
-    function _addOtherButtons (buttons, toolbarButtons) {
-      for (var i = 0; i < toolbarButtons.length; i++) {
-        if (toolbarButtons[i] != '-' && toolbarButtons[i] != '|' && buttons.indexOf(toolbarButtons[i]) < 0) {
-          buttons.push(toolbarButtons[i]);
-        }
-      }
-    }
-
-    /**
-     * Add buttons to the toolbar.
-     */
-    function _addButtons () {
-      var _buttons = $.merge([], _screenButtons());
-      _addOtherButtons(_buttons, editor.opts.toolbarButtonsXS || []);
-      _addOtherButtons(_buttons, editor.opts.toolbarButtonsSM || []);
-      _addOtherButtons(_buttons, editor.opts.toolbarButtonsMD || []);
-      _addOtherButtons(_buttons, editor.opts.toolbarButtons);
-
-      for (var i = _buttons.length - 1; i >= 0; i--) {
-        if (_buttons[i] != '-' && _buttons[i] != '|' && _buttons.indexOf(_buttons[i]) < i) {
-          _buttons.splice(i, 1);
-        }
-      }
-
-      var buttons_list = editor.button.buildList(_buttons, _screenButtons());
-      editor.$tb.append(buttons_list);
-      editor.button.bindCommands(editor.$tb);
-    }
-
-    /**
-     * The buttons that should be visible on the current screen size.
-     */
-    function _screenButtons () {
-      var screen_size = editor.helpers.screenSize();
-      return _buttons_map[screen_size];
-    }
-
-    function _showScreenButtons () {
-      var c_buttons = _screenButtons();
-
-      // Remove separator from toolbar.
-      editor.$tb.find('.fr-separator').remove();
-
-      // Hide all buttons.
-      editor.$tb.find('> .fr-command').addClass('fr-hidden');
-
-      // Reorder buttons.
-      for (var i = 0; i < c_buttons.length; i++) {
-        if (c_buttons[i] == '|' || c_buttons[i] == '-') {
-          editor.$tb.append(editor.button.buildList([c_buttons[i]]));
-        }
-        else {
-          var $btn = editor.$tb.find('> .fr-command[data-cmd="' + c_buttons[i] + '"]');
-          var $dropdown = null;
-          if ($btn.next().hasClass('fr-dropdown-menu')) $dropdown = $btn.next();
-
-          $btn.removeClass('fr-hidden').appendTo(editor.$tb);
-          if ($dropdown) $dropdown.appendTo(editor.$tb);
-        }
-      }
-    }
-
-    /**
-     * Set the buttons visibility based on screen size.
-     */
-    function _setVisibility () {
-      editor.events.$on($(editor.o_win), 'resize', _showScreenButtons, true);
-      editor.events.$on($(editor.o_win), 'orientationchange', _showScreenButtons, true);
-    }
-
-    function showInline (e, force) {
-      if (editor.helpers.isMobile()) {
-        editor.toolbar.show();
-      }
-      else {
-        setTimeout(function () {
-          if (e && e.which == $.FE.KEYCODE.ESC) {
-            // Nothing.
-          }
-          else if (editor.selection.inEditor() && editor.core.hasFocus() && !editor.popups.areVisible()) {
-            if ((editor.opts.toolbarVisibleWithoutSelection && e && e.type != 'keyup') || (!editor.selection.isCollapsed() && !editor.keys.isIME()) || force) {
-              editor.$tb.data('instance', editor);
-
-              // Check if we should actually show the toolbar.
-              if (editor.events.trigger('toolbar.show', [e]) == false) return false;
-
-              if (!editor.helpers.isMobile() && !editor.opts.toolbarContainer) {
-                editor.position.forSelection(editor.$tb);
-              }
-
-              editor.$tb.show();
-            }
-          }
-        }, 0);
-      }
-    }
-
-    function hide (e) {
-      // Check if we should actually hide the toolbar.
-      if (editor.events.trigger('toolbar.hide') == false) return false;
-
-      editor.$tb.hide();
-    }
-
-    function show () {
-      // Check if we should actually hide the toolbar.
-      if (editor.events.trigger('toolbar.show') == false) return false;
-
-      editor.$tb.show();
-    }
-
-    /**
-     * Set the events for show / hide toolbar.
-     */
-    function _initInlineBehavior () {
-      // Window mousedown.
-      editor.events.on('window.mousedown', hide);
-
-      // Element keydown.
-      editor.events.on('keydown', hide);
-
-      // Element blur.
-      editor.events.on('blur', hide);
-
-      // Window mousedown.
-      editor.events.on('window.mouseup', showInline);
-      editor.events.on('window.keyup', showInline);
-
-      // Hide editor on ESC.
-      editor.events.on('keydown', function (e) {
-        if (e && e.which == $.FE.KEYCODE.ESC) {
-          hide();
-        }
-      });
-
-      editor.events.$on(editor.$wp, 'scroll.toolbar', showInline);
-      editor.events.on('commands.after', showInline);
-    }
-
-    /**
-     * Set the events for show / hide toolbar when on mobile.
-     */
-    function _initInlineMobileBehavior () {
-      editor.events.on('focus', showInline, true);
-
-      editor.events.on('blur', hide, true)
-    }
-
-    function _initPositioning () {
-      // Toolbar is inline.
-      if (editor.opts.toolbarInline) {
-        // Mobile should handle this as regular.
-        if (!editor.helpers.isMobile()) {
-          $(editor.opts.scrollableContainer).append(editor.$tb);
-
-          // Add toolbar to body.
-          editor.$tb.data('container', $(editor.opts.scrollableContainer));
-
-          // Add inline class.
-          editor.$tb.addClass('fr-inline');
-
-          // Add arrow.
-          editor.$tb.prepend('<span class="fr-arrow"></span>')
-
-          // Init mouse behavior.
-          _initInlineBehavior();
-
-          editor.opts.toolbarBottom = false;
-        }
-        else {
-          if (editor.helpers.isIOS()) {
-            $(editor.opts.scrollableContainer).prepend(editor.$tb);
-            editor.position.addSticky(editor.$tb);
-          }
-          else {
-            editor.$tb.addClass('fr-bottom');
-            editor.$box.append(editor.$tb);
-            editor.position.addSticky(editor.$tb);
-            editor.opts.toolbarBottom = true;
-          }
-
-          editor.$tb.addClass('fr-inline');
-          _initInlineMobileBehavior();
-
-          editor.opts.toolbarInline = false;
-        }
-      }
-
-      // Toolbar is normal.
-      else {
-        // Won't work on iOS.
-        if (editor.opts.toolbarBottom && !editor.helpers.isIOS()) {
-          editor.$box.append(editor.$tb);
-          editor.$tb.addClass('fr-bottom');
-          editor.$box.addClass('fr-bottom');
-        }
-        else {
-          editor.opts.toolbarBottom = false;
-          editor.$box.prepend(editor.$tb);
-          editor.$tb.addClass('fr-top');
-          editor.$box.addClass('fr-top');
-        }
-
-        editor.$tb.addClass('fr-basic');
-
-        if (editor.opts.toolbarSticky) {
-          if (editor.opts.toolbarStickyOffset) {
-            if (editor.opts.toolbarBottom) {
-              editor.$tb.css('bottom', editor.opts.toolbarStickyOffset);
-            }
-            else {
-              editor.$tb.css('top', editor.opts.toolbarStickyOffset);
-            }
-          }
-
-          editor.position.addSticky(editor.$tb);
-        }
-      }
-    }
-
-    /**
-     * Destroy.
-     */
-    function _sharedDestroy () {
-      editor.$tb.html('').removeData().remove();
-    }
-
-    function _destroy () {
-      editor.$box.removeClass('fr-top fr-bottom fr-inline fr-basic');
-      editor.$box.find('.fr-sticky-dummy').remove();
-    }
-
-    function _setDefaults () {
-      if (editor.opts.theme) {
-        editor.$tb.addClass(editor.opts.theme + '-theme');
-      }
-
-      if (editor.opts.zIndex > 1) {
-        editor.$tb.css('z-index', editor.opts.zIndex + 1);
-      }
-
-      // Set direction.
-      if (editor.opts.direction != 'auto') {
-        editor.$tb.removeClass('fr-ltr fr-rtl').addClass('fr-' + editor.opts.direction);
-      }
-
-      // Mark toolbar for desktop / mobile.
-      if (!editor.helpers.isMobile()) {
-        editor.$tb.addClass('fr-desktop');
-      }
-      else {
-        editor.$tb.addClass('fr-mobile');
-      }
-
-      // Set the toolbar specific position inline / normal.
-      if (!editor.opts.toolbarContainer) {
-        _initPositioning();
-      }
-      else {
-        if (editor.opts.toolbarInline) {
-          _initInlineBehavior();
-          hide();
-        }
-
-        if (editor.opts.toolbarBottom) editor.$tb.addClass('fr-bottom');
-        else editor.$tb.addClass('fr-top');
-      }
-
-      // Set documetn and window for toolbar.
-      _document = editor.$tb.get(0).ownerDocument;
-      _window = 'defaultView' in _document ? _document.defaultView : _document.parentWindow;
-
-      // Add buttons to the toolbar.
-      // Set their visibility for different screens.
-      // Asses commands to the butttons.
-      _addButtons();
-      _setVisibility();
-
-      // Make sure we don't trigger blur.
-      editor.events.$on(editor.$tb, editor._mousedown + ' ' + editor._mouseup, function (e) {
-        var originalTarget = e.originalEvent ? (e.originalEvent.target || e.originalEvent.originalTarget) : null;
-        if (originalTarget && originalTarget.tagName != 'INPUT') {
-          e.stopPropagation();
-          e.preventDefault();
-          return false;
-        }
-      }, true);
-    }
-
-    /**
-     * Initialize
-     */
-    var tb_exists = false;
-    function _init () {
-      if (!editor.$wp) return false;
-
-      // Container for toolbar.
-      if (editor.opts.toolbarContainer) {
-        // Shared toolbar.
-        if (!editor.shared.$tb) {
-          editor.shared.$tb = $('<div class="fr-toolbar"></div>');
-          editor.$tb = editor.shared.$tb;
-          $(editor.opts.toolbarContainer).append(editor.$tb);
-          _setDefaults();
-          editor.$tb.data('instance', editor);
-        }
-        else {
-          editor.$tb = editor.shared.$tb;
-
-          if (editor.opts.toolbarInline) _initInlineBehavior();
-        }
-
-        // On focus set the current instance.
-        editor.events.on('focus', function () {
-          editor.$tb.data('instance', editor);
-        }, true);
-
-        editor.opts.toolbarInline = false;
-      }
-      else {
-        // Inline toolbar.
-        if (editor.opts.toolbarInline) {
-          // Update box.
-          editor.$box.addClass('fr-inline');
-
-          // Check for shared toolbar.
-          if (!editor.shared.$tb) {
-            editor.shared.$tb = $('<div class="fr-toolbar"></div>');
-            editor.$tb = editor.shared.$tb;
-            _setDefaults();
-          }
-          else {
-            editor.$tb = editor.shared.$tb;
-
-            // Init mouse behavior.
-            _initInlineBehavior();
-          }
-        }
-        else {
-          editor.$box.addClass('fr-basic');
-          editor.$tb = $('<div class="fr-toolbar"></div>');
-          _setDefaults();
-
-          editor.$tb.data('instance', editor);
-        }
-      }
-
-      // Destroy.
-      editor.events.on('destroy', _destroy, true);
-      editor.events.on(!editor.opts.toolbarInline ? 'destroy' : 'shared.destroy', _sharedDestroy, true);
-    }
-
-    var disabled = false;
-    function disable () {
-      if (!disabled && editor.$tb) {
-        editor.$tb.find('> .fr-command').addClass('fr-disabled fr-no-refresh');
-        disabled = true;
-      }
-    }
-
-    function enable () {
-      if (disabled && editor.$tb) {
-        editor.$tb.find('> .fr-command').removeClass('fr-disabled fr-no-refresh');
-        disabled = false;
-      }
-
-      editor.button.bulkRefresh();
-    }
-
-    return {
-      _init: _init,
-      hide: hide,
-      show: show,
-      showInline: showInline,
-      disable: disable,
-      enable: enable
-    }
-  };
-
-
-  $.FE.SHORTCUTS_MAP = {
-    69: { cmd: 'show' },
-    66: { cmd: 'bold' },
-    73: { cmd: 'italic' },
-    85: { cmd: 'underline' },
-    83: { cmd: 'strikeThrough' },
-    221: { cmd: 'indent' },
-    219: { cmd: 'outdent' },
-    90: { cmd: 'undo' },
-    '-90': { cmd: 'redo' }
-  }
-
-  $.extend($.FE.DEFAULTS, {
-    shortcutsEnabled: ['show', 'bold', 'italic', 'underline', 'strikeThrough', 'indent', 'outdent', 'undo', 'redo']
-  });
-
-  $.FE.RegisterShortcut = function (key, cmd, val, shift) {
-    $.FE.SHORTCUTS_MAP[key * (shift ? -1 : 1)] = {
+  $.FE.RegisterShortcut = function (key, cmd, val, letter, shift, option) {
+    $.FE.SHORTCUTS_MAP[(shift ? '^' : '') + (option ? '@' : '') + key] = {
       cmd: cmd,
-      val: val
+      val: val,
+      letter: letter,
+      shift: shift,
+      option: option
     }
 
     $.FE.DEFAULTS.shortcutsEnabled.push(cmd);
   }
 
+  $.FE.RegisterShortcut($.FE.KEYCODE.E, 'show', null, 'E', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.B, 'bold', null, 'B', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.I, 'italic', null, 'I', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.U, 'underline', null, 'U', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.S, 'strikeThrough', null, 'S', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.CLOSE_SQUARE_BRACKET, 'indent', null, ']', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.OPEN_SQUARE_BRACKET, 'outdent', null, '[', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.Z, 'undo', null, 'Z', false, false);
+  $.FE.RegisterShortcut($.FE.KEYCODE.Z, 'redo', null, 'Z', true, false);
+
   $.FE.MODULES.shortcuts = function (editor) {
+    var inverse_map = null;
+
+    function get (cmd) {
+      if (!editor.opts.shortcutsHint) return null;
+
+      if (!inverse_map) {
+        inverse_map = {};
+        for (var key in $.FE.SHORTCUTS_MAP) {
+          if ($.FE.SHORTCUTS_MAP.hasOwnProperty(key) && editor.opts.shortcutsEnabled.indexOf($.FE.SHORTCUTS_MAP[key].cmd) >= 0) {
+            inverse_map[$.FE.SHORTCUTS_MAP[key].cmd + '.' + ($.FE.SHORTCUTS_MAP[key].val || '')] = {
+              shift: $.FE.SHORTCUTS_MAP[key].shift,
+              option: $.FE.SHORTCUTS_MAP[key].option,
+              letter: $.FE.SHORTCUTS_MAP[key].letter
+            }
+          }
+        }
+      }
+
+      var srct = inverse_map[cmd];
+
+      if (!srct) return null;
+      return (editor.helpers.isMac() ? String.fromCharCode(8984) : 'Ctrl+') + (srct.shift ? (editor.helpers.isMac() ? String.fromCharCode(8679) : 'Shift+') : '') + (srct.option ? (editor.helpers.isMac() ? String.fromCharCode(8997) : 'Alt+') : '') + srct.letter;
+    }
 
     /**
      * Execute shortcut.
      */
     function exec (e) {
+      if (!editor.core.hasFocus()) return true;
+
       var keycode = e.which;
 
-      // CTRL key.
-      // If SHIFT then check for negative.
-      // If no SHIFT then check normal.
-      if (editor.keys.ctrlKey(e) && ((e.shiftKey && $.FE.SHORTCUTS_MAP[-keycode]) ||  (!e.shiftKey && $.FE.SHORTCUTS_MAP[keycode]))) {
-        var cmd = $.FE.SHORTCUTS_MAP[keycode * (e.shiftKey ? -1 : 1)].cmd;
+      var ctrlKey = navigator.userAgent.indexOf('Mac OS X') != -1 ? e.metaKey : e.ctrlKey;
+
+      // Build shortcuts map.
+      var map_key = (e.shiftKey ? '^' : '') + (e.altKey ? '@' : '') + keycode;
+      if (ctrlKey && $.FE.SHORTCUTS_MAP[map_key]) {
+        var cmd = $.FE.SHORTCUTS_MAP[map_key].cmd;
 
         // Check if shortcut is enabled.
         if (cmd && editor.opts.shortcutsEnabled.indexOf(cmd) >= 0) {
-          var val = $.FE.SHORTCUTS_MAP[keycode * (e.shiftKey ? -1 : 1)].val;
+          var val = $.FE.SHORTCUTS_MAP[map_key].val;
 
           // Search for button.
           var $btn;
@@ -8913,6 +8347,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           if ($btn.length) {
             e.preventDefault();
             e.stopPropagation();
+
+            $btn.parents('.fr-toolbar').data('instance', editor);
 
             if (e.type == 'keydown') {
               editor.button.exec($btn);
@@ -8940,12 +8376,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      * Initialize.
      */
     function _init () {
-      editor.events.on('keydown', exec, true)
-      editor.events.on('keyup', exec, true)
+      editor.events.on('keydown', exec, true);
     }
 
     return {
-      _init: _init
+      _init: _init,
+      get: get
     }
   }
 
@@ -9024,10 +8460,10 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       editor.events.trigger('snapshot.before');
 
-      snapshot.html = editor.$el.html();
+      snapshot.html = editor.$wp ? editor.$el.html() : editor.$oel.get(0).outerHTML;
 
       snapshot.ranges = [];
-      if (editor.selection.inEditor() && editor.core.hasFocus()) {
+      if (editor.$wp && editor.selection.inEditor() && editor.core.hasFocus()) {
         var ranges = editor.selection.ranges();
         for (var i = 0; i < ranges.length; i++) {
           snapshot.ranges.push(_getRange(ranges[i]));
@@ -9101,7 +8537,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      */
     function equal (s1, s2) {
       if (s1.html != s2.html) return false;
-      if (JSON.stringify(s1.ranges) != JSON.stringify(s2.ranges)) return false;
+      if (editor.core.hasFocus() && JSON.stringify(s1.ranges) != JSON.stringify(s2.ranges)) return false;
 
       return true;
     }
@@ -9152,14 +8588,13 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
     var last_html = null;
     function saveStep (snapshot) {
-      if (!editor.undo_stack || editor.undoing) return false;
-
-      dropRedo();
+      if (!editor.undo_stack || editor.undoing || editor.$el.get(0).querySelectorAll('.fr-marker').length) return false;
 
       if (typeof snapshot == 'undefined') {
         snapshot = editor.snapshot.get();
 
         if (!editor.undo_stack[editor.undo_index - 1] || !editor.snapshot.equal(editor.undo_stack[editor.undo_index - 1], snapshot)) {
+          dropRedo();
           editor.undo_stack.push(snapshot);
           editor.undo_index++;
 
@@ -9170,6 +8605,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         }
       }
       else {
+        dropRedo();
         if (editor.undo_index > 0) {
           editor.undo_stack[editor.undo_index - 1] = snapshot;
         }
@@ -9249,6 +8685,10 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       editor.undo_stack = [];
     }
 
+    function _destroy () {
+      editor.undo_stack = [];
+    }
+
     /**
      * Initialize
      */
@@ -9263,6 +8703,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       })
 
       editor.events.on('keydown', _disableBrowserUndo);
+
+      editor.events.on('destroy', _destroy);
     }
 
     return {
@@ -9274,6 +8716,469 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       dropRedo: dropRedo,
       reset: reset,
       saveStep: saveStep
+    }
+  };
+
+
+  $.FE.ICON_DEFAULT_TEMPLATE = 'font_awesome';
+
+  $.FE.ICON_TEMPLATES = {
+    font_awesome: '<i class="fa fa-[NAME]"></i>',
+    text: '<span style="text-align: center;">[NAME]</span>',
+    image: '<img src=[SRC] alt=[ALT] />'
+  }
+
+  $.FE.ICONS = {
+    bold: {NAME: 'bold'},
+    italic: {NAME: 'italic'},
+    underline: {NAME: 'underline'},
+    strikeThrough: {NAME: 'strikethrough'},
+    subscript: {NAME: 'subscript'},
+    superscript: {NAME: 'superscript'},
+    color: {NAME: 'tint'},
+    outdent: {NAME: 'outdent'},
+    indent: {NAME: 'indent'},
+    undo: {NAME: 'rotate-left'},
+    redo: {NAME: 'rotate-right'},
+    insertHR: {NAME: 'minus'},
+    clearFormatting: {NAME: 'eraser'},
+    selectAll: {NAME: 'mouse-pointer'}
+  }
+
+  $.FE.DefineIconTemplate = function (name, options) {
+    $.FE.ICON_TEMPLATES[name] = options;
+  }
+
+  $.FE.DefineIcon = function (name, options) {
+    $.FE.ICONS[name] = options;
+  }
+
+  $.FE.MODULES.icon = function (editor) {
+    function create (command) {
+      var icon = null;
+      var info = $.FE.ICONS[command];
+      if (typeof info != 'undefined') {
+        var template = info.template || $.FE.ICON_DEFAULT_TEMPLATE;
+        if (template && (template = $.FE.ICON_TEMPLATES[template])) {
+          icon = template.replace(/\[([a-zA-Z]*)\]/g, function (str, a1) {
+            return (a1 == 'NAME' ? (info[a1] || command) : info[a1]);
+          });
+        }
+      }
+
+      return (icon || command);
+    }
+
+    return {
+      create: create
+    }
+  };
+
+
+  $.FE.MODULES.button = function (editor) {
+    var buttons = [];
+
+    if (editor.opts.toolbarInline || editor.opts.toolbarContainer) {
+      if (!editor.shared.buttons) editor.shared.buttons = [];
+      buttons = editor.shared.buttons;
+    }
+
+    var popup_buttons = [];
+    if (!editor.shared.popup_buttons) editor.shared.popup_buttons = [];
+    popup_buttons = editor.shared.popup_buttons;
+
+    /**
+     * Click was made on a dropdown button.
+     */
+    function _dropdownButtonClick (e) {
+      // Get current btn and dropdown.
+      var $btn = $(e.currentTarget);
+      var $dropdown = $btn.next();
+
+      var active = $btn.hasClass('fr-active');
+      var mobile = editor.helpers.isMobile();
+
+      var $active_dropdowns = $('.fr-dropdown.fr-active').not($btn);
+
+      var inst = $btn.parents('.fr-toolbar, .fr-popup').data('instance') || editor;
+
+      // Hide keyboard. We need the entire space.
+      if (inst.helpers.isIOS() && inst.$el.get(0).querySelectorAll('.fr-marker').length == 0) {
+        inst.selection.save();
+        inst.selection.clear();
+        inst.selection.restore();
+      }
+
+      // Dropdown is not active.
+      if (!active) {
+        // Call refresh on show.
+        var cmd = $btn.data('cmd');
+        $dropdown.find('.fr-command').removeClass('fr-active');
+        if ($.FE.COMMANDS[cmd] && $.FE.COMMANDS[cmd].refreshOnShow) {
+          $.FE.COMMANDS[cmd].refreshOnShow.apply(inst, [$btn, $dropdown]);
+        }
+
+        $dropdown.css('left', $btn.offset().left - $btn.parent().offset().left - (editor.opts.direction == 'rtl' ? $dropdown.width() - $btn.outerWidth() : 0));
+
+        if (!editor.opts.toolbarBottom) {
+          $dropdown.css('top', $btn.position().top + $btn.outerHeight());
+        }
+        else {
+          $dropdown.css('bottom', editor.$tb.height() - $btn.position().top);
+        }
+      }
+
+      // Blink and activate.
+      $btn.addClass('fr-blink').toggleClass('fr-active');
+      setTimeout (function () {
+        $btn.removeClass('fr-blink');
+      }, 300);
+
+      // Check if it exceeds window on the right.
+      if ($dropdown.offset().left + $dropdown.outerWidth() > $(editor.opts.scrollableContainer).offset().left +  $(editor.opts.scrollableContainer).outerWidth()) {
+        $dropdown.css('margin-left', -($dropdown.offset().left + $dropdown.outerWidth() - $(editor.opts.scrollableContainer).offset().left - $(editor.opts.scrollableContainer).outerWidth()))
+      }
+
+      // Hide dropdowns that might be active.
+      $active_dropdowns.removeClass('fr-active');
+      $active_dropdowns.parent('.fr-toolbar:not(.fr-inline)').css('zIndex', '');
+
+      if ($btn.parents('.fr-popup').length == 0 && !editor.opts.toolbarInline) {
+        if ($btn.hasClass('fr-active')) {
+          editor.$tb.css('zIndex', (editor.opts.zIndex || 1) + 4);
+        }
+        else {
+          editor.$tb.css('zIndex', '');
+        }
+      }
+    }
+
+    function exec ($btn) {
+      // Blink.
+      $btn.addClass('fr-blink');
+      setTimeout (function () {
+        $btn.removeClass('fr-blink');
+      }, 500);
+
+      // Get command, value and additional params.
+      var cmd = $btn.data('cmd');
+      var params = [];
+      while (typeof $btn.data('param' + (params.length + 1)) != 'undefined') {
+        params.push($btn.data('param' + (params.length + 1)));
+      }
+
+      // Hide dropdowns that might be active including the current one.
+      var $active_dropdowns = $('.fr-dropdown.fr-active');
+      if ($active_dropdowns.length) {
+        $active_dropdowns.removeClass('fr-active');
+
+        $active_dropdowns.parent('.fr-toolbar:not(.fr-inline)').css('zIndex', '');
+      }
+
+      // Call the command.
+      $btn.parents('.fr-popup, .fr-toolbar').data('instance').commands.exec(cmd, params);
+    }
+
+    /**
+     * Click was made on a command button.
+     */
+    function _commandButtonClick (e) {
+      var $btn = $(e.currentTarget);
+      exec($btn);
+    }
+
+    function _click (e) {
+      var $btn = $(e.currentTarget);
+
+      var inst = $btn.parents('.fr-popup, .fr-toolbar').data('instance');
+
+      if ($btn.parents('.fr-popup').length == 0 && !$btn.data('popup')) {
+        inst.popups.hideAll();
+      }
+
+      // Popups are visible, but not in the current instance.
+      if (inst.popups.areVisible() && !inst.popups.areVisible(inst)) {
+        // Hide markers in other instances.
+        for (var i = 0; i < $.FE.INSTANCES.length; i++) {
+          if ($.FE.INSTANCES[i] != inst && $.FE.INSTANCES[i].popups && $.FE.INSTANCES[i].popups.areVisible()) {
+            $.FE.INSTANCES[i].$el.find('.fr-marker').remove();
+          }
+        }
+
+        inst.popups.hideAll();
+      }
+
+      // Dropdown button.
+      if ($btn.hasClass('fr-dropdown')) {
+        _dropdownButtonClick(e);
+      }
+
+      // Regular button.
+      else {
+        _commandButtonClick(e);
+
+        if ($.FE.COMMANDS[$btn.data('cmd')] && $.FE.COMMANDS[$btn.data('cmd')].refreshAfterCallback != false) {
+          inst.button.bulkRefresh();
+        }
+      }
+    }
+
+    function _hideActiveDropdowns ($el) {
+      var $active_dropdowns = $el.find('.fr-dropdown.fr-active');
+
+      if ($active_dropdowns.length) {
+        $active_dropdowns.removeClass('fr-active');
+
+        $active_dropdowns.parent('.fr-toolbar:not(.fr-inline)').css('zIndex', '');
+      }
+    }
+
+    /**
+     * Click in the dropdown menu.
+     */
+    function _dropdownMenuClick (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    /**
+     * Click on the dropdown wrapper.
+     */
+    function _dropdownWrapperClick (e) {
+      e.stopPropagation();
+
+      // Prevent blurring.
+      if (!editor.helpers.isMobile()) {
+        return false;
+      }
+    }
+
+    /**
+     * Bind callbacks for commands.
+     */
+    function bindCommands ($el, tooltipAbove) {
+      editor.events.bindClick($el, '.fr-command:not(.fr-disabled)', _click);
+
+      // Click on the dropdown menu.
+      editor.events.$on($el, editor._mousedown + ' ' + editor._mouseup + ' ' + editor._move, '.fr-dropdown-menu', _dropdownMenuClick, true);
+
+      // Click on the dropdown wrapper.
+      editor.events.$on($el, editor._mousedown + ' ' + editor._mouseup + ' ' + editor._move, '.fr-dropdown-menu .fr-dropdown-wrapper', _dropdownWrapperClick, true);
+
+      // Hide dropdowns that might be active.
+      var _document = $el.get(0).ownerDocument;
+      var _window = 'defaultView' in _document ? _document.defaultView : _document.parentWindow;
+      var hideDropdowns = function (e) {
+        if (!e || (e.type == editor._mouseup && e.target != $('html').get(0)) || (e.type == 'keydown' && ((editor.keys.isCharacter(e.which) && !editor.keys.ctrlKey(e)) || e.which == $.FE.KEYCODE.ESC))) {
+          _hideActiveDropdowns($el);
+        }
+      }
+      editor.events.$on($(_window), editor._mouseup + ' resize keydown', hideDropdowns, true);
+
+      if (editor.opts.iframe) {
+        editor.events.$on(editor.$win, editor._mouseup, hideDropdowns, true);
+      }
+
+      // Add refresh.
+      if ($el.hasClass('fr-popup')) {
+        $.merge(popup_buttons, $el.find('.fr-btn').toArray());
+      }
+      else {
+        $.merge(buttons, $el.find('.fr-btn').toArray());
+      }
+
+      // Assing tooltips to buttons.
+      editor.tooltip.bind($el, '.fr-btn, .fr-title', tooltipAbove);
+    }
+
+    /**
+     * Create the content for dropdown.
+     */
+    function _content (command, info) {
+      var c = '';
+
+      if (info.html) {
+        if (typeof info.html == 'function') {
+          c += info.html.call(editor);
+        }
+        else {
+          c += info.html;
+        }
+      }
+      else {
+        var options = info.options;
+        if (typeof options == 'function') options = options();
+
+        c += '<ul class="fr-dropdown-list">';
+        for (var val in options) {
+          if (options.hasOwnProperty(val)) {
+            var shortcut = editor.shortcuts.get(command + '.' + val);
+            if (shortcut) {
+              shortcut = '<span class="fr-shortcut">' + shortcut + '</span>';
+            }
+            else {
+              shortcut = '';
+            }
+
+            c += '<li><a class="fr-command" data-cmd="' + command + '" data-param1="' + val + '" title="' + options[val] + '">' + editor.language.translate(options[val]) + '</a></li>';
+          }
+        }
+        c += '</ul>';
+      }
+
+      return c;
+    }
+
+    /**
+     * Create button.
+     */
+    function _build (command, info, visible) {
+      var display_selection = info.displaySelection;
+      if (typeof display_selection == 'function') {
+        display_selection = display_selection(editor);
+      }
+
+      var icon;
+      if (display_selection) {
+        var default_selection = (typeof info.defaultSelection == 'function' ? info.defaultSelection(editor) : info.defaultSelection);
+        icon = '<span style="width:' + (info.displaySelectionWidth || 100) + 'px">' + (default_selection || editor.language.translate(info.title)) + '</span>';
+      }
+      else {
+        icon = editor.icon.create(info.icon || command)
+      }
+
+      var popup = info.popup ? ' data-popup="true"' : '';
+
+      var shortcut = editor.shortcuts.get(command + '.');
+      if (shortcut) {
+        shortcut = ' (' + shortcut + ')';
+      }
+      else {
+        shortcut = '';
+      }
+
+      var btn = '<button type="button" tabindex="-1" aria-label="' + (editor.language.translate(info.title) || '') + '" title="' + (editor.language.translate(info.title) || '') + shortcut + '" class="fr-command fr-btn' + (info.type == 'dropdown' ? ' fr-dropdown' : '') + (info.displaySelection ? ' fr-selection' : '') + (info.back ? ' fr-back' : '') + (info.disabled ? ' fr-disabled' : '') + (!visible ? ' fr-hidden' : '') + '" data-cmd="' + command + '"' + popup + '>' + icon + '</button>';
+
+      if (info.type == 'dropdown') {
+        // Build dropdown.
+        var dropdown = '<div class="fr-dropdown-menu"><div class="fr-dropdown-wrapper"><div class="fr-dropdown-content">';
+
+        dropdown += _content(command, info);
+
+        dropdown += '</div></div></div>';
+
+        btn += dropdown;
+      }
+
+      return btn;
+    }
+
+    function buildList (buttons, visible_buttons) {
+      var str = '';
+      for (var i = 0; i < buttons.length; i++) {
+        var cmd_name = buttons[i];
+        var cmd_info = $.FE.COMMANDS[cmd_name];
+
+        if (cmd_info && typeof cmd_info.plugin !== 'undefined' && editor.opts.pluginsEnabled.indexOf(cmd_info.plugin) < 0) continue;
+
+        if (cmd_info) {
+          var visible = typeof visible_buttons != 'undefined' ? visible_buttons.indexOf(cmd_name) >= 0 : true;
+          str += _build(cmd_name, cmd_info, visible);
+        }
+        else if (cmd_name == '|') {
+          str += '<div class="fr-separator fr-vs"></div>';
+        }
+        else if (cmd_name == '-') {
+          str += '<div class="fr-separator fr-hs"></div>';
+        }
+      }
+
+      return str;
+    }
+
+    function refresh ($btn) {
+      var inst = $btn.parents('.fr-popup, .fr-toolbar').data('instance') || editor;
+
+      var cmd = $btn.data('cmd');
+
+      var $dropdown;
+      if (!$btn.hasClass('fr-dropdown')) $btn.removeClass('fr-active');
+      else $dropdown = $btn.next();
+
+      if ($.FE.COMMANDS[cmd] && $.FE.COMMANDS[cmd].refresh) {
+       $.FE.COMMANDS[cmd].refresh.apply(inst, [$btn, $dropdown]);
+      }
+      else if (editor.refresh[cmd]) {
+        inst.refresh[cmd]($btn, $dropdown);
+      }
+    }
+
+    function _bulkRefresh (btns) {
+      var inst = editor.$tb ? (editor.$tb.data('instance') || editor) : editor;
+
+      // Check the refresh event.
+      if (editor.events.trigger('buttons.refresh') == false) return true;
+
+      setTimeout(function () {
+        var focused = (inst.selection.inEditor() && inst.core.hasFocus());
+
+        for (var i = 0; i < btns.length; i++) {
+          var $btn = $(btns[i]);
+          var cmd = $btn.data('cmd');
+          if ($btn.parents('.fr-popup').length == 0) {
+            if (focused || ($.FE.COMMANDS[cmd] && $.FE.COMMANDS[cmd].forcedRefresh)) {
+              inst.button.refresh($btn);
+            }
+            else {
+              if (!$btn.hasClass('fr-dropdown')) $btn.removeClass('fr-active');
+            }
+          }
+          else if ($btn.parents('.fr-popup').is(':visible')) {
+            inst.button.refresh($btn);
+          }
+        }
+      }, 0);
+    }
+
+    /**
+     * Do buttons refresh.
+     */
+    function bulkRefresh () {
+      _bulkRefresh(buttons);
+      _bulkRefresh(popup_buttons);
+    }
+
+    function _destroy () {
+      buttons = [];
+      popup_buttons = [];
+    }
+
+    /**
+     * Initialize.
+     */
+    function _init () {
+      // Assign refresh and do refresh.
+      if (editor.opts.toolbarInline) {
+        editor.events.on('toolbar.show', bulkRefresh);
+      }
+      else {
+        editor.events.on('mouseup', bulkRefresh);
+        editor.events.on('keyup', bulkRefresh);
+        editor.events.on('blur', bulkRefresh);
+        editor.events.on('focus', bulkRefresh);
+        editor.events.on('contentChanged', bulkRefresh);
+      }
+
+      editor.events.on('shared.destroy', _destroy);
+    }
+
+    return {
+      _init: _init,
+      buildList: buildList,
+      bindCommands: bindCommands,
+      refresh: refresh,
+      bulkRefresh: bulkRefresh,
+      exec: exec
     }
   };
 
@@ -9291,8 +9196,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     var popups = editor.shared.popups;
 
     function setContainer(id, $container) {
-      popups[id].data('container', $container);
-      $container.append(popups[id]);
+      if (!$container.is(':visible')) $container = $(editor.opts.scrollableContainer);
+
+      if (!$container.is(popups[id].data('container'))) {
+        popups[id].data('container', $container);
+        $container.append(popups[id]);
+      }
     }
 
     /**
@@ -9314,24 +9223,25 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // Set the current instance for the popup.
       popups[id].data('instance', editor);
+      if (editor.$tb) editor.$tb.data('instance', editor);
 
       var width = popups[id].outerWidth();
       var height = popups[id].outerHeight();
       var is_visible = isVisible(id);
-      popups[id].addClass('fr-active').find('input, textarea').removeAttr('disabled');
+      popups[id].addClass('fr-active').removeClass('fr-hidden').find('input, textarea').removeAttr('disabled');
 
       var $container = popups[id].data('container');
 
       // If container is toolbar then increase zindex.
-      if ($container.is(editor.$tb)) editor.$tb.css('zIndex', 5);
+      if ($container.is(editor.$tb)) editor.$tb.css('zIndex', (editor.opts.zIndex || 1) + 4);
 
       // Inline mode when container is toolbar.
       if (editor.opts.toolbarInline && $container && editor.$tb && $container.get(0) == editor.$tb.get(0)) {
-        setContainer(id, editor.opts.toolbarInline ? $(editor.opts.scrollableContainer) : editor.$box);
-        if (top) top = editor.$tb.offset().top - editor.helpers.getPX(editor.$tb.css('margin-top'));
-        if (left) left = editor.$tb.offset().left + editor.$tb.width() / 2;
+        setContainer(id, $(editor.opts.scrollableContainer));
+        top = editor.$tb.offset().top - editor.helpers.getPX(editor.$tb.css('margin-top'));
+        left = editor.$tb.offset().left + editor.$tb.outerWidth() / 2 + (parseFloat(editor.$tb.find('.fr-arrow').css('margin-left')) || 0) + editor.$tb.find('.fr-arrow').outerWidth() / 2;
 
-        if (editor.$tb.hasClass('fr-above')) {
+        if (editor.$tb.hasClass('fr-above') && top) {
           top += editor.$tb.outerHeight();
         }
 
@@ -9351,7 +9261,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       // Toolbar at the bottom and container is toolbar.
       if (editor.opts.toolbarBottom && $container && editor.$tb && $container.get(0) == editor.$tb.get(0)) {
         popups[id].addClass('fr-above');
-        top = top - popups[id].outerHeight();
+        if (top) top = top - popups[id].outerHeight();
       }
 
       // Position editor.
@@ -9372,9 +9282,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         $(active_popup).select().focus();
       }
 
-      if (editor.opts.toolbarInline && !editor.helpers.isMobile()) editor.toolbar.hide();
+      if (editor.opts.toolbarInline) editor.toolbar.hide();
 
       editor.events.trigger('popups.show.' + id);
+
+      // https://github.com/froala/wysiwyg-editor/issues/1248
+      _events(id)._repositionPopup();
     }
 
     function onShow (id, callback) {
@@ -9393,7 +9306,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      */
     function areVisible (new_instance) {
       for (var id in popups) {
-        if (isVisible(id) && (typeof new_instance == 'undefined' || popups[id].data('instance') == new_instance)) return true;
+        if (popups.hasOwnProperty(id)) {
+          if (isVisible(id) && (typeof new_instance == 'undefined' || popups[id].data('instance') == new_instance)) return true;
+        }
       }
 
       return false;
@@ -9408,7 +9323,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         editor.events.trigger('popups.hide.' + id);
 
         // Reset toolbar zIndex.
-        if (editor.$tb) editor.$tb.css('zIndex', '');
+        if (editor.$tb) {
+          if (editor.opts.zIndex > 1) {
+            editor.$tb.css('zIndex', editor.opts.zIndex + 1);
+          }
+          else {
+            editor.$tb.css('zIndex', '');
+          }
+        }
 
         editor.events.disableBlur();
         popups[id].find('input, textarea, button').filter(':focus').blur();
@@ -9463,8 +9385,10 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       if (typeof except == 'undefined') except = [];
 
       for (var id in popups) {
-        if (except.indexOf(id) < 0) {
-          hide(id);
+        if (popups.hasOwnProperty(id)) {
+          if (except.indexOf(id) < 0) {
+            hide(id);
+          }
         }
       }
     }
@@ -9488,7 +9412,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       if (typeof html == 'function') html = html.apply(editor);
 
       for (var nm in template) {
-        html = html.replace('[_' + nm.toUpperCase() + '_]', template[nm]);
+        if (template.hasOwnProperty(nm)) {
+          html = html.replace('[_' + nm.toUpperCase() + '_]', template[nm]);
+        }
       }
 
       return html;
@@ -9549,7 +9475,6 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           var inst = $popup.data('instance') || editor;
 
           e.preventDefault();
-          e.stopPropagation();
 
           // IE workaround.
           setTimeout(function () {
@@ -9755,9 +9680,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
          * Placeholder effect.
          */
         _doPlaceholder: function (e) {
-          var $span = $(this).next();
-          if ($span.length == 0) {
-            $(this).after('<span>' + $(this).attr('placeholder') + '</span>');
+          var $label = $(this).next();
+          if ($label.length == 0) {
+            $(this).after('<label>' + $(this).attr('placeholder') + '</label>');
           }
 
           $(this).toggleClass('fr-not-empty', $(this).val() != '');
@@ -9767,11 +9692,20 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
          * Reposition popup.
          */
         _repositionPopup: function (e) {
-          if (isVisible(id) && $popup.parent().get(0) == $(editor.opts.scrollableContainer).get(0)) {
+          // No height set or toolbar inline.
+          if (!(editor.opts.height || editor.opts.heightMax) || editor.opts.toolbarInline) return true;
+
+          if (editor.$wp && isVisible(id) && $popup.parent().get(0) == $(editor.opts.scrollableContainer).get(0)) {
+            // Popup top - wrapper top.
             var p_top = $popup.offset().top - editor.$wp.offset().top;
-            var w_scroll = editor.$wp.scrollTop();
+
+            // Wrapper height.
             var w_height = editor.$wp.outerHeight();
 
+            if ($popup.hasClass('fr-above')) p_top += $popup.outerHeight();
+
+            // 1. Popup top > w_height.
+            // 2. Popup top + popup height < 0.
             if (p_top > w_height || p_top < 0) {
               $popup.addClass('fr-hidden');
             }
@@ -9790,6 +9724,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // Hide all popups on blur.
       editor.events.on('blur', function (e) {
+        if (areVisible()) editor.markers.remove();
+
         hideAll();
       });
 
@@ -9850,9 +9786,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      */
     function _destroy () {
       for (var id in popups) {
-        var $popup = popups[id];
-        $popup.html('').removeData().remove();
+        if (popups.hasOwnProperty(id)) {
+          var $popup = popups[id];
+          $popup.html('').removeData().remove();
+          popups[id] = null;
+        }
       }
+
+      popups = [];
     }
 
     /**
@@ -9898,16 +9839,474 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
   };
 
 
-  $.FE.MODULES.refresh = function (editor) {
-    function _default ($btn, cmd) {
-      try {
-        if (editor.doc.queryCommandState(cmd) === true) {
-          $btn.addClass('fr-active');
+  $.FE.MODULES.position = function (editor) {
+    /**
+    * Get bounding rect around selection.
+    *
+    */
+    function getBoundingRect () {
+      var boundingRect;
+
+      var range = editor.selection.ranges(0);
+      if (range && range.collapsed && editor.selection.inEditor()) {
+        var remove = false;
+        if (editor.$el.find('.fr-marker').length == 0) {
+          editor.selection.save();
+          remove = true;
         }
-      } catch (ex) {
+
+        var $marker = editor.$el.find('.fr-marker:first');
+        $marker.css('display', 'inline');
+        $marker.css('line-height', '');
+        var offset = $marker.offset();
+        var height = $marker.outerHeight();
+        $marker.css('display', 'none');
+        $marker.css('line-height', 0);
+
+        boundingRect = {}
+        boundingRect.left = offset.left;
+        boundingRect.width = 0;
+        boundingRect.height = height;
+        boundingRect.top = offset.top - (editor.helpers.isIOS() ? 0 : $(editor.o_win).scrollTop());
+        boundingRect.right = 1;
+        boundingRect.bottom = 1;
+        boundingRect.ok = true;
+
+        if (remove) editor.selection.restore();
+      }
+      else if (range) {
+        boundingRect = range.getBoundingClientRect();
+      }
+
+      return boundingRect;
+    }
+
+    /**
+     * Normalize top positioning.
+     */
+    function _topNormalized ($el, top, obj_height) {
+      var height = $el.outerHeight();
+
+      if (!editor.helpers.isMobile() && editor.$tb && $el.parent().get(0) != editor.$tb.get(0)) {
+        // 1. Parent offset + toolbar top + toolbar height > scrollableContainer height.
+        // 2. Selection doesn't go above the screen.
+        var p_height = $el.parent().height() - 20 - (editor.opts.toolbarBottom ? editor.$tb.outerHeight() : 0);
+        var p_offset = $el.parent().offset().top;
+        var new_top = top - height - (obj_height || 0);
+
+        if ($el.parent().get(0) == $(editor.opts.scrollableContainer).get(0)) p_offset = p_offset - $el.parent().position().top;
+
+        var s_height = $(editor.opts.scrollableContainer).get(0).scrollHeight;
+        if (p_offset + top + height > $(editor.opts.scrollableContainer).offset().top + s_height && $el.parent().offset().top + new_top > 0) {
+          top = new_top;
+          $el.addClass('fr-above');
+        }
+        else {
+          $el.removeClass('fr-above');
+        }
+      }
+
+      return top;
+    }
+
+    /**
+     * Normalize left position.
+     */
+    function _leftNormalized ($el, left) {
+      var width = $el.outerWidth();
+
+      // Normalize right.
+      if ($el.parent().offset().left + left + width > $(editor.opts.scrollableContainer).width() - 10) {
+       left = $(editor.opts.scrollableContainer).width() - width - 10 - $el.parent().offset().left + $(editor.opts.scrollableContainer).offset().left;
+      }
+
+      // Normalize left.
+      if ($el.parent().offset().left + left < $(editor.opts.scrollableContainer).offset().left) {
+        left = 10 - $el.parent().offset().left + $(editor.opts.scrollableContainer).offset().left;
+      }
+
+      return left;
+    }
+
+    /**
+     * Place editor below selection.
+     */
+    function forSelection ($el) {
+      var selection_rect = getBoundingRect();
+
+      $el.css('top', 0).css('left', 0);
+
+      var top = selection_rect.top + selection_rect.height;
+      var left = selection_rect.left + selection_rect.width / 2 - $el.outerWidth() / 2 + $(editor.o_win).scrollLeft();
+
+      if (!editor.opts.iframe) {
+        top += $(editor.o_win).scrollTop();
+      }
+
+      at(left, top, $el, selection_rect.height);
+    }
+
+    /**
+     * Position element at the specified position.
+     */
+    function at (left, top, $el, obj_height) {
+      var $container = $el.data('container');
+
+      if ($container && $container.get(0).tagName != 'BODY') {
+        if (left) left -= $container.offset().left;
+        if (top) top -= $container.offset().top - $container.scrollTop();
+      }
+
+      // Apply iframe correction.
+      if (editor.opts.iframe && $container && editor.$tb && $container.get(0) != editor.$tb.get(0)) {
+        if (left) left += editor.$iframe.offset().left;
+        if (top) top += editor.$iframe.offset().top;
+      }
+
+      var new_left = _leftNormalized($el, left);
+
+      if (left) {
+        // Set the new left.
+        $el.css('left', new_left);
+
+        // Normalize arrow.
+        var $arrow = $el.find('.fr-arrow');
+        if (!$arrow.data('margin-left')) $arrow.data('margin-left', editor.helpers.getPX($arrow.css('margin-left')));
+        $arrow.css('margin-left', left - new_left + $arrow.data('margin-left'));
+      }
+
+      if (top) $el.css('top', _topNormalized($el, top, obj_height));
+    }
+
+    /**
+     * Special case for update sticky on iOS.
+     */
+    function _updateIOSSticky (el) {
+      var $el = $(el);
+      var is_on = $el.is('.fr-sticky-on');
+      var prev_top = $el.data('sticky-top');
+      var scheduled_top = $el.data('sticky-scheduled');
+
+      // Create a dummy div that we show then sticky is on.
+			if (typeof prev_top == 'undefined') {
+        $el.data('sticky-top', 0);
+        var $dummy = $('<div class="fr-sticky-dummy" style="height: ' + $el.outerHeight() + 'px;"></div>');
+			  editor.$box.prepend($dummy);
+			}
+      else {
+        editor.$box.find('.fr-sticky-dummy').css('height', $el.outerHeight());
+      }
+
+      // Position sticky doesn't work when the keyboard is on the screen.
+      if (editor.core.hasFocus() || editor.$tb.find('input:visible:focus').length > 0) {
+        // Get the current scroll.
+        var x_scroll = $(window).scrollTop();
+
+        // Get the current top.
+        // We make sure that we keep it within the editable box.
+        var x_top = Math.min(Math.max(x_scroll - editor.$tb.parent().offset().top, 0), editor.$tb.parent().outerHeight() - $el.outerHeight());
+
+        // Not the same top and different than the already scheduled.
+        if (x_top != prev_top && x_top != scheduled_top) {
+          // Clear any too soon change to avoid flickering.
+          clearTimeout($el.data('sticky-timeout'));
+
+          // Store the current scheduled top.
+          $el.data('sticky-scheduled', x_top);
+
+          // Hide the toolbar for a rich experience.
+          if ($el.outerHeight() < x_scroll - editor.$tb.parent().offset().top) {
+            $el.addClass('fr-opacity-0');
+          }
+
+          // Set the timeout for changing top.
+          // Based on the test 100ms seems to be the best timeout.
+          $el.data('sticky-timeout', setTimeout(function () {
+            // Get the current top.
+            var c_scroll = $(window).scrollTop();
+            var c_top = Math.min(Math.max(c_scroll - editor.$tb.parent().offset().top, 0), editor.$tb.parent().outerHeight() - $el.outerHeight());
+
+            if (c_top > 0 && editor.$tb.parent().get(0).tagName == 'BODY') c_top += editor.$tb.parent().position().top;
+
+            // Don't update if it is not different than the prev top.
+            if (c_top != prev_top) {
+              $el.css('top', Math.max(c_top, 0));
+
+              $el.data('sticky-top', c_top);
+              $el.data('sticky-scheduled', c_top);
+            }
+
+            // Show toolbar.
+            $el.removeClass('fr-opacity-0');
+          }, 100));
+        }
+
+        // Turn on sticky mode.
+        if (!is_on) {
+          $el.css('top', '0');
+          $el.width(editor.$tb.parent().width());
+          $el.addClass('fr-sticky-on');
+          editor.$box.addClass('fr-sticky-box');
+        }
+      }
+
+      // Turn off sticky mode.
+      else {
+        clearTimeout($(el).css('sticky-timeout'));
+        $el.css('top', '0');
+        $el.css('position', '');
+        $el.width('');
+        $el.data('sticky-top', 0);
+        $el.removeClass('fr-sticky-on');
+        editor.$box.removeClass('fr-sticky-box');
       }
     }
 
+    /**
+     * Update sticky location for browsers that don't support sticky.
+     * https://github.com/filamentgroup/fixed-sticky
+     *
+     * The MIT License (MIT)
+     *
+     * Copyright (c) 2013 Filament Group
+     */
+    function _updateSticky (el) {
+      if( !el.offsetWidth ) { return; }
+
+			var el_top;
+			var el_bottom;
+      var $el = $(el);
+      var height = $el.outerHeight();
+
+      var position = $el.data('sticky-position');
+
+      // Viewport height.
+      var viewport_height = $(editor.opts.scrollableContainer == 'body' ? editor.o_win : editor.opts.scrollableContainer).outerHeight();
+
+      var scrollable_top = 0;
+      var scrollable_bottom = 0;
+      if (editor.opts.scrollableContainer !== 'body') {
+        scrollable_top = $(editor.opts.scrollableContainer).offset().top;
+        scrollable_bottom = $(editor.o_win).outerHeight() - scrollable_top - viewport_height;
+      }
+
+      var offset_top = editor.opts.scrollableContainer == 'body' ? $(editor.o_win).scrollTop() : scrollable_top;
+
+			var is_on = $el.is('.fr-sticky-on');
+
+      // Decide parent.
+      if (!$el.data('sticky-parent')) {
+        $el.data('sticky-parent', $el.parent());
+      }
+      var $parent = $el.data('sticky-parent');
+		  var parent_top = $parent.offset().top;
+			var parent_height = $parent.outerHeight();
+
+
+			if (!$el.data('sticky-offset')) {
+				$el.data('sticky-offset', true);
+				$el.after('<div class="fr-sticky-dummy" style="height: ' + height + 'px;"></div>');
+			}
+
+      // Detect position placement.
+      if (!position) {
+				// Some browsers require fixed/absolute to report accurate top/left values.
+				var skip_setting_fixed = $el.css('top') !== 'auto' || $el.css('bottom') !== 'auto';
+
+        // Set to position fixed for a split of second.
+				if(!skip_setting_fixed) {
+					$el.css('position', 'fixed');
+				}
+
+        // Find position.
+				position = {
+					top: $el.hasClass('fr-top'),
+					bottom: $el.hasClass('fr-bottom')
+				};
+
+        // Remove position fixed.
+				if(!skip_setting_fixed) {
+					$el.css('position', '');
+				}
+
+        // Store position.
+				$el.data('sticky-position', position);
+
+        $el.data('top', $el.hasClass('fr-top') ? $el.css('top') : 'auto');
+        $el.data('bottom', $el.hasClass('fr-bottom') ? $el.css('bottom') : 'auto');
+  		}
+
+      // Detect if is OK to fix at the top.
+			var isFixedToTop = function () {
+				// 1. Top condition.
+        // 2. Bottom condition.
+				return parent_top <  offset_top + el_top &&
+                parent_top + parent_height - height >= offset_top + el_top;
+			}
+
+      // Detect if it is OK to fix at the bottom.
+			var isFixedToBottom = function () {
+				return parent_top + height < offset_top + viewport_height - el_bottom &&
+        				parent_top + parent_height > offset_top + viewport_height - el_bottom ;
+			}
+
+			el_top = editor.helpers.getPX($el.data('top'));
+			el_bottom = editor.helpers.getPX($el.data('bottom'));
+
+      var at_top = (position.top && isFixedToTop());
+      var at_bottom = (position.bottom && isFixedToBottom());
+
+      // Should be fixed.
+			if (at_top || at_bottom) {
+        $el.css('width', $parent.width() + 'px');
+
+        if (!is_on) {
+					$el.addClass('fr-sticky-on')
+          $el.removeClass('fr-sticky-off');
+
+          if ($el.css('top')) {
+            if ($el.data('top') != 'auto') {
+              $el.css('top', editor.helpers.getPX($el.data('top')) + scrollable_top);
+            }
+            else {
+              $el.data('top', 'auto');
+            }
+          }
+
+          if ($el.css('bottom')) {
+            if ($el.data('bottom') != 'auto') {
+              $el.css('bottom', editor.helpers.getPX($el.data('bottom')) + scrollable_bottom);
+            }
+            else {
+              $el.css('bottom', 'auto');
+            }
+          }
+				}
+			}
+
+      // Shouldn't be fixed.
+      else {
+				if (!$el.hasClass('fr-sticky-off')) {
+          // Reset.
+          $el.width('');
+          $el.removeClass('fr-sticky-on');
+          $el.addClass('fr-sticky-off');
+
+          if ($el.css('top') && $el.css('top') != 'auto') {
+            $el.css('top', 0);
+          }
+
+          if ($el.css('bottom')) $el.css('bottom', 0);
+				}
+      }
+    }
+
+   /**
+    * Test if browser supports sticky.
+    * https://github.com/filamentgroup/fixed-sticky
+    *
+    * The MIT License (MIT)
+    *
+    * Copyright (c) 2013 Filament Group
+    */
+    function _testSticky () {
+      var el = document.createElement('test');
+  		var mStyle = el.style;
+
+			mStyle.cssText = 'position:' + [ '-webkit-', '-moz-', '-ms-', '-o-', '' ].join('sticky; position:') + ' sticky;';
+
+  		return mStyle['position'].indexOf('sticky') !== -1 && !editor.helpers.isIOS() && !editor.helpers.isAndroid();
+    }
+
+    /**
+     * Initialize sticky position.
+     */
+    function _initSticky () {
+      if (!_testSticky()) {
+        editor._stickyElements = [];
+
+        // iOS special case.
+        if (editor.helpers.isIOS()) {
+          // Use an animation frame to make sure we're always OK with the updates.
+          var animate = function () {
+            editor.helpers.requestAnimationFrame()(animate);
+
+            for (var i = 0; i < editor._stickyElements.length; i++) {
+              _updateIOSSticky(editor._stickyElements[i]);
+            }
+          };
+          animate();
+
+          // Hide toolbar on touchmove. This is very useful on iOS versions < 8.
+          editor.events.$on($(editor.o_win), 'scroll', function () {
+            if (editor.core.hasFocus()) {
+              for (var i = 0; i < editor._stickyElements.length; i++) {
+                var $el = $(editor._stickyElements[i]);
+                var $parent = $el.parent();
+                var c_scroll = $(window).scrollTop();
+
+                if ($el.outerHeight() < c_scroll - $parent.offset().top) {
+                  $el.addClass('fr-opacity-0');
+                  $el.data('sticky-top', -1);
+                  $el.data('sticky-scheduled', -1);
+                }
+              }
+            }
+          }, true);
+        }
+
+        // Default case. Do the updates on scroll.
+        else {
+          editor.events.$on($(editor.opts.scrollableContainer == 'body' ? editor.o_win : editor.opts.scrollableContainer), 'scroll', refresh, true);
+          editor.events.$on($(editor.o_win), 'resize', refresh, true);
+
+          editor.events.on('initialized', refresh);
+          editor.events.on('focus', refresh);
+
+          editor.events.$on($(editor.o_win), 'resize', 'textarea', refresh, true);
+        }
+      }
+
+      editor.events.on('destroy', function (e) {
+        editor._stickyElements = [];
+      });
+    }
+
+    function refresh () {
+      for (var i = 0; i < editor._stickyElements.length; i++) {
+        _updateSticky(editor._stickyElements[i]);
+      }
+    }
+
+    /**
+     * Mark element as sticky.
+     */
+    function addSticky ($el) {
+      $el.addClass('fr-sticky');
+
+      if (editor.helpers.isIOS()) $el.addClass('fr-sticky-ios');
+
+      if (!_testSticky()) {
+        editor._stickyElements.push($el.get(0));
+      }
+    }
+
+    function _init () {
+      _initSticky();
+    }
+
+    return {
+      _init: _init,
+      forSelection: forSelection,
+      addSticky: addSticky,
+      refresh: refresh,
+      at: at,
+      getBoundingRect: getBoundingRect
+    }
+  };
+
+
+  $.FE.MODULES.refresh = function (editor) {
     function undo ($btn) {
       $btn.toggleClass('fr-disabled', !editor.undo.canDo());
     }
@@ -9921,7 +10320,11 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       var blocks = editor.selection.blocks();
       for (var i = 0; i < blocks.length; i++) {
-        if (blocks[i].tagName == 'LI' && !blocks[i].previousSibling) {
+        var p_node = blocks[i].previousSibling;
+        while (p_node && p_node.nodeType == Node.TEXT_NODE && p_node.textContent.length === 0) {
+          p_node = p_node.previousSibling;
+        }
+        if (blocks[i].tagName == 'LI' && !p_node) {
           $btn.addClass('fr-disabled');
         }
         else {
@@ -9953,7 +10356,6 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     }
 
     return {
-      default: _default,
       undo: undo,
       redo: redo,
       outdent: outdent,
@@ -10045,6 +10447,477 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       this.textEdit.update();
     }
   })
+
+
+  $.FE.MODULES.tooltip = function (editor) {
+    function hide () {
+      // Position fixed for: https://github.com/froala/wysiwyg-editor/issues/1247.
+      if (editor.$tooltip) editor.$tooltip.removeClass('fr-visible').css('left', '-3000px').css('position', 'fixed');
+    }
+
+    function to ($el, above) {
+      if (!$el.data('title')) {
+        $el.data('title', $el.attr('title'));
+      }
+
+      if (!$el.data('title')) return false;
+
+      if (!editor.$tooltip) _init();
+
+      $el.removeAttr('title');
+      editor.$tooltip.text($el.data('title'));
+      editor.$tooltip.addClass('fr-visible');
+
+      var left = $el.offset().left + ($el.outerWidth() - editor.$tooltip.outerWidth()) / 2;
+
+      // Normalize screen position.
+      if (left < 0) left = 0;
+      if (left + editor.$tooltip.outerWidth() > $(editor.o_win).width()) {
+        left = $(editor.o_win).width() - editor.$tooltip.outerWidth();
+      }
+
+      if (typeof above == 'undefined') above = editor.opts.toolbarBottom;
+      var top = !above ? $el.offset().top + $el.outerHeight() : $el.offset().top - editor.$tooltip.height();
+
+      editor.$tooltip.css('position', '');
+      editor.$tooltip.css('left', left);
+      editor.$tooltip.css('top', top);
+    }
+
+    function bind ($el, selector, above) {
+      if (!editor.helpers.isMobile()) {
+        editor.events.$on($el, 'mouseenter', selector, function (e) {
+          if (!$(e.currentTarget).hasClass('fr-disabled') && !editor.edit.isDisabled()) {
+            to($(e.currentTarget), above);
+          }
+        }, true);
+
+        editor.events.$on($el, 'mouseleave ' + editor._mousedown + ' ' + editor._mouseup, selector, function (e) {
+          hide();
+        }, true);
+      }
+    }
+
+    function _init () {
+      if (!editor.helpers.isMobile()) {
+        if (!editor.shared.$tooltip) {
+          editor.shared.$tooltip = $('<div class="fr-tooltip"></div>');
+
+          editor.$tooltip = editor.shared.$tooltip;
+
+          if (editor.opts.theme) {
+            editor.$tooltip.addClass(editor.opts.theme + '-theme');
+          }
+
+          $(editor.o_doc).find('body').append(editor.$tooltip);
+        }
+        else {
+          editor.$tooltip = editor.shared.$tooltip;
+        }
+
+        editor.events.on('shared.destroy', function () {
+          editor.$tooltip.html('').removeData().remove();
+          editor.$tooltip = null;
+        }, true);
+      }
+    }
+
+    return {
+      hide: hide,
+      to: to,
+      bind: bind
+    }
+  };
+
+
+  // Extend defaults.
+  $.extend($.FE.DEFAULTS, {
+    toolbarBottom: false,
+    toolbarButtons: ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html', 'applyFormat', 'removeFormat'],
+    toolbarButtonsXS: ['bold', 'italic', 'fontFamily', 'fontSize', '|', 'undo', 'redo'],
+    toolbarButtonsSM: ['bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'insertLink', 'insertImage', 'table', '|', 'undo', 'redo'],
+    toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
+    toolbarContainer: null,
+    toolbarInline: false,
+    toolbarSticky: true,
+    toolbarStickyOffset: 0,
+    toolbarVisibleWithoutSelection: false
+  });
+
+  $.FE.MODULES.toolbar = function (editor) {
+    var _document, _window;
+
+    // Create a button map for each screen size.
+    var _buttons_map = [];
+    _buttons_map[$.FE.XS] = editor.opts.toolbarButtonsXS || editor.opts.toolbarButtons;
+    _buttons_map[$.FE.SM] = editor.opts.toolbarButtonsSM || editor.opts.toolbarButtons;
+    _buttons_map[$.FE.MD] = editor.opts.toolbarButtonsMD || editor.opts.toolbarButtons;
+    _buttons_map[$.FE.LG] = editor.opts.toolbarButtons;
+
+    function _addOtherButtons (buttons, toolbarButtons) {
+      for (var i = 0; i < toolbarButtons.length; i++) {
+        if (toolbarButtons[i] != '-' && toolbarButtons[i] != '|' && buttons.indexOf(toolbarButtons[i]) < 0) {
+          buttons.push(toolbarButtons[i]);
+        }
+      }
+    }
+
+    /**
+     * Add buttons to the toolbar.
+     */
+    function _addButtons () {
+      var _buttons = $.merge([], _screenButtons());
+      _addOtherButtons(_buttons, editor.opts.toolbarButtonsXS || []);
+      _addOtherButtons(_buttons, editor.opts.toolbarButtonsSM || []);
+      _addOtherButtons(_buttons, editor.opts.toolbarButtonsMD || []);
+      _addOtherButtons(_buttons, editor.opts.toolbarButtons);
+
+      for (var i = _buttons.length - 1; i >= 0; i--) {
+        if (_buttons[i] != '-' && _buttons[i] != '|' && _buttons.indexOf(_buttons[i]) < i) {
+          _buttons.splice(i, 1);
+        }
+      }
+
+      var buttons_list = editor.button.buildList(_buttons, _screenButtons());
+      editor.$tb.append(buttons_list);
+      editor.button.bindCommands(editor.$tb);
+    }
+
+    /**
+     * The buttons that should be visible on the current screen size.
+     */
+    function _screenButtons () {
+      var screen_size = editor.helpers.screenSize();
+      return _buttons_map[screen_size];
+    }
+
+    function _showScreenButtons () {
+      var c_buttons = _screenButtons();
+
+      // Remove separator from toolbar.
+      editor.$tb.find('.fr-separator').remove();
+
+      // Hide all buttons.
+      editor.$tb.find('> .fr-command').addClass('fr-hidden');
+
+      // Reorder buttons.
+      for (var i = 0; i < c_buttons.length; i++) {
+        if (c_buttons[i] == '|' || c_buttons[i] == '-') {
+          editor.$tb.append(editor.button.buildList([c_buttons[i]]));
+        }
+        else {
+          var $btn = editor.$tb.find('> .fr-command[data-cmd="' + c_buttons[i] + '"]');
+          var $dropdown = null;
+          if ($btn.next().hasClass('fr-dropdown-menu')) $dropdown = $btn.next();
+
+          $btn.removeClass('fr-hidden').appendTo(editor.$tb);
+          if ($dropdown) $dropdown.appendTo(editor.$tb);
+        }
+      }
+    }
+
+    /**
+     * Set the buttons visibility based on screen size.
+     */
+    function _setVisibility () {
+      editor.events.$on($(editor.o_win), 'resize', _showScreenButtons, true);
+      editor.events.$on($(editor.o_win), 'orientationchange', _showScreenButtons, true);
+    }
+
+    function showInline (e, force) {
+      setTimeout(function () {
+        if (e && e.which == $.FE.KEYCODE.ESC) {
+          // Nothing.
+        }
+        else if (editor.selection.inEditor() && editor.core.hasFocus() && !editor.popups.areVisible()) {
+          if ((editor.opts.toolbarVisibleWithoutSelection && e && e.type != 'keyup') || (!editor.selection.isCollapsed() && !editor.keys.isIME()) || force) {
+            editor.$tb.data('instance', editor);
+
+            // Check if we should actually show the toolbar.
+            if (editor.events.trigger('toolbar.show', [e]) == false) return false;
+
+            if (!editor.opts.toolbarContainer) {
+              editor.position.forSelection(editor.$tb);
+            }
+
+            editor.$tb.show();
+          }
+        }
+      }, 0);
+    }
+
+    function hide (e) {
+      // Check if we should actually hide the toolbar.
+      if (editor.events.trigger('toolbar.hide') == false) return false;
+
+      editor.$tb.hide();
+    }
+
+    function show () {
+      // Check if we should actually hide the toolbar.
+      if (editor.events.trigger('toolbar.show') == false) return false;
+
+      editor.$tb.show();
+    }
+
+    /**
+     * Set the events for show / hide toolbar.
+     */
+    function _initInlineBehavior () {
+      // Window mousedown.
+      editor.events.on('window.mousedown', hide);
+
+      // Element keydown.
+      editor.events.on('keydown', hide);
+
+      // Element blur.
+      editor.events.on('blur', hide);
+
+      // Window mousedown.
+      editor.events.on('window.mouseup', showInline);
+
+      if (editor.helpers.isMobile()) {
+        if (!editor.helpers.isIOS()) {
+          editor.events.on('window.touchend', showInline);
+
+          if (editor.browser.mozilla) {
+            setInterval(showInline, 200);
+          }
+        }
+      }
+      else {
+        editor.events.on('window.keyup', showInline);
+      }
+
+      // Hide editor on ESC.
+      editor.events.on('keydown', function (e) {
+        if (e && e.which == $.FE.KEYCODE.ESC) {
+          hide();
+        }
+      });
+
+      editor.events.$on(editor.$wp, 'scroll.toolbar', showInline);
+      editor.events.on('commands.after', showInline);
+
+      if (editor.helpers.isMobile()) {
+        editor.events.$on(editor.$doc, 'selectionchange', showInline);
+        editor.events.$on(editor.$doc, 'orientationchange', showInline);
+      }
+    }
+
+
+    function _initPositioning () {
+      // Toolbar is inline.
+      if (editor.opts.toolbarInline) {
+        // Mobile should handle this as regular.
+        $(editor.opts.scrollableContainer).append(editor.$tb);
+
+        // Add toolbar to body.
+        editor.$tb.data('container', $(editor.opts.scrollableContainer));
+
+        // Add inline class.
+        editor.$tb.addClass('fr-inline');
+
+        // Add arrow.
+        editor.$tb.prepend('<span class="fr-arrow"></span>')
+
+        // Init mouse behavior.
+        _initInlineBehavior();
+
+        editor.opts.toolbarBottom = false;
+      }
+
+      // Toolbar is normal.
+      else {
+        // Won't work on iOS.
+        if (editor.opts.toolbarBottom && !editor.helpers.isIOS()) {
+          editor.$box.append(editor.$tb);
+          editor.$tb.addClass('fr-bottom');
+          editor.$box.addClass('fr-bottom');
+        }
+        else {
+          editor.opts.toolbarBottom = false;
+          editor.$box.prepend(editor.$tb);
+          editor.$tb.addClass('fr-top');
+          editor.$box.addClass('fr-top');
+        }
+
+        editor.$tb.addClass('fr-basic');
+
+        if (editor.opts.toolbarSticky) {
+          if (editor.opts.toolbarStickyOffset) {
+            if (editor.opts.toolbarBottom) {
+              editor.$tb.css('bottom', editor.opts.toolbarStickyOffset);
+            }
+            else {
+              editor.$tb.css('top', editor.opts.toolbarStickyOffset);
+            }
+          }
+
+          editor.position.addSticky(editor.$tb);
+        }
+      }
+    }
+
+    /**
+     * Destroy.
+     */
+    function _sharedDestroy () {
+      editor.$tb.html('').removeData().remove();
+      editor.$tb = null;
+    }
+
+    function _destroy () {
+      editor.$box.removeClass('fr-top fr-bottom fr-inline fr-basic');
+      editor.$box.find('.fr-sticky-dummy').remove();
+    }
+
+    function _setDefaults () {
+      if (editor.opts.theme) {
+        editor.$tb.addClass(editor.opts.theme + '-theme');
+      }
+
+      if (editor.opts.zIndex > 1) {
+        editor.$tb.css('z-index', editor.opts.zIndex + 1);
+      }
+
+      // Set direction.
+      if (editor.opts.direction != 'auto') {
+        editor.$tb.removeClass('fr-ltr fr-rtl').addClass('fr-' + editor.opts.direction);
+      }
+
+      // Mark toolbar for desktop / mobile.
+      if (!editor.helpers.isMobile()) {
+        editor.$tb.addClass('fr-desktop');
+      }
+      else {
+        editor.$tb.addClass('fr-mobile');
+      }
+
+      // Set the toolbar specific position inline / normal.
+      if (!editor.opts.toolbarContainer) {
+        _initPositioning();
+      }
+      else {
+        if (editor.opts.toolbarInline) {
+          _initInlineBehavior();
+          hide();
+        }
+
+        if (editor.opts.toolbarBottom) editor.$tb.addClass('fr-bottom');
+        else editor.$tb.addClass('fr-top');
+      }
+
+      // Set documetn and window for toolbar.
+      _document = editor.$tb.get(0).ownerDocument;
+      _window = 'defaultView' in _document ? _document.defaultView : _document.parentWindow;
+
+      // Add buttons to the toolbar.
+      // Set their visibility for different screens.
+      // Asses commands to the butttons.
+      _addButtons();
+      _setVisibility();
+
+      // Make sure we don't trigger blur.
+      editor.events.$on(editor.$tb, editor._mousedown + ' ' + editor._mouseup, function (e) {
+        var originalTarget = e.originalEvent ? (e.originalEvent.target || e.originalEvent.originalTarget) : null;
+        if (originalTarget && originalTarget.tagName != 'INPUT' && !editor.edit.isDisabled()) {
+          e.stopPropagation();
+          e.preventDefault();
+          return false;
+        }
+      }, true);
+    }
+
+    /**
+     * Initialize
+     */
+    var tb_exists = false;
+    function _init () {
+      if (!editor.$wp) return false;
+
+      // Container for toolbar.
+      if (editor.opts.toolbarContainer) {
+        // Shared toolbar.
+        if (!editor.shared.$tb) {
+          editor.shared.$tb = $('<div class="fr-toolbar"></div>');
+          editor.$tb = editor.shared.$tb;
+          $(editor.opts.toolbarContainer).append(editor.$tb);
+          _setDefaults();
+          editor.$tb.data('instance', editor);
+        }
+        else {
+          editor.$tb = editor.shared.$tb;
+
+          if (editor.opts.toolbarInline) _initInlineBehavior();
+        }
+
+        // On focus set the current instance.
+        editor.events.on('focus', function () {
+          editor.$tb.data('instance', editor);
+        }, true);
+
+        editor.opts.toolbarInline = false;
+      }
+      else {
+        // Inline toolbar.
+        if (editor.opts.toolbarInline) {
+          // Update box.
+          editor.$box.addClass('fr-inline');
+
+          // Check for shared toolbar.
+          if (!editor.shared.$tb) {
+            editor.shared.$tb = $('<div class="fr-toolbar"></div>');
+            editor.$tb = editor.shared.$tb;
+            _setDefaults();
+          }
+          else {
+            editor.$tb = editor.shared.$tb;
+
+            // Init mouse behavior.
+            _initInlineBehavior();
+          }
+        }
+        else {
+          editor.$box.addClass('fr-basic');
+          editor.$tb = $('<div class="fr-toolbar"></div>');
+          _setDefaults();
+
+          editor.$tb.data('instance', editor);
+        }
+      }
+
+      // Destroy.
+      editor.events.on('destroy', _destroy, true);
+      editor.events.on(!editor.opts.toolbarInline ? 'destroy' : 'shared.destroy', _sharedDestroy, true);
+    }
+
+    var disabled = false;
+    function disable () {
+      if (!disabled && editor.$tb) {
+        editor.$tb.find('> .fr-command').addClass('fr-disabled fr-no-refresh');
+        disabled = true;
+      }
+    }
+
+    function enable () {
+      if (disabled && editor.$tb) {
+        editor.$tb.find('> .fr-command').removeClass('fr-disabled fr-no-refresh');
+        disabled = false;
+      }
+
+      editor.button.bulkRefresh();
+    }
+
+    return {
+      _init: _init,
+      hide: hide,
+      show: show,
+      showInline: showInline,
+      disable: disable,
+      enable: enable
+    }
+  };
 
 
 

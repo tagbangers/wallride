@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -49,7 +49,7 @@
 
   $.FE.PLUGINS.fontFamily = function (editor) {
     function apply (val) {
-      editor.commands.applyProperty('font-family', val);
+      editor.format.applyStyle('font-family', val);
     }
 
     function refreshOnShow($btn, $dropdown) {
@@ -93,11 +93,13 @@
 
       var font_matches = [];
       for (var key in editor.opts.fontFamily) {
-        var c_font_array = _getArray(key);
+        if (editor.opts.fontFamily.hasOwnProperty(key)) {
+          var c_font_array = _getArray(key);
 
-        var match = _matches(font_array, c_font_array);
-        if (match) {
-          font_matches.push([key, match]);
+          var match = _matches(font_array, c_font_array);
+          if (match) {
+            font_matches.push([key, match]);
+          }
         }
       }
 
@@ -147,7 +149,9 @@
       var c = '<ul class="fr-dropdown-list">';
       var options = this.opts.fontFamily;
       for (var val in options) {
-        c += '<li><a class="fr-command" data-cmd="fontFamily" data-param1="' + val + '" style="font-family: ' + val + '" title="' + options[val] + '">' + options[val] + '</a></li>';
+        if (options.hasOwnProperty(val)) {
+          c += '<li><a class="fr-command" data-cmd="fontFamily" data-param1="' + val + '" style="font-family: ' + val + '" title="' + options[val] + '">' + options[val] + '</a></li>';
+        }
       }
       c += '</ul>';
 

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -77,7 +77,7 @@
       while (!$parent_node.is('body')) {
         $parent_node
           .data('z-index', $parent_node.css('z-index'))
-          .css('z-index', 'auto');
+          .css('z-index', '9990');
         $parent_node = $parent_node.parent();
       }
 
@@ -131,6 +131,7 @@
           }
           $parent_node.removeData('z-index');
         }
+
         $parent_node = $parent_node.parent();
       }
 
@@ -155,9 +156,7 @@
       var active = isActive();
 
       $btn.toggleClass('fr-active', active);
-      $btn.find('i')
-        .toggleClass('fa-expand', !active)
-        .toggleClass('fa-compress', active);
+      $btn.find('> *').replaceWith(!active ? editor.icon.create('fullscreen') : editor.icon.create('fullscreenCompress'));
     }
 
     function _init () {
@@ -201,6 +200,9 @@
   // Add the font size icon.
   $.FE.DefineIcon('fullscreen', {
     NAME: 'expand'
+  });
+  $.FE.DefineIcon('fullscreenCompress', {
+    NAME: 'compress'
   });
 
 }));

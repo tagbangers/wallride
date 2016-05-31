@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -38,7 +38,7 @@
     function apply (val) {
       // Wrap.
       editor.selection.save();
-      editor.html.wrap(true, true, true);
+      editor.html.wrap(true, true, true, true);
       editor.selection.restore();
 
       var blocks = editor.selection.blocks();
@@ -96,7 +96,9 @@
       var c = '<ul class="fr-dropdown-list">';
       var options =  $.FE.COMMANDS.align.options;
       for (var val in options) {
-        c += '<li><a class="fr-command fr-title" data-cmd="align" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+        if (options.hasOwnProperty(val)) {
+          c += '<li><a class="fr-command fr-title" data-cmd="align" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+        }
       }
       c += '</ul>';
 

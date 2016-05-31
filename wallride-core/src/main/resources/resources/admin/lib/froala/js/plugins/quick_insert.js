@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -48,27 +48,24 @@
 
         if (!editor.shared.$qi_image_input) {
           editor.shared.$qi_image_input = $('<input accept="image/*" name="quickInsertImage' + this.id + '" style="display: none;" type="file">');
-          $('body').append(editor.$qi_image_input);
+          $('body').append(editor.shared.$qi_image_input);
+
+          editor.events.$on(editor.shared.$qi_image_input, 'change', function () {
+            var inst = $(this).data('inst');
+            if (this.files) {
+              inst.quickInsert.hide();
+
+              inst.image.upload(this.files);
+            }
+
+            // Chrome fix.
+            $(this).val('');
+          }, true);
         }
 
         editor.$qi_image_input = editor.shared.$qi_image_input;
 
-        editor.events.$on(editor.$qi_image_input, 'change', function () {
-          var inst = $(this).data('inst');
-          if (this.files) {
-            inst.quickInsert.hide();
-            inst.image.showInsertPopup();
-            var $popup = inst.popups.get('image.insert');
-            inst.position.forSelection($popup);
-
-            inst.image.upload(this.files);
-
-            // Chrome fix.
-            $(this).val('');
-            $(this).blur();
-          }
-        }, true);
-
+        if (editor.helpers.isMobile()) editor.selection.save();
         editor.$qi_image_input.data('inst', editor).trigger('click');
       },
       requiredPlugin: 'image',
@@ -280,7 +277,12 @@
 
       editor.events.on('shared.destroy', function () {
         $quick_insert.html('').removeData().remove();
-        if ($helper) $helper.html('').removeData().remove();
+        $quick_insert = null;
+
+        if ($helper) {
+          $helper.html('').removeData().remove();
+          $helper = null;
+        }
       }, true);
 
       // Hide before a command is executed.
@@ -319,6 +321,10 @@
 
       // Check tag where cursor is to see if the quick insert needs to be shown.
       editor.events.on('mouseup', _checkTag);
+
+      if (editor.helpers.isMobile()) {
+        editor.events.$on($(editor.o_doc), 'selectionchange', _checkTag);
+      }
 
       // Hide the quick insert when editor loses focus.
       editor.events.on('blur', hide);

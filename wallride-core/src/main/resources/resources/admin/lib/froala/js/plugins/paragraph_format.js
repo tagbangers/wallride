@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -138,7 +138,7 @@
 
       // Wrap.
       editor.selection.save();
-      editor.html.wrap(true, true, true);
+      editor.html.wrap(true, true, true, true);
       editor.selection.restore();
 
       // Get blocks.
@@ -240,6 +240,11 @@
   }
 
   // Register the font size command.
+  $.FE.RegisterShortcut($.FE.KEYCODE.ZERO, 'paragraphFormat', 'N', '0', false, true);
+  $.FE.RegisterShortcut($.FE.KEYCODE.ONE, 'paragraphFormat', 'H1', '1', false, true);
+  $.FE.RegisterShortcut($.FE.KEYCODE.TWO, 'paragraphFormat', 'H2', '2', false, true);
+  $.FE.RegisterShortcut($.FE.KEYCODE.THREE, 'paragraphFormat', 'H3', '3', false, true);
+  $.FE.RegisterShortcut($.FE.KEYCODE.FOUR, 'paragraphFormat', 'H4', '4', false, true);
   $.FE.RegisterCommand('paragraphFormat', {
     type: 'dropdown',
     displaySelection: function (editor) {
@@ -251,7 +256,17 @@
       var c = '<ul class="fr-dropdown-list">';
       var options =  this.opts.paragraphFormat;
       for (var val in options) {
-        c += '<li><' + val + ' style="padding: 0 !important; margin: 0 !important;"><a class="fr-command" data-cmd="paragraphFormat" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></' + val + '></li>';
+        if (options.hasOwnProperty(val)) {
+          var shortcut = this.shortcuts.get('paragraphFormat.' + val);
+          if (shortcut) {
+            shortcut = '<span class="fr-shortcut">' + shortcut + '</span>';
+          }
+          else {
+            shortcut = '';
+          }
+
+          c += '<li><' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + ' style="padding: 0 !important; margin: 0 !important;"><a class="fr-command" data-cmd="paragraphFormat" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + '></li>';
+        }
       }
       c += '</ul>';
 

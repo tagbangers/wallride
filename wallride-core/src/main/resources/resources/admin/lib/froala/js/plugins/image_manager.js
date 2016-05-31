@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.2.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2016 Froala Labs
  */
@@ -94,6 +94,8 @@
       // Build the media manager.
       if (!$modal) _build();
 
+      $modal.data('instance', editor);
+
       // Show modal.
       $modal.show();
       $overlay.show();
@@ -120,10 +122,11 @@
      * Hide the media manager.
      */
     function hide () {
-      editor.events.enableBlur();
+      var inst = $modal.data('instance') || editor;
+      inst.events.enableBlur();
       $modal.hide();
       $overlay.hide();
-      editor.$doc.find('body').removeClass('prevent-scroll fr-mobile');
+      inst.$doc.find('body').removeClass('prevent-scroll fr-mobile');
     }
 
     /*
@@ -173,7 +176,7 @@
       var html = '<div class="fr-modal' + cls + '"><div class="fr-modal-wrapper">';
 
       // Modal title.
-      html += '<div class="fr-modal-title"><div class="fr-modal-title-line"><i class="fa fa-bars fr-modal-more fr-not-available" id="fr-modal-more" title="' + editor.language.translate('Tags') + '"></i><h4 data-text="true">' + editor.language.translate('Manage Images') + '</h4><i title="' + editor.language.translate('Cancel') + '" class="fa fa-times fr-modal-close" id="fr-modal-close"></i></div>';
+      html += '<div class="fr-modal-title"><div class="fr-modal-title-line"><i class="fa fa-bars fr-modal-more fr-not-available" id="fr-modal-more-' + editor.sid + '" title="' + editor.language.translate('Tags') + '"></i><h4 data-text="true">' + editor.language.translate('Manage Images') + '</h4><i title="' + editor.language.translate('Cancel') + '" class="fa fa-times fr-modal-close" id="fr-modal-close"></i></div>';
 
       // Tags
       html += '<div class="fr-modal-tags" id="fr-modal-tags"></div>';
@@ -395,14 +398,18 @@
 
         // Set image additional data.
         for (var key in image) {
-          if (key != 'thumb' && key != 'url' && key != 'tag') {
-            $img.attr('data-' + key, image[key]);
+          if (image.hasOwnProperty(key)) {
+            if (key != 'thumb' && key != 'url' && key != 'tag') {
+              $img.attr('data-' + key, image[key]);
+            }
           }
         }
 
         // Add image and insert and delete buttons to the image container.
-        $img_container.append($img).append('<i class="fa fa-trash-o fr-delete-img" title="' + editor.language.translate('Delete') + '"></i>')
-                                    .append('<i class="fa fa-plus fr-insert-img" title="' + editor.language.translate('Insert') + '"></i>');
+        $img_container
+          .append($img)
+          .append($(editor.icon.create('imageManagerDelete')).addClass('fr-delete-img').attr('title', editor.language.translate('Delete')))
+          .append($(editor.icon.create('imageManagerInsert')).addClass('fr-insert-img').attr('title', editor.language.translate('Insert')))
 
         // Show image only if it has selected tags.
         $image_tags.find('.fr-selected-tag').each (function (index, tag) {
@@ -567,6 +574,21 @@
       }
     }
 
+    function _getImageAttrs ($img) {
+      var img_attributes = {};
+      var img_data = $img.data();
+
+      for (var key in img_data) {
+        if (img_data.hasOwnProperty(key)) {
+          if (key != 'url' && key != 'tag') {
+            img_attributes[key] = img_data[key];
+          }
+        }
+      }
+
+      return img_attributes;
+    }
+
     /*
      * Insert image into the editor.
      */
@@ -574,41 +596,30 @@
       // Image to insert.
       var $img = $(e.currentTarget).siblings('img');
 
+      var inst = $modal.data('instance') || editor;
+
       hide();
-      editor.image.showProgressBar();
+      inst.image.showProgressBar();
 
       if (!$current_image) {
         // Make sure we have focus.
-        editor.events.focus(true);
-        editor.selection.restore();
+        inst.events.focus(true);
+        inst.selection.restore();
 
-        var rect = editor.position.getBoundingRect();
+        var rect = inst.position.getBoundingRect();
 
         var left = rect.left + rect.width / 2;
         var top = rect.top + rect.height;
 
         // Show the image insert popup.
-        editor.popups.setContainer('image.insert', editor.$box || $('body'));
-        editor.popups.show('image.insert', left, top);
+        inst.popups.setContainer('image.insert', inst.$box || $('body'));
+        inst.popups.show('image.insert', left, top);
       }
       else {
         $current_image.trigger('click');
       }
 
-      // Copy additional image attributes.
-      // data-url is set as src therefore not needed anymore.
-      // data-tag is only used to sort images by tag in the image manager.
-      var img_attributes = {};
-      var img_data = $img.data();
-
-      for (var key in img_data) {
-        if (key != 'url' && key != 'tag') {
-          img_attributes[key] = img_data[key];
-        }
-      }
-
-      editor.undo.saveStep();
-      editor.image.insert($img.data('url'), false, img_attributes, $current_image);
+      inst.image.insert($img.data('url'), false, _getImageAttrs($img), $current_image);
     }
 
     /*
@@ -633,7 +644,7 @@
             $.ajax({
               method: editor.opts.imageManagerDeleteMethod,
               url: editor.opts.imageManagerDeleteURL,
-              data: $.extend({ src: $img.attr('src') }, editor.opts.imageManagerDeleteParams),
+              data: $.extend($.extend({ src: $img.attr('src') }, _getImageAttrs($img)), editor.opts.imageManagerDeleteParams),
               crossDomain: editor.opts.requestWithCORS,
               xhrFields: {
                 withCredentials: editor.opts.requestWithCORS
@@ -809,7 +820,17 @@
       editor.events.bindClick($modal, 'i#fr-modal-close', hide);
 
       // Resize media manager modal on window resize.
-      editor.events.$on($(editor.o_win), 'resize', _resizeModal);
+      editor.events.$on($(editor.o_win), 'resize', function () {
+        // Window resize with image manager opened.
+        if (images) {
+          _resizeModal(true);
+        }
+
+        // iOS window resize is triggered when modal first opens (no images loaded).
+        else {
+          _resizeModal(false);
+        }
+      });
 
       // Delete and insert buttons for mobile.
       if (editor.helpers.isMobile()) {
@@ -845,7 +866,7 @@
       $scroller.on('scroll', _infiniteScroll);
 
       // Click on image tags button.
-      editor.events.bindClick($modal, 'i#fr-modal-more-' + editor.id, _toggleTags);
+      editor.events.bindClick($modal, 'i#fr-modal-more-' + editor.sid, _toggleTags);
 
       // Select an image tag.
       editor.events.bindClick($image_tags, 'a', _selectTag);
@@ -885,6 +906,16 @@
   // Add the font size icon.
   $.FE.DefineIcon('imageManager', {
     NAME: 'folder'
+  });
+
+  // Add the font size icon.
+  $.FE.DefineIcon('imageManagerInsert', {
+    NAME: 'plus'
+  });
+
+  // Add the font size icon.
+  $.FE.DefineIcon('imageManagerDelete', {
+    NAME: 'trash'
   });
 
 }));

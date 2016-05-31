@@ -2,7 +2,6 @@
 @import 'variables.less';
 
 .link-style-mixin(@sel){
-  // Link styles.
   @{sel} {
     &.fr-strong {
       font-weight: 700;
@@ -23,55 +22,46 @@
 }
 
 .image-style-mixin(@sel) {
-  /**
-   * Image style.
-   */
   @{sel} {
-    z-index: 3;
     position: relative;
-    overflow: auto;
-    cursor: pointer;
+    max-width: 100%;
 
     &.fr-dib {
-      margin: auto;
+      margin: @image-margin auto;
       display: block;
       float: none;
       vertical-align: top;
-      margin-top: @image-margin;
-      margin-bottom: @image-margin;
 
       &.fr-fil {
-        margin: @image-margin auto @image-margin 0;
-        left: @image-margin;
+        margin-left: 0;
       }
 
       &.fr-fir {
-        margin: @image-margin 0 @image-margin auto;
-        right: @image-margin;
+        margin-right: 0;
       }
     }
 
     &.fr-dii {
-      margin: auto;
       display: inline-block;
       float: none;
-      margin-top: @image-margin;
-      margin-bottom: @image-margin;
+      vertical-align: bottom;
+      margin-left: @image-margin;
+      margin-right: @image-margin;
+      max-width: calc(100% - (2 * @image-margin));
 
       &.fr-fil {
-        margin: @image-margin (2 * @image-margin) @image-margin 0;
-        left: @image-margin;
         float: left;
+        margin: @image-margin @image-margin @image-margin 0;
+        max-width: calc(100% - @image-margin);
       }
 
       &.fr-fir {
-        margin: @image-margin 0 @image-margin (2 * @image-margin);
-        right: @image-margin;
         float: right;
+        margin: @image-margin 0 @image-margin @image-margin;
+        max-width: calc(100% - @image-margin);
       }
     }
 
-    // Image styles.
     &.fr-rounded {
       .border-radius(100%);
     }
@@ -92,9 +82,6 @@
 }
 
 .video-style(@cls: '') {
-  /**
-   * Video style
-   */
   .fr-video {
     text-align: center;
     position: relative;
@@ -133,6 +120,10 @@
 }
 
 .fr-view {
+  strong {
+    font-weight: 700;
+  }
+
   table {
     border: none;
     border-collapse: collapse;
@@ -219,14 +210,15 @@
     line-height: 0;
 
     &.fr-emoticon-img {
+      background-repeat: no-repeat !important;
       font-size: inherit;
       height: 1em;
       width: 1em;
       min-height: 20px;
       min-width: 20px;
       display: inline-block;
-      margin: -.2em .15em .2em;
-      line-height: normal;
+      margin: -.1em .1em .1em;
+      line-height: 1;
       vertical-align: middle;
     }
   }
@@ -250,9 +242,28 @@
   }
 
   .image-style();
+
   .video-style();
+
   .link-style();
+
+  button, input, textarea {
+    &.fr-rounded {
+      .border-radius(10px);
+    }
+
+    &.fr-large {
+      font-size: 24px;
+    }
+  }
 }
 
+/**
+ * Image style.
+ */
 .link-style('fr-view');
+
+/**
+ * Link style.
+ */
 .image-style('fr-view');
