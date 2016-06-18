@@ -156,13 +156,11 @@
 			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
 			<version>${thymeleaf-extras-springsecurity4.version}</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-java8time</artifactId>
 			<version>${thymeleaf-extras-java8time.version}</version>
 		</dependency>
-		-->
 
 		<!-- WebJars -->
 		<dependency>
