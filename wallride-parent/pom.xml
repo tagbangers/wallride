@@ -58,8 +58,8 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <thymeleaf.version>3.0.0.BETA02</thymeleaf.version>
-        <thymeleaf-extras-springsecurity4.version>3.0.0.BETA02</thymeleaf-extras-springsecurity4.version>
+        <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
+        <thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
         <hibernate.version>5.1.0.Final</hibernate.version>
     </properties>
 
