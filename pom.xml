@@ -56,8 +56,8 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<spring-cloud-aws-context.verion>1.0.4.RELEASE</spring-cloud-aws-context.verion>
-		<thymeleaf.version>3.0.0.BETA02</thymeleaf.version>
-		<thymeleaf-extras-springsecurity4.version>3.0.0.BETA02</thymeleaf-extras-springsecurity4.version>
+		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
+		<thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
 		<hibernate.version>5.1.0.Final</hibernate.version>
 		<hibernate-search.version>5.5.2.Final</hibernate-search.version>
 		<infinispan.version>8.1.0.Final</infinispan.version>
