@@ -89,6 +89,7 @@ public class PageSpecifications {
 			if (!includeUnpublished) {
 				predicates.add(cb.equal(root.get(Page_.status), Page.Status.PUBLISHED));
 			}
+			query.orderBy(cb.asc(root.get(Page_.lft)));
 			return cb.and(predicates.toArray(new Predicate[0]));
 		};
 	}
@@ -105,6 +106,7 @@ public class PageSpecifications {
 			if (!includeUnpublished) {
 				predicates.add(cb.equal(root.get(Page_.status), Page.Status.PUBLISHED));
 			}
+			query.orderBy(cb.asc(root.get(Page_.lft)));
 			return cb.and(predicates.toArray(new Predicate[0]));
 		};
 	}
