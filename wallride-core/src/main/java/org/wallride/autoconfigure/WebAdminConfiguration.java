@@ -16,7 +16,6 @@
 
 package org.wallride.autoconfigure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.annotation.Bean;
@@ -24,27 +23,20 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.format.Formatter;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.wallride.service.BlogService;
@@ -52,18 +44,13 @@ import org.wallride.support.CodeFormatAnnotationFormatterFactory;
 import org.wallride.web.controller.admin.DashboardController;
 import org.wallride.web.support.*;
 
-import java.text.DateFormat;
-import java.text.Normalizer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 @Configuration
 @ComponentScan(basePackageClasses = DashboardController.class)
-public class WebAdminConfiguration extends WebMvcConfigurationSupport {
+public class WebAdminConfiguration extends DelegatingWebMvcConfiguration {
 
 	@Autowired
 	private MessageCodesResolver messageCodesResolver;
@@ -87,27 +74,6 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 	private ThymeleafProperties properties;
 
 	@Override
-	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//		converters.add(new FormHttpMessageConverter());
-
-		converters.add(new ByteArrayHttpMessageConverter());
-		converters.add(new ResourceHttpMessageConverter());
-
-		MappingJackson2HttpMessageConverter jackson = new MappingJackson2HttpMessageConverter();
-		ObjectMapper objectMapper = new ObjectMapper();
-//		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
-		objectMapper.setDateFormat(dateFormat);
-		jackson.setObjectMapper(objectMapper);
-		converters.add(jackson);
-	}
-
-//	@Override
-//	public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-//		exceptionResolvers.add(new ExceptionHandlerExceptionResolver());
-//	}
-
-	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/resources/admin/");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
@@ -116,18 +82,7 @@ public class WebAdminConfiguration extends WebMvcConfigurationSupport {
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		registry.addFormatter(new Formatter<String>() {
-			@Override
-			public String print(String object, Locale locale) {
-				return (!object.equals("") ? object : null);
-			}
-
-			@Override
-			public String parse(String text, Locale locale) throws ParseException {
-				String value = StringUtils.trimWhitespace(text);
-				return Normalizer.normalize(value, Normalizer.Form.NFKC);
-			}
-		});
+		super.addFormatters(registry);
 		registry.addFormatterForFieldAnnotation(new CodeFormatAnnotationFormatterFactory());
 	}
 

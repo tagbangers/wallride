@@ -79,7 +79,9 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
 		context.setResourceLoader(getResourceLoader());
 		context.register(WebGuestConfiguration.class);
-		return new DispatcherServlet(context);
+		WallRideDispatcherServlet dispatcherServlet = new WallRideDispatcherServlet(context);
+		dispatcherServlet.setDetectParentHandlerMappings(true);
+		return dispatcherServlet;
 	}
 
 	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
@@ -96,7 +98,8 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
 		context.setResourceLoader(getResourceLoader());
 		context.register(WebAdminConfiguration.class);
-		return new DispatcherServlet(context);
+		WallRideDispatcherServlet dispatcherServlet = new WallRideDispatcherServlet(context);
+		return dispatcherServlet;
 	}
 
 	@Bean
