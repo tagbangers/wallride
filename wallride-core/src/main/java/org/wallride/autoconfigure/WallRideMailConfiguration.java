@@ -16,6 +16,8 @@
 
 package org.wallride.autoconfigure;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.ApplicationContext;
@@ -28,6 +30,7 @@ import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.inject.Inject;
+import javax.mail.Session;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +48,10 @@ public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 
 	@Inject
 	private ThymeleafProperties properties;
+
+	public WallRideMailConfiguration(MailProperties properties, ObjectProvider<Session> sessionProvider) {
+		super(properties, sessionProvider);
+	}
 
 	@Bean(name = "emailTemplateResolver")
 	public ITemplateResolver emailTemplateResolver() {

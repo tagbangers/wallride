@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.5.RELEASE</version>
+        <version>1.4.0.RELEASE</version>
         <relativePath />
     </parent>
     <groupId>org.wallride</groupId>
@@ -60,6 +60,7 @@
         <java.version>1.8</java.version>
         <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
         <thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
+        <thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
         <hibernate.version>5.1.0.Final</hibernate.version>
     </properties>
 

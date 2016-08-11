@@ -3,15 +3,16 @@ package org.wallride.autoconfigure;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
-import org.springframework.boot.context.web.OrderedHiddenHttpMethodFilter;
-import org.springframework.boot.context.web.OrderedHttpPutFormContentFilter;
+import org.springframework.boot.web.filter.OrderedHiddenHttpMethodFilter;
+import org.springframework.boot.web.filter.OrderedHttpPutFormContentFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -54,16 +55,22 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
-	public FilterRegistrationBean urlRewriteFilter() {
-		UrlRewriteFilter urlRewriteFilter = new ExtendedUrlRewriteFilter();
+	@ConditionalOnMissingBean(UrlRewriteFilter.class)
+	public UrlRewriteFilter urlRewriteFilter() {
+		return new ExtendedUrlRewriteFilter();
+	}
+
+	@Bean
+	public FilterRegistrationBean urlRewriteFilterRegistration() {
+		DelegatingFilterProxy proxy = new DelegatingFilterProxy("urlRewriteFilter");
+		proxy.setTargetFilterLifecycle(true);
 
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setName("urlRewriteFilter");
-		registration.setFilter(urlRewriteFilter);
+		registration.setFilter(proxy);
 		registration.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
 		registration.addUrlPatterns("/*");
 		registration.setOrder(0);
-		registration.getInitParameters().put("confPath", "classpath:/urlrewrite.xml");
 		return registration;
 	}
 
