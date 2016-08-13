@@ -16,6 +16,7 @@
 
 package org.wallride.web.controller.admin.article;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -83,7 +84,7 @@ public class ArticlePreviewController {
 		for (CustomFieldValueEditForm valueForm : form.getCustomFieldValues()) {
 			CustomFieldValue value = new CustomFieldValue();
 			value.setCustomField(customFieldService.getCustomFieldById(valueForm.getCustomFieldId(), language));
-			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX) && !ArrayUtils.isEmpty(valueForm.getTextValues())) {
 				value.setTextValue(String.join(",", valueForm.getTextValues()));
 			} else {
 				value.setTextValue(valueForm.getTextValue());
