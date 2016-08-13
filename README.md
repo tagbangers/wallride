@@ -8,6 +8,10 @@ and easy deploy to AWS BeansTalk(of course other servlet containers)
 
 We hope this CMS is loved by many developers of principles all over the world.
 
+Documentation
+========
+[Documentation is here.](http://wallride.org/docs/guide.html)
+
 Screen Shots
 ========
 [Screen Shots is here.](https://github.com/tagbangers/wallride/wiki/Screen-shots)
