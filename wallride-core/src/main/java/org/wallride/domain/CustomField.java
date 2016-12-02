@@ -76,7 +76,7 @@ public class CustomField extends DomainObject<Long> implements Comparable<Custom
 	private Integer idx;
 
 	@Column(length = 200)
-	@Field
+	@Field(analyze = Analyze.NO)
 	private String code;
 
 	@Column(length = 200)

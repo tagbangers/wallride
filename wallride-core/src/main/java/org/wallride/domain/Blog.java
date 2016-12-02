@@ -18,6 +18,7 @@ package org.wallride.domain;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -45,7 +46,7 @@ public class Blog extends DomainObject<Long> {
 	private long id;
 
 	@Column(length = 200, nullable = false, unique = true)
-	@Field
+	@Field(analyze = Analyze.NO)
 	private String code;
 
 	@Column(length = 3, nullable = false)
