@@ -93,6 +93,9 @@ public class PostService {
 	private Job updatePostViewsJob;
 
 	@Autowired
+	private BlogService blogService;
+
+	@Autowired
 	private PostRepository postRepository;
 	@Autowired
 	private PopularPostRepository popularPostRepository;
@@ -209,7 +212,7 @@ public class PostService {
 					request.setQueryString(uriComponents.getQuery());
 					MockHttpServletResponse response = new MockHttpServletResponse();
 
-					BlogLanguageRewriteRule rewriteRule = new BlogLanguageRewriteRule();
+					BlogLanguageRewriteRule rewriteRule = new BlogLanguageRewriteRule(blogService);
 					BlogLanguageRewriteMatch rewriteMatch = (BlogLanguageRewriteMatch) rewriteRule.matches(request, response);
 					try {
 						rewriteMatch.execute(request, response);

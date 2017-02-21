@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.wallride</groupId>
 		<artifactId>wallride</artifactId>
-		<version>1.0.0.M9</version>
+		<version>1.0.0.M10</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>wallride-core</artifactId>
@@ -73,6 +73,12 @@
 		<dependency>
 			<groupId>org.thymeleaf</groupId>
 			<artifactId>thymeleaf-spring4</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -150,13 +156,11 @@
 			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
 			<version>${thymeleaf-extras-springsecurity4.version}</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-java8time</artifactId>
 			<version>${thymeleaf-extras-java8time.version}</version>
 		</dependency>
-		-->
 
 		<!-- WebJars -->
 		<dependency>
@@ -189,6 +193,11 @@
 			<artifactId>datetimepicker</artifactId>
 			<version>2.3.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>jsrender</artifactId>
+			<version>1.0.0-rc.70</version>
+		</dependency>
 
 		<!-- @Inject -->
 		<dependency>
@@ -210,14 +219,6 @@
 			<version>v3-rev119-1.20.0</version>
 		</dependency>
 
-		<!-- im4java -->
-		<!--
-		<dependency>
-			<groupId>org.im4java</groupId>
-			<artifactId>im4java</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-		-->
 		<!-- java image scaling -->
 		<dependency>
 			<groupId>com.mortennobel</groupId>
@@ -305,11 +306,5 @@
 			<version>9.4-1206-jdbc42</version>
 			<scope>provided</scope>
 		</dependency>
-
-        <dependency>
-            <groupId>org.webjars.bower</groupId>
-            <artifactId>jsrender</artifactId>
-            <version>1.0.0-rc.70</version>
-        </dependency>
 	</dependencies>
 </project>

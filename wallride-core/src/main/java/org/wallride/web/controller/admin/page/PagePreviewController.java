@@ -16,6 +16,7 @@
 
 package org.wallride.web.controller.admin.page;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,14 +27,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.expression.ThymeleafEvaluationContext;
-import org.wallride.domain.CustomField;
-import org.wallride.domain.CustomFieldValue;
-import org.wallride.domain.Blog;
-import org.wallride.domain.BlogLanguage;
-import org.wallride.domain.Page;
+import org.wallride.domain.*;
 import org.wallride.exception.ServiceException;
 import org.wallride.service.BlogService;
 import org.wallride.service.CustomFieldService;
@@ -87,7 +84,7 @@ public class PagePreviewController {
 		for (CustomFieldValueEditForm valueForm : form.getCustomFieldValues()) {
 			CustomFieldValue value = new CustomFieldValue();
 			value.setCustomField(customFieldService.getCustomFieldById(valueForm.getCustomFieldId(), language));
-			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX)) {
+			if (valueForm.getFieldType().equals(CustomField.FieldType.CHECKBOX) && !ArrayUtils.isEmpty(valueForm.getTextValues())) {
 				value.setTextValue(String.join(",", valueForm.getTextValues()));
 			} else {
 				value.setTextValue(valueForm.getTextValue());
@@ -114,17 +111,16 @@ public class PagePreviewController {
 		ModelAndView mv = new ModelAndView("dummy");
 		interceptor.postHandle(request, response, this, mv);
 
-		final SpringWebContext ctx = new SpringWebContext(
+		final WebContext ctx = new WebContext(
 				request,
 				response,
 				servletContext,
 				LocaleContextHolder.getLocale(),
-				mv.getModelMap(),
-				WebApplicationContextUtils.getWebApplicationContext(servletContext));
+				mv.getModelMap());
 		ctx.setVariable("page", page);
 
 		ThymeleafEvaluationContext evaluationContext = new ThymeleafEvaluationContext(context, null);
-		ctx.getVariables().put(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME, evaluationContext);
+		ctx.setVariable(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME, evaluationContext);
 
 		SpringTemplateEngine templateEngine = context.getBean("templateEngine", SpringTemplateEngine.class);
 		String html = templateEngine.process("page/describe", ctx);

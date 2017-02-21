@@ -16,35 +16,24 @@
 
 package org.wallride.web.support;
 
-import org.springframework.mobile.device.Device;
-import org.springframework.mobile.device.DeviceResolver;
 import org.thymeleaf.context.IExpressionContext;
-import org.thymeleaf.context.IWebContext;
+import org.wallride.domain.Tag;
+import org.wallride.support.TagUtils;
 
-public class Devices {
+import java.util.List;
+
+public class Tags {
 
 	private IExpressionContext context;
 
-	private DeviceResolver deviceResolver;
+	private TagUtils TagUtils;
 
-	public Devices (IExpressionContext context, DeviceResolver deviceResolver) {
+	public Tags(IExpressionContext context, TagUtils TagUtils) {
 		this.context = context;
-		this.deviceResolver = deviceResolver;
+		this.TagUtils = TagUtils;
 	}
 
-	public boolean isMobile() {
-		return resolveDevice().isMobile();
-	}
-
-	public boolean isNormal() {
-		return resolveDevice().isNormal();
-	}
-
-	public boolean isTablet() {
-		return resolveDevice().isTablet();
-	}
-
-	private Device resolveDevice() {
-		return deviceResolver.resolveDevice(((IWebContext) context).getRequest());
+	public List<Tag> getAllTags() {
+		return TagUtils.getAllTags();
 	}
 }

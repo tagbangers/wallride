@@ -26,7 +26,7 @@
 										<span th:if="${#strings.toString(page.status) eq 'DRAFT'}" class="glyphicon glyphicon-warning-sign"></span>
 										<span th:if="${#strings.toString(page.status) eq 'SCHEDULED'}" class="glyphicon glyphicon-time"></span>
 										<span th:if="${#strings.toString(page.status) ne 'PUBLISHED'}" th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
-										<a th:href="@{__${WEBSITE_PATH}__/{code}(code=${page.code})}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
+										<a th:href="@{__${WEBSITE_PATH}____${#posts.path(page)}__}" th:if="${#strings.toString(page.status) eq 'PUBLISHED'}" target="_blank">
 											<span class="glyphicon glyphicon-globe"></span>
 											<span th:text="${#messages.msg('Post.Status.' + page.status)}">Published</span>
 										</a>

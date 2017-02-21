@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package org.wallride.web.support;
+package org.wallride.support;
 
-import org.thymeleaf.context.IExpressionContext;
-import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.domain.Media;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.wallride.domain.Tag;
+import org.wallride.service.TagService;
 
-public class Medias {
+import java.util.List;
 
-	private IExpressionContext context;
+public class TagUtils {
 
-	private WallRideProperties wallRideProperties;
+	private TagService tagService;
 
-	public Medias(IExpressionContext context, WallRideProperties wallRideProperties) {
-		this.context = context;
-		this.wallRideProperties = wallRideProperties;
+	public TagUtils(TagService tagService) {
+		this.tagService = tagService;
 	}
 
-	public String link(Media media) {
-		return link(media.getId());
-	}
-
-	public String link(String id) {
-		return wallRideProperties.getMediaUrlPrefix() + id;
+	public List<Tag> getAllTags() {
+		return tagService.getTags(LocaleContextHolder.getLocale().getLanguage());
 	}
 }

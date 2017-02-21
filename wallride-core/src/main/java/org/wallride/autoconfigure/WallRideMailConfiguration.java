@@ -16,16 +16,21 @@
 
 package org.wallride.autoconfigure;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.templateresolver.TemplateResolver;
+import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.inject.Inject;
+import javax.mail.Session;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +38,7 @@ import java.util.Set;
 public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 
 	@Inject
-	private WallRideResourceResourceResolver wallRideResourceResourceResolver;
+	private ApplicationContext applicationContext;
 
 	@Inject
 	private WallRideThymeleafDialect wallRideThymeleafDialect;
@@ -44,10 +49,15 @@ public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 	@Inject
 	private ThymeleafProperties properties;
 
+	public WallRideMailConfiguration(MailProperties properties, ObjectProvider<Session> sessionProvider) {
+		super(properties, sessionProvider);
+	}
+
 	@Bean(name = "emailTemplateResolver")
-	public TemplateResolver emailTemplateResolver() {
-		TemplateResolver resolver = new TemplateResolver();
-		resolver.setResourceResolver(wallRideResourceResourceResolver);
+	public ITemplateResolver emailTemplateResolver() {
+		SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
+//		resolver.setResourceResolver(wallRideResourceResourceResolver);
+		resolver.setApplicationContext(applicationContext);
 		resolver.setPrefix(environment.getRequiredProperty("spring.thymeleaf.prefix.mail"));
 		resolver.setSuffix(this.properties.getSuffix());
 		resolver.setTemplateMode(this.properties.getMode());
@@ -60,7 +70,7 @@ public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 	@Bean(name = "emailTemplateEngine")
 	public SpringTemplateEngine emailTemplateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
-		Set<TemplateResolver> resolvers = new HashSet<>();
+		Set<ITemplateResolver> resolvers = new HashSet<>();
 		resolvers.add(emailTemplateResolver());
 		engine.setTemplateResolvers(resolvers);
 

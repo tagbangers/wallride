@@ -16,21 +16,14 @@
 
 package org.wallride.autoconfigure;
 
-import org.springframework.mobile.device.LiteDeviceResolver;
-import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.AbstractDialect;
-import org.thymeleaf.dialect.IExpressionEnhancingDialect;
-import org.wallride.support.ArticleUtils;
-import org.wallride.support.CategoryUtils;
-import org.wallride.support.PageUtils;
-import org.wallride.support.PostUtils;
-import org.wallride.web.support.*;
+import org.thymeleaf.dialect.IExpressionObjectDialect;
+import org.thymeleaf.expression.IExpressionObjectFactory;
+import org.wallride.support.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+public class WallRideThymeleafDialect extends AbstractDialect implements IExpressionObjectDialect {
 
-public class WallRideThymeleafDialect extends AbstractDialect implements IExpressionEnhancingDialect {
+	public static final String NAME = "WallRide";
 
 	private PostUtils postUtils;
 
@@ -40,7 +33,13 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 
 	private CategoryUtils categoryUtils;
 
+	private TagUtils tagUtils;
+
 	private WallRideProperties wallRideProperties;
+
+	protected WallRideThymeleafDialect() {
+		super(NAME);
+	}
 
 	public PostUtils getPostUtils() {
 		return postUtils;
@@ -74,6 +73,14 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 		this.categoryUtils = categoryUtils;
 	}
 
+	public TagUtils getTagUtils() {
+		return tagUtils;
+	}
+
+	public void setTagUtils(TagUtils tagUtils) {
+		this.tagUtils = tagUtils;
+	}
+
 	public WallRideProperties getWallRideProperties() {
 		return wallRideProperties;
 	}
@@ -83,48 +90,14 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 	}
 
 	@Override
-	public Map<String, Object> getAdditionalExpressionObjects(IProcessingContext processingContext) {
-		Map<String, Object> objects = new HashMap<>();
-		objects.put("posts", createPosts(processingContext));
-		objects.put("articles", createArticles(processingContext));
-		objects.put("pages", createPages(processingContext));
-		objects.put("categories", createCategories(processingContext));
-		objects.put("medias", createMedias(processingContext));
-		objects.put("users", createUsers(processingContext));
-		objects.put("devices", createDevices(processingContext));
-		return Collections.unmodifiableMap(objects);
-	}
-
-	protected Posts createPosts(IProcessingContext processingContext) {
-		return new Posts(processingContext, postUtils, wallRideProperties);
-	}
-
-	protected Articles createArticles(IProcessingContext processingContext) {
-		return new Articles(processingContext, articleUtils);
-	}
-
-	protected Pages createPages(IProcessingContext processingContext) {
-		return new Pages(processingContext, pageUtils);
-	}
-
-	protected Categories createCategories(IProcessingContext processingContext) {
-		return new Categories(processingContext, categoryUtils);
-	}
-
-	protected Medias createMedias(IProcessingContext processingContext) {
-		return new Medias(processingContext, wallRideProperties);
-	}
-
-	protected Users createUsers(IProcessingContext processingContext) {
-		return new Users(processingContext, wallRideProperties);
-	}
-
-	protected Devices createDevices(IProcessingContext processingContext) {
-		return new Devices(processingContext, new LiteDeviceResolver());
-	}
-
-	@Override
-	public String getPrefix() {
-		return null;
+	public IExpressionObjectFactory getExpressionObjectFactory() {
+		WallRideExpressionObjectFactory expressionObjectFactory = new WallRideExpressionObjectFactory();
+		expressionObjectFactory.setPostUtils(postUtils);
+		expressionObjectFactory.setArticleUtils(articleUtils);
+		expressionObjectFactory.setPageUtils(pageUtils);
+		expressionObjectFactory.setCategoryUtils(categoryUtils);
+		expressionObjectFactory.setTagUtils(tagUtils);
+		expressionObjectFactory.setWallRideProperties(wallRideProperties);
+		return expressionObjectFactory;
 	}
 }

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -37,7 +36,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.access.channel.ChannelProcessor;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -47,8 +45,6 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.wallride.service.AuthorizedUserDetailsService;
-import org.wallride.support.ProxyInsecureChannelProcessor;
-import org.wallride.support.ProxySecureChannelProcessor;
 import org.wallride.web.support.BlogLanguageRedirectStrategy;
 
 import javax.sql.DataSource;
@@ -82,8 +78,6 @@ public class WallRideSecurityConfiguration {
 //		private SecurityExpressionHandler securityExpressionHandler;
 		@Autowired
 		private PersistentTokenRepository persistentTokenRepository;
-		@Autowired
-		private Environment environment;
 
 		@Override
 		public void configure(WebSecurity web) throws Exception {
@@ -128,15 +122,15 @@ public class WallRideSecurityConfiguration {
 					.disable()
 				.exceptionHandling()
 					.accessDeniedPage("/_admin/login");
-			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
-				List<ChannelProcessor> channelProcessors = new ArrayList<>();
-				channelProcessors.add(new ProxySecureChannelProcessor());
-				channelProcessors.add(new ProxyInsecureChannelProcessor());
-
-				http.requiresChannel()
-					.channelProcessors(channelProcessors)
-					.anyRequest().requiresSecure();
-			}
+//			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
+//				List<ChannelProcessor> channelProcessors = new ArrayList<>();
+//				channelProcessors.add(new ProxySecureChannelProcessor());
+//				channelProcessors.add(new ProxyInsecureChannelProcessor());
+//
+//				http.requiresChannel()
+//					.channelProcessors(channelProcessors)
+//					.anyRequest().requiresSecure();
+//			}
 			// @formatter:on
 		}
 	}
@@ -151,8 +145,6 @@ public class WallRideSecurityConfiguration {
 //		private SecurityExpressionHandler securityExpressionHandler;
 		@Autowired
 		private PersistentTokenRepository persistentTokenRepository;
-		@Autowired
-		private Environment environment;
 
 		@Override
 		public void configure(WebSecurity web) throws Exception {
@@ -209,15 +201,15 @@ public class WallRideSecurityConfiguration {
 					.disable()
 				.exceptionHandling()
 					.accessDeniedPage("/login");
-			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
-				List<ChannelProcessor> channelProcessors = new ArrayList<>();
-				channelProcessors.add(new ProxySecureChannelProcessor());
-				channelProcessors.add(new ProxyInsecureChannelProcessor());
-
-				http.requiresChannel()
-					.channelProcessors(channelProcessors)
-					.anyRequest().requiresSecure();
-			}
+//			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
+//				List<ChannelProcessor> channelProcessors = new ArrayList<>();
+//				channelProcessors.add(new ProxySecureChannelProcessor());
+//				channelProcessors.add(new ProxyInsecureChannelProcessor());
+//
+//				http.requiresChannel()
+//					.channelProcessors(channelProcessors)
+//					.anyRequest().requiresSecure();
+//			}
 			// @formatter:on
 		}
 	}
