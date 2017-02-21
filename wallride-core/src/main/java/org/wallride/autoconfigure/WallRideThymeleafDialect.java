@@ -19,10 +19,7 @@ package org.wallride.autoconfigure;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionObjectDialect;
 import org.thymeleaf.expression.IExpressionObjectFactory;
-import org.wallride.support.ArticleUtils;
-import org.wallride.support.CategoryUtils;
-import org.wallride.support.PageUtils;
-import org.wallride.support.PostUtils;
+import org.wallride.support.*;
 
 public class WallRideThymeleafDialect extends AbstractDialect implements IExpressionObjectDialect {
 
@@ -35,6 +32,8 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 	private PageUtils pageUtils;
 
 	private CategoryUtils categoryUtils;
+
+	private TagUtils tagUtils;
 
 	private WallRideProperties wallRideProperties;
 
@@ -74,6 +73,14 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 		this.categoryUtils = categoryUtils;
 	}
 
+	public TagUtils getTagUtils() {
+		return tagUtils;
+	}
+
+	public void setTagUtils(TagUtils tagUtils) {
+		this.tagUtils = tagUtils;
+	}
+
 	public WallRideProperties getWallRideProperties() {
 		return wallRideProperties;
 	}
@@ -89,6 +96,7 @@ public class WallRideThymeleafDialect extends AbstractDialect implements IExpres
 		expressionObjectFactory.setArticleUtils(articleUtils);
 		expressionObjectFactory.setPageUtils(pageUtils);
 		expressionObjectFactory.setCategoryUtils(categoryUtils);
+		expressionObjectFactory.setTagUtils(tagUtils);
 		expressionObjectFactory.setWallRideProperties(wallRideProperties);
 		return expressionObjectFactory;
 	}

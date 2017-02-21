@@ -32,10 +32,12 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.wallride.service.ArticleService;
 import org.wallride.service.CategoryService;
 import org.wallride.service.PageService;
+import org.wallride.service.TagService;
 import org.wallride.support.ArticleUtils;
 import org.wallride.support.CategoryUtils;
 import org.wallride.support.PageUtils;
 import org.wallride.support.PostUtils;
+import org.wallride.support.TagUtils;
 import org.wallride.web.support.ExtendedThymeleafViewResolver;
 
 import javax.inject.Inject;
@@ -60,6 +62,9 @@ public class WallRideThymeleafConfiguration {
 
 	@Autowired
 	private CategoryService categoryService;
+
+	@Autowired
+	private TagService tagService;
 
 	@Inject
 	private ThymeleafProperties thymeleafProperties;
@@ -88,6 +93,11 @@ public class WallRideThymeleafConfiguration {
 	}
 
 	@Bean
+	public TagUtils tagUtils() {
+		return new TagUtils(tagService);
+	}
+
+	@Bean
 	@ConditionalOnMissingBean
 	public WallRideThymeleafDialect wallRideThymeleafDialect() {
 		WallRideThymeleafDialect dialect = new WallRideThymeleafDialect();
@@ -97,6 +107,7 @@ public class WallRideThymeleafConfiguration {
 		dialect.setArticleUtils(articleUtils);
 		dialect.setPageUtils(pageUtils);
 		dialect.setCategoryUtils(categoryUtils());
+		dialect.setTagUtils(tagUtils());
 		dialect.setWallRideProperties(wallRideProperties);
 		return dialect;
 	}
