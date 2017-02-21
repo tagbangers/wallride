@@ -33,8 +33,7 @@ public class Tags {
 		this.TagUtils = TagUtils;
 	}
 
-	public List<Tag> getAllCategories() {
+	public List<Tag> getAllTags() {
 		return TagUtils.getAllTags();
 	}
-
 }
