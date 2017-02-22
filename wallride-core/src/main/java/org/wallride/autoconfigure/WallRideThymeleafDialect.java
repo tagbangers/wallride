@@ -19,85 +19,20 @@ package org.wallride.autoconfigure;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.dialect.IExpressionObjectDialect;
 import org.thymeleaf.expression.IExpressionObjectFactory;
-import org.wallride.support.*;
 
 public class WallRideThymeleafDialect extends AbstractDialect implements IExpressionObjectDialect {
 
 	public static final String NAME = "WallRide";
 
-	private PostUtils postUtils;
+	private WallRideExpressionObjectFactory wallRideExpressionObjectFactory;
 
-	private ArticleUtils articleUtils;
-
-	private PageUtils pageUtils;
-
-	private CategoryUtils categoryUtils;
-
-	private TagUtils tagUtils;
-
-	private WallRideProperties wallRideProperties;
-
-	protected WallRideThymeleafDialect() {
+	protected WallRideThymeleafDialect(WallRideExpressionObjectFactory wallRideExpressionObjectFactory) {
 		super(NAME);
-	}
-
-	public PostUtils getPostUtils() {
-		return postUtils;
-	}
-
-	public void setPostUtils(PostUtils postUtils) {
-		this.postUtils = postUtils;
-	}
-
-	public ArticleUtils getArticleUtils() {
-		return articleUtils;
-	}
-
-	public void setArticleUtils(ArticleUtils articleUtils) {
-		this.articleUtils = articleUtils;
-	}
-
-	public PageUtils getPageUtils() {
-		return pageUtils;
-	}
-
-	public void setPageUtils(PageUtils pageUtils) {
-		this.pageUtils = pageUtils;
-	}
-
-	public CategoryUtils getCategoryUtils() {
-		return categoryUtils;
-	}
-
-	public void setCategoryUtils(CategoryUtils categoryUtils) {
-		this.categoryUtils = categoryUtils;
-	}
-
-	public TagUtils getTagUtils() {
-		return tagUtils;
-	}
-
-	public void setTagUtils(TagUtils tagUtils) {
-		this.tagUtils = tagUtils;
-	}
-
-	public WallRideProperties getWallRideProperties() {
-		return wallRideProperties;
-	}
-
-	public void setWallRideProperties(WallRideProperties wallRideProperties) {
-		this.wallRideProperties = wallRideProperties;
+		this.wallRideExpressionObjectFactory = wallRideExpressionObjectFactory;
 	}
 
 	@Override
 	public IExpressionObjectFactory getExpressionObjectFactory() {
-		WallRideExpressionObjectFactory expressionObjectFactory = new WallRideExpressionObjectFactory();
-		expressionObjectFactory.setPostUtils(postUtils);
-		expressionObjectFactory.setArticleUtils(articleUtils);
-		expressionObjectFactory.setPageUtils(pageUtils);
-		expressionObjectFactory.setCategoryUtils(categoryUtils);
-		expressionObjectFactory.setTagUtils(tagUtils);
-		expressionObjectFactory.setWallRideProperties(wallRideProperties);
-		return expressionObjectFactory;
+		return wallRideExpressionObjectFactory;
 	}
 }
