@@ -26,14 +26,14 @@ public class Tags {
 
 	private IExpressionContext context;
 
-	private TagUtils TagUtils;
+	private TagUtils tagUtils;
 
 	public Tags(IExpressionContext context, TagUtils TagUtils) {
 		this.context = context;
-		this.TagUtils = TagUtils;
+		this.tagUtils = TagUtils;
 	}
 
 	public List<Tag> getAllTags() {
-		return TagUtils.getAllTags();
+		return tagUtils.getAllTags();
 	}
 }
