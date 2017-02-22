@@ -99,17 +99,23 @@ public class WallRideThymeleafConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public WallRideThymeleafDialect wallRideThymeleafDialect() {
-		WallRideThymeleafDialect dialect = new WallRideThymeleafDialect();
+	public WallRideThymeleafDialect wallRideThymeleafDialect(WallRideExpressionObjectFactory expressionObjectFactory) {
+		return new WallRideThymeleafDialect(expressionObjectFactory);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public WallRideExpressionObjectFactory wallRideExpressionObjectFactory() {
+		WallRideExpressionObjectFactory expressionObjectFactory = new WallRideExpressionObjectFactory();
 		ArticleUtils articleUtils = articleUtils();
 		PageUtils pageUtils = pageUtils();
-		dialect.setPostUtils(postUtils(pageUtils));
-		dialect.setArticleUtils(articleUtils);
-		dialect.setPageUtils(pageUtils);
-		dialect.setCategoryUtils(categoryUtils());
-		dialect.setTagUtils(tagUtils());
-		dialect.setWallRideProperties(wallRideProperties);
-		return dialect;
+		expressionObjectFactory.setPostUtils(postUtils(pageUtils));
+		expressionObjectFactory.setArticleUtils(articleUtils);
+		expressionObjectFactory.setPageUtils(pageUtils);
+		expressionObjectFactory.setCategoryUtils(categoryUtils());
+		expressionObjectFactory.setTagUtils(tagUtils());
+		expressionObjectFactory.setWallRideProperties(wallRideProperties);
+		return expressionObjectFactory;
 	}
 
 	@Bean(name = {"defaultTemplateResolver", "homePathTemplateResolver"})
@@ -141,7 +147,7 @@ public class WallRideThymeleafConfiguration {
 	}
 
 	@Bean
-	public SpringTemplateEngine templateEngine() {
+	public SpringTemplateEngine templateEngine(WallRideThymeleafDialect wallRideThymeleafDialect) {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
 //		engine.setTemplateResolver(templateResolver());
 		Set<ITemplateResolver> templateResolvers = new LinkedHashSet<>();
@@ -152,15 +158,15 @@ public class WallRideThymeleafConfiguration {
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(new SpringSecurityDialect());
 		dialects.add(new Java8TimeDialect());
-		dialects.add(wallRideThymeleafDialect());
+		dialects.add(wallRideThymeleafDialect);
 		engine.setAdditionalDialects(dialects);
 		return engine;
 	}
 
 	@Bean
-	public ThymeleafViewResolver thymeleafViewResolver() {
+	public ThymeleafViewResolver thymeleafViewResolver(SpringTemplateEngine templateEngine) {
 		ThymeleafViewResolver viewResolver = new ExtendedThymeleafViewResolver();
-		viewResolver.setTemplateEngine(templateEngine());
+		viewResolver.setTemplateEngine(templateEngine);
 		viewResolver.setViewNames(this.thymeleafProperties.getViewNames());
 		viewResolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
 		viewResolver.setContentType(this.thymeleafProperties.getContentType() + ";charset=" + this.thymeleafProperties.getEncoding());
