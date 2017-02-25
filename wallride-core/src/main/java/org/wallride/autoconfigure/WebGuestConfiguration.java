@@ -21,8 +21,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.web.accept.ContentNegotiationManager;
-import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.wallride.service.BlogService;
 import org.wallride.service.PageService;
@@ -35,11 +35,9 @@ import org.wallride.web.controller.guest.article.ArticleIndexController;
 import org.wallride.web.controller.guest.comment.CommentRestController;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.controller.guest.user.*;
-import org.wallride.web.support.DefaultModelAttributeInterceptor;
-import org.wallride.web.support.SetupRedirectInterceptor;
 
 @Configuration
-public class WebGuestConfiguration {
+public class WebGuestConfiguration extends DelegatingWebMvcConfiguration {
 
 	@Autowired
 	private BlogService blogService;
@@ -47,27 +45,26 @@ public class WebGuestConfiguration {
 	@Autowired
 	private PageService pageService;
 
-	@Autowired
-	private ContentNegotiationManager mvcContentNegotiationManager;
-
-	@Autowired
-	private DefaultModelAttributeInterceptor defaultModelAttributeInterceptor;
-
-	@Autowired
-	private SetupRedirectInterceptor setupRedirectInterceptor;
-
-	@Bean(name = "guestRequestMappingHandlerMapping")
-	public RequestMappingHandlerMapping requestMappingHandlerMapping(PageDescribeController pageDescribeController) {
-		RequestMappingHandlerMapping handlerMapping = new RequestMappingHandlerMapping();
+	@Override
+	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+		RequestMappingHandlerMapping handlerMapping = super.requestMappingHandlerMapping();
 		handlerMapping.setOrder(Ordered.LOWEST_PRECEDENCE);
-		handlerMapping.setDefaultHandler(pageDescribeController);
-		handlerMapping.setInterceptors(new HandlerInterceptor[] {
-				defaultModelAttributeInterceptor,
-				setupRedirectInterceptor
-		});
-		handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager);
 		return handlerMapping;
 	}
+
+	@Override
+	protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+		RequestMappingHandlerMapping handlerMapping = super.createRequestMappingHandlerMapping();
+		handlerMapping.setDefaultHandler(pageDescribeController());
+		return handlerMapping;
+	}
+
+	@Override
+	protected RequestMappingHandlerAdapter createRequestMappingHandlerAdapter() {
+		return super.createRequestMappingHandlerAdapter();
+	}
+
+	// Controllers
 
 	@Bean
 	@ConditionalOnMissingBean

@@ -17,8 +17,6 @@
 package org.wallride.web.support;
 
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.UrlPathHelper;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteMatch;
 import org.tuckey.web.filters.urlrewrite.extend.RewriteRule;
@@ -32,8 +30,13 @@ import javax.servlet.http.HttpServletResponse;
 
 public class BlogLanguageRewriteRule extends RewriteRule {
 
-//	private BlogService blogService;
-//
+	private BlogService blogService;
+
+	public BlogLanguageRewriteRule(BlogService blogService) {
+		this.blogService = blogService;
+	}
+
+	// https://github.com/paultuckey/urlrewritefilter/issues/136
 //	@Override
 //	public boolean initialise(ServletContext servletContext) {
 //		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext);
@@ -52,8 +55,6 @@ public class BlogLanguageRewriteRule extends RewriteRule {
 
 		String lookupPath = urlPathHelper.getLookupPathForRequest(request);
 
-		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
-		BlogService blogService = context.getBean(BlogService.class);
 		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 		if (blog == null) {
 			return null;

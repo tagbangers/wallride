@@ -61,7 +61,7 @@ public class Post extends DomainObject<Long> {
 	private long id;
 
 	@Column(length = 200)
-	@Field
+	@Field(analyze = Analyze.NO)
 	private String code;
 
 	@Column(length = 3, nullable = false)

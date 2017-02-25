@@ -56,7 +56,7 @@ public class Category extends DomainObject<Long> implements Comparable<Category>
 	private long id;
 
 	@Column(length = 200, nullable = false)
-	@Field
+	@Field(analyze = Analyze.NO)
 	private String code;
 
 	@Column(length = 3, nullable = false)

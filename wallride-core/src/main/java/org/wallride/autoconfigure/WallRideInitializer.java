@@ -32,13 +32,18 @@ import org.springframework.util.StringUtils;
 
 public class WallRideInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
+	/**
+	 * @see ConfigFileApplicationListener#DEFAULT_SEARCH_LOCATIONS
+	 */
+	private static final String DEFAULT_CONFIG_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/";
+
 	@Override
 	public void onApplicationEvent(ApplicationStartedEvent event) {
-		event.getSpringApplication().setEnvironment(createEnvironment());
+		event.getSpringApplication().setEnvironment(createEnvironment(event));
 		event.getSpringApplication().setResourceLoader(createResourceLoader());
 	}
 
-	public static ConfigurableEnvironment createEnvironment() {
+	public static ConfigurableEnvironment createEnvironment(ApplicationStartedEvent event) {
 		StandardEnvironment environment = new StandardEnvironment();
 
 		String home = environment.getProperty(WallRideProperties.HOME_PROPERTY);
@@ -54,7 +59,11 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 
 		System.setProperty(WallRideProperties.CONFIG_LOCATION_PROPERTY, config);
 		System.setProperty(WallRideProperties.MEDIA_LOCATION_PROPERTY, media);
-		System.setProperty(ConfigFileApplicationListener.CONFIG_LOCATION_PROPERTY, config);
+
+		event.getSpringApplication().getListeners().stream()
+				.filter(listener -> listener.getClass().isAssignableFrom(ConfigFileApplicationListener.class))
+				.map(listener -> (ConfigFileApplicationListener) listener)
+				.forEach(listener -> listener.setSearchLocations(DEFAULT_CONFIG_SEARCH_LOCATIONS + "," + config));
 
 		return environment;
 	}

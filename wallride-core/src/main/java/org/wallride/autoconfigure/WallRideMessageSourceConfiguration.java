@@ -5,22 +5,21 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
 
 @Configuration
 public class WallRideMessageSourceConfiguration extends MessageSourceAutoConfiguration {
 
-	@Bean
+	@Override
 	public MessageSource messageSource() {
-		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-		messageSource.setDefaultEncoding("utf-8");
-		messageSource.setBasenames(
-				"classpath:/messages/messages",
-				"classpath:/messages/validations",
-				"classpath:/messages/enumerations",
-				"classpath:/messages/languages"
+		ResourceBundleMessageSource messageSource = (ResourceBundleMessageSource) super.messageSource();
+		messageSource.addBasenames(
+				"messages/messages",
+				"messages/validations",
+				"messages/enumerations",
+				"messages/languages"
 		);
 		return messageSource;
 	}

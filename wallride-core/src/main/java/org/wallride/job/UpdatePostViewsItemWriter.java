@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -33,12 +34,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.wallride.domain.Post;
 import org.wallride.exception.ServiceException;
 import org.wallride.repository.PostRepository;
+import org.wallride.service.BlogService;
 import org.wallride.web.controller.guest.article.ArticleDescribeController;
 import org.wallride.web.controller.guest.page.PageDescribeController;
 import org.wallride.web.support.BlogLanguageRewriteMatch;
 import org.wallride.web.support.BlogLanguageRewriteRule;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -52,7 +53,10 @@ public class UpdatePostViewsItemWriter implements ItemWriter<List> {
 	@Inject
 	private ServletContext servletContext;
 
-	@Resource
+	@Autowired
+	private BlogService blogService;
+
+	@Autowired
 	private PostRepository postRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(UpdatePostViewsItemWriter.class);
@@ -76,7 +80,7 @@ public class UpdatePostViewsItemWriter implements ItemWriter<List> {
 			request.setQueryString(uriComponents.getQuery());
 			MockHttpServletResponse response = new MockHttpServletResponse();
 
-			BlogLanguageRewriteRule rewriteRule = new BlogLanguageRewriteRule();
+			BlogLanguageRewriteRule rewriteRule = new BlogLanguageRewriteRule(blogService);
 			BlogLanguageRewriteMatch rewriteMatch = (BlogLanguageRewriteMatch) rewriteRule.matches(request, response);
 			try {
 				rewriteMatch.execute(request, response);

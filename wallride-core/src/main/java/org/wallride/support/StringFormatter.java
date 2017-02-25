@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package org.wallride.web.support;
+package org.wallride.support;
 
-import org.thymeleaf.context.IExpressionContext;
-import org.wallride.autoconfigure.WallRideProperties;
-import org.wallride.domain.Media;
+import org.springframework.format.Formatter;
+import org.springframework.util.StringUtils;
 
-public class Medias {
+import java.text.ParseException;
+import java.util.Locale;
 
-	private IExpressionContext context;
+public class StringFormatter implements Formatter<String> {
 
-	private WallRideProperties wallRideProperties;
-
-	public Medias(IExpressionContext context, WallRideProperties wallRideProperties) {
-		this.context = context;
-		this.wallRideProperties = wallRideProperties;
+	@Override
+	public String print(String object, Locale locale) {
+		return (!object.equals("") ? object : null);
 	}
 
-	public String link(Media media) {
-		return link(media.getId());
-	}
-
-	public String link(String id) {
-		return wallRideProperties.getMediaUrlPrefix() + id;
+	@Override
+	public String parse(String text, Locale locale) throws ParseException {
+		String value = StringUtils.trimWhitespace(text);
+//		value = Normalizer.normalize(value, Normalizer.Form.NFKC);
+		return value;
 	}
 }

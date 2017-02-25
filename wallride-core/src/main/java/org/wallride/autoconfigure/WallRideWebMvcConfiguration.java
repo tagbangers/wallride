@@ -25,34 +25,32 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.web.HttpRequestHandler;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.wallride.service.BlogService;
 import org.wallride.service.MediaService;
 import org.wallride.support.CodeFormatAnnotationFormatterFactory;
+import org.wallride.support.StringFormatter;
 import org.wallride.web.support.*;
 
-import java.text.Normalizer;
-import java.text.ParseException;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
-public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
+public class WallRideWebMvcConfiguration extends WebMvcConfigurerAdapter {
 
 	private static final String CLASSPATH_RESOURCE_LOCATION = "classpath:/resources/guest/";
 
@@ -86,18 +84,7 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		registry.addFormatter(new org.springframework.format.Formatter<String>() {
-			@Override
-			public String print(String object, Locale locale) {
-				return (!object.equals("") ? object : null);
-			}
-
-			@Override
-			public String parse(String text, Locale locale) throws ParseException {
-				String value = StringUtils.trimWhitespace(text);
-				return Normalizer.normalize(value, Normalizer.Form.NFKC);
-			}
-		});
+		super.addFormatters(registry);
 		registry.addFormatterForFieldAnnotation(new CodeFormatAnnotationFormatterFactory());
 	}
 
@@ -125,23 +112,6 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 	// additional webmvc-related beans
 
 	@Bean
-	public SimpleUrlHandlerMapping faviconHandlerMapping(WebApplicationContext context) {
-		ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-		requestHandler.setApplicationContext(context);
-
-		List<org.springframework.core.io.Resource> locations = new ArrayList<>();
-		locations.add(resourceLoader.getResource(wallRideProperties.getHome() + "themes/default/resources/"));
-		locations.add(resourceLoader.getResource(CLASSPATH_RESOURCE_LOCATION));
-		locations.add(resourceLoader.getResource("classpath:/"));
-		requestHandler.setLocations(locations);
-
-		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-		mapping.setOrder(Integer.MIN_VALUE + 1);
-		mapping.setUrlMap(Collections.singletonMap("**/favicon.ico", requestHandler));
-		return mapping;
-	}
-
-	@Bean
 	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
 		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
 		mediaHttpRequestHandler.setWallRideProperties(wallRideProperties);
@@ -156,6 +126,11 @@ public class WallRideWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 		handlerMapping.setOrder(0);
 		handlerMapping.setUrlMap(urlMap);
 		return handlerMapping;
+	}
+
+	@Bean
+	public StringFormatter stringFormatter() {
+		return new StringFormatter();
 	}
 
 	@Bean

@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.3.RELEASE</version>
+        <version>1.4.4.RELEASE</version>
         <relativePath />
     </parent>
     <groupId>org.wallride</groupId>
     <artifactId>wallride-parent</artifactId>
-    <version>1.0.0.M8</version>
+    <version>1.0.0.M12</version>
     <packaging>pom</packaging>
     <name>WallRide Parent</name>
     <description>CMS for developers of principles</description>
@@ -58,6 +58,9 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
+        <thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
+        <thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
         <hibernate.version>5.1.0.Final</hibernate.version>
     </properties>
 
@@ -65,7 +68,7 @@
         <dependency>
             <groupId>org.wallride</groupId>
             <artifactId>wallride-core</artifactId>
-            <version>1.0.0.M8</version>
+            <version>1.0.0.M12</version>
         </dependency>
 
         <dependency>
@@ -93,6 +96,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thymeleaf-layout-dialect</artifactId>
+                    <groupId>nz.net.ultraq.thymeleaf</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
