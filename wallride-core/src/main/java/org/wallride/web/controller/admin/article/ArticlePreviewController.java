@@ -75,6 +75,7 @@ public class ArticlePreviewController {
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		Article article = new Article();
+		article.setLanguage(language);
 		article.setCover(form.getCoverId() != null ? mediaService.getMedia(form.getCoverId()) : null);
 		article.setTitle(form.getTitle());
 		article.setBody(form.getBody());

@@ -76,6 +76,7 @@ public class PagePreviewController {
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		Page page = new Page();
+		page.setLanguage(language);
 		page.setCover(form.getCoverId() != null ? mediaService.getMedia(form.getCoverId()) : null);
 		page.setTitle(form.getTitle());
 		page.setBody(form.getBody());
