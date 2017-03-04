@@ -27,6 +27,7 @@ public class PostSearchRequest {
 	private Collection<Long> postIds = new ArrayList<>();
 	private Post.Status status = Post.Status.PUBLISHED;
 	private String keyword;
+	private Collection<String> categoryCodes = new ArrayList<>();
 	private Collection<String> tagNames = new ArrayList<>();
 	private LocalDateTime dateFrom;
 	private LocalDateTime dateTo;
@@ -77,6 +78,24 @@ public class PostSearchRequest {
 
 	public PostSearchRequest withKeyword(String keyword) {
 		this.keyword = keyword;
+		return this;
+	}
+
+	public Collection<String> getCategoryCodes() {
+		return categoryCodes;
+	}
+
+	public void setCategoryCodes(Collection<String> categoryCodes) {
+		this.categoryCodes = categoryCodes;
+	}
+
+	public PostSearchRequest withCategoryCodes(String... categoryCodes) {
+		if (getCategoryCodes() == null) {
+			setCategoryCodes(new ArrayList<String>(categoryCodes.length));
+		}
+		for (String value : categoryCodes) {
+			getCategoryCodes().add(value);
+		}
 		return this;
 	}
 

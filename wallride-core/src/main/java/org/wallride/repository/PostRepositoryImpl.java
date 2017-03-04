@@ -81,6 +81,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
 			String[] fields = new String[] {
 					"title", "body",
+					"categories.code",
 					"tags.name",
 			};
 			MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, analyzer);
@@ -111,6 +112,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		}
 		if (request.getDateTo() != null) {
 			junction.must(qb.range().onField("date").below(request.getDateTo()).createQuery());
+		}
+
+		if (!CollectionUtils.isEmpty(request.getCategoryCodes())) {
+			BooleanJunction<BooleanJunction> subJunction = qb.bool();
+			for (String categoryCode : request.getCategoryCodes()) {
+				subJunction.should(qb.phrase().onField("categories.code").sentence(categoryCode).createQuery());
+			}
+			junction.must(subJunction.createQuery());
 		}
 
 		if (!CollectionUtils.isEmpty(request.getTagNames())) {

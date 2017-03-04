@@ -26,10 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.wallride.service.BlogService;
 import org.wallride.service.PageService;
-import org.wallride.web.controller.guest.FeedController;
-import org.wallride.web.controller.guest.IndexController;
-import org.wallride.web.controller.guest.SearchController;
-import org.wallride.web.controller.guest.TagController;
+import org.wallride.web.controller.guest.*;
 import org.wallride.web.controller.guest.article.ArticleDescribeController;
 import org.wallride.web.controller.guest.article.ArticleIndexController;
 import org.wallride.web.controller.guest.comment.CommentRestController;
@@ -142,6 +139,12 @@ public class WebGuestConfiguration extends DelegatingWebMvcConfiguration {
 			return new SearchController();
 		}
 
+		@Bean
+		@ConditionalOnMissingBean
+		public CategoryController categoryController() {
+			return new CategoryController();
+		}
+		
 		@Bean
 		@ConditionalOnMissingBean
 		public TagController tagController() {

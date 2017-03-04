@@ -114,46 +114,6 @@ public class ArticleIndexController {
 		return "article/index";
 	}
 
-	@RequestMapping("/category/**")
-	public String category(
-			@PageableDefault(10) Pageable pageable,
-			BlogLanguage blogLanguage,
-			HttpServletRequest servletRequest,
-			Model model) {
-		String path = extractPathFromPattern(servletRequest);
-		String[] codes = path.split("/");
-		String lastCode = codes[codes.length - 1];
-
-		Category category = categoryService.getCategoryByCode(lastCode, blogLanguage.getLanguage());
-		if (category == null) {
-			category = categoryService.getCategoryByCode(lastCode, blogLanguage.getBlog().getDefaultLanguage());
-		}
-		if (category == null) {
-			throw new HttpNotFoundException();
-		}
-
-		ArticleSearchForm form = new ArticleSearchForm() {};
-		form.setLanguage(category.getLanguage());
-		form.getCategoryIds().add(category.getId());
-
-		Page<Article> articles = articleService.getArticles(form.toArticleSearchRequest(), pageable);
-		model.addAttribute("category", category);
-		model.addAttribute("articles", articles);
-		model.addAttribute("pageable", pageable);
-		model.addAttribute("pagination", new Pagination<>(articles, servletRequest));
-		return "article/category";
-	}
-
-	private String extractPathFromPattern(final HttpServletRequest request){
-		String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		String bestMatchPattern = (String ) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-
-		AntPathMatcher apm = new AntPathMatcher();
-		String finalPath = apm.extractPathWithinPattern(bestMatchPattern, path);
-
-		return finalPath;
-	}
-
 	@RequestMapping("/author/{loginId}")
 	public String author(
 			@PathVariable String loginId,
