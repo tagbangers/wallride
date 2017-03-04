@@ -38,16 +38,16 @@ public class CategoryUtils {
 		return getAllCategories(false);
 	}
 
-	public List<Category> getAllCategories(boolean includeNoArticle) {
-		return categoryService.getCategories(LocaleContextHolder.getLocale().getLanguage(), includeNoArticle);
+	public List<Category> getAllCategories(boolean includeNoPosts) {
+		return categoryService.getCategories(LocaleContextHolder.getLocale().getLanguage(), includeNoPosts);
 	}
 
 	public List<TreeNode<Category>> getNodes() {
 		return getNodes(false);
 	}
 
-	public List<TreeNode<Category>> getNodes(boolean includeNoArticle) {
-		Collection<Category> categories = categoryService.getCategories(LocaleContextHolder.getLocale().getLanguage(), includeNoArticle);
+	public List<TreeNode<Category>> getNodes(boolean includeNoPosts) {
+		Collection<Category> categories = categoryService.getCategories(LocaleContextHolder.getLocale().getLanguage(), includeNoPosts);
 
 		List<TreeNode<Category>> rootNodes = new ArrayList<>();
 		Iterator<Category> i = categories.iterator();
