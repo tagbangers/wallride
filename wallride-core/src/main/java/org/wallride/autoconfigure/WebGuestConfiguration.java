@@ -40,10 +40,7 @@ import org.wallride.web.controller.guest.user.*;
 public class WebGuestConfiguration extends DelegatingWebMvcConfiguration {
 
 	@Autowired
-	private BlogService blogService;
-
-	@Autowired
-	private PageService pageService;
+	private PageDescribeController pageDescribeController;
 
 	@Override
 	public RequestMappingHandlerMapping requestMappingHandlerMapping() {
@@ -55,7 +52,7 @@ public class WebGuestConfiguration extends DelegatingWebMvcConfiguration {
 	@Override
 	protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
 		RequestMappingHandlerMapping handlerMapping = super.createRequestMappingHandlerMapping();
-		handlerMapping.setDefaultHandler(pageDescribeController());
+		handlerMapping.setDefaultHandler(pageDescribeController);
 		return handlerMapping;
 	}
 
@@ -64,83 +61,91 @@ public class WebGuestConfiguration extends DelegatingWebMvcConfiguration {
 		return super.createRequestMappingHandlerAdapter();
 	}
 
-	// Controllers
+	@Configuration
+	public static class ControllerConfigration {
 
-	@Bean
-	@ConditionalOnMissingBean
-	public PageDescribeController pageDescribeController() {
-		return new PageDescribeController(blogService, pageService);
-	}
+		@Autowired
+		private BlogService blogService;
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ArticleDescribeController articleDescribeController() {
-		return new ArticleDescribeController();
-	}
+		@Autowired
+		private PageService pageService;
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ArticleIndexController articleIndexController() {
-		return new ArticleIndexController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public PageDescribeController pageDescribeController() {
+			return new PageDescribeController(blogService, pageService);
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public CommentRestController commentRestController() {
-		return new CommentRestController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public ArticleDescribeController articleDescribeController() {
+			return new ArticleDescribeController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public LoginController loginController() {
-		return new LoginController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public ArticleIndexController articleIndexController() {
+			return new ArticleIndexController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public PasswordResetController passwordResetController() {
-		return new PasswordResetController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public CommentRestController commentRestController() {
+			return new CommentRestController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public PasswordUpdateController passwordUpdateController() {
-		return new PasswordUpdateController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public LoginController loginController() {
+			return new LoginController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ProfileUpdateController profileUpdateController() {
-		return new ProfileUpdateController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public PasswordResetController passwordResetController() {
+			return new PasswordResetController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public SignupController signupController() {
-		return new SignupController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public PasswordUpdateController passwordUpdateController() {
+			return new PasswordUpdateController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public FeedController feedController() {
-		return new FeedController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public ProfileUpdateController profileUpdateController() {
+			return new ProfileUpdateController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public IndexController indexController() {
-		return new IndexController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public SignupController signupController() {
+			return new SignupController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public SearchController searchController() {
-		return new SearchController();
-	}
+		@Bean
+		@ConditionalOnMissingBean
+		public FeedController feedController() {
+			return new FeedController();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public TagController tagController() {
-		return new TagController();
+		@Bean
+		@ConditionalOnMissingBean
+		public IndexController indexController() {
+			return new IndexController();
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public SearchController searchController() {
+			return new SearchController();
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public TagController tagController() {
+			return new TagController();
+		}
 	}
 }

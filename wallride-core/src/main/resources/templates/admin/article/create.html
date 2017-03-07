@@ -31,7 +31,9 @@
 											form.attr('action', action);
 											form.attr('target', '_blank');
 											$(':input[name="body"]', form).val($('#wr-page-content :input[name="body"]').froalaEditor('html.get'));
+											$('body').append(form);
 											form.submit();
+											form.remove();
 										});
 									});
 								</script>
