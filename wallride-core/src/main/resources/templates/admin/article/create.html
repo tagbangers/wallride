@@ -550,7 +550,7 @@
 										<option value="">Select Author</option>
 										<option th:each="article : ${#articles.getAllArticles()}" th:if="${article.id ne id}" th:value="${article.author}" th:text="${article.author}" th:selected="${article.author}"></option>
 									</select>
-									<script th:inline="jauthorListavascript">
+									<script th:inline="javascript">
                                         $(".form-control option").each(function(){
                                             $(this).siblings("[value='"+ this.value+"']").remove();
                                         });
