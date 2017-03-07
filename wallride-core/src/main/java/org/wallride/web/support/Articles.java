@@ -37,6 +37,14 @@ public class Articles {
 		this.articleUtils = articleUtils;
 	}
 
+	////////////////////////////////////// Custom ///////////////////////////////////
+
+	public List<Article> getAllArticles() {
+		return articleUtils.getAllArticles();
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////
+
 	public List<Article> search(Condition condition) {
 		Page<Article> result = articleUtils.search(condition.buildArticleSearchRequest(), condition.size);
 		return new ArrayList<>(result.getContent());
