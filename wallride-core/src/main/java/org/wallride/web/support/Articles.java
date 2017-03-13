@@ -42,6 +42,10 @@ public class Articles {
 		return new ArrayList<>(result.getContent());
 	}
 
+	public List<Article> getAllArticles() {
+		return articleUtils.getAllArticles();
+	}
+
 	public Condition condition() {
 		return new Condition();
 	}
