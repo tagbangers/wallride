@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'colors.picker': '[_BUTTONS_][_TEXT_COLORS_][_BACKGROUND_COLORS_]'
@@ -65,9 +64,11 @@
       var $btn = editor.$tb.find('.fr-command[data-cmd="color"]');
 
       var $popup = editor.popups.get('colors.picker');
+
       if (!$popup) $popup = _initColorsPopup();
 
       if (!$popup.hasClass('fr-active')) {
+
         // Colors popup
         editor.popups.setContainer('colors.picker', editor.$tb);
 
@@ -80,6 +81,7 @@
           var top = $btn.offset().top + (editor.opts.toolbarBottom ? 10 : $btn.outerHeight() - 10);
           editor.popups.show('colors.picker', left, top, $btn.outerHeight());
         }
+
         else {
           editor.position.forSelection($popup);
           editor.popups.show('colors.picker');
@@ -91,6 +93,7 @@
      * Hide colors popup.
      */
     function _hideColorsPopup () {
+
       // Hide popup.
       editor.popups.hide('colors.picker');
     }
@@ -102,6 +105,7 @@
       var colors_buttons = '<div class="fr-buttons fr-colors-buttons">';
 
       if (editor.opts.toolbarInline) {
+
         // Colors buttons.
         if (editor.opts.colorsButtons.length > 0) {
           colors_buttons += editor.button.buildList(editor.opts.colorsButtons)
@@ -119,6 +123,8 @@
       // Create popup.
       var $popup = editor.popups.create('colors.picker', template);
 
+      _addAccessibility($popup);
+
       return $popup;
     }
 
@@ -126,13 +132,13 @@
      * HTML for the color picker text and background tabs.
      */
     function _colorsTabsHTML () {
-      var tabs_html = '<div class="fr-colors-tabs">';
+      var tabs_html = '<div class="fr-colors-tabs fr-group">';
 
       // Text tab.
-      tabs_html += '<span class="fr-colors-tab ' + (editor.opts.colorsDefaultTab == 'background' ? '' : 'fr-selected-tab ') + 'fr-command" data-param1="text" data-cmd="colorChangeSet" title="' + editor.language.translate('Text') + '">' + editor.language.translate('Text') + '</span>';
+      tabs_html += '<span class="fr-colors-tab ' + (editor.opts.colorsDefaultTab == 'background' ? '' : 'fr-selected-tab ') + 'fr-command" tabIndex="-1" role="button" aria-pressed="' + (editor.opts.colorsDefaultTab == 'background' ? false : true) + '" data-param1="text" data-cmd="colorChangeSet" title="' + editor.language.translate('Text') + '">' + editor.language.translate('Text') + '</span>';
 
       // Background tab.
-      tabs_html += '<span class="fr-colors-tab ' + (editor.opts.colorsDefaultTab == 'background' ? 'fr-selected-tab ' : '') + 'fr-command" data-param1="background" data-cmd="colorChangeSet" title="' + editor.language.translate('Background') + '">' + editor.language.translate('Background') + '</span>';
+      tabs_html += '<span class="fr-colors-tab ' + (editor.opts.colorsDefaultTab == 'background' ? 'fr-selected-tab ' : '') + 'fr-command" tabIndex="-1" role="button" aria-pressed="' + (editor.opts.colorsDefaultTab == 'background' ? true : false) + '" data-param1="background" data-cmd="colorChangeSet" title="' + editor.language.translate('Background') + '">' + editor.language.translate('Background') + '</span>';
 
       return tabs_html + '</div>';
     }
@@ -141,6 +147,7 @@
      * HTML for the color picker colors.
      */
     function _colorPickerHTML (tab) {
+
       // Get colors according to tab name.
       var colors = (tab == 'text' ? editor.opts.colorsText : editor.opts.colorsBackground);
 
@@ -154,15 +161,104 @@
         }
 
         if (colors[i] != 'REMOVE') {
-          colors_html += '<span class="fr-command fr-select-color" style="background: ' + colors[i] + ';" data-cmd="' + tab + 'Color" data-param1="' + colors[i] + '"></span>';
+          colors_html += '<span class="fr-command fr-select-color" style="background: ' + colors[i] + ';" tabIndex="-1" aria-selected="false" role="button" data-cmd="' + tab + 'Color" data-param1="' + colors[i] + '"><span class="fr-sr-only">' + editor.language.translate('Color') + ' ' + colors[i] + '&nbsp;&nbsp;&nbsp;</span></span>';
         }
 
         else {
-          colors_html += '<span class="fr-command fr-select-color" data-cmd="' + tab + 'Color" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '">' + editor.icon.create('remove') + '</span>';
+          colors_html += '<span class="fr-command fr-select-color" data-cmd="' + tab + 'Color" tabIndex="-1" role="button" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '">' + editor.icon.create('remove') + '<span class="fr-sr-only">' + editor.language.translate('Clear Formatting') + '</span>' +  '</span>';
         }
       }
 
       return colors_html + '</div>';
+    }
+
+    /*
+     * Register keyboard events.
+     */
+    function _addAccessibility ($popup) {
+
+      // Register popup event.
+      editor.events.on('popup.tab', function (e) {
+        var $focused_item = $(e.currentTarget);
+
+        // Skip if popup is not visible or focus is elsewere.
+        if (!editor.popups.isVisible('colors.picker') || !$focused_item.is('span')) {
+          return true;
+        }
+        var key_code = e.which;
+        var status = true;
+
+        // Tabbing.
+        if ($.FE.KEYCODE.TAB == key_code) {
+          var $tb = $popup.find('.fr-buttons');
+
+          // Focus back the popup's toolbar if exists.
+          status = !editor.accessibility.focusToolbar($tb, (e.shiftKey ? true : false));
+        }
+
+        // Arrows.
+        else if ($.FE.KEYCODE.ARROW_UP == key_code || $.FE.KEYCODE.ARROW_DOWN == key_code || $.FE.KEYCODE.ARROW_LEFT == key_code || $.FE.KEYCODE.ARROW_RIGHT == key_code) {
+          if ($focused_item.is('span.fr-select-color')) {
+
+            // Get all current colors.
+            var $colors = $focused_item.parent().find('span.fr-select-color');
+
+            // Get focused item position.
+            var index = $colors.index($focused_item);
+
+            // Get color matrix dimensions.
+            var columns = editor.opts.colorsStep;
+            var lines = Math.floor($colors.length / columns);
+
+            // Get focused item coordinates.
+            var column = index % columns;
+            var line = Math.floor(index / columns);
+
+            var nextIndex = line * columns + column;
+            var dimension = lines * columns;
+
+            // Calculate next index. Go to the other opposite site of the matrix if there is no next adjacent element.
+            // Up/Down: Traverse matrix lines.
+            // Left/Right: Traverse the matrix as it is a vector.
+            if ($.FE.KEYCODE.ARROW_UP == key_code) {
+              nextIndex = (((nextIndex - columns) % dimension) + dimension) % dimension; // Javascript negative modulo bug.
+            }
+            else if ($.FE.KEYCODE.ARROW_DOWN == key_code) {
+              nextIndex = (nextIndex + columns) % dimension;
+            }
+            else if ($.FE.KEYCODE.ARROW_LEFT == key_code) {
+              nextIndex = (((nextIndex - 1) % dimension) + dimension) % dimension; // Javascript negative modulo bug.
+            }
+            else if ($.FE.KEYCODE.ARROW_RIGHT == key_code) {
+              nextIndex = (nextIndex + 1) % dimension;
+            }
+
+            // Get the next element based on the new index.
+            var $el = $($colors.get(nextIndex));
+
+            // Focus.
+            editor.events.disableBlur();
+            $el.focus();
+
+            status = false;
+          }
+        }
+
+        // ENTER or SPACE.
+        else if ($.FE.KEYCODE.ENTER == key_code) {
+
+          editor.button.exec($focused_item);
+          status = false;
+        }
+
+        // Prevent propagation.
+        if (status === false) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        return status;
+      }, true);
     }
 
     /*
@@ -174,6 +270,7 @@
 
       // The color css property.
       var color_type;
+
       if (tab == 'background') {
         color_type = 'background-color';
       }
@@ -181,11 +278,16 @@
         color_type = 'color';
       }
 
+      var $current_color = $popup.find('.fr-' + tab + '-color .fr-select-color');
+
       // Remove current color selection.
-      $popup.find('.fr-' + tab + '-color .fr-select-color').removeClass('fr-selected-color');
+      $current_color.find('.fr-selected-color').remove();
+      $current_color.removeClass('fr-active-item');
+      $current_color.not('[data-param1="REMOVE"]').attr('aria-selected', false);
 
       // Find the selected color.
-      while ($element.get(0) != editor.$el.get(0)) {
+      while ($element.get(0) != editor.el) {
+
         // Transparent or black.
         if ($element.css(color_type) == 'transparent' || $element.css(color_type) == 'rgba(0, 0, 0, 0)') {
           $element = $element.parent();
@@ -193,7 +295,11 @@
 
         // Select the correct color.
         else {
-          $popup.find('.fr-' + tab + '-color .fr-select-color[data-param1="' + editor.helpers.RGBToHex($element.css(color_type)) + '"]').addClass('fr-selected-color');
+          var $select_color = $popup.find('.fr-' + tab + '-color .fr-select-color[data-param1="' + editor.helpers.RGBToHex($element.css(color_type)) + '"]');
+
+          // Add checked icon.
+          $select_color.append('<span class="fr-selected-color" aria-hidden="true">\uf00c</span>');
+          $select_color.addClass('fr-active-item').attr('aria-selected', true);
           break;
         }
       }
@@ -203,11 +309,13 @@
      * Change the colors' tab.
      */
     function _changeSet ($tab, val) {
+
       // Only on the tab that is not selected yet. On left click only.
       if (!$tab.hasClass('fr-selected-tab')) {
+
         // Switch selected tab.
-        $tab.siblings().removeClass('fr-selected-tab');
-        $tab.addClass('fr-selected-tab');
+        $tab.siblings().removeClass('fr-selected-tab').attr('aria-pressed', false);
+        $tab.addClass('fr-selected-tab').attr('aria-pressed', true);
 
         // Switch the color set.
         $tab.parents('.fr-popup').find('.fr-color-set').removeClass('fr-selected-set');
@@ -215,13 +323,18 @@
 
         // Refresh selected color.
         _refreshColor(val);
+
       }
+
+      // Focus popup.
+      editor.accessibility.focusPopup($tab.parents('.fr-popup'));
     }
 
     /*
      * Change background color.
      */
     function background (val) {
+
       // Set background  color.
       if (val != 'REMOVE') {
         editor.format.applyStyle('background-color', editor.helpers.HEXtoRGB(val));
@@ -239,6 +352,7 @@
      * Change text color.
      */
     function text (val) {
+
       // Set text color.
       if (val != 'REMOVE') {
         editor.format.applyStyle('color', editor.helpers.HEXtoRGB(val));
@@ -283,7 +397,7 @@
         this.colors.showColorsPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }

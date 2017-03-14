@@ -120,6 +120,10 @@
 }
 
 .fr-view {
+  span[style~="color:"] a {
+    color: inherit;
+  }
+
   strong {
     font-weight: 700;
   }
@@ -184,6 +188,24 @@
   pre {
     white-space: pre-wrap;
     word-wrap: break-word;
+  }
+
+  &[dir="rtl"] {
+    blockquote {
+      border-left: none;
+      border-right: solid 2px @blockquote-level1-color;
+      margin-right: 0;
+      padding-right: 5px;
+      padding-left: 0px;
+
+      blockquote {
+        border-color: @blockquote-level2-color;
+
+        blockquote {
+          border-color: @blockquote-level3-color;
+        }
+      }
+    }
   }
 
   blockquote {

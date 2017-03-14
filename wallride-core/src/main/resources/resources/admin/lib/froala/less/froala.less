@@ -7,11 +7,12 @@
 
 @import 'tooltip.less';
 
-@import 'toolbar/ui.less';
-@import 'toolbar/buttons.less';
-@import 'toolbar/dropdown.less';
-@import 'toolbar/popup.less';
-@import 'toolbar/text_edit.less';
+@import 'ui/buttons.less';
+@import 'ui/dropdown.less';
+@import 'ui/modal.less';
+@import 'ui/popup.less';
+@import 'ui/text_edit.less';
+@import 'ui/toolbar.less';
 
 @import 'helpers.less';
 
@@ -51,4 +52,9 @@
 
 .fr-sticky-on + .fr-sticky-dummy, .fr-sticky-box > .fr-sticky-dummy {
 	display: block;
+}
+
+// Used for accessibility instead of aria-label.
+span.fr-sr-only {
+  .hide-by-clipping();
 }

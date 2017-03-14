@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.DEFAULTS, {
     paragraphFormat: {
@@ -57,11 +56,13 @@
 
       // If val is null or default tag already do nothing.
       if (val && val.toLowerCase() != defaultTag) {
+
         // Deal with nested lists.
         if ($li.find('ul, ol').length > 0) {
           var $el = $('<' + val + '>');
           $li.prepend($el);
           var node = editor.node.contents($li.get(0))[0];
+
           while (node && ['UL', 'OL'].indexOf(node.tagName) < 0) {
             var next_node = node.nextSibling;
             $el.append(node);
@@ -107,6 +108,7 @@
 
       // Return to the regular case. We don't use P inside TD/TH.
       if (val.toLowerCase() == defaultTag) {
+
         // If node is not empty, then add a BR.
         if (!editor.node.isEmpty($blk.get(0), true)) {
           $blk.append('<br/>');
@@ -133,6 +135,7 @@
      * Apply style.
      */
     function apply (val) {
+
       // Normal.
       if (val == 'N') val = editor.html.defaultTag();
 
@@ -197,14 +200,15 @@
         var blk = blocks[0];
         var tag = 'N';
         var default_tag = editor.html.defaultTag();
-        if (blk.tagName.toLowerCase() != default_tag && blk != editor.$el.get(0)) {
+
+        if (blk.tagName.toLowerCase() != default_tag && blk != editor.el) {
           tag = blk.tagName;
         }
 
-        $dropdown.find('.fr-command[data-param1="' + tag + '"]').addClass('fr-active');
+        $dropdown.find('.fr-command[data-param1="' + tag + '"]').addClass('fr-active').attr('aria-selected', true);
       }
       else {
-        $dropdown.find('.fr-command[data-param1="N"]').addClass('fr-active');
+        $dropdown.find('.fr-command[data-param1="N"]').addClass('fr-active').attr('aria-selected', true);
       }
     }
 
@@ -216,7 +220,8 @@
           var blk = blocks[0];
           var tag = 'N';
           var default_tag = editor.html.defaultTag();
-          if (blk.tagName.toLowerCase() != default_tag && blk != editor.$el.get(0)) {
+
+          if (blk.tagName.toLowerCase() != default_tag && blk != editor.el) {
             tag = blk.tagName;
           }
 
@@ -227,7 +232,7 @@
           $btn.find('> span').text(editor.opts.paragraphFormat[tag]);
         }
         else {
-          $btn.find('> span').text(edior.opts.paragraphFormat.N);
+          $btn.find('> span').text(editor.opts.paragraphFormat.N);
         }
       }
     }
@@ -240,11 +245,6 @@
   }
 
   // Register the font size command.
-  $.FE.RegisterShortcut($.FE.KEYCODE.ZERO, 'paragraphFormat', 'N', '0', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.ONE, 'paragraphFormat', 'H1', '1', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.TWO, 'paragraphFormat', 'H2', '2', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.THREE, 'paragraphFormat', 'H3', '3', false, true);
-  $.FE.RegisterShortcut($.FE.KEYCODE.FOUR, 'paragraphFormat', 'H4', '4', false, true);
   $.FE.RegisterCommand('paragraphFormat', {
     type: 'dropdown',
     displaySelection: function (editor) {
@@ -253,11 +253,13 @@
     defaultSelection: 'Normal',
     displaySelectionWidth: 100,
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.paragraphFormat;
+
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
           var shortcut = this.shortcuts.get('paragraphFormat.' + val);
+
           if (shortcut) {
             shortcut = '<span class="fr-shortcut">' + shortcut + '</span>';
           }
@@ -265,7 +267,7 @@
             shortcut = '';
           }
 
-          c += '<li><' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + ' style="padding: 0 !important; margin: 0 !important;"><a class="fr-command" data-cmd="paragraphFormat" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + '></li>';
+          c += '<li role="presentation"><' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + ' style="padding: 0 !important; margin: 0 !important;" role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="paragraphFormat" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></' + (val == 'N' ? this.html.defaultTag() || 'DIV' : val) + '></li>';
         }
       }
       c += '</ul>';

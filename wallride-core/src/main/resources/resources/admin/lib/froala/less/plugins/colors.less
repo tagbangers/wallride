@@ -19,7 +19,7 @@
       padding: 8px 0;
       position: relative;
 
-      &:hover {
+      &:hover, &:focus {
         color: @ui-color;
       }
 
@@ -77,9 +77,8 @@
         left: 0;
       }
 
-      &.fr-selected-color::after {
+      .fr-selected-color {
         color: @white;
-        content: "\f00c";
         font-family: FontAwesome;
         font-size: 13px;
         font-weight: 400;
@@ -93,7 +92,7 @@
         cursor: default;
       }
 
-      &:hover, &.fr-selected-color {
+      &:hover, &:focus {
         outline: 1px solid @ui-text;
         z-index: 2;
       }

@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.lists = function (editor) {
     function _openFlag(tag_name) {
@@ -48,8 +47,10 @@
      */
     function _replace(blocks, tag_name) {
       var lists = [];
+
       for (var i = 0; i < blocks.length; i++) {
         var parent_node = blocks[i].parentNode;
+
         if (blocks[i].tagName == 'LI' && parent_node.tagName != tag_name && lists.indexOf(parent_node) < 0) {
           lists.push(parent_node);
         }
@@ -69,8 +70,10 @@
 
       // Format those blocks that are not LI.
       var default_tag = editor.html.defaultTag();
+
       for (var i = 0; i < blocks.length; i++) {
         if (blocks[i].tagName != 'LI') {
+
           // Default tag.
           if (default_tag && blocks[i].tagName.toLowerCase() == default_tag) {
             $(blocks[i]).replaceWith('<' + tag_name + '><li' + editor.node.attributes(blocks[i]) + '>' + $(blocks[i]).html() + '</li></' + tag_name + '>');
@@ -103,9 +106,11 @@
 
       // Unwrap remaining LI.
       var lists = [];
+
       for (i = 0; i < blocks.length; i++) {
         var $li = $(blocks[i]);
         var parent_node = blocks[i].parentNode;
+        var li_class = $li.attr('class');
 
         $li.before(_closeFlag(parent_node.tagName));
 
@@ -115,6 +120,12 @@
           $li.after(_openFlag('LI'));
         }
         else {
+
+          // https://github.com/froala/wysiwyg-editor/issues/1765 .
+          if (li_class) {
+            $li.wrapInner('<' + editor.html.defaultTag() + ' class="' + li_class + '"></' + editor.html.defaultTag() + '>')
+          }
+
           // Append BR if the node is not empty.
           if (!editor.node.isEmpty($li.get(0), true) && $li.find(editor.html.blockTagsQuery()).length === 0) {
             $li.append('<br>');
@@ -157,7 +168,9 @@
      */
     function _shouldUnformat(blocks, tag_name) {
       var do_unformat = true;
+
       for (var i = 0; i < blocks.length; i++) {
+
         // Something else than LI is selected.
         if (blocks[i].tagName != 'LI') {
           return false;
@@ -176,6 +189,7 @@
      * Call the list actions.
      */
     function format(tag_name) {
+
       // Wrap.
       editor.selection.save();
       editor.html.wrap(true, true, true, true);
@@ -214,13 +228,24 @@
      */
     function refresh($btn, tag_name) {
       var $el = $(editor.selection.element());
-      if ($el.get(0) != editor.$el.get(0)) {
+
+      if ($el.get(0) != editor.el) {
         var li = $el.get(0);
-        if (li.tagName != 'LI') {
+
+        if (li.tagName != 'LI' && li.firstElementChild && li.firstElementChild.tagName != 'LI') {
           li = $el.parents('li').get(0);
         }
+        else if (li.tagName != 'LI' && !li.firstElementChild) {
+          li = $el.parents('li').get(0);
+        }
+        else if (li.firstElementChild && li.firstElementChild.tagName == 'LI') {
+          li = $el.get(0).firstChild;
+        }
+        else {
+          li = $el.get(0)
+        }
 
-        if (li && li.parentNode.tagName == tag_name && editor.$el.get(0).contains(li.parentNode)) {
+        if (li && li.parentNode.tagName == tag_name && editor.el.contains(li.parentNode)) {
           $btn.addClass('fr-active');
         }
       }
@@ -231,27 +256,38 @@
      */
     function _indent (blocks) {
       editor.selection.save();
+
       for (var i = 0; i < blocks.length; i++) {
+
         // There should be a previous li.
         var prev_li = blocks[i].previousSibling;
+
         if (prev_li) {
-          var nl = $(blocks[i]).find('> ul, > ol').get(0);
+          var nl = $(blocks[i]).find('> ul, > ol').last().get(0);
 
           // Current LI has a nested list.
           if (nl) {
+
+            // Build a new list item and prepend it to the list.
             var $li = $('<li>').prependTo($(nl));
+
+            // Get first node of the list item.
             var node = editor.node.contents(blocks[i])[0];
+
+            // While node and it is not a list, append to the new list item.
             while (node && !editor.node.isList(node)) {
               var tmp = node.nextSibling;
               $li.append(node);
               node = tmp;
             }
 
+            // Append current list to the previous node.
             $(prev_li).append($(nl));
             $(blocks[i]).remove();
           }
           else {
-            var prev_nl = $(prev_li).find('> ul, > ol').get(0);
+            var prev_nl = $(prev_li).find('> ul, > ol').last().get(0);
+
             if (prev_nl) {
               $(prev_nl).append($(blocks[i]));
             }
@@ -285,6 +321,7 @@
         var do_indent = false;
         var blocks = editor.selection.blocks();
         var blks = [];
+
         for (var i = 0; i < blocks.length; i++) {
           if (blocks[i].tagName == 'LI') {
             do_indent = true;
@@ -312,21 +349,21 @@
       // TAB key in lists.
       editor.events.on('keydown', function (e) {
         if (e.which == $.FE.KEYCODE.TAB) {
-          var do_indent;
           var blocks = editor.selection.blocks();
           var blks = [];
+
           for (var i = 0; i < blocks.length; i++) {
             if (blocks[i].tagName == 'LI') {
-              do_indent = true;
               blks.push(blocks[i]);
             }
             else if (blocks[i].parentNode.tagName == 'LI') {
-              do_indent = true;
-              blks.push(blocks[i].parentNode);
+              blks.push(blocks[i].parentNode)
             }
           }
 
-          if (do_indent) {
+          // There is more than one list item selected.
+          // Selection is at the beginning of the selected list item.
+          if (blks.length > 1 || (blks.length && (editor.selection.info(blks[0]).atStart || editor.node.isEmpty(blks[0])))) {
             e.preventDefault();
             e.stopPropagation();
 

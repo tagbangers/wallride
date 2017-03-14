@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.DEFAULTS, {
     codeMirror: true,
@@ -52,7 +51,8 @@
       indent_char: '\t',
       indent_size: 1,
       wrap_line_length: 0
-    }
+    },
+    codeViewKeepActiveButtons: ['fullscreen']
   })
 
   $.FE.PLUGINS.codeView = function (editor) {
@@ -69,7 +69,8 @@
     function get () {
       if (code_mirror) {
         return code_mirror.getValue();
-      } else {
+      }
+      else {
         return $html_area.val();
       }
     }
@@ -87,8 +88,8 @@
       editor.$el.blur();
 
       // Toolbar no longer disabled.
-      editor.$tb.find(' > .fr-command').not($btn).removeClass('fr-disabled');
-      $btn.removeClass('fr-active');
+      editor.$tb.find(' > .fr-command').not($btn).removeClass('fr-disabled').attr('aria-disabled', false);
+      $btn.removeClass('fr-active').attr('aria-pressed', false);
 
       editor.events.focus(true);
       editor.placeholder.refresh();
@@ -100,11 +101,44 @@
      * Get to code mode.
      */
     function _showHTML ($btn) {
-      if (!$html_area) _initArea();
+      if (!$html_area) {
+        _initArea();
 
-      // Enable code mirror.
-      if (!code_mirror && editor.opts.codeMirror && typeof CodeMirror != 'undefined') {
-        code_mirror = CodeMirror.fromTextArea($html_area.get(0), editor.opts.codeMirrorOptions);
+        // Enable code mirror.
+        if (!code_mirror && editor.opts.codeMirror && typeof CodeMirror != 'undefined') {
+          code_mirror = CodeMirror.fromTextArea($html_area.get(0), editor.opts.codeMirrorOptions);
+        }
+        else {
+          editor.events.$on($html_area, 'keydown keyup change input', function () {
+            if (!editor.opts.height) {
+              if (!this.rows) {
+                this.rows = 1;
+              }
+
+              // Textarea has no content anymore.
+              if (this.value.length === 0) {
+                this.rows = 1;
+              }
+
+              else {
+                this.style.height = 'auto';
+
+                // Decrease height in case text is deleted.
+                while (this.rows > 1 && this.scrollHeight <= this.offsetHeight) {
+                  this.rows -= 1;
+                }
+
+                // Increase textarea height.
+                while (this.scrollHeight > this.offsetHeight && (!editor.opts.heightMax || this.offsetHeight < editor.opts.heightMax)) {
+                  this.rows += 1;
+                }
+              }
+            }
+            else {
+              this.removeAttribute('rows')
+            }
+          });
+        }
       }
 
       editor.undo.saveStep();
@@ -125,6 +159,8 @@
       // Get HTML.
       var html = editor.html.get(false, true);
       editor.$el.find('span.fr-tmp').remove();
+
+      editor.$box.toggleClass('fr-code-view', true);
 
       if (editor.core.hasFocus()) editor.$el.blur();
 
@@ -159,6 +195,7 @@
         e_index = html.substring(0, e_index).length - html.substring(0, html.substring(0, e_index).lastIndexOf('\n')  + 1).length;
 
         code_mirror.setSize(null, editor.opts.height ? editor.opts.height : 'auto');
+
         if (editor.opts.heightMin) editor.$box.find('.CodeMirror-scroll').css('min-height', editor.opts.heightMin);
         code_mirror.setValue(html);
         code_mirror.focus();
@@ -176,18 +213,26 @@
           $html_area.css('min-height', editor.opts.heightMin);
         }
 
-        if (editor.opts.height || editor.opts.heightMax) {
+        if (editor.opts.height) {
+          $html_area.css('height', editor.opts.height);
+        }
+
+        if (editor.opts.heightMax) {
           $html_area.css('max-height', editor.opts.height || editor.opts.heightMax);
         }
 
-        $html_area.val(html.replace(/FROALA-SM/g, '').replace(/FROALA-EM/g, ''));
+        $html_area.val(html.replace(/FROALA-SM/g, '').replace(/FROALA-EM/g, '')).trigger('change');
+        var scroll_top = $(editor.o_doc).scrollTop();
         $html_area.focus();
         $html_area.get(0).setSelectionRange(s_index, e_index);
+        $(editor.o_doc).scrollTop(scroll_top);
       }
 
       // Disable buttons.
-      editor.$tb.find(' > .fr-command').not($btn).addClass('fr-disabled');
-      $btn.addClass('fr-active');
+      editor.$tb.find(' > .fr-command').not($btn).filter(function () {
+        return editor.opts.codeViewKeepActiveButtons.indexOf($(this).data('cmd')) < 0;
+      }).addClass('fr-disabled').attr('aria-disabled', true);
+      $btn.addClass('fr-active').attr('aria-pressed', true);
 
       if (!editor.helpers.isMobile() && editor.opts.toolbarInline) {
         editor.toolbar.hide();
@@ -205,9 +250,9 @@
       if (!val) {
         editor.$box.toggleClass('fr-code-view', false);
         _showText($btn);
-      } else {
+      }
+      else {
         editor.popups.hideAll();
-        editor.$box.toggleClass('fr-code-view', true);
         _showHTML($btn);
       }
     }
@@ -231,15 +276,16 @@
     }
 
     function _initArea () {
+
       // Add the coding textarea to the wrapper.
-      $html_area = $('<textarea class="fr-code" tabindex="-1">');
+      $html_area = $('<textarea class="fr-code" tabIndex="-1">');
       editor.$wp.append($html_area);
 
       $html_area.attr('dir', editor.opts.direction);
 
       // Exit code view button for inline toolbar.
-      if (editor.opts.toolbarInline) {
-        $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabindex="-1"><i class="fa fa-code"></i></button>');
+      if (!editor.$box.hasClass('fr-basic')) {
+        $back_button = $('<a data-cmd="html" title="Code View" class="fr-command fr-btn html-switch' + (editor.helpers.isMobile() ? '' : ' fr-desktop') + '" role="button" tabIndex="-1"><i class="fa fa-code"></i></button>');
         editor.$box.append($back_button);
 
         editor.events.bindClick(editor.$box, 'a.html-switch', function () {
@@ -265,6 +311,7 @@
 
       editor.events.on('form.submit', function () {
         if (isActive()) {
+
           // Code mirror enabled.
           editor.html.set(get());
 
@@ -277,6 +324,7 @@
      * Initialize.
      */
     var $back_button;
+
     function _init () {
       if (!editor.$wp) return false;
     }
@@ -294,6 +342,7 @@
     undo: false,
     focus: false,
     forcedRefresh: true,
+    toggle: true,
     callback: function () {
       this.codeView.toggle();
     },

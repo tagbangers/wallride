@@ -11,6 +11,8 @@
     display: none;
     top: 0;
     left: 0;
+    right: 0;
+    overflow: hidden;
   }
 
   &.show-placeholder {
@@ -30,34 +32,13 @@
   }
 }
 
-.fr-box.fr-rtl {
-  .fr-wrapper {
-    .fr-placeholder {
-      right: 0;
-      left: auto;
-    }
-  }
-}
-
 .fr-box.fr-basic {
   .fr-wrapper {
     background: @editor-bg;
     border: @editor-border;
     border-top: 0;
-
-    .fr-placeholder {
-      top: @editor-padding;
-      left: @editor-padding;
-    }
-  }
-
-  &.fr-rtl {
-    .fr-wrapper {
-      .fr-placeholder {
-        right: @editor-padding;
-        left: auto;
-      }
-    }
+    top: 0;
+    left: 0;
   }
 }
 

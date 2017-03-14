@@ -2,13 +2,14 @@
   outline: 0px solid transparent;
 }
 
-.fr-basic .fr-element {
-  text-align: initial;
-  color: @editor-text;
-  padding: @editor-padding;
-  .box-sizing(border-box);
-  overflow-x: auto;
-  min-height: (20px + (2 * @editor-padding));
+.fr-box.fr-basic {
+  .fr-element {
+    color: @editor-text;
+    padding: @editor-padding;
+    .box-sizing(border-box);
+    overflow-x: auto;
+    min-height: (20px + (2 * @editor-padding));
+  }
 }
 
 .fr-element {
