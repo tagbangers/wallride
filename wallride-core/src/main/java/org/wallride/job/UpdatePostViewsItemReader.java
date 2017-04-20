@@ -56,6 +56,10 @@ public class UpdatePostViewsItemReader extends AbstractPagingItemReader<List> {
 		}
 
 		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
+		if (blog == null) {
+			logger.warn("Configuration of Default Blog can not be found");
+			return;
+		}
 		GoogleAnalytics googleAnalytics = blog.getGoogleAnalytics();
 		if (googleAnalytics == null) {
 			logger.warn("Configuration of Google Analytics can not be found");
