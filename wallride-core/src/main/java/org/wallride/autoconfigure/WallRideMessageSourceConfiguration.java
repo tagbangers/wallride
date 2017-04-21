@@ -1,6 +1,6 @@
 package org.wallride.autoconfigure;
 
-import org.springframework.boot.autoconfigure.MessageSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ public class WallRideMessageSourceConfiguration extends MessageSourceAutoConfigu
 	@Override
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = (ResourceBundleMessageSource) super.messageSource();
-		messageSource.addBasenames(
+		messageSource.setBasenames(
 				"messages/messages",
 				"messages/validations",
 				"messages/enumerations",
