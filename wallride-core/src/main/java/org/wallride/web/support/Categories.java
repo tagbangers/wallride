@@ -38,15 +38,15 @@ public class Categories {
 		return CategoryUtils.getAllCategories();
 	}
 
-	public List<Category> getAllCategories(boolean includeNoArticle) {
-		return CategoryUtils.getAllCategories(includeNoArticle);
+	public List<Category> getAllCategories(boolean includeNoPosts) {
+		return CategoryUtils.getAllCategories(includeNoPosts);
 	}
 
 	public List<TreeNode<Category>> getNodes() {
 		return CategoryUtils.getNodes();
 	}
 
-	public List<TreeNode<Category>> getNodes(boolean includeNoArticle) {
-		return CategoryUtils.getNodes(includeNoArticle);
+	public List<TreeNode<Category>> getNodes(boolean includeNoPosts) {
+		return CategoryUtils.getNodes(includeNoPosts);
 	}
 }
