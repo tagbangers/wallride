@@ -587,10 +587,12 @@ public class ArticleService {
 		return articles;
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public List<Long> getArticleIds(ArticleSearchRequest request) {
 		return articleRepository.searchForId(request);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public Page<Article> getArticles(ArticleSearchRequest request) {
 		Pageable pageable = new PageRequest(0, 10);
 		return getArticles(request, pageable);
@@ -601,6 +603,7 @@ public class ArticleService {
 		return articleRepository.search(request, pageable);
 	}
 
+	@Cacheable(value = WallRideCacheConfiguration.ARTICLE_CACHE)
 	public List<Article> getArticles(Collection<Long> ids) {
 		Set<Article> results = new LinkedHashSet<Article>(articleRepository.findAllByIdIn(ids));
 		List<Article> articles = new ArrayList<>();

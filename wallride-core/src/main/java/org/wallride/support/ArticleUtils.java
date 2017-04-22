@@ -22,6 +22,8 @@ import org.wallride.domain.Article;
 import org.wallride.model.ArticleSearchRequest;
 import org.wallride.service.ArticleService;
 
+import java.util.List;
+
 public class ArticleUtils {
 
 	private ArticleService articleService;
@@ -33,4 +35,10 @@ public class ArticleUtils {
 	public Page<Article> search(ArticleSearchRequest request, int size) {
 		return articleService.getArticles(request, new PageRequest(0, size));
 	}
+
+	public List<Article> getAllArticles() {
+		ArticleSearchRequest request = new ArticleSearchRequest();
+		return articleService.getArticles(request).getContent();
+	}
+
 }
