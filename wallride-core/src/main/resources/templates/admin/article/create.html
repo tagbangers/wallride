@@ -544,6 +544,18 @@
 										</div>
 									</div>
 								</fieldset>
+								<fieldset id="authorList-fieldset">
+									<legend th:text="#{Authors}">Authors</legend>
+									<select name="parentId" class="form-control">
+										<option value="">Select Author</option>
+										<option th:each="article : ${#articles.getAllArticles()}" th:if="${article.id ne id}" th:value="${article.author}" th:text="${article.author}" th:selected="${article.author}"></option>
+									</select>
+									<script th:inline="javascript">
+                                        $(".form-control option").each(function(){
+                                            $(this).siblings("[value='"+ this.value+"']").remove();
+                                        });
+									</script>
+								</fieldset>
 							</div>
 						</div>
 					</div>
