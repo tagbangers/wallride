@@ -16,7 +16,7 @@
 
 package org.wallride.autoconfigure;
 
-import com.amazonaws.internal.EC2MetadataClient;
+import com.amazonaws.util.EC2MetadataUtils;
 import jp.co.tagbangers.jgroups.S3_CLIENT_PING;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -81,13 +81,7 @@ public class WallRideCacheConfiguration extends CachingConfigurerSupport {
 		String jgroupsConfigurationFile = environment.getRequiredProperty("jgroups.configurationFile");
 		if ("jgroups-ec2.xml".equals(jgroupsConfigurationFile)) {
 			ClassConfigurator.addProtocol((short) 1000, S3_CLIENT_PING.class);
-			EC2MetadataClient metadataClient = new EC2MetadataClient();
-			String ipAddress;
-			try {
-				ipAddress = metadataClient.readResource("/latest/meta-data/local-ipv4");
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			String ipAddress = EC2MetadataUtils.getPrivateIpAddress();
 			logger.info("jgroups.tcp.address -> {}", ipAddress);
 			System.setProperty("jgroups.tcp.address", ipAddress);
 			System.setProperty("jgroups.s3.bucket", environment.getRequiredProperty("jgroups.s3.bucket"));
