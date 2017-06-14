@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,50 +23,72 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
 
   });
 
-  $.FE.URLRegEx = /(\s|^|>)((http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+(\.[a-zA-Z]{2,3})?(:\d*)?(\/[^\s<]*)?)(\s|$|<)/gi;
+  $.FE.URLRegEx = '(\\s|^|>)(((http|https|ftp|ftps)\\:\\/\\/)?[a-zA-Z0-9\\-\\.]+(\\.[a-zA-Z]{2,3})(:\\d*)?(\\/[^\\s<]*)?)(\\s|$|<)';
 
   $.FE.PLUGINS.url = function (editor) {
 
-    function _convertURLS (contents) {
-      // All content zones.
-      contents.each (function () {
-        if (this.tagName == 'IFRAME') return;
+    function _ignore (node) {
+      while (node.parentNode) {
+        node = node.parentNode;
 
-        // Text node.
-        if (this.nodeType == 3) {
-          var text = this.textContent.replace(/&nbsp;/gi, '');
+        if (['A', 'BUTTON', 'TEXTAREA'].indexOf(node.tagName) >= 0) {
+          return true;
+        }
+      }
 
-          // Check if text is URL.
-          if ($.FE.URLRegEx.test(text)) {
-            // Convert it to A.
-            $(this).before(text.replace($.FE.URLRegEx, '$1<a href="$2">$2</a>$7'));
+      return false;
+    }
 
-            $(this).remove();
-          }
+    function _convertURLS () {
+      var walker = editor.doc.createTreeWalker(editor.el, NodeFilter.SHOW_TEXT, editor.node.filter(function (nd) {
+
+        return ((new RegExp($.FE.URLRegEx,'gi')).test(nd.textContent.replace(/&nbsp;/gi, ' ')) && !_ignore(nd));
+      }), false);
+
+      var nodes = [];
+      var node;
+
+      while (walker.nextNode()) {
+        node = walker.currentNode;
+
+        nodes.push(node);
+      }
+
+      for (var i = 0; i < nodes.length; i++) {
+        node = nodes[i];
+
+        var rel = null;
+
+        if (editor.opts.linkAlwaysNoFollow) {
+          rel = 'nofollow';
         }
 
-        // Other type of node.
-        else if (this.nodeType == 1 && ['A', 'BUTTON', 'TEXTAREA'].indexOf(this.tagName) < 0) {
-          // Convert urls inside it.
-          _convertURLS(editor.node.contents(this));
+        // https://github.com/froala/wysiwyg-editor/issues/1576.
+        if (editor.opts.linkAlwaysBlank) {
+          if (!rel) rel = 'noopener noreferrer';
+          else rel += ' noopener noreferrer';
         }
-      })
+
+        // Convert it to A.
+        $(node).before(node.textContent.replace((new RegExp($.FE.URLRegEx,'gi')), '$1<a' + (editor.opts.linkAlwaysBlank ? ' target="_blank"' : '') + (rel ? (' rel="' + rel + '"') : '') + ' href="$2">$2</a>$8'));
+
+        node.parentNode.removeChild(node);
+      }
     }
 
     /*
@@ -74,17 +96,18 @@
      */
     function _init () {
       editor.events.on('paste.afterCleanup', function (html) {
-        if ($.FE.URLRegEx.test(html)) {
-          return html.replace($.FE.URLRegEx, '$1<a href="$2">$2</a>$7')
+        if ((new RegExp($.FE.URLRegEx,'gi')).test(html)) {
+          return html.replace((new RegExp($.FE.URLRegEx,'gi')), '$1<a' + (editor.opts.linkAlwaysBlank ? ' target="_blank"' : '') + (editor.opts.linkAlwaysNoFollow ? ' rel="nofollow"' : '') + ' href="$2">$2</a>$8')
         }
       });
 
       editor.events.on('keyup', function (e) {
         var keycode = e.which;
+
         if (keycode == $.FE.KEYCODE.ENTER || keycode == $.FE.KEYCODE.SPACE) {
-          _convertURLS(editor.node.contents(editor.$el.get(0)));
+          _convertURLS(editor.node.contents(editor.el));
         }
-      });
+      },true);
 
       editor.events.on('keydown', function (e) {
         var keycode = e.which;

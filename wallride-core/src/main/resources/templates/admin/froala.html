@@ -28,7 +28,7 @@
 					{
 						name: 'Column x 3',
 						value: '<div class="row"><div class="col-sm-4"><img src="../../resources/img/sample.jpg" /></div><div class="col-sm-4"><img src="../../resources/img/sample.jpg" /></div><div class="col-sm-4"><p>Lorem ipsum dolor sit amet, vis affert mollis maiestatis no, at iusto rationibus eum, cu vix malis graeci sententiae. Adhuc tamquam et nec. Diam viderer feugiat ut nam, quo te consul scriptorem intellegebat. Diam audiam voluptua eam id. Te eos illum putant voluptatum.</p></div></div><br/>'
-					},
+					}
 				];
 
 				var $contents = [];
@@ -51,7 +51,7 @@
 
 				// Define a global dropdown button for the Froala WYSIWYG HTML editor.
 				$.FroalaEditor.RegisterCommand(commandName, {
-					title: 'レイアウト',
+					title: 'Layout',
 					type: 'dropdown',
 					icon: iconName,
 
@@ -95,7 +95,8 @@
 					imageDefaultAlign: 'left',
 					imageUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
 					imageManagerLoadURL: /*[[@{__${ADMIN_PATH}__/media/index.json}]]*/ '#',
-					fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#'
+					fileUploadURL: /*[[@{__${ADMIN_PATH}__/media/create.json}]]*/ '#',
+					htmlRemoveTags: []
 				});
 			});
 			/*]]>*/

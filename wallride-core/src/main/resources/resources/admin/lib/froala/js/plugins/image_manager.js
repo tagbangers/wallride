@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,20 +23,19 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
-    imageManagerLoadURL: 'http://i.froala.com/load-files',
+    imageManagerLoadURL: 'https://i.froala.com/load-files',
     imageManagerLoadMethod: 'get',
     imageManagerLoadParams: {},
     imageManagerPreloader: '',
@@ -50,12 +49,13 @@
 
   $.FE.PLUGINS.imageManager = function (editor) {
     var $modal;
+    var modal_id = 'image_manager';
+
+    var $head;
+    var $body;
     var $preloader;
     var $media_files;
-    var $scroller;
     var $image_tags;
-    var $modal_title;
-    var $overlay;
     var images;
     var page;
     var image_count;
@@ -85,22 +85,37 @@
     error_messages[ERROR_DURING_DELETE] = 'Error during delete image request.';
     error_messages[MISSING_DELETE_URL_OPTION] = 'Missing imageManagerDeleteURL option.';
 
-    var $current_image;
-
     /*
-     * Show the media manager.
+     * Show the image manager.
      */
     function show () {
-      // Build the media manager.
-      if (!$modal) _build();
 
-      $modal.data('instance', editor);
+      // Build the image manager.
+      if (!$modal) {
+
+        // Build head.
+        var head = '<div class="fr-modal-head-line"><i class="fa fa-bars fr-modal-more fr-not-available" id="fr-modal-more-' + editor.sid + '" title="' + editor.language.translate('Tags') + '"></i><h4 data-text="true">' + editor.language.translate('Manage Images') + '</h4></div>';
+
+        // Tags
+        head += '<div class="fr-modal-tags" id="fr-modal-tags"></div>';
+
+        // Preloader.
+        var body = '<img class="fr-preloader" id="fr-preloader" alt="' + editor.language.translate('Loading') + '.." src="' + editor.opts.imageManagerPreloader + '" style="display: none;">';
+
+        // Image list.
+        body += '<div class="fr-image-list" id="fr-image-list"></div>';
+
+        var modalHash = editor.modals.create(modal_id, head, body);
+        $modal = modalHash.$modal;
+        $head = modalHash.$head;
+        $body = modalHash.$body;
+      }
+
+      // Set the current image (if modal is opened to replace an image).
+      $modal.data('current-image', editor.image.get());
 
       // Show modal.
-      $modal.show();
-      $overlay.show();
-
-      $current_image = editor.image.get();
+      editor.modals.show(modal_id);
 
       if (!$preloader) {
         _delayedInit();
@@ -108,25 +123,15 @@
 
       // Load images.
       _loadImages();
-
-      // Prevent scrolling in page.
-      editor.$doc.find('body').addClass('prevent-scroll');
-
-      // Mobile device
-      if (editor.helpers.isMobile()) {
-        editor.$doc.find('body').addClass('fr-mobile');
-      }
     }
 
     /*
-     * Hide the media manager.
+     * Hide the image manager.
      */
     function hide () {
-      var inst = $modal.data('instance') || editor;
-      inst.events.enableBlur();
-      $modal.hide();
-      $overlay.hide();
-      inst.$doc.find('body').removeClass('prevent-scroll fr-mobile');
+
+      // Hide modal.
+      editor.modals.hide(modal_id);
     }
 
     /*
@@ -163,77 +168,6 @@
     }
 
     /*
-     * The media manager modal HTML.
-     */
-    function _modalHTML () {
-      var cls = '';
-
-      if (editor.opts.theme) {
-        cls = ' ' + editor.opts.theme + '-theme';
-      }
-
-      // Modal wrapper.
-      var html = '<div class="fr-modal' + cls + '"><div class="fr-modal-wrapper">';
-
-      // Modal title.
-      html += '<div class="fr-modal-title"><div class="fr-modal-title-line"><i class="fa fa-bars fr-modal-more fr-not-available" id="fr-modal-more-' + editor.sid + '" title="' + editor.language.translate('Tags') + '"></i><h4 data-text="true">' + editor.language.translate('Manage Images') + '</h4><i title="' + editor.language.translate('Cancel') + '" class="fa fa-times fr-modal-close" id="fr-modal-close"></i></div>';
-
-      // Tags
-      html += '<div class="fr-modal-tags" id="fr-modal-tags"></div>';
-      html += '</div>';
-
-      // Preloader.
-      html += '<img class="fr-preloader" id="fr-preloader" alt="' + editor.language.translate('Loading') + '.." src="' + editor.opts.imageManagerPreloader + '" style="display: none;">';
-
-      // Modal scroller.
-      html += '<div class="fr-scroller" id="fr-scroller"><div class="fr-image-list" id="fr-image-list"></div></div>';
-
-      html += '</div></div>';
-
-      return $(html);
-    }
-
-    /*
-     * Build the image manager.
-     */
-    function _build () {
-      // Build modal.
-      if (!editor.shared.$modal) {
-        editor.shared.$modal = _modalHTML();
-
-        $modal = editor.shared.$modal;
-
-        // Desktop or mobile device.
-        if (!editor.helpers.isMobile()) {
-          $modal.addClass('fr-desktop');
-        }
-
-        // Append modal to body.
-        $modal.appendTo('body');
-
-        editor.shared.$overlay = $('<div class="fr-overlay">').appendTo('body');
-        $overlay = editor.shared.$overlay;
-
-        if (editor.opts.theme) {
-          $overlay.addClass(editor.opts.theme + '-theme');
-        }
-
-        // Finished building the media manager.
-        hide();
-      }
-      else {
-        $modal = editor.shared.$modal;
-        $overlay = editor.shared.$overlay;
-      }
-
-      // Editor destroy.
-      editor.events.on('shared.destroy', function () {
-        $modal.removeData().remove();
-        $overlay.removeData().remove();
-      }, true);
-    }
-
-    /*
      * Load images from server.
      */
     function _loadImages () {
@@ -242,6 +176,7 @@
 
       // If the images load URL is set.
       if (editor.opts.imageManagerLoadURL) {
+
         // Make GET request to get the images.
         $.ajax({
           url: editor.opts.imageManagerLoadURL,
@@ -250,10 +185,11 @@
           dataType: 'json',
           crossDomain: editor.opts.requestWithCORS,
           xhrFields: {
-            withCredentials: editor.opts.requestWithCORS
+            withCredentials: editor.opts.requestWithCredentials
           },
           headers: editor.opts.requestHeaders
         })
+
         // On success start processing the response.
         .done(function (data, status, xhr) {
           editor.events.trigger('imageManager.imagesLoaded', [data]);
@@ -299,10 +235,12 @@
      * Load more images if necessary.
      */
     function _infiniteScroll () {
+
       // If there aren't enough images in the modal or if the user scrolls down.
       if (image_count < images.length &&
-        ($media_files.outerHeight() <= $scroller.outerHeight() + editor.opts.imageManagerScrollOffset ||
-        $scroller.scrollTop() + editor.opts.imageManagerScrollOffset > $media_files.outerHeight() - $scroller.outerHeight())) {
+        ($media_files.outerHeight() <= $body.outerHeight() + editor.opts.imageManagerScrollOffset ||
+        $body.scrollTop() + editor.opts.imageManagerScrollOffset > $media_files.outerHeight() - $body.outerHeight())) {
+
         // Increase page number.
         page++;
 
@@ -325,6 +263,7 @@
 
       // Image has been loaded.
       img.onload = function () {
+
         // Update image container height.
         $img_container.height(Math.floor($img_container.width() / img.width * img.height));
 
@@ -333,12 +272,14 @@
 
         // Use image thumb in image manager.
         if (image.thumb) {
+
           // Set image src attribute/
           $img.attr('src', image.thumb);
         }
 
         // Image does not have thumb.
         else {
+
           // Throw missing image thumb error.
           _throwError(MISSING_IMG_THUMB, image);
 
@@ -346,12 +287,15 @@
           if (image.url) {
             $img.attr('src', image.url);
           }
+
           // Missing image URL.
           else {
+
             // Throw missing image url error.
             _throwError(MISSING_IMG_URL, image);
 
             // Don't go further if image does not have a src attribute.
+
             return false;
           }
         }
@@ -361,16 +305,19 @@
 
         // Image tags.
         if (image.tag) {
+
           // Show tags only if there are any.
-          $modal_title.find('.fr-modal-more.fr-not-available').removeClass('fr-not-available');
-          $modal_title.find('.fr-modal-tags').show();
+          $head.find('.fr-modal-more.fr-not-available').removeClass('fr-not-available');
+          $head.find('.fr-modal-tags').show();
 
           // Image has more than one tag.
           if (image.tag.indexOf(',') >= 0) {
+
             // Add tags to the image manager tag list.
             var tags = image.tag.split(',');
 
             for (var i = 0; i < tags.length; i++) {
+
               // Remove trailing spaces.
               tags[i] = tags[i].trim();
 
@@ -386,6 +333,7 @@
 
           // Image has only one tag.
           else {
+
             // Add tag to the tag list.
             if ($image_tags.find('a[title="' + image.tag.trim() + '"]').length === 0) {
               $image_tags.append('<a role="button" title="' + image.tag.trim() + '">' + image.tag.trim() + '</a>');
@@ -394,6 +342,11 @@
             // Set img tag attribute.
             $img.attr('data-tag', image.tag.trim());
           }
+        }
+
+        // Image alt.
+        if (image.name) {
+          $img.attr('alt', image.name);
         }
 
         // Set image additional data.
@@ -420,6 +373,7 @@
 
         // After an image is loaded the modal may need to be resized.
         $img.on('load', function () {
+
           // Image container is no longer empty.
           $img_container.removeClass('fr-empty');
           $img_container.height('auto');
@@ -466,7 +420,7 @@
       };
 
       // Set the image object's src.
-      img.src = image.url;
+      img.src = image.thumb || image.url;
 
       // Add loaded or empty image to the media manager image list on the shortest column.
       _shortestColumn().append($img_container);
@@ -532,10 +486,11 @@
     }
 
     /*
-     * Resize the media manager modal and scroller if height changes.
+     * Resize the media manager modal if height changes.
      */
     function _resizeModal (infinite_scroll) {
       if (infinite_scroll === undefined) infinite_scroll = true;
+
       if (!$modal.is(':visible')) return true;
 
       // If width changes, the number of columns may change.
@@ -554,19 +509,7 @@
         _reorderImages(imgs);
       }
 
-      var height = editor.$win.height();
-
-      // The wrapper and scroller objects.
-      var $wrapper = $modal.find('.fr-modal-wrapper');
-
-      // Wrapper's top and bottom margins.
-      var wrapper_margins = parseFloat($wrapper.css('margin-top')) + parseFloat($wrapper.css('margin-bottom'));
-      var wrapper_padding = parseFloat($wrapper.css('padding-top')) + parseFloat($wrapper.css('padding-bottom'));
-      var wrapper_border_top = parseFloat($wrapper.css('border-top-width'));
-      var h4_height = $wrapper.find('h4').outerHeight();
-
-      // Change height.
-      $scroller.height(Math.min($media_files.outerHeight(), height - wrapper_margins - wrapper_padding - h4_height - wrapper_border_top));
+      editor.modals.resize(modal_id);
 
       // Load more photos when window is resized if necessary.
       if (infinite_scroll) {
@@ -593,29 +536,33 @@
      * Insert image into the editor.
      */
     function _insertImage (e) {
+
       // Image to insert.
       var $img = $(e.currentTarget).siblings('img');
 
       var inst = $modal.data('instance') || editor;
+      var $current_image = $modal.data('current-image');
 
-      hide();
+      editor.modals.hide(modal_id);
       inst.image.showProgressBar();
 
       if (!$current_image) {
+
         // Make sure we have focus.
         inst.events.focus(true);
         inst.selection.restore();
 
         var rect = inst.position.getBoundingRect();
 
-        var left = rect.left + rect.width / 2;
-        var top = rect.top + rect.height;
+        var left = rect.left + rect.width / 2 + $(editor.doc).scrollLeft();
+        var top = rect.top + rect.height + $(editor.doc).scrollTop();
 
         // Show the image insert popup.
-        inst.popups.setContainer('image.insert', inst.$box || $('body'));
+        inst.popups.setContainer('image.insert', editor.$sc);
         inst.popups.show('image.insert', left, top);
       }
       else {
+        $current_image.data('fr-old-src', $current_image.attr('src'));
         $current_image.trigger('click');
       }
 
@@ -626,6 +573,7 @@
      * Delete image.
      */
     function _deleteImage (e) {
+
       // Image to delete.
       var $img = $(e.currentTarget).siblings('img');
 
@@ -634,8 +582,10 @@
 
       // Ask for confirmation.
       if (confirm(message)) {
+
         // If the images delete URL is set.
         if (editor.opts.imageManagerDeleteURL) {
+
           // Before delete image event.
           if (editor.events.trigger('imageManager.beforeDeleteImage', [$img]) !== false) {
             $img.parent().addClass('fr-image-deleting');
@@ -647,7 +597,7 @@
               data: $.extend($.extend({ src: $img.attr('src') }, _getImageAttrs($img)), editor.opts.imageManagerDeleteParams),
               crossDomain: editor.opts.requestWithCORS,
               xhrFields: {
-                withCredentials: editor.opts.requestWithCORS
+                withCredentials: editor.opts.requestWithCredentials
               },
               headers: editor.opts.requestHeaders
             })
@@ -655,6 +605,7 @@
               // On success remove the image from the image manager.
               .done(function (data) {
                 editor.events.trigger('imageManager.imageDeleted', [data]);
+
                 // A deleted image may break the images order. Reorder them starting with this image.
                 var imgs = _getImages(parseInt($img.parent().attr('class').match(/fr-image-(\d+)/)[1], 10) + 1);
 
@@ -687,14 +638,17 @@
      * Throw image manager errors.
      */
     function _throwError (code, response) {
+
       // Load images error.
       if (10 <= code && code < 20) {
+
         // Hide preloader.
         $preloader.hide();
       }
 
       // Delete image error.
       else if (20 <= code && code < 30) {
+
         // Remove deleting overlay.
         $('.fr-image-deleting').removeClass('fr-image-deleting');
       }
@@ -710,21 +664,23 @@
      * Toogle (show or hide) image tags.
      */
     function _toggleTags () {
-      var title_height = $modal_title.find('.fr-modal-title-line').outerHeight();
+      var title_height = $head.find('.fr-modal-head-line').outerHeight();
       var tags_height = $image_tags.outerHeight();
 
       // Use .fr-show-tags.
-      $modal_title.toggleClass('.fr-show-tags');
+      $head.toggleClass('.fr-show-tags');
 
-      if ($modal_title.hasClass('.fr-show-tags')) {
+      if ($head.hasClass('.fr-show-tags')) {
+
         // Show tags by changing height to have transition.
-        $modal_title.css('height', title_height + tags_height);
+        $head.css('height', title_height + tags_height);
         $image_tags.find('a').css('opacity', 1);
       }
 
       else {
+
         // Hide tags by changing height to have transition.
-        $modal_title.css('height', title_height);
+        $head.css('height', title_height);
         $image_tags.find('a').css('opacity', 0);
       }
     }
@@ -733,11 +689,13 @@
      * Show only images with selected tags.
      */
     function _showImagesByTags() {
+
       // Get all selected tags.
       var $tags = $image_tags.find('.fr-selected-tag');
 
       // Show only images with selected tags.
       if ($tags.length > 0) {
+
         // Hide all images.
         $media_files.find('img').parent().show();
 
@@ -803,24 +761,18 @@
     function _delayedInit() {
       $preloader = $modal.find('#fr-preloader');
       $media_files = $modal.find('#fr-image-list');
-      $scroller = $modal.find('#fr-scroller');
       $image_tags = $modal.find('#fr-modal-tags');
-      $modal_title = $image_tags.parent();
 
       // Columns.
       column_number = _columnNumber();
       _buildColumns();
 
       // Set height for title (we need this for show tags transition).
-      var title_height = $modal_title.find('.fr-modal-title-line').outerHeight();
-      $modal_title.css('height', title_height);
-      $scroller.css('margin-top', title_height);
-
-      // Close button.
-      editor.events.bindClick($modal, 'i#fr-modal-close', hide);
+      $head.css('height', $head.find('.fr-modal-head-line').outerHeight());
 
       // Resize media manager modal on window resize.
       editor.events.$on($(editor.o_win), 'resize', function () {
+
         // Window resize with image manager opened.
         if (images) {
           _resizeModal(true);
@@ -834,6 +786,7 @@
 
       // Delete and insert buttons for mobile.
       if (editor.helpers.isMobile()) {
+
         // Show image buttons on mobile.
         editor.events.bindClick($media_files, 'div.fr-image-container', function (e) {
           $modal.find('.fr-mobile-selected').removeClass('fr-mobile-selected');
@@ -863,7 +816,7 @@
       });
 
       // Infinite scroll
-      $scroller.on('scroll', _infiniteScroll);
+      $body.on('scroll', _infiniteScroll);
 
       // Click on image tags button.
       editor.events.bindClick($modal, 'i#fr-modal-more-' + editor.sid, _toggleTags);
@@ -876,7 +829,7 @@
      * Init media manager.
      */
     function _init () {
-      if (!editor.$wp && editor.$el.get(0).tagName != 'IMG') return false;
+      if (!editor.$wp && editor.el.tagName != 'IMG') return false;
     }
 
     return {
@@ -897,6 +850,7 @@
     title: 'Browse',
     undo: false,
     focus: false,
+    modal: true,
     callback: function () {
       this.imageManager.show();
     },

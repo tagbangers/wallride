@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'file.insert': '[_BUTTONS_][_UPLOAD_LAYER_][_PROGRESS_BAR_]'
@@ -40,7 +39,7 @@
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
-    fileUploadURL: 'http://i.froala.com/upload',
+    fileUploadURL: 'https://i.froala.com/upload',
     fileUploadParam: 'file',
     fileUploadParams: {},
     fileUploadToS3: false,
@@ -74,9 +73,11 @@
       var $btn = editor.$tb.find('.fr-command[data-cmd="insertFile"]');
 
       var $popup = editor.popups.get('file.insert');
+
       if (!$popup) $popup = _initInsertPopup();
 
       hideProgressBar();
+
       if (!$popup.hasClass('fr-active')) {
         editor.popups.refresh('file.insert');
         editor.popups.setContainer('file.insert', editor.$tb);
@@ -92,6 +93,7 @@
      */
     function showProgressBar () {
       var $popup = editor.popups.get('file.insert');
+
       if (!$popup) $popup = _initInsertPopup();
 
       $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
@@ -113,7 +115,8 @@
         $popup.find('.fr-buttons').show();
 
         if (dismiss) {
-          editor.popups.show('file.insert', null, null);
+          editor.events.focus();
+          editor.popups.hide('file.insert');
         }
       }
     }
@@ -147,8 +150,11 @@
       showProgressBar();
       var $popup = editor.popups.get('file.insert');
       var $layer = $popup.find('.fr-file-progress-bar-layer');
-      $layer.addClass('fr-error')
-      $layer.find('h3').text(message);
+      $layer.addClass('fr-error');
+      var $message_header = $layer.find('h3');
+      $message_header.text(message);
+      editor.events.disableBlur();
+      $message_header.focus();
     }
 
     /**
@@ -161,16 +167,23 @@
       editor.events.focus(true);
       editor.selection.restore();
 
+      if (editor.opts.fileUseSelectedText && editor.selection.text().length) {
+        text = editor.selection.text();
+      }
+
       // Insert the link.
-      editor.html.insert('<a href="' + link + '" id="fr-inserted-file" class="fr-file">' + (text || editor.selection.text()) + '</a>');
+      editor.html.insert('<a href="' + link + '" id="fr-inserted-file" class="fr-file">' + text + '</a>');
 
       // Get the file.
       var $file = editor.$el.find('#fr-inserted-file');
+
       $file.removeAttr('id');
 
       editor.popups.hide('file.insert');
 
       editor.undo.saveStep();
+
+      _syncFiles();
 
       editor.events.trigger('file.inserted', [$file, response]);
     }
@@ -182,21 +195,29 @@
       try {
         if (editor.events.trigger('file.uploaded', [response], true) === false) {
           editor.edit.on();
+
           return false;
         }
 
         var resp = $.parseJSON(response);
+
         if (resp.link) {
+
           return resp;
-        } else {
+        }
+        else {
+
           // No link in upload request.
           _throwError(MISSING_LINK, response);
+
           return false;
         }
-      } catch (ex) {
+      }
+      catch (ex) {
 
         // Bad response.
         _throwError(BAD_RESPONSE, response);
+
         return false;
       }
     }
@@ -211,13 +232,17 @@
 
         if (editor.events.trigger('file.uploadedToS3', [link, key, response], true) === false) {
           editor.edit.on();
+
           return false;
         }
 
         return link;
-      } catch (ex) {
+      }
+      catch (ex) {
+
         // Bad response.
         _throwError(BAD_RESPONSE, response);
+
         return false;
       }
     }
@@ -235,16 +260,19 @@
         if (editor.opts.fileUploadToS3) {
           if (status == 201) {
             var link = _parseXMLResponse(responseXML);
+
             if (link) {
               insert(link, text, response || responseXML);
             }
-          } else {
+          }
+          else {
             _throwError(BAD_RESPONSE, response || responseXML);
           }
         }
         else {
           if (status >= 200 && status < 300) {
             var resp = _parseResponse(responseText);
+
             if (resp) {
               insert(resp.link, text, response || responseText);
             }
@@ -253,7 +281,9 @@
             _throwError(ERROR_DURING_UPLOAD, response || responseText);
           }
         }
-      } catch (ex) {
+      }
+      catch (ex) {
+
         // Bad response.
         _throwError(BAD_RESPONSE, response || responseText);
       }
@@ -298,29 +328,36 @@
     }
 
     function upload (files) {
-      // Check if we should cancel the file upload.
-      if (editor.events.trigger('file.beforeUpload', [files]) === false) {
-        return false;
-      }
 
       // Make sure we have what to upload.
       if (typeof files != 'undefined' && files.length > 0) {
+
+        // Check if we should cancel the file upload.
+        if (editor.events.trigger('file.beforeUpload', [files]) === false) {
+
+          return false;
+        }
+
+
         var file = files[0];
 
         // Check file max size.
         if (file.size > editor.opts.fileMaxSize) {
           _throwError(MAX_SIZE_EXCEEDED);
+
           return false;
         }
 
         // Check file types.
         if (editor.opts.fileAllowedTypes.indexOf('*') < 0 && editor.opts.fileAllowedTypes.indexOf(file.type.replace(/file\//g,'')) < 0) {
           _throwError(BAD_FILE_TYPE);
+
           return false;
         }
 
         // Create form Data.
         var form_data;
+
         if (editor.drag_support.formdata) {
           form_data = editor.drag_support.formdata ? new FormData() : null;
         }
@@ -355,14 +392,20 @@
 
           // Create XHR request.
           var url = editor.opts.fileUploadURL;
+
           if (editor.opts.fileUploadToS3) {
-            url = 'https://' + editor.opts.fileUploadToS3.region + '.amazonaws.com/' + editor.opts.fileUploadToS3.bucket;
+            if (editor.opts.fileUploadToS3.uploadURL) {
+              url = editor.opts.fileUploadToS3.uploadURL;
+            }
+            else {
+              url = 'https://' + editor.opts.fileUploadToS3.region + '.amazonaws.com/' + editor.opts.fileUploadToS3.bucket;
+            }
           }
           var xhr = editor.core.getXHR(url, editor.opts.fileUploadMethod);
 
           // Set upload events.
           xhr.onload = function () {
-            _fileUploaded.call(xhr, [(editor.opts.fileUseSelectedText ? null : file.name)]);
+            _fileUploaded.call(xhr, file.name);
           };
           xhr.onerror = _fileUploadError;
           xhr.upload.onprogress = _fileUploadProgress;
@@ -372,6 +415,7 @@
           editor.edit.off();
 
           var $popup = editor.popups.get('file.insert');
+
           if ($popup) {
             $popup.off('abortUpload').on('abortUpload', function () {
               if (xhr.readyState != 4) {
@@ -387,15 +431,18 @@
     }
 
     function _bindInsertEvents ($popup) {
+
       // Drag over the dropable area.
       editor.events.$on($popup, 'dragover dragenter', '.fr-file-upload-layer', function () {
         $(this).addClass('fr-drop');
+
         return false;
       }, true);
 
       // Drag end.
       editor.events.$on($popup, 'dragleave dragend', '.fr-file-upload-layer', function () {
         $(this).removeClass('fr-drop');
+
         return false;
       }, true);
 
@@ -407,6 +454,7 @@
         $(this).removeClass('fr-drop');
 
         var dt = e.originalEvent.dataTransfer;
+
         if (dt && dt.files) {
           var inst = $popup.data('instance') || editor;
           inst.file.upload(dt.files);
@@ -443,11 +491,11 @@
 
       // File upload layer.
       var upload_layer = '';
-      upload_layer = '<div class="fr-file-upload-layer fr-layer fr-active" id="fr-file-upload-layer-' + editor.id + '"><strong>' + editor.language.translate('Drop file') + '</strong><br>(' + editor.language.translate('or click') + ')<div class="fr-form"><input type="file" name="' + editor.opts.fileUploadParam + '" accept="/*" tabIndex="-1"></div></div>'
+      upload_layer = '<div class="fr-file-upload-layer fr-layer fr-active" id="fr-file-upload-layer-' + editor.id + '"><strong>' + editor.language.translate('Drop file') + '</strong><br>(' + editor.language.translate('or click') + ')<div class="fr-form"><input type="file" name="' + editor.opts.fileUploadParam + '" accept="/*" tabIndex="-1" aria-labelledby="fr-file-upload-layer-' + editor.id + '" role="button"></div></div>'
 
 
       // Progress bar.
-      var progress_bar_layer = '<div class="fr-file-progress-bar-layer fr-layer"><h3 class="fr-message">Uploading</h3><div class="fr-loader"><span class="fr-progress"></span></div><div class="fr-action-buttons"><button type="button" class="fr-command" data-cmd="fileDismissError" tabIndex="2">OK</button></div></div>';
+      var progress_bar_layer = '<div class="fr-file-progress-bar-layer fr-layer"><h3 tabIndex="-1" class="fr-message">Uploading</h3><div class="fr-loader"><span class="fr-progress"></span></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-dismiss" data-cmd="fileDismissError" tabIndex="2" role="button">OK</button></div></div>';
 
       var template = {
         buttons: file_buttons,
@@ -464,17 +512,22 @@
     }
 
     function _onRemove (link) {
-      if ($(link).hasClass('fr-file')) {
-        return editor.events.trigger('file.unlink', [link]);
+      if (editor.node.hasClass(link, 'fr-file')) {
+
+        return;
       }
     }
 
     function _drop (e) {
+
       // Check if we are dropping files.
       var dt = e.originalEvent.dataTransfer;
+
       if (dt && dt.files && dt.files.length) {
         var file = dt.files[0];
+
         if (file && typeof file.type != 'undefined') {
+
           // Dropped file is an file that we allow.
           if (file.type.indexOf('image') < 0 && (editor.opts.fileAllowedTypes.indexOf(file.type) >= 0 || editor.opts.fileAllowedTypes.indexOf('*') >= 0)) {
             editor.markers.remove();
@@ -486,8 +539,9 @@
 
             // Show the file insert popup.
             var $popup = editor.popups.get('file.insert');
+
             if (!$popup) $popup = _initInsertPopup();
-            editor.popups.setContainer('file.insert', $(editor.opts.scrollableContainer));
+            editor.popups.setContainer('file.insert', editor.$sc);
             editor.popups.show('file.insert', e.originalEvent.pageX, e.originalEvent.pageY);
             showProgressBar();
 
@@ -505,12 +559,14 @@
     }
 
     function _initEvents() {
+
       // Drop inside the editor.
       editor.events.on('drop', _drop);
 
       editor.events.$on(editor.$win, 'keydown', function (e) {
         var key_code = e.which;
         var $popup = editor.popups.get('file.insert');
+
         if ($popup && key_code == $.FE.KEYCODE.ESC) {
           $popup.trigger('abortUpload');
         }
@@ -518,6 +574,7 @@
 
       editor.events.on('destroy', function () {
         var $popup = editor.popups.get('file.insert');
+
         if ($popup) {
           $popup.trigger('abortUpload');
         }
@@ -533,6 +590,34 @@
       editor.toolbar.showInline();
     }
 
+    var files;
+
+    function _syncFiles () {
+
+      // Get current files.
+      var c_files = Array.prototype.slice.call(editor.el.querySelectorAll('a.fr-file'));
+
+      // Current files src.
+      var file_srcs = [];
+      var i;
+
+      for (i = 0; i < c_files.length; i++) {
+        file_srcs.push(c_files[i].getAttribute('href'));
+      }
+
+      // Loop previous files and check their src.
+      if (files) {
+        for (i = 0; i < files.length; i++) {
+          if (file_srcs.indexOf(files[i].getAttribute('href')) < 0) {
+            editor.events.trigger('file.unlink', [files[i]]);
+          }
+        }
+      }
+
+      // Current files are the old ones.
+      files = c_files;
+    }
+
     /*
      * Initialize.
      */
@@ -540,6 +625,11 @@
       _initEvents();
 
       editor.events.on('link.beforeRemove', _onRemove);
+
+      if (editor.$wp) {
+        _syncFiles();
+        editor.events.on('contentChanged', _syncFiles);
+      }
 
       _initInsertPopup(true);
     }
@@ -560,14 +650,14 @@
     title: 'Upload File',
     undo: false,
     focus: true,
-    refershAfterCallback: false,
+    refreshAfterCallback: false,
     popup: true,
     callback: function () {
       if (!this.popups.isVisible('file.insert')) {
         this.file.showInsertPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }

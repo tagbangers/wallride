@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'forms.edit': '[_BUTTONS_]',
@@ -65,6 +64,7 @@
      * Mouseup on the input.
      */
     function _inputMouseUp (e) {
+
       // Mousedown was made.
       if ($(this).data('mousedown')) {
         e.stopPropagation();
@@ -118,8 +118,10 @@
      * Init the edit button popup.
      */
     function _initEditPopup () {
+
       // Button edit buttons.
       var buttons = '';
+
       if (editor.opts.formEditButtons.length > 0) {
         buttons = '<div class="fr-buttons">' + editor.button.buildList(editor.opts.formEditButtons) + '</div>';
       }
@@ -133,7 +135,7 @@
 
       if (editor.$wp) {
         editor.events.$on(editor.$wp, 'scroll.link-edit', function () {
-          if (get() && editor.popups.isVisible('forms.edit')) {
+          if (getInput() && editor.popups.isVisible('forms.edit')) {
             showEditPopup(getInput());
           }
         });
@@ -147,6 +149,7 @@
      */
     function showEditPopup (input) {
       var $popup = editor.popups.get('forms.edit');
+
       if (!$popup) $popup = _initEditPopup();
 
       current_input = input;
@@ -154,7 +157,7 @@
 
       editor.popups.refresh('forms.edit');
 
-      editor.popups.setContainer('forms.edit', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('forms.edit', editor.$sc);
       var left = $input.offset().left + $input.outerWidth() / 2;
       var top = $input.offset().top + $input.outerHeight();
 
@@ -168,8 +171,10 @@
       var $popup = editor.popups.get('forms.update');
 
       var input = getInput();
+
       if (input) {
         var $input = $(input);
+
         if ($input.is('button')) {
           $popup.find('input[type="text"][name="text"]').val($input.text());
         }
@@ -201,6 +206,7 @@
 
       // Button update buttons.
       var buttons = '';
+
       if (editor.opts.formUpdateButtons.length >= 1) {
         buttons = '<div class="fr-buttons">' + editor.button.buildList(editor.opts.formUpdateButtons) + '</div>';
       }
@@ -228,17 +234,19 @@
      */
     function showUpdatePopup () {
       var input = getInput();
+
       if (input) {
         var $input = $(input);
 
         var $popup = editor.popups.get('forms.update');
+
         if (!$popup) $popup = _initUpdatePopup();
 
         if (!editor.popups.isVisible('forms.update')) {
           editor.popups.refresh('forms.update');
         }
 
-        editor.popups.setContainer('forms.update', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('forms.update', editor.$sc);
         var left = $input.offset().left + $input.outerWidth() / 2;
         var top = $input.offset().top + $input.outerHeight();
 
@@ -251,9 +259,11 @@
      */
     function applyStyle (val, formStyles, multipleStyles) {
       if (typeof formStyles == 'undefined') formStyles = editor.opts.formStyles;
+
       if (typeof multipleStyles == 'undefined') multipleStyles = editor.opts.formMultipleStyles;
 
       var input = getInput();
+
       if (!input) return false;
 
       // Remove multiple styles.
@@ -289,6 +299,7 @@
       var $popup = editor.popups.get('forms.update');
 
       var input = getInput();
+
       if (input) {
         var $input = $(input);
         var val = $popup.find('input[type="text"][name="text"]').val() || '';
@@ -311,12 +322,14 @@
      * Initialize.
      */
     function _init () {
+
       // Bind input events.
       _bindEvents();
 
       // Prevent form submit.
       editor.events.$on(editor.$el, 'submit', 'form', function (e) {
         e.preventDefault();
+
         return false;
       })
     }
@@ -350,9 +363,10 @@
     html: function () {
       var c = '<ul class="fr-dropdown-list">';
       var options =  this.opts.formStyles;
+
       for (var cls in options) {
         if (options.hasOwnProperty(cls)) {
-          c += '<li><a class="fr-command" data-cmd="inputStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+          c += '<li><a class="fr-command" tabIndex="-1" data-cmd="inputStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -372,6 +386,7 @@
 
       if (input) {
         var $input = $(input);
+
         $dropdown.find('.fr-command').each (function () {
           var cls = $(this).data('param1');
           $(this).toggleClass('fr-active', $input.hasClass(cls));

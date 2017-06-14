@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.4.RELEASE</version>
+        <version>1.5.4.RELEASE</version>
         <relativePath />
     </parent>
     <groupId>org.wallride</groupId>
     <artifactId>wallride-parent</artifactId>
-    <version>1.0.0.M14</version>
+    <version>1.0.0.M15</version>
     <packaging>pom</packaging>
     <name>WallRide Parent</name>
     <description>CMS for developers of principles</description>
@@ -61,14 +61,14 @@
         <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
         <thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
         <thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
-        <hibernate.version>5.1.0.Final</hibernate.version>
+        <hibernate.version>5.2.10.Final</hibernate.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.wallride</groupId>
             <artifactId>wallride-core</artifactId>
-            <version>1.0.0.M14</version>
+            <version>1.0.0.M15</version>
         </dependency>
 
         <dependency>

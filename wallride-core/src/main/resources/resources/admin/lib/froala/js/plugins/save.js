@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -74,12 +73,15 @@
 
       if (editor.opts.saveURL) {
         var params = {};
+
         for (var key in editor.opts.saveParams) {
           if (editor.opts.saveParams.hasOwnProperty(key)) {
             var param = editor.opts.saveParams[key];
+
             if (typeof(param) == 'function') {
               params[key] = param.call(this);
-            } else {
+            }
+            else {
               params[key] = param;
             }
           }
@@ -94,19 +96,24 @@
           data: $.extend(dt, params),
           crossDomain: editor.opts.requestWithCORS,
           xhrFields: {
-            withCredentials: editor.opts.requestWithCORS
+            withCredentials: editor.opts.requestWithCredentials
           },
           headers: editor.opts.requestHeaders
         })
         .done(function (data) {
+          _last_html = html;
+
           // data
           editor.events.trigger('save.after', [data]);
         })
         .fail(function (xhr) {
+
           // (error)
-          _throwError(ERROR_ON_SERVER, xhr.response);
+          _throwError(ERROR_ON_SERVER, xhr.response || xhr.responseText);
         });
-      } else {
+      }
+      else {
+
         // (error)
         _throwError(BAD_LINK);
       }
@@ -116,6 +123,7 @@
       clearTimeout(_timeout);
       _timeout = setTimeout(function () {
         var html = editor.html.get();
+
         if (_last_html != html || _force) {
           _last_html = html;
           _force = false;
@@ -147,9 +155,9 @@
       if (editor.opts.saveInterval) {
         _last_html = editor.html.get();
         editor.events.on('contentChanged', _mightSave);
-        editor.events.on('keydown', function () {
+        editor.events.on('keydown destroy', function () {
           clearTimeout(_timeout);
-        })
+        });
       }
     }
 

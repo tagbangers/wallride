@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.codeBeautifier = function () {
     /**
@@ -1361,7 +1360,7 @@
     }
 
     function js_beautify(js_source_text, options) {
-        "use strict";
+        
         var beautifier = new Beautifier(js_source_text, options);
         return beautifier.beautify();
     }
@@ -1377,7 +1376,7 @@
         };
 
     function Beautifier(js_source_text, options) {
-        "use strict";
+        
         var output
         var tokens = [], token_pos;
         var Tokenizer;
@@ -3260,12 +3259,12 @@
 
     }
 
-    /* jshint ignore:end */
-    /* jscs:enable */
-
     return {
       run: run
     }
+
+    /* jshint ignore:end */
+    /* jscs:enable */
   };
 
 }));

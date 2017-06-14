@@ -65,6 +65,7 @@
       > span {
         display: inline-block;
         padding: 0px 4px 4px 0;
+        background: transparent;
 
         > span {
           display: inline-block;
@@ -73,7 +74,7 @@
           border: @insert-table-grid;
         }
 
-        &:hover, &.hover {
+        &.hover {
           background: transparent;
 
           > span {
@@ -127,23 +128,7 @@
         left: 0;
       }
 
-      &.fr-selected-color::after {
-        color: @white;
-        content: "\f00c";
-        font-family: FontAwesome;
-        font-size: 13px;
-        font-weight: 400;
-        line-height: 32px;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        text-align: center;
-        cursor: default;
-      }
-
-      &:hover, &.fr-selected-color {
+      &:focus {
         outline: 1px solid @ui-text;
         z-index: 2;
       }

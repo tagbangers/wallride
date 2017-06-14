@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.DEFAULTS, {
     paragraphStyles: {
@@ -50,16 +49,17 @@
      */
     function apply (val, paragraphStyles, paragraphMultipleStyles) {
       if (typeof paragraphStyles == 'undefined') paragraphStyles = editor.opts.paragraphStyles;
+
       if (typeof paragraphMultipleStyles == 'undefined') paragraphMultipleStyles = editor.opts.paragraphMultipleStyles;
 
       var styles = '';
+
       // Remove multiple styles.
       if (!paragraphMultipleStyles) {
         styles = Object.keys(paragraphStyles);
         styles.splice(styles.indexOf(val), 1);
         styles = styles.join(' ');
       }
-
       editor.selection.save();
       editor.html.wrap(true, true, true, true);
       editor.selection.restore();
@@ -70,10 +70,12 @@
       editor.selection.save();
 
       var hasClass = $(blocks[0]).hasClass(val);
+
       for (var i = 0; i < blocks.length; i++) {
         $(blocks[i]).removeClass(styles).toggleClass(val, !hasClass);
 
         if ($(blocks[i]).hasClass('fr-temp-div')) $(blocks[i]).removeClass('fr-temp-div');
+
         if ($(blocks[i]).attr('class') === '') $(blocks[i]).removeAttr('class');
       }
 
@@ -89,9 +91,11 @@
 
       if (blocks.length) {
         var $blk = $(blocks[0]);
+
         $dropdown.find('.fr-command').each (function () {
           var cls = $(this).data('param1');
-          $(this).toggleClass('fr-active', $blk.hasClass(cls));
+          var active = $blk.hasClass(cls);
+          $(this).toggleClass('fr-active', active).attr('aria-selected', active);
         })
       }
     }
@@ -110,11 +114,12 @@
   $.FE.RegisterCommand('paragraphStyle', {
     type: 'dropdown',
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.paragraphStyles;
+
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command ' + val + '" data-cmd="paragraphStyle" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command ' + val + '" tabIndex="-1" role="option" data-cmd="paragraphStyle" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
         }
       }
       c += '</ul>';

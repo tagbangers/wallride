@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -23,16 +23,15 @@
                     jQuery = require('jquery')(root);
                 }
             }
-            factory(jQuery);
-            return jQuery;
+            return factory(jQuery);
         };
     } else {
         // Browser globals
-        factory(jQuery);
+        factory(window.jQuery);
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -48,13 +47,14 @@
      * Get the char number.
      */
     function count () {
-      return editor.$el.text().length;
+      return editor.el.textContent.length;
     }
 
     /**
      * Check chars on typing.
      */
     function _checkCharNumber (e) {
+
       // Continue if infinite characters;
       if (editor.opts.charCounterMax < 0) return true;
 
@@ -63,10 +63,12 @@
 
       // Stop if the key will produce a new char.
       var keyCode = e.which;
+
       if (!editor.keys.ctrlKey(e) && editor.keys.isCharacter(keyCode)) {
         e.preventDefault();
         e.stopPropagation();
         editor.events.trigger('charCounter.exceeded');
+
         return false;
       }
 
@@ -80,6 +82,7 @@
       if (editor.opts.charCounterMax < 0) return html;
 
       var len = $('<div>').html(html).text().length;
+
       if (len + count() <= editor.opts.charCounterMax) return html;
 
       editor.events.trigger('charCounter.exceeded');
@@ -102,6 +105,7 @@
 
         // Scroll size correction.
         var scroll_size = editor.$wp.get(0).offsetWidth - editor.$wp.get(0).clientWidth;
+
         if (scroll_size >= 0) {
           if (editor.opts.direction == 'rtl') {
             $counter.css('margin-left', scroll_size);
@@ -127,7 +131,7 @@
 
       editor.events.on('keydown', _checkCharNumber, true);
       editor.events.on('paste.afterCleanup', _checkCharNumberOnPaste);
-      editor.events.on('keyup contentChanged', function () {
+      editor.events.on('keyup contentChanged input', function () {
         editor.events.trigger('charCounter.update');
       });
 

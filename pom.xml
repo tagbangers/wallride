@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>1.4.4.RELEASE</version>
+		<version>1.5.4.RELEASE</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.M14</version>
+	<version>1.0.0.M15</version>
 	<packaging>pom</packaging>
 	<name>WallRide</name>
 	<description>CMS for developers of principles</description>
@@ -59,12 +59,12 @@
 		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
 		<thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
 		<thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
-		<hibernate.version>5.1.0.Final</hibernate.version>
-		<hibernate-search.version>5.5.4.Final</hibernate-search.version>
+		<hibernate.version>5.2.10.Final</hibernate.version>
+		<hibernate-search.version>5.7.0.Final</hibernate-search.version>
 		<infinispan.version>8.1.0.Final</infinispan.version>
 		<infinispan-spring4.version>8.1.0.Alpha2</infinispan-spring4.version>
-		<lucene.version>5.3.0</lucene.version>
-		<amazonaws-version>1.11.25</amazonaws-version>
+		<lucene.version>5.5.4</lucene.version>
+		<amazonaws-version>1.11.145</amazonaws-version>
 	</properties>
 
 	<modules>
@@ -80,7 +80,7 @@
 			<dependency>
 				<groupId>org.wallride</groupId>
 				<artifactId>wallride-core</artifactId>
-				<version>1.0.0.M14</version>
+				<version>1.0.0.M15</version>
 			</dependency>
 
 			<!-- Spring -->
@@ -157,6 +157,11 @@
 			</dependency>
 
 			<!-- Lucene -->
+			<dependency>
+				<groupId>org.apache.lucene</groupId>
+				<artifactId>lucene-core</artifactId>
+				<version>${lucene.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-queryparser</artifactId>
