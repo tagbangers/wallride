@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>1.5.2.RELEASE</version>
+		<version>1.5.4.RELEASE</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
@@ -64,7 +64,7 @@
 		<infinispan.version>8.1.0.Final</infinispan.version>
 		<infinispan-spring4.version>8.1.0.Alpha2</infinispan-spring4.version>
 		<lucene.version>5.5.4</lucene.version>
-		<amazonaws-version>1.11.25</amazonaws-version>
+		<amazonaws-version>1.11.145</amazonaws-version>
 	</properties>
 
 	<modules>
