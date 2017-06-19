@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -76,6 +77,7 @@ public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 
 		Set<IDialect> dialects = new HashSet<>();
 		dialects.add(wallRideThymeleafDialect);
+		dialects.add(new Java8TimeDialect());
 		engine.setAdditionalDialects(dialects);
 		return engine;
 	}
