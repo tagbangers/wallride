@@ -171,7 +171,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 				BooleanJunction<BooleanJunction> subJunction = qb.bool();
 				for (String key : request.getCustomFields().keySet()) {
-					List<Object> values = (List<Object>)request.getCustomFields().get(key);
+					List<Object> values = request.getCustomFields().get(key);
 					CustomField target = customFieldMap.get(key);
 					BooleanJunction<BooleanJunction> customFieldJunction = qb.bool();
 					switch (target.getFieldType()) {

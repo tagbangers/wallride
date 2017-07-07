@@ -17,6 +17,8 @@
 package org.wallride.web.support;
 
 import org.springframework.data.domain.Page;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.thymeleaf.context.IExpressionContext;
 import org.wallride.domain.Article;
 import org.wallride.domain.Post;
@@ -54,6 +56,7 @@ public class Articles {
 		private Collection<Long> categoryIds;
 		private Collection<String> categoryCodes;
 		private Collection<String> tagNames;
+		private MultiValueMap<String, Object> customFields;
 		private Long authorId;
 		private Post.Status status = Post.Status.PUBLISHED;
 //		private LocalDateTime dateFrom;
@@ -96,6 +99,15 @@ public class Articles {
 			return this;
 		}
 
+		public Condition customField(String key, Object... values) {
+			MultiValueMap<String, Object> customFields = new LinkedMultiValueMap<>();
+			for (Object value : values) {
+				customFields.add(key, value);
+			}
+			this.customFields = customFields;
+			return this;
+		}
+
 		public Condition author(Long id) {
 			this.authorId = id;
 			return this;
@@ -108,6 +120,7 @@ public class Articles {
 					.withCategoryIds(this.categoryIds)
 					.withCategoryCodes(this.categoryCodes)
 					.withTagNames(this.tagNames)
+					.withCustomFields(this.customFields)
 					.withAuthorId(this.authorId);
 			return request;
 		}
