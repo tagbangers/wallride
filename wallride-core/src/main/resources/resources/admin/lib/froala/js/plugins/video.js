@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -41,6 +41,7 @@
 
   $.extend($.FE.DEFAULTS, {
     videoAllowedTypes: ['mp4', 'webm', 'ogg'],
+    videoAllowedProviders: ['.*'],
     videoDefaultAlign: 'center',
     videoDefaultDisplay: 'block',
     videoDefaultWidth: 600,
@@ -64,37 +65,43 @@
       test_regex: /^.*((youtu.be)|(youtube.com))\/((v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))?\??v?=?([^#\&\?]*).*/,
       url_regex: /(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/)?([0-9a-zA-Z_\-]+)(.+)?/g,
       url_text: '//www.youtube.com/embed/$1',
-      html: '<iframe width="640" height="360" src="{url}?wmode=opaque" frameborder="0" allowfullscreen></iframe>'
+      html: '<iframe width="640" height="360" src="{url}?wmode=opaque" frameborder="0" allowfullscreen></iframe>',
+      provider: 'youtube'
     },
     {
       test_regex: /^.*(?:vimeo.com)\/(?:channels(\/\w+\/)?|groups\/*\/videos\/​\d+\/|video\/|)(\d+)(?:$|\/|\?)/,
       url_regex: /(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:[a-zA-Z0-9_\-]+)?/i,
       url_text: '//player.vimeo.com/video/$1',
-      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>'
+      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>',
+      provider: 'vimeo'
     },
     {
       test_regex: /^.+(dailymotion.com|dai.ly)\/(video|hub)?\/?([^_]+)[^#]*(#video=([^_&]+))?/,
       url_regex: /(?:https?:\/\/)?(?:www\.)?(?:dailymotion\.com|dai\.ly)\/(?:video|hub)?\/?(.+)/g,
       url_text: '//www.dailymotion.com/embed/video/$1',
-      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>'
+      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>',
+      provider: 'dailymotion'
     },
     {
       test_regex: /^.+(screen.yahoo.com)\/[^_&]+/,
       url_regex: '',
       url_text: '',
-      html: '<iframe width="640" height="360" src="{url}?format=embed" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" allowtransparency="true"></iframe>'
+      html: '<iframe width="640" height="360" src="{url}?format=embed" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" allowtransparency="true"></iframe>',
+      provider: 'yahoo'
     },
     {
       test_regex: /^.+(rutube.ru)\/[^_&]+/,
       url_regex: /(?:https?:\/\/)?(?:www\.)?(?:rutube\.ru)\/(?:video)?\/?(.+)/g,
       url_text: '//rutube.ru/play/embed/$1',
-      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" allowtransparency="true"></iframe>'
+      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" allowtransparency="true"></iframe>',
+      provider: 'rutube'
     },
     {
       test_regex: /^(?:.+)vidyard.com\/(?:watch)?\/?([^.&/]+)\/?(?:[^_.&]+)?/,
       url_regex: /^(?:.+)vidyard.com\/(?:watch)?\/?([^.&/]+)\/?(?:[^_.&]+)?/g,
       url_text: '//play.vidyard.com/$1',
-      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>'
+      html: '<iframe width="640" height="360" src="{url}" frameborder="0" allowfullscreen></iframe>',
+      provider: 'vidyard'
     }
   ];
 
@@ -390,9 +397,7 @@
 
       if (sanitize) link = editor.helpers.sanitizeURL(link);
 
-      var video = document.createElement('video');
-
-      video.oncanplay = function () {
+      var _add = function () {
         var $video;
         var attr;
 
@@ -464,13 +469,9 @@
         }
       }
 
-      video.onerror = function () {
-        _throwError(BAD_LINK);
-      }
-
       showProgressBar('Loading video');
 
-      video.src = link;
+      _add();
     }
 
     /**
@@ -496,7 +497,7 @@
       }
 
       if (typeof no_message == 'undefined') {
-        _setProgressMessage('Uploading', 0);
+        _setProgressMessage(editor.language.translate('Uploading'), 0);
       }
     }
 
@@ -586,7 +587,8 @@
         for (var i = 0; i < $.FE.VIDEO_PROVIDERS.length; i++) {
           var vp = $.FE.VIDEO_PROVIDERS[i];
 
-          if (vp.test_regex.test(link)) {
+          // Check if video provider is allowed.
+          if (vp.test_regex.test(link) && (new RegExp(editor.opts.videoAllowedProviders.join('|'))).test(vp.provider)) {
             video = link.replace(vp.url_regex, vp.url_text);
             video = vp.html.replace(/\{url\}/, video);
             break;
@@ -635,7 +637,7 @@
           return false;
         }
 
-        var resp = $.parseJSON(response);
+        var resp = JSON.parse(response);
 
         if (resp.link) {
 
@@ -744,7 +746,7 @@
     function _videoUploadProgress (e) {
       if (e.lengthComputable) {
         var complete = (e.loaded / e.total * 100 | 0);
-        _setProgressMessage('Uploading', complete);
+        _setProgressMessage(editor.language.translate('Uploading'), complete);
       }
     }
 
@@ -779,10 +781,8 @@
       }
 
       // Create video object and set the load event.
-      var $video = $('<span contenteditable="false" draggable="true" class="fr-video fr-dv' + (editor.opts.videoDefaultDisplay[0]) + (editor.opts.videoDefaultAlign != 'center' ? ' fr-fv' + editor.opts.videoDefaultAlign[0] : '') + '"><video src="' + link + '" ' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '" controls>' + editor.language.translate('Your browser does not support HTML5 video.') + '</video></span>');
+      var $video = $('<span contenteditable="false" draggable="true" class="fr-video fr-dv' + (editor.opts.videoDefaultDisplay[0]) + (editor.opts.videoDefaultAlign != 'center' ? ' fr-fv' + editor.opts.videoDefaultAlign[0] : '') + '"><video src="' + link + '" ' + data_str + (width ? ' style="width: ' + width + ';" ' : '') + ' controls>' + editor.language.translate('Your browser does not support HTML5 video.') + '</video></span>');
       $video.toggleClass('fr-draggable', editor.opts.videoMove);
-
-      $video.find('video').on('canplay', loadCallback);
 
       // Make sure we have focus.
       // Call the event.
@@ -809,8 +809,16 @@
       }
 
       $marker.replaceWith($video);
+
       editor.html.wrap();
       editor.selection.clear();
+
+      if ($video.find('video').get(0).readyState > $video.find('video').get(0).HAVE_FUTURE_DATA || editor.helpers.isIOS()) {
+        loadCallback.call($video.find('video').get(0));
+      }
+      else {
+        $video.find('video').on('canplaythrough load', loadCallback);
+      }
 
       return $video;
     }
@@ -841,9 +849,15 @@
         var oel = editor.$oel.get(0);
         var doc = oel.ownerDocument;
         var win = doc.defaultView || doc.parentWindow;
-        var editor_inside_iframe = win.location != win.parent.location;
+        var editor_inside_iframe = false;
 
-        if (editor_inside_iframe) {
+        try {
+          editor_inside_iframe = (win.location != win.parent.location && !(win.$ && win.$.FE));
+        }
+        catch (ex) {
+        }
+
+        if (editor_inside_iframe && win.frameElement) {
           c_x += editor.helpers.getPX($(win.frameElement).offset().left) + win.frameElement.clientLeft;
 
           // Override c_y with clientY attribute.
@@ -976,7 +990,7 @@
           editor.shared.$vid_overlay = $('<div class="fr-video-overlay"></div>');
           $overlay = editor.shared.$vid_overlay;
           doc = $video_resizer.get(0).ownerDocument;
-          $(doc).find('body').append($overlay);
+          $(doc).find('body:first').append($overlay);
         }
       }
       else {
@@ -984,7 +998,7 @@
         $overlay = editor.shared.$vid_overlay;
 
         editor.events.on('destroy', function () {
-          $video_resizer.removeClass('fr-active').appendTo($('body'));
+          $video_resizer.removeClass('fr-active').appendTo($('body:first'));
         }, true);
       }
 
@@ -1335,7 +1349,9 @@
           xhr.onabort = _videoUploadAborted;
 
           showProgressBar();
+          editor.events.disableBlur();
           editor.edit.off();
+          editor.events.enableBlur();
 
           var $popup = editor.popups.get('video.insert');
 
@@ -1389,6 +1405,12 @@
           inst.events.enableBlur();
         }
       });
+
+      if (editor.helpers.isIOS()) {
+        editor.events.$on($popup, 'touchstart', '.fr-video-upload-layer input[type="file"]', function () {
+          $(this).trigger('click');
+        });
+      }
 
       editor.events.$on($popup, 'change', '.fr-video-upload-layer input[type="file"]', function () {
         if (this.files) {
@@ -1626,8 +1648,10 @@
         _setStyle($current_video, getDisplay(), val);
       }
 
+      _selectVideo()
       _repositionResizer();
       _showEditPopup();
+      editor.selection.clear();
     }
 
     /**
@@ -1703,8 +1727,10 @@
         _setStyle($current_video, val, getAlign());
       }
 
+      _selectVideo()
       _repositionResizer();
       _showEditPopup();
+      editor.selection.clear();
     }
 
     /**
@@ -1823,8 +1849,8 @@
      */
     function _convertStyleToClasses ($video) {
       if (!$video.hasClass('fr-dvi') && !$video.hasClass('fr-dvb')) {
-        $video.addClass('fr-fi' + getAlign($video)[0]);
-        $video.addClass('fr-di' + getDisplay($video)[0]);
+        $video.addClass('fr-fv' + getAlign($video)[0]);
+        $video.addClass('fr-dv' + getDisplay($video)[0]);
       }
     }
 
@@ -1863,7 +1889,8 @@
         for (var i = 0; i < $.FE.VIDEO_PROVIDERS.length; i++) {
           var vp = $.FE.VIDEO_PROVIDERS[i];
 
-          if (vp.test_regex.test(link)) {
+          // Check if video provider is allowed.
+          if (vp.test_regex.test(link) && (new RegExp(editor.opts.videoAllowedProviders.join('|'))).test(vp.provider)) {
 
             return true;
           }

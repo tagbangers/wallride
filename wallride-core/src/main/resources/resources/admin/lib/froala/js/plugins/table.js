@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -133,9 +133,13 @@
 
           editor.button.bulkRefresh();
 
+          // https://github.com/froala/wysiwyg-editor/issues/1851.
+          // https://github.com/froala-labs/froala-editor-js-2/issues/314.
+          // https://github.com/froala/wysiwyg-editor/issues/1656.
+          // https://github.com/froala-labs/froala-editor-js-2/issues/294.
+
           // Place selection in last selected table cell.
           editor.selection.setAtEnd(editor.$el.find('.fr-selected-cell:last').get(0));
-          editor.$el.focus()
           editor.selection.restore();
         }
       }
@@ -449,7 +453,7 @@
         }
 
         else {
-          colors_html += '<span class="fr-command" data-cmd="tableCellBackgroundColor" tabIndex="-1" role="button" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '"><i class="fa fa-eraser"></i><span class="fr-sr-only">' + editor.language.translate('Clear Formatting') + '</span></span>';
+          colors_html += '<span class="fr-command" data-cmd="tableCellBackgroundColor" tabIndex="-1" role="button" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '">' + editor.icon.create('tableColorRemove') + '<span class="fr-sr-only">' + editor.language.translate('Clear Formatting') + '</span></span>';
         }
       }
 
@@ -2484,7 +2488,7 @@
 
       editor.events.on('destroy', function () {
         editor.$el.find('.fr-selected-cell').removeClass('fr-selected-cell');
-        $resizer.hide().appendTo($('body'));
+        $resizer.hide().appendTo($('body:first'));
       }, true);
     }
 
@@ -2976,6 +2980,8 @@
         var $table = $resizer.data('table');
         var table_width = $table.outerWidth();
 
+        if (!editor.undo.canDo()) editor.undo.saveStep();
+
         // Resize columns and not the table.
         if (first !== null && second !== null) {
 
@@ -3173,16 +3179,21 @@
           if (cell.tagName == 'TD' || cell.tagName == 'TH') {
             $cell = $(cell);
           }
-          else if ($(cell).closest('td').length > 0) {
-            $cell = $(cell).closest('td');
+          else if ($(cell).parentsUntil(editor.$el, 'td').length > 0) {
+            $cell = $(cell).parents('td:first');
           }
-          else if ($(cell).closest('th').length > 0) {
-            $cell = $(cell).closest('th');
+          else if ($(cell).parentsUntil(editor.$el, 'th').length > 0) {
+            $cell = $(cell).parents('th:first');
           }
         }
 
         if ($cell) {
           e.preventDefault();
+
+          if ($(editor.selection.element()).parents('ol, ul').length > 0) {
+
+            return true;
+          }
 
           _stopEdit();
 
@@ -3570,6 +3581,18 @@
           var selected_cells = selectedCells();
 
           if (selected_cells.length > 0) {
+
+            // CMD + A clear table cell selection and allow propagation.
+            if (selected_cells.length > 0 && editor.keys.ctrlKey(e) && e.which == $.FE.KEYCODE.A) {
+              _removeSelection();
+
+              if (editor.popups.isVisible('table.edit')) {
+                editor.popups.hide('table.edit');
+              }
+              selected_cells = [];
+
+              return true;
+            }
 
             // ESC clear table cell selection.
             if (e.which == $.FE.KEYCODE.ESC) {
@@ -4060,5 +4083,7 @@
       }
     }
   });
+
+  $.FE.DefineIcon('tableColorRemove', { NAME: 'eraser' });
 
 }));

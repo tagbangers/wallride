@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -34,7 +34,7 @@
   
 
   $.extend($.FE.DEFAULTS, {
-    codeMirror: true,
+    codeMirror: window.CodeMirror,
     codeMirrorOptions: {
       lineNumbers: true,
       tabMode: 'indent',
@@ -105,33 +105,21 @@
         _initArea();
 
         // Enable code mirror.
-        if (!code_mirror && editor.opts.codeMirror && typeof CodeMirror != 'undefined') {
-          code_mirror = CodeMirror.fromTextArea($html_area.get(0), editor.opts.codeMirrorOptions);
+        if (!code_mirror && editor.opts.codeMirror) {
+          code_mirror = editor.opts.codeMirror.fromTextArea($html_area.get(0), editor.opts.codeMirrorOptions);
         }
         else {
           editor.events.$on($html_area, 'keydown keyup change input', function () {
             if (!editor.opts.height) {
-              if (!this.rows) {
-                this.rows = 1;
-              }
+              this.rows = 1;
 
               // Textarea has no content anymore.
               if (this.value.length === 0) {
-                this.rows = 1;
+                this.style.height = 'auto';
               }
 
               else {
-                this.style.height = 'auto';
-
-                // Decrease height in case text is deleted.
-                while (this.rows > 1 && this.scrollHeight <= this.offsetHeight) {
-                  this.rows -= 1;
-                }
-
-                // Increase textarea height.
-                while (this.scrollHeight > this.offsetHeight && (!editor.opts.heightMax || this.offsetHeight < editor.opts.heightMax)) {
-                  this.rows += 1;
-                }
+                this.style.height = this.scrollHeight + 'px';
               }
             }
             else {
@@ -222,6 +210,7 @@
         }
 
         $html_area.val(html.replace(/FROALA-SM/g, '').replace(/FROALA-EM/g, '')).trigger('change');
+
         var scroll_top = $(editor.o_doc).scrollTop();
         $html_area.focus();
         $html_area.get(0).setSelectionRange(s_index, e_index);
@@ -262,7 +251,7 @@
      */
     function _destroy () {
       if (isActive()) {
-        toggle(editor.$tb.find('button[data-cmd="html"]'));
+        toggle(false);
       }
 
       if (code_mirror) code_mirror.toTextArea();

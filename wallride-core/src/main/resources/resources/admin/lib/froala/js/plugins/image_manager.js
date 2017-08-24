@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -570,6 +570,20 @@
     }
 
     /*
+     * Update tags.
+     */
+    function _updateTags () {
+      $modal.find('#fr-modal-tags > a').each (function () {
+
+        if ($modal.find('#fr-image-list [data-tag*="' + $(this).text() + '"]').length === 0) {
+          $(this).removeClass('fr-selected-tag').hide();
+        }
+      });
+
+      _showImagesByTags();
+    }
+
+    /*
      * Delete image.
      */
     function _deleteImage (e) {
@@ -604,6 +618,7 @@
 
               // On success remove the image from the image manager.
               .done(function (data) {
+
                 editor.events.trigger('imageManager.imageDeleted', [data]);
 
                 // A deleted image may break the images order. Reorder them starting with this image.
@@ -614,6 +629,9 @@
 
                 // Reorder images.
                 _reorderImages(imgs);
+
+                // Update tags.
+                _updateTags();
 
                 // Modal needs resizing.
                 _resizeModal(true);
@@ -668,9 +686,9 @@
       var tags_height = $image_tags.outerHeight();
 
       // Use .fr-show-tags.
-      $head.toggleClass('.fr-show-tags');
+      $head.toggleClass('fr-show-tags');
 
-      if ($head.hasClass('.fr-show-tags')) {
+      if ($head.hasClass('fr-show-tags')) {
 
         // Show tags by changing height to have transition.
         $head.css('height', title_height + tags_height);
@@ -747,7 +765,7 @@
      * Method to check if an image has a specific tag.
      */
     function _imageHasTag ($image, tag) {
-      var tags = $image.attr('data-tag').split(',');
+      var tags = ($image.attr('data-tag') || '').split(',');
 
       for (var i = 0; i < tags.length; i++) {
         if (tags[i] == tag) {

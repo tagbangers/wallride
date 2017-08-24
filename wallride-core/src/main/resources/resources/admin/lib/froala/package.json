@@ -1,7 +1,7 @@
 {
   "name": "froala-editor",
-  "version": "2.5.1",
-  "description": "A beautiful jQuery WYSIWYG HTML rich text editor. High performance and modern design make it easy to use for developers and loved by users.",
+  "version": "2.6.5",
+  "description": "A beautiful Javascript WYSIWYG HTML rich text editor. High performance and modern design make it easy to use for developers and loved by users.",
   "keywords": [
     "froala",
     "froala-editor",
@@ -40,12 +40,14 @@
       "basePath": "/",
       "files": [
         "js/plugins/*.min.js",
+        "js/third_party/*.min.js",
         "js/froala_editor.min.js",
         "js/froala_editor.pkgd.min.js",
         "css/froala_editor.min.css",
         "css/froala_editor.pkgd.min.css",
         "css/froala_style.min.css",
         "css/plugins/*.min.css",
+        "css/third_party/*.min.css",
         "css/themes/*.min.css"
       ]
     }

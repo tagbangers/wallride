@@ -8,7 +8,16 @@
     z-index: 4;
     -webkit-overflow-scrolling: touch;
     overflow: hidden;
+    zoom: 1;
     .border-radius(0 0 @border-radius @border-radius);
+
+    &.test-height {
+      .fr-dropdown-wrapper {
+        .transition(none);
+        height: auto;
+        max-height: @dropdown-max-height;
+      }
+    }
 
     .fr-dropdown-wrapper {
       background: @ui-bg;
@@ -61,6 +70,12 @@
           }
         }
       }
+    }
+  }
+
+  &:not(.fr-active) {
+    + .fr-dropdown-menu {
+      left: -3000px !important;
     }
   }
 

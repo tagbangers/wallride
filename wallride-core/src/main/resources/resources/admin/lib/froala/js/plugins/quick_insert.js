@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -47,7 +47,7 @@
 
         if (!editor.shared.$qi_image_input) {
           editor.shared.$qi_image_input = $('<input accept="image/*" name="quickInsertImage' + this.id + '" style="display: none;" type="file">');
-          $('body').append(editor.shared.$qi_image_input);
+          $('body:first').append(editor.shared.$qi_image_input);
 
           editor.events.$on(editor.shared.$qi_image_input, 'change', function () {
             var inst = $(this).data('inst');
@@ -203,7 +203,7 @@
         }
 
         // Tag must be empty block and direct child of element in order to show the quick insert.
-        if (tag && editor.node.isEmpty(tag) && editor.node.isElement(tag.parentNode)) {
+        if (tag && editor.node.isEmpty(tag) && editor.node.isElement(tag.parentNode) && editor.opts.quickInsertTags.indexOf(tag.tagName.toLowerCase()) >= 0) {
 
           // If the quick insert is not repositioned, just close the helper.
           if ($quick_insert && $quick_insert.data('tag').is($(tag)) && $quick_insert.hasClass('fr-on')) {
@@ -274,7 +274,7 @@
           editor.shared.$qi_helper = $(btns_html);
 
           // Quick insert helper tooltip.
-          editor.tooltip.bind(editor.shared.$qi_helper, '.fr-qi-helper > a.fr-btn');
+          editor.tooltip.bind(editor.shared.$qi_helper, '> a.fr-btn');
         }
 
         $helper = editor.shared.$qi_helper;
@@ -320,11 +320,11 @@
 
       // Editor destroy.
       editor.events.on('destroy', function () {
-        $quick_insert.removeClass('fr-on').appendTo($('body')).css('left', -9999).css('top', -9999);
+        $quick_insert.removeClass('fr-on').appendTo($('body:first')).css('left', -9999).css('top', -9999);
 
         if ($helper) {
           _hideHelper();
-          $helper.appendTo($('body'));
+          $helper.appendTo($('body:first'));
         }
       }, true);
 

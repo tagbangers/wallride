@@ -50,7 +50,7 @@
       font-size: @ui-font-size;
       display: block;
       line-height:  (@ui-font-size + 3px);
-      min-width: @btn-width;
+      min-width: (@btn-width - 2 * @btn-margin);
       float: left;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -145,7 +145,7 @@
 }
 
 .fr-toolbar.fr-inline {
-  .fr-command.fr-btn {
+  .fr-command.fr-btn:not(.fr-hidden) {
     .display-inline-flex();
     float: none;
   }

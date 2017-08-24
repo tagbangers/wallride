@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -41,6 +41,7 @@
 }
 .fr-modal-head .fr-modal-tags {
   display: none;
+  text-align: left;
 }
 .fr-modal-head .fr-modal-tags a {
   display: inline-block;
