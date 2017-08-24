@@ -783,6 +783,27 @@
     }
   }
 
+  .examples-variante > a {
+    font-size: @ui-font-size;
+    font-family: @font-family;
+  }
+
+  .sc-cm-holder > .sc-cm {
+    border-top: @ui-border-top !important;
+  }
+
+  .sc-cm__item_dropdown:hover > a,  .sc-cm a:hover {
+    background-color: @ui-hover-color !important;
+  }
+
+  .sc-cm__item_active > a,  .sc-cm__item_active > a:hover,  .sc-cm a:active,  .sc-cm a:focus{
+    background-color: @ui-focused-color !important;
+  }
+
+  .sc-cm-holder> .sc-cm:before {
+    background-color: @ui-hover-color !important;
+  }
+
   .fr-tooltip {
     top: 0;
     left: 0;
@@ -826,7 +847,7 @@
       span {
         font-size: @ui-font-size;
         line-height:  (@ui-font-size + 3px);
-        min-width: @btn-width;
+        min-width: (@btn-width - 2 * @btn-margin);
         height: (@btn-font-size + 3px);
         padding: 0 @btn-margin;
       }
@@ -947,6 +968,14 @@
       height: auto;
       .border-radius(0 0 @border-radius @border-radius);
 
+      &.test-height {
+
+        .fr-dropdown-wrapper {
+          height: auto;
+          max-height: @dropdown-max-height;
+        }
+      }
+
       .fr-dropdown-wrapper {
         background: @ui-bg;
         padding: 0;
@@ -1015,6 +1044,16 @@
     bottom: 0;
     right: 0;
 
+    &.fr-middle {
+
+      .fr-modal-wrapper {
+        margin-top: 0;
+        margin-bottom: 0;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
     .fr-modal-wrapper {
       .border-radius(@border-radius);
       margin: 20px auto;
@@ -1041,9 +1080,9 @@
           color: @ui-text;
 
           &.fr-modal-close {
-              top: 0;
-              right: 0;
-              .transition(color @transition-timing);
+            top: 0;
+            right: 0;
+            .transition(color @transition-timing);
           }
         }
 
@@ -1057,6 +1096,25 @@
 
         &:focus {
           outline: 0;
+        }
+
+        button.fr-command {
+          color: @ui-color;
+          .transition(background @transition-timing);
+
+          &:hover,  &:focus {
+            background: @ui-hover-color;
+            color: @ui-color;
+          }
+
+          &:active {
+            background: @ui-focused-color;
+            color: @ui-color;
+          }
+        }
+
+        button::-moz-focus-inner {
+          border: 0;
         }
       }
     }

@@ -18,9 +18,9 @@ package org.wallride.model;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.logging.Log;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.wallride.domain.BlogLanguage;
 import org.wallride.domain.Post;
@@ -28,7 +28,6 @@ import org.wallride.domain.Post;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 @SuppressWarnings("serial")
 public class PageSearchRequest implements Serializable {
@@ -38,7 +37,7 @@ public class PageSearchRequest implements Serializable {
 	private Collection<String> tagNames;
 	private Collection<Long> categoryIds;
 	private Collection<String> categoryCodes;
-	private Map<String, Object> customFields;
+	private MultiValueMap<String, Object> customFields;
 	private Long authorId;
 	private Post.Status status;
 	private String language;
@@ -177,15 +176,15 @@ public class PageSearchRequest implements Serializable {
 		}
 		return this;
 	}
-	public Map<String, Object> getCustomFields() {
+	public MultiValueMap<String, Object> getCustomFields() {
 		return customFields;
 	}
 
-	public void setCustomFields(Map<String, Object> customFields) {
+	public void setCustomFields(MultiValueMap<String, Object> customFields) {
 		this.customFields = customFields;
 	}
 
-	public PageSearchRequest withCustomFields(Map<String, Object> customFields) {
+	public PageSearchRequest withCustomFields(MultiValueMap<String, Object> customFields) {
 		this.customFields = customFields;
 		return this;
 	}

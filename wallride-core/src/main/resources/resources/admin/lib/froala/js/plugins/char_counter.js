@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -64,7 +64,7 @@
       // Stop if the key will produce a new char.
       var keyCode = e.which;
 
-      if (!editor.keys.ctrlKey(e) && editor.keys.isCharacter(keyCode)) {
+      if ((!editor.keys.ctrlKey(e) && editor.keys.isCharacter(keyCode)) || (keyCode === $.FE.KEYCODE.IME)) {
         e.preventDefault();
         e.stopPropagation();
         editor.events.trigger('charCounter.exceeded');

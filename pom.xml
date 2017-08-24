@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>1.5.4.RELEASE</version>
+		<version>1.5.6.RELEASE</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.M15</version>
+	<version>1.0.0.M16</version>
 	<packaging>pom</packaging>
 	<name>WallRide</name>
 	<description>CMS for developers of principles</description>
@@ -80,7 +80,7 @@
 			<dependency>
 				<groupId>org.wallride</groupId>
 				<artifactId>wallride-core</artifactId>
-				<version>1.0.0.M15</version>
+				<version>1.0.0.M16</version>
 			</dependency>
 
 			<!-- Spring -->

@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -54,7 +54,7 @@
     function _on () {
       old_scroll = editor.helpers.scrollTop();
       editor.$box.toggleClass('fr-fullscreen');
-      $('body').toggleClass('fr-fullscreen');
+      $('body:first').toggleClass('fr-fullscreen');
       $placeholder = $('<div style="display: none;"></div>');
       editor.$box.after($placeholder);
 
@@ -80,10 +80,12 @@
 
       var $parent_node = editor.$box.parent();
 
-      while (!$parent_node.is('body')) {
+      while (!$parent_node.is('body:first')) {
         $parent_node
           .data('z-index', $parent_node.css('z-index'))
-          .css('z-index', '9990');
+          .data('overflow', $parent_node.css('overflow'))
+          .css('z-index', '9990')
+          .css('overflow', 'visible');
         $parent_node = $parent_node.parent();
       }
 
@@ -96,7 +98,7 @@
      */
     function _off () {
       editor.$box.toggleClass('fr-fullscreen');
-      $('body').toggleClass('fr-fullscreen');
+      $('body:first').toggleClass('fr-fullscreen');
 
       editor.$tb.prependTo(editor.$tb.data('parent'));
 
@@ -132,7 +134,7 @@
 
       var $parent_node = editor.$box.parent();
 
-      while (!$parent_node.is('body')) {
+      while (!$parent_node.is('body:first')) {
         if ($parent_node.data('z-index')) {
           $parent_node.css('z-index', '');
 
@@ -140,6 +142,19 @@
             $parent_node.css('z-index', $parent_node.data('z-index'));
           }
           $parent_node.removeData('z-index');
+        }
+
+        if ($parent_node.data('overflow')) {
+          $parent_node.css('overflow', '');
+
+          if ($parent_node.css('overflow') != $parent_node.data('overflow')) {
+            $parent_node.css('overflow', $parent_node.data('overflow'));
+          }
+          $parent_node.removeData('overflow');
+        }
+        else {
+          $parent_node.css('overflow', '');
+          $parent_node.removeData('overflow');
         }
 
         $parent_node = $parent_node.parent();

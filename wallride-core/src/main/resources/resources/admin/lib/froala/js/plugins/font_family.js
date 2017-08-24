@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -39,7 +39,7 @@
       'Georgia,serif': 'Georgia',
       'Impact,Charcoal,sans-serif': 'Impact',
       'Tahoma,Geneva,sans-serif': 'Tahoma',
-      'Times New Roman,Times,serif': 'Times New Roman',
+      'Times New Roman,Times,serif,-webkit-standard': 'Times New Roman',
       'Verdana,Geneva,sans-serif': 'Verdana'
     },
     fontFamilySelection: false,
@@ -127,7 +127,7 @@
       if (editor.opts.fontFamilySelection) {
         var val = $(editor.selection.element()).css('font-family').replace(/(sans-serif|serif|monospace|cursive|fantasy)/gi, '').replace(/"|'|/g, '').split(',');
 
-        $btn.find('> span').text(editor.opts.fontFamily[_getSelection()] || val[0] || editor.opts.fontFamilyDefaultSelection);
+        $btn.find('> span').text(editor.opts.fontFamily[_getSelection()] || val[0] || editor.language.translate(editor.opts.fontFamilyDefaultSelection));
       }
     }
 

@@ -25,6 +25,20 @@ body.prevent-scroll {
   text-rendering: optimizelegibility;
   .font-smoothing();
   text-align: center;
+  line-height: 1.2;
+
+  &.fr-middle {
+    .fr-modal-wrapper {
+      margin-top: 0;
+      margin-bottom: 0;
+      margin-left: auto;
+      margin-right: auto;
+      top: 50%;
+      left: 50%;
+      .transform(translate(-50%, -50%));
+      position: absolute;
+    }
+  }
 
   .fr-modal-wrapper {
     .border-radius(@border-radius);
@@ -37,7 +51,6 @@ body.prevent-scroll {
     border-top: @ui-border-top;
     overflow: hidden;
     width: 90%;
-    padding-bottom: 10px;
     position: relative;
 
     @media (min-width: @screen-sm) and (max-width: @screen-sm-max) {
@@ -71,10 +84,10 @@ body.prevent-scroll {
         .box-sizing(content-box);
 
         &.fr-modal-close {
-            position: absolute;
-            top: 0;
-            right: 0;
-            .transition(color @transition-timing);
+          position: absolute;
+          top: 0;
+          right: 0;
+          .transition(color @transition-timing);
         }
       }
 
@@ -93,9 +106,42 @@ body.prevent-scroll {
       height: 100%;
       min-height: 150px;
       overflow-y: scroll;
+      padding-bottom: 10px;
 
       &:focus {
         outline: 0;
+      }
+
+      button.fr-command {
+        height: 36px;
+        line-height: 1;
+        color: @ui-color;
+        padding: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+        background: none;
+        font-size: 16px;
+        outline: none;
+        .transition(background @transition-timing);
+
+        + button {
+          margin-left: 24px;
+        }
+
+        &:hover, &:focus {
+          background: @ui-hover-color;
+          color: @ui-color;
+        }
+
+        &:active {
+          background: @ui-focused-color;
+          color: @ui-color;
+        }
+      }
+
+      button::-moz-focus-inner {
+        border: 0;
       }
     }
   }

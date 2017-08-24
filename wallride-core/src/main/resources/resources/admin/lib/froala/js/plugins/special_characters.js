@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -48,6 +48,7 @@
           { 'char': '&sect;', desc: 'SECTION SIGN' },
           { 'char': '&uml;', desc: 'DIAERESIS' },
           { 'char': '&copy;', desc: 'COPYRIGHT SIGN' },
+          { 'char': '&trade;', desc: 'TRADEMARK SIGN' },
           { 'char': '&ordf;', desc: 'FEMININE ORDINAL INDICATOR' },
           { 'char': '&laquo;', desc: 'LEFT-POINTING DOUBLE ANGLE QUOTATION MARK' },
           { 'char': '&not;', desc: 'NOT SIGN' },
@@ -684,7 +685,9 @@
 
         // Enter on a focused item.
         else if (keycode == $.FE.KEYCODE.ENTER && $focused_char.length) {
-          _insertSpecialCharacter($focused_char);
+          var instance = $modal.data('instance') || editor;
+
+          instance.specialCharacters.insert($focused_char);
         }
         else {
 
@@ -707,13 +710,17 @@
 
         // Resize Special Characters modal on window resize.
         editor.events.$on($(editor.o_win), 'resize', function () {
-          editor.modals.resize(modal_id);
+          var instance = $modal.data('instance') || editor;
+
+          instance.modals.resize(modal_id);
         });
 
         // Insert image.
         editor.events.bindClick($body, '.fr-special-character', function (e) {
+          var instance = $modal.data('instance') || editor;
           var $target = $(e.currentTarget);
-          _insertSpecialCharacter($target);
+
+          instance.specialCharacters.insert($target);
         });
 
         _addAccessibility();
@@ -737,7 +744,7 @@
     /*
      * Insert special character.
      */
-    function _insertSpecialCharacter($target) {
+    function insert($target) {
 
       // Hide modal.
       editor.specialCharacters.hide();
@@ -751,7 +758,8 @@
     return {
       _init: _init,
       show: show,
-      hide: hide
+      hide: hide,
+      insert: insert
     };
   };
 

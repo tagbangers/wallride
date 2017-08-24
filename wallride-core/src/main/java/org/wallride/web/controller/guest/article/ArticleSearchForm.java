@@ -18,6 +18,8 @@ package org.wallride.web.controller.guest.article;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.wallride.domain.Post;
 import org.wallride.model.ArticleSearchRequest;
@@ -26,8 +28,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @SuppressWarnings("serial")
 public class ArticleSearchForm implements Serializable {
@@ -38,7 +38,7 @@ public class ArticleSearchForm implements Serializable {
 	private Collection<Long> categoryIds = new ArrayList<>();
 	private Collection<String> categoryCodes = new ArrayList<>();
 	private Collection<String> tagNames = new ArrayList<>();
-	private Map<String, Object> customFields = new HashMap<>();
+	private MultiValueMap<String, Object> customFields = new LinkedMultiValueMap<>();
 	private Long authorId;
 	private String language;
 
@@ -90,11 +90,11 @@ public class ArticleSearchForm implements Serializable {
 		this.tagNames = tagNames;
 	}
 
-	public Map<String, Object> getCustomFields() {
+	public MultiValueMap<String, Object> getCustomFields() {
 		return customFields;
 	}
 
-	public void setCustomFields(Map<String, Object> customFields) {
+	public void setCustomFields(MultiValueMap<String, Object> customFields) {
 		this.customFields = customFields;
 	}
 

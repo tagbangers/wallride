@@ -20,16 +20,14 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import org.wallride.domain.CustomField;
 import org.wallride.domain.Post;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public class ArticleSearchRequest implements Serializable {
 
@@ -40,7 +38,7 @@ public class ArticleSearchRequest implements Serializable {
 	private Collection<String> categoryCodes;
 	private Collection<Long> tagIds;
 	private Collection<String> tagNames;
-	private Map<String, Object> customFields;
+	private MultiValueMap<String, Object> customFields;
 	private Long authorId;
 	private Post.Status status;
 	private String language;
@@ -200,15 +198,15 @@ public class ArticleSearchRequest implements Serializable {
 		return this;
 	}
 
-	public Map<String, Object> getCustomFields() {
+	public MultiValueMap<String, Object> getCustomFields() {
 		return customFields;
 	}
 
-	public void setCustomFields(Map<String, Object> customFields) {
+	public void setCustomFields(MultiValueMap<String, Object> customFields) {
 		this.customFields = customFields;
 	}
 
-	public  ArticleSearchRequest withCustomFields(Map<String, Object> customFields) {
+	public  ArticleSearchRequest withCustomFields(MultiValueMap<String, Object> customFields) {
 		this.customFields = customFields;
 		return this;
 	}

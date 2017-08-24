@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -339,7 +339,15 @@
         // Place new elements.
         if (!editor.core.isEmpty()) {
           var marker = editor.markers.insert();
-          $(marker).replaceWith($droppedEl);
+
+          // Make sure we do not have marker inside $droppedEl.
+          if ($droppedEl.find(marker).length === 0) {
+            $(marker).replaceWith($droppedEl);
+          }
+          else {
+            $(marker).replaceWith($draggedEl);
+          }
+
           $draggedEl.after($.FE.MARKERS);
           editor.selection.restore();
         }
@@ -375,6 +383,17 @@
         // Stop bubbling.
 
         return false;
+      }
+
+      // Save step when something else is dragged into the editor.
+      else {
+        if ($draggable_helper) $draggable_helper.removeClass('fr-visible');
+
+        if (!editor.undo.canDo()) editor.undo.saveStep();
+
+        setTimeout(function () {
+          editor.undo.saveStep();
+        }, 0);
       }
     }
 

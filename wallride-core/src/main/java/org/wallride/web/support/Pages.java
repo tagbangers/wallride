@@ -16,6 +16,8 @@
 
 package org.wallride.web.support;
 
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.thymeleaf.context.IExpressionContext;
 import org.wallride.domain.Page;
 import org.wallride.domain.Post;
@@ -77,12 +79,14 @@ public class Pages {
 	}
 
 	class Condition {
+
 		private int size = 1;
 		private String keyword;
 		private Collection<Long> categoryIds;
 		private Collection<String> categoryCodes;
 		private Collection<Long> tagIds;
 		private Collection<String> tagNames;
+		private MultiValueMap<String, Object> customFields;
 		private Long authorId;
 		private Post.Status status = Post.Status.PUBLISHED;
 
@@ -132,6 +136,20 @@ public class Pages {
 			return this;
 		}
 
+		public Condition customField(String key, Object... values) {
+			MultiValueMap<String, Object> customFields = new LinkedMultiValueMap<>();
+			for (Object value : values) {
+				customFields.add(key, value);
+			}
+			this.customFields = customFields;
+			return this;
+		}
+
+		public Condition author(Long id) {
+			this.authorId = id;
+			return this;
+		}
+
 		private PageSearchRequest buildPageSearchRequest() {
 			PageSearchRequest request = new PageSearchRequest(context.getLocale().getLanguage())
 					.withKeyword(this.keyword)
@@ -139,6 +157,7 @@ public class Pages {
 					.withCategoryCodes(this.categoryCodes)
 					.withTagIds(this.tagIds)
 					.withTagNames(this.tagNames)
+					.withCustomFields(this.customFields)
 					.withAuthorId(this.authorId)
 					.withStatus(this.status);
 			return request;

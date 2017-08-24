@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -100,7 +100,7 @@
       $popup.find('.fr-file-progress-bar-layer').addClass('fr-active');
       $popup.find('.fr-buttons').hide();
 
-      _setProgressMessage('Uploading', 0);
+      _setProgressMessage(editor.language.translate('Uploading'), 0);
     }
 
     /**
@@ -199,7 +199,7 @@
           return false;
         }
 
-        var resp = $.parseJSON(response);
+        var resp = JSON.parse(response);
 
         if (resp.link) {
 
@@ -302,7 +302,7 @@
     function _fileUploadProgress (e) {
       if (e.lengthComputable) {
         var complete = (e.loaded / e.total * 100 | 0);
-        _setProgressMessage('Uploading', complete);
+        _setProgressMessage(editor.language.translate('Uploading'), complete);
       }
     }
 
@@ -460,6 +460,12 @@
           inst.file.upload(dt.files);
         }
       }, true);
+
+      if (editor.helpers.isIOS()) {
+        editor.events.$on($popup, 'touchstart', '.fr-file-upload-layer input[type="file"]', function () {
+          $(this).trigger('click');
+        });
+      }
 
       editor.events.$on($popup, 'change', '.fr-file-upload-layer input[type="file"]', function () {
         if (this.files) {

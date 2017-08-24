@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -71,15 +71,42 @@
       // Format those blocks that are not LI.
       var default_tag = editor.html.defaultTag();
 
+      var start_margin = null;
+
+      var prop;
+
+      if (blocks.length) prop = (editor.opts.direction == 'rtl' || $(blocks[0]).css('direction') == 'rtl') ? 'margin-right' : 'margin-left';
+
       for (var i = 0; i < blocks.length; i++) {
         if (blocks[i].tagName != 'LI') {
 
+          // Get margin left and unset it.
+          var margin_left = editor.helpers.getPX($(blocks[i]).css(prop)) || 0;
+          blocks[i].style.marginLeft = null;
+
+          // Start indentation relative to the first element.
+          if (start_margin === null) start_margin = margin_left;
+
+          // Update open tag.
+          var open_tag = start_margin > 0 ? '<' + tag_name + ' style="' + prop + ': ' + start_margin + 'px;"' + '>' : '<' + tag_name + '>';
+          var end_tag = '</' + tag_name + '>';
+
+          // Subsctract starting.
+          margin_left = margin_left - start_margin;
+
+          // Keep wrapping.
+          while (margin_left / editor.opts.indentMargin > 0) {
+            open_tag += '<' + tag_name + '>';
+            end_tag += end_tag;
+            margin_left = margin_left - editor.opts.indentMargin;
+          }
+
           // Default tag.
           if (default_tag && blocks[i].tagName.toLowerCase() == default_tag) {
-            $(blocks[i]).replaceWith('<' + tag_name + '><li' + editor.node.attributes(blocks[i]) + '>' + $(blocks[i]).html() + '</li></' + tag_name + '>');
+            $(blocks[i]).replaceWith(open_tag + '<li' + editor.node.attributes(blocks[i]) + '>' + $(blocks[i]).html() + '</li>' + end_tag);
           }
           else {
-            $(blocks[i]).wrap('<' + tag_name + '><li></li></' + tag_name + '>');
+            $(blocks[i]).wrap(open_tag + '<li></li>' + end_tag);
           }
         }
       }
@@ -120,10 +147,21 @@
           $li.after(_openFlag('LI'));
         }
         else {
+          var li_attrs = '';
 
           // https://github.com/froala/wysiwyg-editor/issues/1765 .
           if (li_class) {
-            $li.wrapInner('<' + editor.html.defaultTag() + ' class="' + li_class + '"></' + editor.html.defaultTag() + '>')
+            li_attrs += ' class="' + li_class + '"';
+          }
+
+          var prop = (editor.opts.direction == 'rtl' || $li.css('direction') == 'rtl') ? 'margin-right' : 'margin-left';
+
+          if (editor.helpers.getPX($(parent_node).css(prop))) {
+            li_attrs += ' style="' + prop + ':' + editor.helpers.getPX($(parent_node).css(prop)) + 'px;"';
+          }
+
+          if (li_attrs) {
+            $li.wrapInner('<' + editor.html.defaultTag() + li_attrs + '></' + editor.html.defaultTag() + '>')
           }
 
           // Append BR if the node is not empty.

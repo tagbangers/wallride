@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -188,44 +188,49 @@
     }
 
     function _edit (e) {
-      _hideEditPopup();
+      if (editor.core.hasFocus()) {
+        _hideEditPopup();
 
-      setTimeout (function () {
+        // Do not show edit popup for link when ALT is hit.
+        if (e && e.type === 'keyup' && (e.altKey || e.which == $.FE.KEYCODE.ALT)) return true;
 
-        // No event passed.
-        // Event passed and (left click or other event type).
-        if (!e || (e && (e.which == 1 || e.type != 'mouseup'))) {
-          var link = get();
-          var $current_image = editor.image ? editor.image.get() : null;
+        setTimeout (function () {
 
-          if (link && !$current_image) {
-            if (editor.image) {
-              var contents = editor.node.contents(link);
+          // No event passed.
+          // Event passed and (left click or other event type).
+          if (!e || (e && (e.which == 1 || e.type != 'mouseup'))) {
+            var link = get();
+            var $current_image = editor.image ? editor.image.get() : null;
 
-              // https://github.com/froala/wysiwyg-editor/issues/1103
-              if (contents.length == 1 && contents[0].tagName == 'IMG') {
-                var range = editor.selection.ranges(0);
+            if (link && !$current_image) {
+              if (editor.image) {
+                var contents = editor.node.contents(link);
 
-                if (range.startOffset === 0 && range.endOffset === 0) {
-                  $(link).before($.FE.MARKERS);
+                // https://github.com/froala/wysiwyg-editor/issues/1103
+                if (contents.length == 1 && contents[0].tagName == 'IMG') {
+                  var range = editor.selection.ranges(0);
+
+                  if (range.startOffset === 0 && range.endOffset === 0) {
+                    $(link).before($.FE.MARKERS);
+                  }
+                  else {
+                    $(link).after($.FE.MARKERS);
+                  }
+
+                  editor.selection.restore();
+
+                  return false;
                 }
-                else {
-                  $(link).after($.FE.MARKERS);
-                }
-
-                editor.selection.restore();
-
-                return false;
               }
-            }
 
-            if (e) {
-              e.stopPropagation();
+              if (e) {
+                e.stopPropagation();
+              }
+              _showEditPopup(link);
             }
-            _showEditPopup(link);
           }
-        }
-      }, editor.helpers.isIOS() ? 100 : 0);
+        }, editor.helpers.isIOS() ? 100 : 0);
+      }
     }
 
     function _showEditPopup (link) {
@@ -447,6 +452,13 @@
 
       editor.events.on('window.mouseup', _edit);
 
+      // Do not follow links when edit is disabled.
+      editor.events.$on(editor.$el, 'click', 'a', function (e) {
+        if (editor.edit.isDisabled()) {
+          e.preventDefault();
+        }
+      });
+
       if (editor.helpers.isMobile()) {
         editor.events.$on(editor.$doc, 'selectionchange', _edit);
       }
@@ -538,6 +550,7 @@
           var $marker = $(markers.pop());
           $marker.removeClass('fr-unprocessed');
 
+          // Get deepest parent.
           var deep_parent = editor.node.deepestParent($marker.get(0));
 
           if (deep_parent) {
@@ -557,14 +570,17 @@
             var marker_str = editor.node.openTagString($marker.get(0)) + $marker.html() +  editor.node.closeTagString($marker.get(0));
 
             $marker.replaceWith('<span id="fr-break"></span>');
-            var h = $(deep_parent).html();
+            var h = deep_parent.outerHTML;
+
             h = h.replace(/<span id="fr-break"><\/span>/g, close_str + marker_str + open_str);
 
-            $(deep_parent).html(h);
+            deep_parent.outerHTML = h;
           }
 
           markers = editor.$el.find('.fr-marker.fr-unprocessed').toArray();
         }
+
+        editor.html.cleanEmptyTags();
 
         editor.selection.restore();
       }
@@ -593,15 +609,18 @@
 
       // Convert email address.
       if (editor.opts.linkConvertEmailAddress) {
-        var regex = /^[\w._]+@[a-z\u00a1-\uffff0-9_-]+?\.[a-z\u00a1-\uffff0-9]{2,}$/i;
+        var regex = $.FE.MAIL_REGEX;
 
         if (regex.test(href) && !/^mailto:.*/i.test(href)) {
           href = 'mailto:' + href;
         }
       }
 
+      // Check if is local path.
+      var local_path = /^([A-Za-z]:(\\){1,2}|[A-Za-z]:((\\){1,2}[^\\]+)+)(\\)?$/i;
+
       // Add autoprefix.
-      if (editor.opts.linkAutoPrefix !== '' && !/^(mailto|tel|sms|notes|data):.*/i.test(href) && !/^data:image.*/i.test(href) && !/^(https?:|ftps?:|file:|)\/\//i.test(href)) {
+      if (editor.opts.linkAutoPrefix !== '' && !/^(mailto|tel|sms|notes|data):.*/i.test(href) && !/^data:image.*/i.test(href) && !/^(https?:|ftps?:|file:|)\/\//i.test(href) && !local_path.test(href)) {
 
         // Do prefix only if starting character is not absolute.
         if (['/', '{', '[', '#', '('].indexOf((href || '')[0]) < 0) {
@@ -621,6 +640,14 @@
       if (attrs.target == '_blank') {
         if (!attrs.rel) attrs.rel = 'noopener noreferrer';
         else attrs.rel += ' noopener noreferrer';
+      }
+      else if (attrs.target == null) {
+        if (attrs.rel) {
+          attrs.rel = attrs.rel.replace(/noopener/, '').replace(/noreferrer/, '');
+        }
+        else {
+          attrs.rel = null;
+        }
       }
 
       // Format text.

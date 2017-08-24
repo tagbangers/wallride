@@ -1,5 +1,5 @@
 /*!
- * froala_editor v2.5.1 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.6.5 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
  * Copyright 2014-2017 Froala Labs
  */
@@ -105,6 +105,8 @@
             this.events.trigger('initialized');
           }
         }, this));
+
+        this.events.trigger('initializationDelayed');
       }
       else {
         this.load($.FE.MODULES);
@@ -131,7 +133,7 @@
 
   FE.PLUGINS = {};
 
-  FE.VERSION = '2.5.1';
+  FE.VERSION = '2.6.5';
 
   FE.INSTANCES = [];
 
@@ -390,6 +392,33 @@
   $.FE.MD = 2;
   $.FE.LG = 3;
 
+  // Chars to allow.
+  var x = 'a-z\\u0080-\\u009f\\u00a1-\\uffff0-9';
+
+  // Common regex to avoid double chars.
+  $.FE.LinkRegExCommon = '(([' + x + '])|([' + x + '](\\.|-|_))){1,}[' + x + ']{1,}';
+
+  // PORT:something_else.php
+  $.FE.LinkRegExEnd = '((:[0-9]{1,5})|())(((\\/|)[a-z\\u00a1-\\uffff0-9@?!^=%&amp;\/~+#-_{}]*)|())';
+
+  // Common TLD
+  $.FE.LinkRegExTLD = '((' + $.FE.LinkRegExCommon + ')(\\.(com|net|org|edu|mil|gov|co|biz|info|me|dev)))';
+
+  // Starts with HTTP.
+  $.FE.LinkRegExHTTP = '((ftp|http|https):\\/\\/(www\\.)?' + $.FE.LinkRegExCommon + ')';
+
+  // Authenticate with HTTP.
+  $.FE.LinkRegExAuth = '((ftp|http|https):\\/\\/(www\\.)?[\\u0021-\\uffff]{1,}@' + $.FE.LinkRegExCommon + ')';
+
+  // Starts with WWWW.
+  $.FE.LinkRegExWWW = '(((ftp|http|https):\\/\\/)?www\\.' + $.FE.LinkRegExCommon + '\\.[a-z0-9-]{2,24})';
+
+  // Join.
+  $.FE.LinkRegEx =  '(' + $.FE.LinkRegExTLD + '|' + $.FE.LinkRegExHTTP + '|' + $.FE.LinkRegExAuth + '|' + $.FE.LinkRegExWWW + ')' + $.FE.LinkRegExEnd;
+
+  // https://davidcel.is/posts/stop-validating-email-addresses-with-regex/
+  $.FE.MAIL_REGEX = /.+@.+\..+/i;
+
   $.FE.MODULES.helpers = function (editor) {
     /**
      * Get the IE version.
@@ -504,7 +533,7 @@
     }
 
     function screenSize () {
-      var $test = $('<div class="fr-visibility-helper"></div>').appendTo('body');
+      var $test = $('<div class="fr-visibility-helper"></div>').appendTo('body:first');
       var size = getPX($test.css('margin-left'));
       $test.remove();
 
@@ -517,6 +546,7 @@
     }
 
     function isURL (url) {
+      // Check if it starts with http.
       if (!/^(https?:|ftps?:|)\/\//i.test(url)) return false;
 
       url = String(url)
@@ -526,13 +556,19 @@
           .replace(/ /g, '%20');
 
 
-      var test_reg = /(http|ftp|https):\/\/[a-z\u00a1-\uffff0-9{}]+(\.[a-z\u00a1-\uffff0-9{}]*)*([a-z\u00a1-\uffff0-9.,@?^=%&amp;:\/~+#-_{}]*[a-z\u00a1-\uffff0-9@?^=%&amp;\/~+#-_{}])?/gi;
+      var test_reg = new RegExp('^' + $.FE.LinkRegEx + '$', 'gi');
 
       return test_reg.test(url);
     }
 
     // Sanitize URL.
     function sanitizeURL (url) {
+      var local_path = /^([A-Za-z]:(\\){1,2}|[A-Za-z]:((\\){1,2}[^\\]+)+)(\\)?$/i;
+
+      if (local_path.test(url)) {
+        return url;
+      }
+
       if (/^(https?:|ftps?:|)\/\//i.test(url)) {
         if (!isURL(url) && !isURL('http:' + url)) {
 
@@ -627,7 +663,7 @@
       if (['left', 'right', 'justify', 'center'].indexOf(alignment) < 0) {
         if (!default_alignment) {
           var $div = $('<div dir="' + (editor.opts.direction == 'rtl' ? 'rtl' : 'auto') + '" style="text-align: ' + editor.$el.css('text-align') + '; position: fixed; left: -3000px;"><span id="s1">.</span><span id="s2">.</span></div>');
-          $('body').append($div);
+          $('body:first').append($div);
 
           var l1 = $div.find('#s1').get(0).getBoundingClientRect().left;
           var l2 = $div.find('#s2').get(0).getBoundingClientRect().left;
@@ -734,6 +770,8 @@
         // Browser doesn't support :scope, add polyfill
         overrideNodeMethod(Element.prototype, 'querySelector');
         overrideNodeMethod(Element.prototype, 'querySelectorAll');
+        overrideNodeMethod(HTMLElement.prototype, 'querySelector');
+        overrideNodeMethod(HTMLElement.prototype, 'querySelectorAll');
       }
     }
 
@@ -872,9 +910,17 @@
 
         // Hack to prevent scrolling.
         if (editor.browser.msie && editor.$box) editor.$box.css('position', 'fixed');
+
+        // hack to prevent scrolling.
+        if (editor.browser.msie && editor.$wp) editor.$wp.css('overflow', 'visible');
+
         editor.$el.focus();
 
+        // Revert position.
         if (editor.browser.msie && editor.$box) editor.$box.css('position', '');
+
+        // Revert scroll.
+        if (editor.browser.msie && editor.$wp) editor.$wp.css('overflow', 'auto');
 
         if (st != editor.$win.scrollTop()) {
           editor.$win.scrollTop(st);
@@ -1124,22 +1170,22 @@
         $el.on(evs.split(' ').join('.ed' + id + ' ') + '.ed' + id, selector, callback);
       }
 
-      if (ary.indexOf($el.get(0)) < 0) ary.push($el.get(0));
+      ary.push([$el, evs.split(' ').join('.ed' + id + ' ') + '.ed' + id]);
     }
 
-    function _$off (evs, id) {
+    function _$off (evs) {
       for (var i = 0; i < evs.length; i++) {
-        $(evs[i]).off('.ed' + id);
+        evs[i][0].off(evs[i][1]);
       }
     }
 
     function $off () {
-      _$off($_events, editor.id);
+      _$off($_events);
       $_events = [];
 
       if (editor.shared.count === 0) {
-        _$off(editor.shared.$_events, editor.sid);
-        editor.shared.$_events = null;
+        _$off(editor.shared.$_events);
+        editor.shared.$_events = [];
       }
     }
 
@@ -1288,6 +1334,17 @@
       if (node.nodeType != Node.ELEMENT_NODE) return false;
 
       return $.FE.BLOCK_TAGS.indexOf(node.tagName.toLowerCase()) >= 0;
+    }
+
+    /**
+     * Determine if the node is a link tag.
+     */
+    function isLink (node) {
+      if (!node) return false;
+
+      if (node.nodeType != Node.ELEMENT_NODE) return false;
+
+      return node.tagName.toLowerCase() == 'a';
     }
 
     /**
@@ -1558,6 +1615,7 @@
       isFirstSibling: isFirstSibling,
       isLastSibling: isLastSibling,
       isList: isList,
+      isLink: isLink,
       isElement: isElement,
       contents: getContents,
       isVoid: isVoid,
@@ -1597,10 +1655,11 @@
 
         boundary.insertNode(_build(marker, id));
 
-        if (marker === true && range.collapsed) {
-          mk = editor.$el.find('span.fr-marker[data-type="true"][data-id="' + id + '"]');
-          sibling = mk.get(0).nextSibling;
+        if (marker === true) {
+          mk = editor.$el.find('span.fr-marker[data-type="true"][data-id="' + id + '"]').get(0);
+          sibling = mk.nextSibling;
 
+          // Clean empty spaces.
           while (sibling && sibling.nodeType === Node.TEXT_NODE && sibling.textContent.length === 0) {
             $(sibling).remove();
             sibling = mk.nextSibling;
@@ -1608,8 +1667,13 @@
         }
 
         if (marker === true && !range.collapsed) {
-          mk = editor.$el.find('span.fr-marker[data-type="true"][data-id="' + id + '"]').get(0);
-          sibling = mk.nextSibling;
+
+          // Move markers outside of something like this:
+          // <p><strong>fooM</strong>bar</p>
+          while (!editor.node.isElement(mk.parentNode) && !sibling) {
+            $(mk.parentNode).after(mk);
+            sibling = mk.nextSibling;
+          }
 
           if (sibling && sibling.nodeType === Node.ELEMENT_NODE && editor.node.isBlock(sibling)) {
 
@@ -1737,8 +1801,9 @@
       if (deep_parent) {
         if (editor.node.isBlock(deep_parent) && editor.node.isEmpty(deep_parent)) {
 
-          // https://github.com/froala/wysiwyg-editor/issues/1730 .
-          if (deep_parent.tagName == 'LI' && deep_parent.parentNode.firstElementChild == deep_parent) {
+          // https://github.com/froala/wysiwyg-editor/issues/1730.
+          // https://github.com/froala/wysiwyg-editor/issues/1970.
+          if (deep_parent.tagName == 'LI' && (deep_parent.parentNode.firstElementChild == deep_parent && !editor.node.isEmpty(deep_parent.parentNode))) {
             $(deep_parent).append('<span class="fr-marker"></span>');
           }
           else {
@@ -2203,9 +2268,8 @@
 
       // Remove blocks that we don't need.
       for (i = blks.length - 1; i > 0; i--) {
-
         // Nodes that contain another node. Don't do it for LI, but remove them if there is a single child and has format.
-        if ($(blks[i]).find(blks).length && (blks[i].tagName != 'LI' || (blks[i].children.length == 1 && blks.indexOf(blks[i].children[0]) >= 0))) blks.splice(i, 1);
+        if ($(blks[i]).find(blks).length && (blks[i].tagName != 'LI' || (blks[i].children.length > 0 && blks.indexOf(blks[i].children[0]) >= 0))) blks.splice(i, 1);
       }
 
       return blks;
@@ -2224,11 +2288,20 @@
         var i;
 
         for (i = 0; i < rgs.length; i++) {
-          if (rgs[i].startContainer !== editor.doc) {
+
+          // 2nd condition is for https://github.com/froala/wysiwyg-editor/issues/1750.
+          if (rgs[i].startContainer !== editor.doc || editor.browser.msie) {
             range = rgs[i];
+
             var collapsed = range.collapsed;
             var start_m = editor.markers.place(range, true, i); // Start.
             var end_m = editor.markers.place(range, false, i); // End.
+
+            // Put selection at the end when there is no marker.
+            if ((typeof start_m == 'undefined' || !start_m) && collapsed) {
+              $('.fr-marker').remove();
+              editor.selection.setAtEnd(editor.el);
+            }
 
             // https://github.com/froala/wysiwyg-editor/issues/1398.
             editor.el.normalize();
@@ -3000,12 +3073,12 @@
       restore();
     }
 
-    function setAtStart (node) {
+    function setAtStart (node, deep) {
       if (!node || node.getElementsByClassName('fr-marker').length > 0) return false;
 
       var child = node.firstChild;
 
-      while (child && editor.node.isBlock(child)) {
+      while (child && (editor.node.isBlock(child) || (deep && !editor.node.isVoid(child) && child.nodeType == Node.ELEMENT_NODE))) {
         node = child;
         child = child.firstChild;
       }
@@ -3013,12 +3086,12 @@
       node.innerHTML = $.FE.MARKERS + node.innerHTML;
     }
 
-    function setAtEnd (node) {
+    function setAtEnd (node, deep) {
       if (!node || node.getElementsByClassName('fr-marker').length > 0) return false;
 
       var child = node.lastChild;
 
-      while (child && editor.node.isBlock(child)) {
+      while (child && (editor.node.isBlock(child) || (deep && !editor.node.isVoid(child) && child.nodeType == Node.ELEMENT_NODE))) {
         node = child;
         child = child.lastChild;
       }
@@ -3200,7 +3273,9 @@
 
         // If node is text node, replace invisible spaces.
         else if (contents[i].nodeType == Node.TEXT_NODE) {
-          contents[i].textContent = contents[i].textContent.replace(/\u200b/g, '').replace(/&/g, '&amp;');
+          contents[i].textContent = contents[i].textContent.replace(/\u200b/g, '');
+
+          // .replace(/&/g, '&amp;');
         }
       }
 
@@ -3256,7 +3331,9 @@
         return temp.innerHTML;
       }
 
-      if (el.tagName == 'IFRAME') return el.outerHTML;
+      if (el.tagName == 'IFRAME') {
+        return el.outerHTML.replace(/\&lt;/g, '<').replace(/\&gt;/g, '>');
+      }
 
       var contents = el.childNodes;
 
@@ -3295,6 +3372,12 @@
         return '[FROALA.EDITOR.NOSCRIPT ' + (scripts.length - 1) + ']';
       });
 
+      dirty_html = dirty_html.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, function (str) {
+        scripts.push(str);
+
+        return '[FROALA.EDITOR.IFRAME ' + (scripts.length - 1) + ']';
+      });
+
       dirty_html = dirty_html.replace(/<img((?:[\w\W]*?)) src="/g, '<img$1 data-fr-src="');
 
       return dirty_html;
@@ -3311,8 +3394,18 @@
           return scripts[parseInt(a1, 10)];
         }
       });
+
       dirty_html = dirty_html.replace(/\[FROALA\.EDITOR\.NOSCRIPT ([\d]*)\]/gi, function (str, a1) {
         if (editor.opts.htmlRemoveTags.indexOf('noscript') >= 0) {
+          return '';
+        }
+        else {
+          return scripts[parseInt(a1, 10)].replace(/\&lt;/g, '<').replace(/\&gt;/g, '>');
+        }
+      });
+
+      dirty_html = dirty_html.replace(/\[FROALA\.EDITOR\.IFRAME ([\d]*)\]/gi, function (str, a1) {
+        if (editor.opts.htmlRemoveTags.indexOf('iframe') >= 0) {
           return '';
         }
         else {
@@ -3484,6 +3577,14 @@
       }
     }
 
+    // Fixes paths coming as HTML entities which are later on converted to their coresponding chars.
+    function _convertHref (href) {
+      var div = editor.doc.createElement('DIV');
+      div.innerText = href;
+
+      return div.textContent;
+    }
+
     function _node (node) {
 
       // Skip when we're dealing with markers.
@@ -3492,9 +3593,11 @@
       if (node.tagName == 'PRE') _cleanPre(node);
 
       if (node.nodeType == Node.ELEMENT_NODE) {
-        if (node.getAttribute('data-fr-src')) node.setAttribute('data-fr-src', editor.helpers.sanitizeURL(node.getAttribute('data-fr-src')));
+        if (node.getAttribute('data-fr-src') && node.getAttribute('data-fr-src').indexOf('blob:') !== 0) node.setAttribute('data-fr-src', editor.helpers.sanitizeURL(_convertHref(node.getAttribute('data-fr-src'))));
 
-        if (node.getAttribute('href')) node.setAttribute('href', editor.helpers.sanitizeURL(node.getAttribute('href')));
+        if (node.getAttribute('href')) node.setAttribute('href', editor.helpers.sanitizeURL(_convertHref(node.getAttribute('href'))));
+
+        if (node.getAttribute('src')) node.setAttribute('src', editor.helpers.sanitizeURL(_convertHref(node.getAttribute('src'))));
 
         if (['TABLE', 'TBODY', 'TFOOT', 'TR'].indexOf(node.tagName) >= 0) {
           node.innerHTML = node.innerHTML.trim();
@@ -3561,14 +3664,14 @@
 
             // There are allowed style props.
             if (attr.nodeName == 'style' && editor.opts.htmlAllowedStyleProps.length) {
-              allowed_style_props_matches = attr.nodeValue.match(allowedStylePropsRE);
+              allowed_style_props_matches = attr.value.match(allowedStylePropsRE);
             }
 
             // Attribute is allowed and there are style matches.
             if (is_attr_allowed && allowed_style_props_matches) {
 
               // Override attr value with only the allowed properties.
-              attr.nodeValue = _cleanStyle(allowed_style_props_matches.join(';'));
+              attr.value = _cleanStyle(allowed_style_props_matches.join(';'));
             }
             else if (!is_attr_allowed || (attr.nodeName == 'style' && !allowed_style_props_matches)) {
               node.removeAttribute(attr.nodeName);
@@ -3643,7 +3746,7 @@
       removeTagsRE = new RegExp('^' + editor.opts.htmlRemoveTags.join('$|^') + '$', 'gi');
 
       if (editor.opts.htmlAllowedStyleProps.length) {
-        allowedStylePropsRE = new RegExp('((^|;|\\s)' + editor.opts.htmlAllowedStyleProps.join(':.+?(?=;|$))|((^|;|\\s)') + ':.+?(?=(;|\')|$))', 'gi');
+        allowedStylePropsRE = new RegExp('((^|;|\\s)' + editor.opts.htmlAllowedStyleProps.join(':.+?(?=;|$))|((^|;|\\s)') + ':.+?(?=(;)|$))', 'gi');
       }
       else {
         allowedStylePropsRE = null;
@@ -3953,6 +4056,8 @@
 
       _listsJoinSiblings();
 
+      _listsFindMissplacedText();
+
       _listsRemoveEmpty();
 
       _listsWrapLists();
@@ -3960,8 +4065,6 @@
       _listsNoTagAfterNested();
 
       _listsTypeInNested();
-
-      _listsFindMissplacedText();
 
       _listsRemoveEmptyLI();
 
@@ -4000,16 +4103,17 @@
       var txt = node.textContent;
       var parent_node = node.parentNode;
 
-      if (parent_node.tagName == 'PRE') return;
+      if (editor.html.isPreformatted(parent_node)) return;
 
       if (browser_way) {
         txt = txt.replace(/[\f\n\r\t\v ]{2,}/g, ' ');
 
-        if ((!n_node || n_node.tagName === 'BR' || editor.node.isBlock(n_node)) && editor.node.isBlock(parent_node)) {
+        // No node after.
+        if ((!n_node || n_node.tagName === 'BR' || editor.node.isBlock(n_node)) && (editor.node.isBlock(parent_node) || editor.node.isLink(parent_node))) {
           txt = txt.replace(/[\f\n\r\t\v ]{1,}$/g, '');
         }
 
-        if ((!p_node || p_node.tagName === 'BR' || editor.node.isBlock(p_node)) && editor.node.isBlock(parent_node)) {
+        if ((!p_node || p_node.tagName === 'BR' || editor.node.isBlock(p_node)) && (editor.node.isBlock(parent_node) || editor.node.isLink(parent_node))) {
           txt = txt.replace(/^[\f\n\r\t\v ]{1,}/g, '');
         }
 
@@ -4034,7 +4138,10 @@
       }
 
       // Ending spaces should be NBSP or spaces before block tags.
-      if (!n_node || editor.node.isBlock(n_node) || (n_node.nodeType == Node.ELEMENT_NODE && editor.win.getComputedStyle(n_node) && editor.win.getComputedStyle(n_node).display == 'block')) {
+      // 1. No node after and the parent node is block tag.
+      // 2. Next block is block tag.
+      // 3. Next element has display block.
+      if ((!n_node && editor.node.isBlock(node.parentNode)) || (n_node && editor.node.isBlock(n_node)) || (n_node && n_node.nodeType == Node.ELEMENT_NODE && editor.win.getComputedStyle(n_node) && editor.win.getComputedStyle(n_node).display == 'block')) {
         new_text = new_text.replace(/ $/, $.FE.UNICODE_NBSP);
       }
 
@@ -4061,8 +4168,6 @@
 
       if (typeof browser_way == 'undefined') browser_way = false;
 
-      if (editor.opts.htmlUntouched) return false;
-
       // Ignore contenteditable.
       if (el.getAttribute && el.getAttribute('contenteditable') == 'false') return;
 
@@ -4077,6 +4182,10 @@
 
           // Loop through the nodes to see if it is PRE tag, go to the highest parent until editable element.
           while (temp_node && temp_node !== editor.el) {
+
+            if (temp_node.tagName == 'STYLE' || temp_node.tagName == 'IFRAME') {
+              return false;
+            }
 
             if (temp_node.tagName !== 'PRE') {
 
@@ -4155,7 +4264,8 @@
     htmlAllowedEmptyTags: ['textarea', 'a', 'iframe', 'object', 'video', 'style', 'script', '.fa', '.fr-emoticon'],
     htmlDoNotWrapTags: ['script', 'style'],
     htmlSimpleAmpersand: false,
-    htmlIgnoreCSSProperties: []
+    htmlIgnoreCSSProperties: [],
+    htmlExecuteScripts: true
   });
 
   $.FE.MODULES.html = function (editor) {
@@ -4168,6 +4278,28 @@
       if (editor.opts.enter == $.FE.ENTER_DIV) return 'div';
 
       if (editor.opts.enter == $.FE.ENTER_BR) return null;
+    }
+
+    /**
+     * Tells if the node keeps text formating.
+     */
+    function isPreformatted (node, look_up) {
+      // Stop condition.
+      if (!node || node === editor.el) return false;
+
+      // Check only first level.
+      if (!look_up) {
+        // Is preformatted.
+        return ['PRE', 'SCRIPT', 'STYLE'].indexOf(node.tagName) != -1;
+      }
+      else {
+        if (['PRE', 'SCRIPT', 'STYLE'].indexOf(node.tagName) != -1) {
+          return true;
+        }
+        else {
+          return isPreformatted(node.parentNode, look_up);
+        }
+      }
     }
 
     /**
@@ -4330,7 +4462,8 @@
             if (anchor == null) {
               anchor = editor.doc.createElement(default_tag);
 
-              if (temp) anchor.setAttribute('data-empty', true);
+              if (temp) anchor.setAttribute('class', 'fr-temp-div');
+              anchor.setAttribute('data-empty', true);
               anchor.appendChild(node);
 
               main_doc.appendChild(anchor);
@@ -4342,6 +4475,8 @@
               // There is nothing else except markers and BR inside the new formed tag.
               if (found === false) {
                 anchor.appendChild(editor.doc.createElement('br'));
+
+                if (temp) anchor.setAttribute('class', 'fr-temp-div');
                 anchor.setAttribute('data-empty', true);
               }
             }
@@ -4407,6 +4542,8 @@
       if (typeof inner == 'undefined') inner = false;
 
       // Wrap element.
+      var wp_st = editor.$wp.scrollTop();
+
       _wrapElement(editor.el, temp);
 
       if (inner) {
@@ -4422,6 +4559,10 @@
       if (blockquote) {
         _wrapElements(editor.el.querySelectorAll('blockquote'), temp);
       }
+
+      if (wp_st != editor.$wp.scrollTop()) {
+        editor.$wp.scrollTop(wp_st);
+      }
     }
 
     /**
@@ -4429,7 +4570,7 @@
      */
     function unwrap () {
       editor.$el.find('div.fr-temp-div').each(function () {
-        if ($(this).data('empty') || this.parentNode.tagName == 'LI' ||
+        if ($(this).attr('data-empty') || ['LI'].indexOf(this.parentNode.tagName) >= 0 ||
               (editor.node.isBlock(this.nextSibling) && !$(this.nextSibling).hasClass('fr-temp-div'))) {
           $(this).replaceWith($(this).html());
         }
@@ -4457,7 +4598,7 @@
         if (block.getAttribute('contenteditable') !== 'false' &&
             !block.querySelector(editor.opts.htmlAllowedEmptyTags.join(':not(.fr-marker),') + ':not(.fr-marker)') &&
             !editor.node.isVoid(block)) {
-          if (block.tagName != 'TABLE' && block.tagName != 'TBODY' && block.tagName != 'TR') block.appendChild(editor.doc.createElement('br'));
+          if (block.tagName != 'TABLE' && block.tagName != 'TBODY' && block.tagName != 'TR' && block.tagName != 'UL' && block.tagName != 'OL') block.appendChild(editor.doc.createElement('br'));
         }
       }
 
@@ -4496,7 +4637,7 @@
 
         var node = walker.currentNode;
 
-        if (node.parentNode.tagName == 'PRE') continue;
+        if (isPreformatted(node.parentNode, true)) continue;
 
         var is_block_or_element = editor.node.isBlock(node.parentNode) || editor.node.isElement(node.parentNode);
 
@@ -4616,6 +4757,15 @@
 
             if (store_selection) editor.selection.restore();
           }
+        }
+      }
+
+      // Regular node.
+      else if (parent_node && !(editor.node.isBlock(parent_node) || editor.node.isElement(parent_node))) {
+
+        // Check if we have something else than BR.
+        if (!br.previousSibling && !br.nextSibling) {
+          _processBR(br.parentNode, store_selection);
         }
       }
     }
@@ -4790,6 +4940,19 @@
       return _extractMatch(html, '<!DOCTYPE([^>]*?)>', 0) || '<!DOCTYPE html>';
     }
 
+    /*
+     * Set html to node.
+     */
+    function _setHtml($node, html) {
+
+      if (editor.opts.htmlExecuteScripts) {
+        $node.html(html);
+      }
+      else {
+        $node.get(0).innerHTML = html;
+      }
+    }
+
     /**
      * Set HTML.
      */
@@ -4797,7 +4960,7 @@
       var clean_html = editor.clean.html(html || '', [], [], editor.opts.fullPage);
 
       if (!editor.opts.fullPage) {
-        editor.$el.html(clean_html);
+        _setHtml(editor.$el, clean_html);
       }
       else {
 
@@ -4843,14 +5006,14 @@
         // Get HTML attributes.
         var html_attrs = extractNodeAttrs(clean_html, 'html');
 
-        editor.$el.html(head_bad_html + '\n' + body_html);
+        _setHtml(editor.$el, head_bad_html + '\n' + body_html);
         editor.node.clearAttributes(editor.el);
         editor.$el.attr(body_attrs);
         editor.$el.addClass('fr-view');
         editor.$el.attr('spellcheck', editor.opts.spellcheck);
         editor.$el.attr('dir', editor.opts.direction);
 
-        editor.$head.html(head_html);
+        _setHtml(editor.$head, head_html);
         editor.node.clearAttributes(editor.$head.get(0));
         editor.$head.attr(head_attrs);
 
@@ -4941,12 +5104,24 @@
         el.removeAttribute('class');
       }
 
+      if (el && el.getAttribute && el.getAttribute('style') === '') {
+        el.removeAttribute('style');
+      }
+
       // Look at inner nodes that have no class set.
       if (el && el.nodeType == Node.ELEMENT_NODE) {
-        var els = el.querySelectorAll('[class=""]');
+        var els = el.querySelectorAll('[class=""],[style=""]');
 
         for (var i = 0; i < els.length; i++) {
-          els[i].removeAttribute('class');
+          var _el = els[i];
+
+          if (_el.getAttribute('class') === '') {
+            _el.removeAttribute('class');
+          }
+
+          if (_el.getAttribute('style') === '') {
+            _el.removeAttribute('style');
+          }
         }
       }
     }
@@ -5328,7 +5503,8 @@
         clean_html = _setCursorAtEnd(clean_html);
       }
 
-      if (editor.core.isEmpty() && !editor.opts.keepFormatOnDelete) {
+      // Editor is empty and there are block tags in the pasted HTML.
+      if (editor.core.isEmpty() && !editor.opts.keepFormatOnDelete && _hasBlockTags(clean_html)) {
         editor.el.innerHTML = clean_html;
       }
       else {
@@ -5364,6 +5540,7 @@
       }
 
       _normalize();
+      editor.keys.positionCaret();
 
       editor.events.trigger('html.inserted');
     }
@@ -5399,7 +5576,7 @@
 
           var text = el.textContent;
 
-          if (el.children.length === 0 && text.length === 1 && text.charCodeAt(0) == 8203) {
+          if (el.children.length === 0 && text.length === 1 && text.charCodeAt(0) == 8203 && el.tagName !== 'TD') {
             $(el).remove();
             removed = true;
           }
@@ -5411,21 +5588,24 @@
      * Initialization.
      */
     function _init () {
-      var cleanTags = function () {
-        cleanWhiteTags();
+      if (editor.$wp) {
+        var cleanTags = function () {
+          cleanWhiteTags();
 
-        if (editor.placeholder) {
-          setTimeout(editor.placeholder.refresh, 0);
+          if (editor.placeholder) {
+            setTimeout(editor.placeholder.refresh, 0);
+          }
         }
-      }
 
-      editor.events.on('mouseup', cleanTags);
-      editor.events.on('keydown', cleanTags);
-      editor.events.on('contentChanged', checkIfEmpty);
+        editor.events.on('mouseup', cleanTags);
+        editor.events.on('keydown', cleanTags);
+        editor.events.on('contentChanged', checkIfEmpty);
+      }
     }
 
     return {
       defaultTag: defaultTag,
+      isPreformatted: isPreformatted,
       emptyBlocks: emptyBlocks,
       emptyBlockTagsQuery: emptyBlockTagsQuery,
       blockTagsQuery: blockTagsQuery,
@@ -5586,6 +5766,8 @@
     function show () {
       if (!editor.$placeholder) _add();
 
+      var margin_offset = editor.opts.iframe ? editor.$iframe.prev().outerHeight(true) : editor.$el.prev().outerHeight(true);
+
       // Determine the placeholder position based on the first element inside editor.
       var margin_top = 0;
       var margin_left = 0;
@@ -5601,7 +5783,7 @@
 
         var $first_node = $(contents[0]);
 
-        if (!editor.opts.toolbarInline && editor.ready) {
+        if ((!editor.opts.toolbarInline || editor.$el.prev().length > 0) && editor.ready) {
           margin_top = editor.helpers.getPX($first_node.css('margin-top'));
           padding_top = editor.helpers.getPX($first_node.css('padding-top'));
           margin_left = editor.helpers.getPX($first_node.css('margin-left'));
@@ -5621,7 +5803,7 @@
       editor.$wp.addClass('show-placeholder');
       editor.$placeholder
         .css({
-            marginTop: Math.max(editor.helpers.getPX(editor.$el.css('margin-top')), margin_top),
+            marginTop: Math.max(editor.helpers.getPX(editor.$el.css('margin-top')), margin_top) + margin_offset,
             paddingTop: Math.max(editor.helpers.getPX(editor.$el.css('padding-top')), padding_top),
             paddingLeft: Math.max(editor.helpers.getPX(editor.$el.css('padding-left')), padding_left),
             marginLeft: Math.max(editor.helpers.getPX(editor.$el.css('margin-left')), margin_left),
@@ -5748,7 +5930,16 @@
       return disabled;
     }
 
+    function _init () {
+      // When there are multiple editor instances and shared toolbar make sure we can edit.
+      editor.events.on('focus', function () {
+        if (isDisabled()) editor.edit.off();
+        else editor.edit.on();
+      });
+    }
+
     return {
+      _init: _init,
       on: on,
       off: off,
       disableDesign: disableDesign,
@@ -5772,6 +5963,7 @@
     iframeStyleFiles: [],
     direction: 'auto',
     zIndex: 1,
+    tabIndex: null,
     disableRightClick: false,
     scrollableContainer: 'body',
     keepFormatOnDelete: false,
@@ -5855,6 +6047,13 @@
 
       if (editor.opts.theme) {
         editor.$box.addClass(editor.opts.theme + '-theme');
+      }
+
+      // Set tabIndex option.
+      editor.opts.tabIndex = editor.opts.tabIndex || editor.$oel.attr('tabIndex');
+
+      if (editor.opts.tabIndex) {
+        editor.$el.attr('tabIndex', editor.opts.tabIndex);
       }
     }
 
@@ -6115,8 +6314,18 @@
 
         editor.$el.find('li:empty').remove();
       }
+
       else if ((prev_li && next_li) || !editor.node.isEmpty(li, true)) {
-        $(li).before('<li><br></li>');
+
+        var br_str = '<br>';
+        var nd = marker.parentNode;
+
+        while (nd && nd.tagName != 'LI') {
+          br_str = editor.node.openTagString(nd) + br_str + editor.node.closeTagString(nd);
+          nd = nd.parentNode;
+        }
+
+        $(li).before('<li>' + br_str + '</li>');
         $(marker).remove();
       }
 
@@ -6127,10 +6336,10 @@
         // We are in a nested list so add a new li before it.
         if (ul.parentNode && ul.parentNode.tagName == 'LI') {
           if (next_li) {
-            $(ul.parentNode).before('<li>' + $.FE.MARKERS + '<br></li>');
+            $(ul.parentNode).before(editor.node.openTagString(li) + $.FE.MARKERS + '<br></li>');
           }
           else {
-            $(ul.parentNode).after('<li>' + $.FE.MARKERS + '<br></li>');
+            $(ul.parentNode).after(editor.node.openTagString(li) + $.FE.MARKERS + '<br></li>');
           }
         }
 
@@ -6484,7 +6693,7 @@
         return _atEnd(node.nextSibling);
       }
 
-      if (node.nextSibling) return false;
+      if (node.nextSibling && !(node.previousSibling && node.nextSibling.tagName == 'BR' && !node.nextSibling.nextSibling)) return false;
 
       return _atEnd(node.parentNode);
     }
@@ -6538,7 +6747,7 @@
         return _isAtEnd(node.nextSibling, container);
       }
 
-      if (node.nextSibling) return false;
+      if (node.nextSibling && !(node.previousSibling && node.nextSibling.tagName == 'BR' && !node.nextSibling.nextSibling)) return false;
 
       if (node.parentNode == container) return true;
 
@@ -6550,6 +6759,28 @@
      */
     function _inLi (node) {
       return $(node).parentsUntil(editor.$el, 'LI').length > 0 && $(node).parentsUntil('LI', 'TABLE').length === 0;
+    }
+
+    /**
+     * Get the length of the first or last character from text. Note: A special character can contain 1, 2 or 4 javascript 16bits characters.
+     */
+    function _getExtremityCharacterLength(text, first) {
+
+      // Regex from https://github.com/lodash/lodash/blob/4.16.6/lodash.js
+      var special_chars_regex = new RegExp('(?:[\\u2700-\\u27bf]|(?:\\ud83c[\\udde6-\\uddff]){2}|[\\ud800-\\udbff][\\udc00-\\udfff]|[\\u0023-\\u0039]\\ufe0f?\\u20e3|\\u3299|\\u3297|\\u303d|\\u3030|\\u24c2|\\ud83c[\\udd70-\\udd71]|\\ud83c[\\udd7e-\\udd7f]|\\ud83c\\udd8e|\\ud83c[\\udd91-\\udd9a]|\\ud83c[\\udde6-\\uddff]|[\\ud83c[\\ude01-\\ude02]|\\ud83c\\ude1a|\\ud83c\\ude2f|[\\ud83c[\\ude32-\\ude3a]|[\\ud83c[\\ude50-\\ude51]|\\u203c|\\u2049|[\\u25aa-\\u25ab]|\\u25b6|\\u25c0|[\\u25fb-\\u25fe]|\\u00a9|\\u00ae|\\u2122|\\u2139|\\ud83c\\udc04|[\\u2600-\\u26FF]|\\u2b05|\\u2b06|\\u2b07|\\u2b1b|\\u2b1c|\\u2b50|\\u2b55|\\u231a|\\u231b|\\u2328|\\u23cf|[\\u23e9-\\u23f3]|[\\u23f8-\\u23fa]|\\ud83c\\udccf|\\u2934|\\u2935|[\\u2190-\\u21ff])' + ((first ? '' : '$')), 'i');
+      var matches = text.match(special_chars_regex);
+
+      // No matches means there is a normal character.
+      if (!matches) {
+
+        return 1;
+      }
+
+      // Special character match. Can be 1, 2 or 4 characters.
+      else {
+
+        return matches[0].length;
+      }
     }
 
     /**
@@ -6588,6 +6819,9 @@
                 if (editor.node.isBlock(prev_node)) {
                   if (editor.node.isEmpty(prev_node) && !editor.node.isList(prev_node)) {
                     $(prev_node).remove();
+
+                    // https://github.com/froala/wysiwyg-editor/issues/1877.
+                    $(marker).after(editor.opts.keepFormatOnDelete ? $.FE.INVISIBLE_SPACE : '');
                   }
                   else {
                     if (editor.node.isList(prev_node)) {
@@ -6621,8 +6855,19 @@
                       }
                     }
 
-                    $(marker).replaceWith($.FE.MARKERS);
-                    $(prev_node).append(editor.node.isEmpty(deep_parent) ? $.FE.MARKERS : deep_parent.innerHTML);
+                    // When current node is empty place the cursor at the end of the prev node.
+                    if (editor.node.isEmpty(deep_parent)) {
+                      $(marker).remove();
+                      editor.selection.setAtEnd(prev_node, editor.opts.keepFormatOnDelete);
+                    }
+
+                    // Replace marker with markers and append to prev node current HTML.
+                    else {
+                      $(marker).replaceWith($.FE.MARKERS);
+                      $(prev_node).append(deep_parent.innerHTML);
+                    }
+
+                    // Remove current deep parent.
                     $(deep_parent).remove();
                   }
                 }
@@ -6682,10 +6927,8 @@
         }
 
         if (prev_node.nodeType == Node.TEXT_NODE) {
-          if (editor.helpers.isIOS()) return true;
-
           var txt = prev_node.textContent;
-          var len = txt.length - 1;
+          var len = txt.length;
 
           // Tab UNDO.
           if (editor.opts.tabSpaces && txt.length >= editor.opts.tabSpaces) {
@@ -6696,11 +6939,7 @@
             }
           }
 
-          prev_node.textContent = txt.substring(0, len);
-
-          if (prev_node.textContent.length && prev_node.textContent.charCodeAt(prev_node.textContent.length - 1) == 55357) {
-            prev_node.textContent = prev_node.textContent.substr(0, prev_node.textContent.length - 1);
-          }
+          prev_node.textContent = txt.substring(0, len - _getExtremityCharacterLength(txt));
 
           var deleted = (txt.length != prev_node.textContent.length);
 
@@ -6712,7 +6951,9 @@
               $(prev_node).after($.FE.INVISIBLE_SPACE + $.FE.MARKERS);
             }
             else {
-              if (prev_node.parentNode.childNodes.length == 2 && prev_node.parentNode == marker.parentNode && !editor.node.isBlock(prev_node.parentNode) && !editor.node.isElement(prev_node.parentNode)) {
+
+              // Condition prev_node.parentNode.childNodes.length == 1 is from https://github.com/froala/wysiwyg-editor/issues/1855 .
+              if (((prev_node.parentNode.childNodes.length == 2 && prev_node.parentNode == marker.parentNode) || prev_node.parentNode.childNodes.length == 1) && !editor.node.isBlock(prev_node.parentNode) && !editor.node.isElement(prev_node.parentNode)) {
                 $(prev_node.parentNode).after($.FE.MARKERS);
                 $(prev_node.parentNode).remove();
               }
@@ -6840,16 +7081,13 @@
       if (prev_node) {
         var txt = prev_node.textContent;
 
+        // Check if we have an invisible space before the marker.
         if (txt && txt.length && txt.charCodeAt(txt.length - 1) == 8203) {
           if (txt.length == 1) {
             $(prev_node).remove()
           }
           else {
-            prev_node.textContent = prev_node.textContent.substr(0, txt.length - 1);
-
-            if (prev_node.textContent.length && prev_node.textContent.charCodeAt(prev_node.textContent.length - 1) == 55357) {
-              prev_node.textContent = prev_node.textContent.substr(0, prev_node.textContent.length - 1);
-            }
+            prev_node.textContent = prev_node.textContent.substr(0, txt.length - _getExtremityCharacterLength(txt));
           }
         }
       }
@@ -7091,11 +7329,8 @@
         if (next_node.nodeType == Node.TEXT_NODE) {
           $(next_node).before($.FE.MARKERS);
 
-          if (next_node.textContent.length && next_node.textContent.charCodeAt(0) == 55357) {
-            next_node.textContent = next_node.textContent.substring(2, next_node.textContent.length);
-          }
-          else {
-            next_node.textContent = next_node.textContent.substring(1, next_node.textContent.length);
+          if (next_node.textContent.length) {
+            next_node.textContent = next_node.textContent.substring(_getExtremityCharacterLength(next_node.textContent, true), next_node.textContent.length);
           }
         }
         else if (editor.node.isDeletable(next_node)) {
@@ -7276,7 +7511,12 @@
         default_tag = editor.html.defaultTag();
 
         if (!default_tag || !editor.node.isElement(marker.parentNode)) {
-          $(marker).replaceWith((!editor.node.isEmpty(marker.parentNode, true) ? '<br/>' : '') + $.FE.MARKERS + '<br/>');
+          if (marker.previousSibling && !$(marker.previousSibling).is('br') && !marker.nextSibling) {
+            $(marker).replaceWith('<br>' + $.FE.MARKERS + '<br>');
+          }
+          else {
+            $(marker).replaceWith('<br>' + $.FE.MARKERS);
+          }
         }
         else {
           $(marker).replaceWith('<' + default_tag + '>' + $.FE.MARKERS + '<br>' + '</' + default_tag + '>');
@@ -7531,7 +7771,6 @@
      * Do enter.
      */
     function enter (shift) {
-
       // Add a marker in HTML.
       var marker = editor.markers.insert();
 
@@ -7585,9 +7824,9 @@
       }
 
       _cleanNodesToRemove();
+      editor.html.fillEmptyBlocks(true);
 
       if (!editor.opts.htmlUntouched) {
-        editor.html.fillEmptyBlocks(true);
         editor.html.cleanEmptyTags();
         editor.clean.lists();
       }
@@ -7708,7 +7947,9 @@
     SINGLE_QUOTE: 222,         // needs localization
     OPEN_SQUARE_BRACKET: 219,  // needs localization
     BACKSLASH: 220,            // needs localization
-    CLOSE_SQUARE_BRACKET: 221  // needs localization
+    CLOSE_SQUARE_BRACKET: 221,  // needs localization
+
+    IME: 229
   }
 
   // Extend defaults.
@@ -7720,15 +7961,20 @@
 
   $.FE.MODULES.keys = function (editor) {
     var IME = false;
+    var ios_snapshot = null;
 
     /**
      * ENTER.
      */
     function _enter (e) {
+      ios_snapshot = null;
+
       if (!editor.opts.multiLine) {
         e.preventDefault();
         e.stopPropagation();
       }
+
+      // Not iOS.
       else if (!editor.helpers.isIOS()) {
         e.preventDefault();
         e.stopPropagation();
@@ -7736,6 +7982,10 @@
         if (!editor.selection.isCollapsed()) editor.selection.remove();
 
         editor.cursor.enter();
+      }
+
+      else {
+        ios_snapshot = editor.snapshot.get();
       }
     }
 
@@ -7752,20 +8002,32 @@
         editor.cursor.enter(true);
       }
     }
+    /**
+     * Control/Command Backspace.
+     */
+    function _ctlBackspace () {
+
+      setTimeout(function () {
+        editor.events.disableBlur();
+        editor.events.focus();
+      }, 0);
+    }
 
     /**
      * BACKSPACE.
      */
-    var regular_backspace;
-
     function _backspace (e) {
+      ios_snapshot = null;
 
       // There is no selection.
       if (editor.selection.isCollapsed()) {
-        if (!editor.cursor.backspace()) {
+        if (editor.helpers.isIOS()) {
+          ios_snapshot = editor.snapshot.get();
+        }
+        else {
+          editor.cursor.backspace();
           e.preventDefault();
           e.stopPropagation();
-          regular_backspace = false;
         }
       }
 
@@ -7776,8 +8038,6 @@
 
         editor.selection.remove();
         editor.html.fillEmptyBlocks();
-
-        regular_backspace = false;
       }
 
       editor.placeholder.refresh();
@@ -7811,7 +8071,7 @@
 
       // Do nothing on mobile.
       // Browser is Mozilla or we're inside a link tag.
-      if (!editor.helpers.isMobile() && (editor.browser.mozilla || (el && el.tagName == 'A'))) {
+      if (!editor.helpers.isMobile() && (el && el.tagName == 'A')) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -7925,6 +8185,10 @@
       IME = false;
     }
 
+    function _clearIME () {
+      IME = false;
+    }
+
     /**
      * If is IME.
      */
@@ -7938,14 +8202,12 @@
     function _mapKeyDown (e) {
       editor.events.disableBlur();
 
-      regular_backspace = true;
-
       var key_code = e.which;
 
       if (key_code === 16) return true;
 
       // Handle Japanese typing.
-      if (key_code === 229) {
+      if (key_code === $.FE.KEYCODE.IME) {
         IME = true;
 
         return true;
@@ -7988,6 +8250,11 @@
         else {
           _enter(e);
         }
+      }
+
+      // Ctrl/Command Backspace.
+      else if (key_code === $.FE.KEYCODE.BACKSPACE && (e.metaKey || e.ctrlKey)) {
+        _ctlBackspace();
       }
 
       // Backspace.
@@ -8043,7 +8310,7 @@
       }
     }
 
-    function _positionCaret () {
+    function positionCaret () {
       if (!editor.$wp) return true;
 
       var info;
@@ -8056,7 +8323,7 @@
         // https://github.com/froala/wysiwyg-editor/issues/834.
         if (editor.opts.toolbarBottom) info += editor.opts.toolbarStickyOffset;
 
-        if (editor.helpers.isIOS()) info -= editor.helpers.scrollTop();
+        if (editor.helpers.isIOS() || editor.helpers.isAndroid()) info -= editor.helpers.scrollTop();
 
         if (editor.opts.iframe) {
           info += editor.$iframe.offset().top;
@@ -8077,7 +8344,7 @@
         // https://github.com/froala/wysiwyg-editor/issues/834.
         if (!editor.opts.toolbarBottom) info -= editor.opts.toolbarStickyOffset;
 
-        if (editor.helpers.isIOS()) info -= editor.helpers.scrollTop();
+        if (editor.helpers.isIOS() || editor.helpers.isAndroid()) info -= editor.helpers.scrollTop();
 
         if (editor.opts.iframe) {
           info += editor.$iframe.offset().top;
@@ -8095,7 +8362,7 @@
         // Make sure we scroll bottom.
         info = editor.position.getBoundingRect().top;
 
-        if (editor.helpers.isIOS()) info -= editor.helpers.scrollTop();
+        if (editor.helpers.isIOS() || editor.helpers.isAndroid()) info -= editor.helpers.scrollTop();
 
         if (editor.opts.iframe) {
           info += editor.$iframe.offset().top;
@@ -8126,7 +8393,29 @@
      * Map keyUp actions.
      */
     function _mapKeyUp (e) {
-      if (editor.helpers.isAndroid && editor.browser.mozilla) {
+
+      // Fix https://github.com/froala/wysiwyg-editor/issues/2007.
+      // Fix https://github.com/froala/wysiwyg-editor/issues/2015.
+      if (editor.helpers.isIOS() && e && ios_snapshot) {
+        if (e.which == $.FE.KEYCODE.ENTER) {
+          editor.snapshot.restore(ios_snapshot);
+          editor.cursor.enter();
+        }
+        else if (e.which == $.FE.KEYCODE.BACKSPACE) {
+          // Korean hack.
+          var new_snapshot = editor.snapshot.get();
+
+          editor.snapshot.restore(ios_snapshot);
+          editor.cursor.backspace();
+
+          // Korean hack.
+          if (editor.el.innerHTML !== new_snapshot.html) {
+            editor.snapshot.restore(new_snapshot);
+          }
+        }
+      }
+
+      if (editor.helpers.isAndroid() && editor.browser.mozilla) {
 
         return true;
       }
@@ -8147,7 +8436,7 @@
       }
 
       if (e && (e.which == $.FE.KEYCODE.ENTER || e.which == $.FE.KEYCODE.BACKSPACE || (e.which >= 37 && e.which <= 40 && !editor.browser.msie))) {
-        if (!(e.which == $.FE.KEYCODE.BACKSPACE && regular_backspace)) _positionCaret();
+        positionCaret();
       }
 
       editor.html.cleanBRs(true, true);
@@ -8259,7 +8548,7 @@
     function _typingKeyDown (e) {
       var keycode = e.which;
 
-      if (ctrlKey(e) || (keycode >= 37 && keycode <= 40) || (!isCharacter(keycode) && keycode != $.FE.KEYCODE.DELETE && keycode != $.FE.KEYCODE.BACKSPACE && keycode != $.FE.KEYCODE.ENTER && keycode != 229)) return true;
+      if (ctrlKey(e) || (keycode >= 37 && keycode <= 40) || (!isCharacter(keycode) && keycode != $.FE.KEYCODE.DELETE && keycode != $.FE.KEYCODE.BACKSPACE && keycode != $.FE.KEYCODE.ENTER && keycode != $.FE.KEYCODE.IME)) return true;
 
       if (!_typing_timeout) {
         _temp_snapshot = editor.snapshot.get();
@@ -8283,6 +8572,13 @@
         editor.undo.saveStep(_temp_snapshot);
         _temp_snapshot = null;
       }
+
+      // iOS choosing suggestion.
+      else {
+        if ((typeof keycode === 'undefined' || keycode === 0) && !_temp_snapshot && !_typing_timeout) {
+          editor.undo.saveStep();
+        }
+      }
     }
 
     function forceUndo () {
@@ -8302,12 +8598,65 @@
       return ctrlKey(e) || keycode == $.FE.KEYCODE.F5;
     }
 
+    // Node doesn't have a BR or text inside it.
+    function _isEmpty (node) {
+      if (node && node.tagName == 'BR') return false;
+
+      return (node.textContent || '').length === 0 && node.querySelector && !node.querySelector(':scope > br');
+    }
+
+    /**
+     * Allow typing after/before last element.
+     */
+    function _allowTypingOnEdges (e) {
+      var childs = editor.el.childNodes;
+      var dt = editor.html.defaultTag();
+
+      if (e.target && e.target !== editor.el) return true;
+
+      // No childs.
+      if (childs.length === 0) return true;
+
+      // At the bottom.
+      if (editor.$el.outerHeight() - e.offsetY <= 10) {
+        if (_isEmpty(childs[childs.length - 1])) {
+          if (dt) {
+            editor.$el.append('<' + dt + '>' + $.FE.MARKERS + '<br></' + dt + '>');
+          }
+          else {
+            editor.$el.append($.FE.MARKERS + '<br>');
+          }
+
+          // Restore selection and scroll.
+          editor.selection.restore();
+          positionCaret();
+        }
+      }
+
+      // At the top
+      else if (e.offsetY <= 10) {
+        if (_isEmpty(childs[0])) {
+          if (dt) {
+            editor.$el.prepend('<' + dt + '>' + $.FE.MARKERS + '<br></' + dt + '>');
+          }
+          else {
+            editor.$el.prepend($.FE.MARKERS + '<br>');
+          }
+
+          // Restore selection and scroll.
+          editor.selection.restore();
+          positionCaret();
+        }
+      }
+    }
+
     /**
      * Tear up.
      */
     function _init () {
       editor.events.on('keydown', _typingKeyDown);
       editor.events.on('input', _input);
+      editor.events.on('mousedown', _clearIME);
       editor.events.on('keyup input', _typingKeyUp);
 
       // Register for handling.
@@ -8319,6 +8668,9 @@
 
       // Handle cut.
       editor.events.on('cut', _cut);
+
+      // Click in editor at beginning / end.
+      editor.events.on('click', _allowTypingOnEdges);
 
       // IME
       if (!editor.browser.edge && editor.el.msGetInputContext) {
@@ -8344,7 +8696,8 @@
       isArrow: isArrow,
       forceUndo: forceUndo,
       isIME: isIME,
-      isBrowserAction: isBrowserAction
+      isBrowserAction: isBrowserAction,
+      positionCaret: positionCaret
     }
   };
 
@@ -9356,7 +9709,8 @@
       // Search while there is a next node.
       // Next node is not marker.
       // Next node does not contain marker.
-      while (node && !$(node).is('.fr-marker') && $(node).find('.fr-marker').length === 0) {
+      // Next node is not an inner list.
+      while (node && !$(node).is('.fr-marker') && $(node).find('.fr-marker').length === 0 && node.tagName != 'UL' && node.tagName != 'OL') {
         var tmp = node;
         node = node.nextSibling;
         $span.append(tmp);
@@ -9386,8 +9740,8 @@
         }
       }
 
-      // Start processing child nodes if there is a marker.
-      else if ($(node).find('.fr-marker').length) {
+      // Start processing child nodes if there is a marker or an inner list.
+      else if ($(node).find('.fr-marker').length || node.tagName == 'UL' || node.tagName == 'OL') {
         _processNodeFormat(node.firstChild, tag, attrs);
       }
 
@@ -9597,7 +9951,21 @@
         var markers = editor.$el.find('.fr-marker');
 
         for (var i = 0; i < markers.length; i++) {
-          if (_split($(markers[i]), tag, attrs, collapsed)) {
+          var $marker = $(markers[i]);
+          var $clone = null;
+
+          if (!$marker.attr('data-cloned') && !collapsed) {
+            $clone = $marker.clone().removeClass('fr-marker').addClass('fr-clone');
+
+            if ($marker.data('type') === true) {
+              $marker.attr('data-cloned', true).after($clone);
+            }
+            else {
+              $marker.attr('data-cloned', true).before($clone);
+            }
+          }
+
+          if (_split($marker, tag, attrs, collapsed)) {
             reassess = true;
             break;
           }
@@ -9606,6 +9974,12 @@
 
       // Remove format between markers.
       _processNodeRemove(editor.$el, 0, tag, attrs);
+
+      // Replace markers with their clones.
+      if (!collapsed) {
+        editor.$el.find('.fr-marker').remove();
+        editor.$el.find('.fr-clone').removeClass('fr-clone').addClass('fr-marker');
+      }
 
       // Selection is collapsed => add invisible spaces.
       if (collapsed) {
@@ -9729,6 +10103,11 @@
         editor.$el.find('.fr-unprocessed + .fr-marker').each(function () {
           $(this).prev().append(this);
         });
+
+        // When em are being used keep them as the most inner props.
+        if ((val || '').match(/\dem$/)) {
+          editor.$el.find('span.fr-unprocessed').removeClass('fr-unprocessed');
+        }
 
         while (editor.$el.find('span.fr-unprocessed').length > 0) {
           var $span = editor.$el.find('span.fr-unprocessed:first').removeClass('fr-unprocessed');
@@ -9872,6 +10251,18 @@
         }
       }
 
+      // If we are at the end of text node, then check next elements.
+      if (!range.collapsed && el.nodeType == Node.TEXT_NODE && range.startOffset == (el.textContent || '').length) {
+        while (!editor.node.isBlock(el.parentNode) && !el.nextSibling) {
+          el = el.parentNode;
+        }
+
+        if (el.nextSibling) {
+          el = el.nextSibling;
+        }
+      }
+
+
       // Check first childs.
       var f_child = el;
 
@@ -9880,6 +10271,7 @@
       }
 
       if (f_child && f_child.nodeType == Node.ELEMENT_NODE && _matches(f_child, _query(tag, attrs))) return true;
+
 
       // Check parents.
       var p_node = el;
@@ -9906,6 +10298,10 @@
   }
 
 
+
+  $.extend($.FE.DEFAULTS, {
+    indentMargin: 20
+  });
 
   $.FE.COMMANDS = {
     bold: {
@@ -10005,10 +10401,22 @@
       },
 
       subscript: function () {
+
+        // Remove sup.
+        if (editor.format.is('sup')) {
+          editor.format.remove('sup');
+        }
+
         _execCommand('subscript', 'sub');
       },
 
       superscript: function () {
+
+        // Remove sub.
+        if (editor.format.is('sub')) {
+          editor.format.remove('sub');
+        }
+
         _execCommand('superscript', 'sup');
       },
 
@@ -10131,6 +10539,7 @@
             editor.events.disableBlur();
             editor.selection.restore();
           }
+
           editor.undo.saveStep();
         }
 
@@ -10168,7 +10577,7 @@
 
           var margin_left = editor.helpers.getPX($block.css(prop));
 
-          $block.css(prop, Math.max(margin_left + indent * 20, 0) || '');
+          $block.css(prop, Math.max(margin_left + indent * editor.opts.indentMargin, 0) || '');
           $block.removeClass('fr-temp-div');
         }
       }
@@ -10276,7 +10685,7 @@
     });
   };
 
-$.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return a;for(var c="",f=b("charCodeAt"),g=b("fromCharCode"),h=l.indexOf(a[0]),i=1;i<a.length-2;i++){for(var j=d(++h),k=a[f](i),m="";/[0-9-]/.test(a[i+1]);)m+=a[++i];m=parseInt(m,10)||0,k=e(k,j,m),k^=h-1&31,c+=String[g](k)}return c}function d(a){for(var b=a.toString(),c=0,d=0;d<b.length;d++)c+=parseInt(b.charAt(d),10);return c>10?c%9+1:c}function e(a,b,c){for(var d=Math.abs(c);d-- >0;)a-=b;return c<0&&(a+=123),a}function f(a){return!(!a||"none"!=a.css("display"))&&(a.remove(),!0)}function g(){return f(j)||f(k)}function h(){return!!a.$box&&(a.$box.append(n(b(n("noLD2laB-7NB1C1ebcvH-9SB3a1C6QC2D4A-9d1E2B2B4xgAE4B2G2I1C3A3B2qMF1DE1fkxfcC-11C-9g1G2E4XC9a1E5A3G-10mvrioCC3AA1KA1qJ-7NB2MA6sxeqVA6TD6e2D4B-9rYA2a1A4bCD3vwC-7EC10D3E2lNC1KD1QB9SB6UE5TE4YF3YA5c1A3d1B3kGE2gFA5A2D2ch1KI1IB1thyH5wvVC11UB6c1F4wwwXA7gmnfB2jgB1A7nd1e1IC2NG4H1A9bjvnbC-8PG3mlazD4dH-9HI2qAA2jGC2IA1dajajFD5SG4J4c1qttyB-9wg1B2b2A6b1C3EG3B2I2rCD4E1B1LG1oaMA3RE7abC-8C-7aVA4C5B5F-11e1D3I3a5A8hmmnogH2IB5A2nhkgiA4TH4VC7yxdblH-8YC6D6C4xC3yqJJ2C-21spB-11fMF1KF1IC2USC4PG4TE3RD6ZF5XE3UE3uefaFE4D2G2AE1HA2JD1zzzQE3SD9vgqF4ua3B13XA4C5gd1E3E2A14ridsldcCA7MC5ghwE-11ZH5f1D3a1D8bwxmkzi1A7IB3KvpB-8rwMD3IE1GG-10bgqwxewvWE4H3VbD-16qC-11qc1E2TwEA6A3aCE4A1A4lOD3JC1iVA3RA13c2D8olqf1G3A32B17==")))),j=a.$box.find("> div:last"),k=j.find("> a"),void("rtl"==a.opts.direction&&j.css("left","auto").css("right",0)))}function i(){var c=localStorage&&localStorage.FEK||a.opts.key||[""];"string"==typeof c&&(c=[c]),a.ul=!0;for(var d=0;d<c.length;d++){var e=n(c[d])||"";if(!(e!==n(b(n("mcVRDoB1BGILD7YFe1BTXBA7B6==")))&&e.indexOf(m,e.length-m.length)<0&&[n("9qqG-7amjlwq=="),n("KA3B3C2A6D1D5H5H1A3=="),n("QzbzvxyB2yA-9m=="),n("naamngiA3dA-16xtE-11C-9B1H-8sc==")].indexOf(m)<0)){a.ul=!1;break}}a.ul===!0&&h(),a.events.on("contentChanged",function(){a.ul===!0&&g()&&h()}),a.events.on("destroy",function(){j&&j.length&&j.remove()},!0)}var j,k,l="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",m=function(){for(var a=0,b=document.domain,c=b.split("."),d="_gd"+(new Date).getTime();a<c.length-1&&document.cookie.indexOf(d+"="+d)==-1;)b=c.slice(-1-++a).join("."),document.cookie=d+"="+d+";domain="+b+";";return document.cookie=d+"=;expires=Thu, 01 Jan 1970 00:00:01 GMT;domain="+b+";",(b||"").replace(/(^\.*)|(\.*$)/g,"")}(),n=b(c);return{_init:i}}
+$.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return a;for(var c="",f=b("charCodeAt"),g=b("fromCharCode"),h=l.indexOf(a[0]),i=1;i<a.length-2;i++){for(var j=d(++h),k=a[f](i),m="";/[0-9-]/.test(a[i+1]);)m+=a[++i];m=parseInt(m,10)||0,k=e(k,j,m),k^=h-1&31,c+=String[g](k)}return c}function d(a){for(var b=a.toString(),c=0,d=0;d<b.length;d++)c+=parseInt(b.charAt(d),10);return c>10?c%9+1:c}function e(a,b,c){for(var d=Math.abs(c);d-- >0;)a-=b;return c<0&&(a+=123),a}function f(a){return!(!a||"block"===a.css("display"))&&(a.remove(),!0)}function g(){return f(j)||f(k)}function h(){return o>10&&a.destroy(),!!a.$box&&(a.$wp.prepend(n(b(n("NCKB1zwtPA9tqzajXC2c2A7B-16VD3spzJ1C9C3D5oOF2OB1NB1LD7VA5QF4TE3gytXB2A4C-8VA2AC4E1D3GB2EB2KC3KD1MF1juuSB1A8C6yfbmd1B2a1A5qdsdB2tivbC3CB1KC1CH1eLA2sTF1B4I4H-7B-21UB6b1F5bzzzyAB4JC3MG2hjdKC1JE6C1E1cj1pD-16pUE5B4prra2B5ZB3D3C3pxj1EA6A3rnJA2C-7I-7JD9D1E1wYH1F3sTB5TA2G4H4ZA22qZA5BB3mjcvcCC3JB1xillavC-21VE6PC5SI4YC5C8mb1A3WC3BD2B5aoDA2qqAE3A5D-17fOD1D5RD4WC10tE6OAZC3nF-7b1C4A4D3qCF2fgmapcromlHA2QA6a1E1D3e1A6C2bie2F4iddnIA7B2mvnwcIB5OA1DB2OLQA3PB10WC7WC5d1E3uI-7b1D5D6b1E4D2arlAA4EA1F-11srxI-7MB1D7PF1E5B4adB-21YD5vrZH3D3xAC4E1A2GF2CF2J-7yNC2JE1MI2hH-7QB1C6B5B-9bA-7XB13a1B5VievwpKB4LA3NF-10H-9I-8hhaC-16nqPG4wsleTD5zqYF3h1G2B7B4yvGE2Pi1H-7C-21OE6B1uLD1kI4WC1E7C5g1D-8fue1C8C6c1D4D3Hpi1CC4kvGC2E1legallyXB4axVA11rsA4A-9nkdtlmzBA2GD3A13A6CB1dabE1lezrUE6RD5TB4A-7f1C8c1B5d1D4D3tyfCD5C2D2==")))),j=a.$wp.find("> div:first"),k=j.find("> a"),"rtl"==a.opts.direction&&j.css("left","auto").css("right",0).setAttribute("direction","rtl"),void o++)}function i(){var c=a.o_win.FEK;try{c=c||localStorage&&localStorage.FEK}catch(d){}c=c||a.opts.key||[""];var e=n(b("ziRA1E3B9pA5B-11D-11xg1A3ZB5D1D4B-11ED2EG2pdeoC1clIH4wB-22yQD5uF4YE3E3A9=="));"string"==typeof c&&(c=[c]),a.ul=!0;for(var f=0;f<c.length;f++){var i=n(c[f])||"";if(!(i!==n(b(n("mcVRDoB1BGILD7YFe1BTXBA7B6==")))&&i.indexOf(m,i.length-m.length)<0&&[n("9qqG-7amjlwq=="),n("KA3B3C2A6D1D5H5H1A3=="),n("QzbzvxyB2yA-9m=="),n("ji1kacwmgG5bc=="),n("naamngiA3dA-16xtE-11C-9B1H-8sc==")].indexOf(m)<0)){a.ul=!1;break}}var k=new Image;a.ul===!0?(h(),k.src=b(n(e))+"u"):$.FE.DT||(k.src=b(n(e))+c.join("+")),a.events.on("contentChanged",function(){a.ul===!0&&g()&&h()}),a.events.on("destroy",function(){j&&j.length&&j.remove()},!0)}var j,k,l="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",m=function(){for(var a=0,b=document.domain,c=b.split("."),d="_gd"+(new Date).getTime();a<c.length-1&&document.cookie.indexOf(d+"="+d)==-1;)b=c.slice(-1-++a).join("."),document.cookie=d+"="+d+";domain="+b+";";return document.cookie=d+"=;expires=Thu, 01 Jan 1970 00:00:01 GMT;domain="+b+";",(b||"").replace(/(^\.*)|(\.*$)/g,"")}(),n=b(c),o=0;return{_init:i}}
 
   $.extend($.FE.DEFAULTS, {
     pastePlain: false,
@@ -10291,13 +10700,19 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     var clipboard_html;
     var clipboard_rtf;
     var $paste_div;
+    var snapshot;
 
     /**
      * Save copied html to localstorage.
      */
     function saveCopiedText (html, text) {
-      editor.win.localStorage.setItem('fr-copied-html', html);
-      editor.win.localStorage.setItem('fr-copied-text', text);
+      try {
+        editor.win.localStorage.setItem('fr-copied-html', html);
+        editor.win.localStorage.setItem('fr-copied-text', text);
+      }
+      catch (ex) {
+
+      }
     }
 
     /**
@@ -10358,7 +10773,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         clipboard_html = '';
 
         // Get rtf clipboard.
-        clipboard_rtf = e.clipboardData.getData('text/rtf');
+        if (/text\/rtf/.test(types)) {
+          clipboard_rtf = e.clipboardData.getData('text/rtf');
+        }
 
         // HTML.
         if (/text\/html/.test(types)) {
@@ -10370,7 +10787,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           clipboard_html = clipboard_rtf;
         }
 
-        else if (/text\/plain/.test(types) && !this.browser.mozilla) {
+        else if (/text\/plain/.test(types) && !editor.browser.mozilla) {
           clipboard_html = editor.html.escapeEntities(e.clipboardData.getData('text/plain')).replace(/\n/g, '<br>');
         }
 
@@ -10391,6 +10808,75 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // Normal paste.
       _beforePaste();
+
+      return false;
+    }
+
+    /**
+     * Handle dropping content in the editor.
+     */
+    function _dropPaste (e) {
+      if (e.originalEvent) e = e.originalEvent;
+
+      // Read data from clipboard.
+      if (e && e.dataTransfer && e.dataTransfer.getData) {
+        var types = '';
+        var clipboard_types = e.dataTransfer.types;
+
+        if (editor.helpers.isArray(clipboard_types)) {
+          for (var i = 0 ; i < clipboard_types.length; i++) {
+            types += clipboard_types[i] + ';';
+          }
+        }
+        else {
+          types = clipboard_types;
+        }
+
+        clipboard_html = '';
+
+        // Get rtf clipboard.
+        if (/text\/rtf/.test(types)) {
+          clipboard_rtf = e.dataTransfer.getData('text/rtf');
+        }
+
+        // HTML.
+        if (/text\/html/.test(types)) {
+          clipboard_html = e.dataTransfer.getData('text/html');
+        }
+
+        // Safari HTML.
+        else if (/text\/rtf/.test(types) && editor.browser.safari) {
+          clipboard_html = clipboard_rtf;
+        }
+
+        else if (/text\/plain/.test(types) && !this.browser.mozilla) {
+          clipboard_html = editor.html.escapeEntities(e.dataTransfer.getData('text/plain')).replace(/\n/g, '<br>');
+        }
+
+        if (clipboard_html !== '') {
+          var ok = editor.markers.insertAtPoint(e);
+
+          if (ok !== false) {
+
+            // Insert markers.
+            var marker = editor.el.querySelector('.fr-marker');
+
+            $(marker).replaceWith($.FE.MARKERS);
+
+            _processPaste();
+
+            if (e.preventDefault) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+
+            return false;
+          }
+        }
+        else {
+          clipboard_html = null;
+        }
+      }
     }
 
     /**
@@ -10408,7 +10894,16 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       // Remove and store the editable content
       if (!$paste_div) {
         $paste_div = $('<div contenteditable="true" style="position: fixed; top: 0; left: -9999px; height: 100%; width: 0; word-break: break-all; overflow:hidden; z-index: 9999; line-height: 140%;" tabIndex="-1"></div>');
-        editor.$box.after($paste_div);
+
+        // Sketch app fix. https://github.com/froala/wysiwyg-editor/issues/2042
+        // Also: when using iframe Safari needs to have focus in the same window.
+        if (editor.browser.safari) {
+          $paste_div.css('top', editor.$sc.scrollTop());
+          editor.$el.after($paste_div);
+        }
+        else {
+          editor.$box.after($paste_div);
+        }
 
         editor.events.on('destroy', function () {
           $paste_div.remove();
@@ -10604,25 +11099,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       return div.innerHTML;
     }
 
-    /*
-     * Detect if html is pasted from Word.
-     */
-    function isWord (clipboard_html) {
-      return clipboard_html.match(/(class=\"?Mso|class=\'?Mso|style=\"[^\"]*\bmso\-|style=\'[^\']*\bmso\-|w:WordDocument)/gi);
-    }
-
     /**
      * Process the pasted HTML.
      */
     function _processPaste () {
 
-      var els = null;
-      var el = null;
-      var i;
-
       // Save undo snapshot.
       editor.keys.forceUndo();
-      var snapshot = editor.snapshot.get();
+      snapshot = editor.snapshot.get();
 
       // Cannot read from clipboard.
       if (clipboard_html === null) {
@@ -10632,7 +11116,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         editor.events.enableBlur();
       }
 
-      var is_word = isWord(clipboard_html);
+      var is_word = clipboard_html.match(/(class=\"?Mso|class=\'?Mso|class="?Xl|class='?Xl|class=Xl|style=\"[^\"]*\bmso\-|style=\'[^\']*\bmso\-|w:WordDocument)/gi);
 
       // Trigger chain cleanp.
       var response = editor.events.chainTrigger('paste.beforeCleanup', clipboard_html);
@@ -10641,14 +11125,36 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         clipboard_html = response;
       }
 
+      // Clean non-word or word if no plugin processed the paste.
+      if (!is_word || (is_word && editor.events.trigger('paste.wordPaste', [clipboard_html]) !== false)) {
+        clean(clipboard_html, is_word);
+      }
+    }
+
+    /**
+     * Clean clipboard html.
+     */
+    function clean (clipboard_html, is_word, keep_formatting) {
+      var els = null;
+      var el = null;
+      var i;
+
       // Keep only body if there is.
       if (clipboard_html.toLowerCase().indexOf('<body') >= 0) {
         clipboard_html = clipboard_html.replace(/[.\s\S\w\W<>]*<body[^>]*>[\s]*([.\s\S\w\W<>]*)[\s]*<\/body>[.\s\S\w\W<>]*/gi, '$1');
-        clipboard_html = clipboard_html.replace(/([^>])\n([^<])/g, '$1 $2');
+        clipboard_html = clipboard_html.replace(/ \n/g, ' ').replace(/\n /g, ' ').replace(/([^>])\n([^<])/g, '$1 $2');
       }
 
-      if (!is_word) {
+      // Google Docs paste.
+      var is_gdocs = false;
 
+      if (clipboard_html.indexOf('id="docs-internal-guid') >= 0) {
+        clipboard_html = clipboard_html.replace(/^[\w\W\s\S]* id="docs-internal-guid[^>]*>([\w\W\s\S]*)<\/b>[\w\W\s\S]*$/g, '$1');
+        is_gdocs = true;
+      }
+
+      // Not word paste.
+      if (!is_word) {
         // Remove comments.
         var htmlAllowedStylePropsCopy = editor.opts.htmlAllowedStyleProps;
         editor.opts.htmlAllowedStyleProps = editor.opts.pasteAllowedStyleProps;
@@ -10668,8 +11174,16 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         tmp_div.innerHTML = clipboard_html;
 
         // Get copied html from localstorage.
-        var copied_html = editor.win.localStorage.getItem('fr-copied-html');
-        var copied_text = editor.win.localStorage.getItem('fr-copied-text');
+        var copied_html = null;
+        var copied_text = null;
+
+        try {
+          copied_html = editor.win.localStorage.getItem('fr-copied-html');
+          copied_text = editor.win.localStorage.getItem('fr-copied-text');
+        }
+        catch (ex) {
+
+        }
 
         if (copied_text && tmp_div.textContent.replace(/(\u00A0)/gi, ' ').replace(/\r|\n/gi, '') == copied_text.replace(/(\u00A0)/gi, ' ').replace(/(\r|\n)+([ ]+[\r\n]+)*/gi, ' ')) {
           clipboard_html = copied_html;
@@ -10679,15 +11193,8 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         clipboard_html = clipboard_html.replace(/^ */g, '').replace(/ *$/g, '');
       }
 
-      // Google Docs paste.
-      var is_gdocs = false;
-
-      if (clipboard_html.indexOf('id="docs-internal-guid') >= 0) {
-        clipboard_html = clipboard_html.replace(/^.* id="docs-internal-guid[^>]*>(.*)<\/b>.*$/, '$1');
-        is_gdocs = true;
-      }
-
-      if (is_word && !editor.wordPaste) {
+      // Word paste cleanup when word plugin is not used.
+      if (is_word && (!editor.wordPaste || !keep_formatting)) {
 
         // Strip spaces at the beginning.
         clipboard_html = clipboard_html.replace(/^\n*/g, '').replace(/^ /g, '');
@@ -10708,7 +11215,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       }
 
       // After paste cleanup event.
-      response = editor.events.chainTrigger('paste.afterCleanup', clipboard_html);
+      var response = editor.events.chainTrigger('paste.afterCleanup', clipboard_html);
 
       if (typeof(response) === 'string') {
         clipboard_html = response;
@@ -10733,11 +11240,21 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
           }
         }
 
-        // Unwrap lists if they are the only thing in the pasted HTML.
-        var list = tmp.children;
+        // Check if we're inside a list.
+        var selection_el = editor.selection.element();
+        var in_list = false;
 
-        if (list.length == 1 && ['OL', 'UL'].indexOf(list[0].tagName) >= 0) {
-          list[0].outerHTML = list[0].innerHTML;
+        if (selection_el && $(selection_el).parentsUntil(editor.el, 'ul, ol').length) {
+          in_list = true;
+        }
+
+        // Unwrap lists if they are the only thing in the pasted HTML.
+        if (in_list) {
+          var list = tmp.children;
+
+          if (list.length == 1 && ['OL', 'UL'].indexOf(list[0].tagName) >= 0) {
+            list[0].outerHTML = list[0].innerHTML;
+          }
         }
 
         // Remove unecessary new_lines.
@@ -10759,7 +11276,11 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
           for (i = els.length - 1; i >= 0; i--) {
             el = els[i];
-            el.outerHTML = el.innerHTML + (el.nextSibling && !editor.node.isEmpty(el) ? '<br>' : '');
+
+            // Fixes https://github.com/froala/wysiwyg-editor/issues/1895.
+            if (el.attributes.length === 0) {
+              el.outerHTML = el.innerHTML + (el.nextSibling && !editor.node.isEmpty(el) ? '<br>' : '');
+            }
           }
         }
 
@@ -10810,14 +11331,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       div.innerHTML = html;
 
       // Clean empty tags.
-      var empty_tags = div.querySelectorAll('*:empty:not(br):not(img):not(td):not(th)');
+      var empty_tags = div.querySelectorAll('*:empty:not(td):not(th):not(iframe):not(svg):not(' + $.FE.VOID_ELEMENTS.join('):not(') + ')');
 
       while (empty_tags.length) {
         for (i = 0; i < empty_tags.length; i++) {
           empty_tags[i].parentNode.removeChild(empty_tags[i]);
         }
 
-        empty_tags = div.querySelectorAll('*:empty:not(br):not(img):not(td):not(th)');
+        empty_tags = div.querySelectorAll('*:empty:not(td):not(th):not(iframe):not(svg):not(' + $.FE.VOID_ELEMENTS.join('):not(') + ')');
       }
 
       // Workaround for Nodepad paste.
@@ -10839,7 +11360,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         else {
           var els = dv.querySelectorAll('*');
 
-          if (!els.length || els[els.length - 1].tagName !== 'BR') {
+          if (!els.length || (els[els.length - 1].tagName !== 'BR' && dv.innerText.length === 0)) {
             dv.outerHTML = dv.innerHTML + '<br>';
           }
           else {
@@ -10871,9 +11392,11 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      * Initialize.
      */
     function _init () {
-      editor.events.on('copy', _handleCopy);
-      editor.events.on('cut', _handleCopy);
-      editor.events.on('paste', _handlePaste);
+      editor.el.addEventListener('copy', _handleCopy);
+      editor.el.addEventListener('cut', _handleCopy);
+      editor.el.addEventListener('paste', _handlePaste);
+
+      editor.events.on('drop', _dropPaste);
 
       if (editor.browser.msie && editor.browser.version < 11) {
         editor.events.on('mouseup', function (e) {
@@ -10887,20 +11410,28 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
         editor.events.on('beforepaste', _handlePaste);
       }
+
+      editor.events.on('destroy', _destroy);
+    }
+
+    function _destroy () {
+      editor.el.removeEventListener('copy', _handleCopy);
+      editor.el.removeEventListener('cut', _handleCopy);
+      editor.el.removeEventListener('paste', _handlePaste);
     }
 
     return {
       _init: _init,
       removeEmptyTags: removeEmptyTags,
       getRtfClipboard: getRtfClipboard,
-      isWord: isWord,
-      saveCopiedText: saveCopiedText
+      saveCopiedText: saveCopiedText,
+      clean: clean
     }
   };
 
 
   $.extend($.FE.DEFAULTS, {
-    shortcutsEnabled: ['show', 'bold', 'italic', 'underline', 'strikeThrough', 'indent', 'outdent', 'undo', 'redo'],
+    shortcutsEnabled: [],
     shortcutsHint: true
   });
 
@@ -11182,7 +11713,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
     function restore (snapshot) {
 
       // Restore HTML.
-      if (editor.$el.html() != snapshot.html) editor.$el.html(snapshot.html);
+      if (editor.$el.html() != snapshot.html) {
+        if (editor.opts.htmlExecuteScripts) {
+          editor.$el.html(snapshot.html);
+        }
+        else {
+          editor.el.innerHTML = snapshot.html;
+        }
+      }
 
       // Get selection.
       var sel = editor.selection.get();
@@ -11490,7 +12028,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       if (!editor.$tooltip) _init();
 
       $el.removeAttr('title');
-      editor.$tooltip.text($el.data('title'));
+      editor.$tooltip.text(editor.language.translate($el.data('title')));
       editor.$tooltip.addClass('fr-visible');
 
       var left = $el.offset().left + ($el.outerWidth() - editor.$tooltip.outerWidth()) / 2;
@@ -11509,9 +12047,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       editor.$tooltip.css('left', left);
       editor.$tooltip.css('top', Math.ceil(top));
 
-      if ($(editor.o_doc).find('body').css('position') != 'static') {
-        editor.$tooltip.css('margin-left', -$(editor.o_doc).find('body').offset().left);
-        editor.$tooltip.css('margin-top', -$(editor.o_doc).find('body').offset().top);
+      if ($(editor.o_doc).find('body:first').css('position') != 'static') {
+        editor.$tooltip.css('margin-left', -$(editor.o_doc).find('body:first').offset().left);
+        editor.$tooltip.css('margin-top', -$(editor.o_doc).find('body:first').offset().top);
       }
       else {
         editor.$tooltip.css('margin-left', '');
@@ -11544,7 +12082,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
             editor.$tooltip.addClass(editor.opts.theme + '-theme');
           }
 
-          $(editor.o_doc).find('body').append(editor.$tooltip);
+          $(editor.o_doc).find('body:first').append(editor.$tooltip);
         }
         else {
           editor.$tooltip = editor.shared.$tooltip;
@@ -11626,7 +12164,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
         if (editor.shared.popups.hasOwnProperty(id)) {
           var $popup = editor.shared.popups[id];
-          var $popup_buttons = $popup.children().not('.fr-buttons').find(selector);
+          var $popup_buttons = $popup.children().find(selector);
           $buttons = $buttons.add($popup_buttons);
         }
       }
@@ -11676,7 +12214,16 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
         $dropdown.css('left', $btn.offset().left - $btn.parent().offset().left - (editor.opts.direction == 'rtl' ? $dropdown.width() - $btn.outerWidth() : 0));
 
-        if (!editor.opts.toolbarBottom) {
+        // Test height.
+        $dropdown.addClass('test-height')
+        var ht = $dropdown.outerHeight();
+        $dropdown.removeClass('test-height')
+
+        // Reset top and bottom.
+        $dropdown.css('top', '').css('bottom', '');
+
+        // Toolbar top or dropdown is exceeding the window.
+        if (!editor.opts.toolbarBottom && ($dropdown.offset().top + $btn.outerHeight() + ht < $(editor.o_doc).height())) {
           $dropdown.css('top', $btn.position().top + $btn.outerHeight());
         }
         else {
@@ -11699,9 +12246,12 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         $btn.removeClass('fr-blink');
       }, 300);
 
+      // Reset left margin for dropdown.
+      $dropdown.css('margin-left', '');
+
       // Check if it exceeds window on the right.
-      if ($dropdown.offset().left + $dropdown.outerWidth() > editor.$sc.offset().left +  editor.$sc.outerWidth()) {
-        $dropdown.css('margin-left', -($dropdown.offset().left + $dropdown.outerWidth() - editor.$sc.offset().left - editor.$sc.outerWidth()))
+      if ($dropdown.offset().left + $dropdown.outerWidth() > editor.$sc.offset().left +  editor.$sc.width()) {
+        $dropdown.css('margin-left', -($dropdown.offset().left + $dropdown.outerWidth() - editor.$sc.offset().left - editor.$sc.width()))
       }
 
       // Hide dropdowns that might be active.
@@ -11933,7 +12483,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       if (display_selection) {
         var default_selection = (typeof info.defaultSelection == 'function' ? info.defaultSelection(editor) : info.defaultSelection);
-        icon = '<span style="width:' + (info.displaySelectionWidth || 100) + 'px">' + (default_selection || editor.language.translate(info.title)) + '</span>';
+        icon = '<span style="width:' + (info.displaySelectionWidth || 100) + 'px">' + editor.language.translate(default_selection || info.title) + '</span>';
       }
       else {
         icon = editor.icon.create(info.icon || command);
@@ -12084,6 +12634,10 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         editor.events.on('blur', bulkRefresh);
         editor.events.on('focus', bulkRefresh);
         editor.events.on('contentChanged', bulkRefresh);
+
+        if (editor.helpers.isMobile()) {
+          editor.events.$on(editor.$doc, 'selectionchange', bulkRefresh);
+        }
       }
 
       editor.events.on('shared.destroy', _destroy);
@@ -12144,7 +12698,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       // Build modal overlay.
       if (!editor.shared.$overlay) {
-        editor.shared.$overlay = $('<div class="fr-overlay">').appendTo('body');
+        editor.shared.$overlay = $('<div class="fr-overlay">').appendTo('body:first');
       }
       $overlay = editor.shared.$overlay;
 
@@ -12167,7 +12721,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         }
 
         // Append modal to body.
-        $modal.appendTo('body');
+        $modal.appendTo('body:first');
 
         // Click on close button.
         editor.events.bindClick($modal, 'i.fr-modal-close', function () {
@@ -12238,11 +12792,11 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       $overlay.show();
 
       // Prevent scrolling in page.
-      $(editor.o_doc).find('body').addClass('prevent-scroll');
+      $(editor.o_doc).find('body:first').addClass('prevent-scroll');
 
       // Mobile device
       if (editor.helpers.isMobile()) {
-        $(editor.o_doc).find('body').addClass('fr-mobile');
+        $(editor.o_doc).find('body:first').addClass('fr-mobile');
       }
 
       $modal.addClass('fr-active');
@@ -12264,7 +12818,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       inst.events.enableBlur();
       $modal.hide();
       $overlay.hide();
-      $(inst.o_doc).find('body').removeClass('prevent-scroll fr-mobile');
+      $(inst.o_doc).find('body:first').removeClass('prevent-scroll fr-mobile');
 
       $modal.removeClass('fr-active');
 
@@ -12289,7 +12843,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       var $modal = modalHash.$modal;
       var $body = modalHash.$body;
 
-      var height = editor.$win.height();
+      var height = $(editor.o_win).height();
 
       // The wrapper object.
       var $wrapper = $modal.find('.fr-modal-wrapper');
@@ -12571,6 +13125,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      * Refresh content inside the popup.
      */
     function refresh (id) {
+      // Set the instance id for the popup.
+      popups[id].data('instance', editor);
+
       editor.events.trigger('popups.refresh.' + id);
 
       var btns = popups[id].find('.fr-command');
@@ -12648,7 +13205,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       $popup.find('input, textarea').attr('dir', editor.opts.direction).attr('disabled', 'disabled');
 
-      var $container = $('body');
+      var $container = $('body:first');
       $container.append($popup);
       $popup.data('container', $container);
 
@@ -12689,14 +13246,13 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
             $target.closest('.fr-layer').addClass('fr-input-focus');
           }
 
-
           e.preventDefault();
           e.stopPropagation();
 
           // IE workaround.
           setTimeout(function () {
             inst.events.enableBlur();
-          }, 0);
+          }, 100);
 
           // Reposition scroll on mobile to the original one.
           if (inst.helpers.isMobile()) {
@@ -12756,19 +13312,20 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
         _preventFocus: function (e) {
           var inst = $popup.data('instance') || editor;
 
-          // Hide popup's active dropdowns on mouseup.
-          if (e.type == 'mouseup') {
-            editor.button.hideActiveDropdowns($popup);
-          }
-
           // Get the original target.
           var originalTarget = e.originalEvent ? (e.originalEvent.target || e.originalEvent.originalTarget) : null;
 
           // Do not disable blur on mouseup because it is the last event in the chain.
           if (e.type != 'mouseup' && !$(originalTarget).is(':focus')) inst.events.disableBlur();
 
+          // Hide popup's active dropdowns on mouseup.
+          if (e.type == 'mouseup' && !($(originalTarget).hasClass('fr-command') || $(originalTarget).parents('.fr-command').length > 0)) {
+            editor.button.hideActiveDropdowns($popup);
+          }
+
           // https://github.com/froala/wysiwyg-editor/issues/1733
-          if (editor.browser.safari && e.type == 'mousedown' && $(originalTarget).is('input[type=file]')) {
+          // https://github.com/froala/wysiwyg-editor/issues/1838 . Firefox: with Jquery > 2 $(originalTarget).is(':focus') returns the oposite to Jquery < 2.
+          if ((editor.browser.safari || editor.browser.mozilla) && e.type == 'mousedown' && $(originalTarget).is('input[type=file]')) {
             inst.events.disableBlur();
           }
 
@@ -12952,7 +13509,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       editor.events.on('destroy', function () {
         if (editor.core.sameInstance(popups[id])) {
-          popups[id].removeClass('fr-active').appendTo('body');
+          popups[id].removeClass('fr-active').appendTo('body:first');
         }
       }, true)
     }
@@ -13003,8 +13560,11 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       for (var id in popups) {
         if (popups.hasOwnProperty(id)) {
           var $popup = popups[id];
-          $popup.html('').removeData().remove();
-          popups[id] = null;
+
+          if ($popup) {
+            $popup.html('').removeData().remove();
+            popups[id] = null;
+          }
         }
       }
 
@@ -13098,19 +13658,22 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      * Normalize top positioning.
      */
     function _topNormalized ($el, top, obj_height) {
-      var height = $el.get(0).offsetHeight;
+      var height = $el.outerHeight(true);
 
       if (!editor.helpers.isMobile() && editor.$tb && $el.parent().get(0) != editor.$tb.get(0)) {
-
-        // 1. Parent offset + toolbar top + toolbar height > scrollableContainer height.
-        // 2. Selection doesn't go above the screen.
+        // Get the parent of the element.
         var p_offset = $el.parent().offset().top;
         var new_top = top - height - (obj_height || 0);
 
+        // Parent is scrollable container.
+        // Substract the top of the container.
         if ($el.parent().get(0) == editor.$sc.get(0)) p_offset = p_offset - $el.parent().position().top;
 
+        // Scrollable container height.
         var s_height = editor.$sc.get(0).scrollHeight;
 
+        // 1. Parent offset + toolbar top + toolbar height > scrollableContainer height.
+        // 2. Selection doesn't go above the screen.
         if (p_offset + top + height > editor.$sc.offset().top + s_height && $el.parent().offset().top + new_top > 0) {
           top = new_top;
           $el.addClass('fr-above');
@@ -13127,11 +13690,11 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      * Normalize left position.
      */
     function _leftNormalized ($el, left) {
-      var width = $el.get(0).offsetWidth;
+      var width = $el.outerWidth(true);
 
       // Normalize right.
-      if (left + width > editor.$sc.get(0).clientWidth - 10) {
-        left = editor.$sc.get(0).clientWidth - width - 10;
+      if ($el.parent().offset().left + left + width > editor.$sc.get(0).clientWidth - editor.$sc.position().left - 10) {
+        left = editor.$sc.get(0).clientWidth - $el.parent().offset().left - width - 10;
       }
 
       // Normalize left.
@@ -13661,7 +14224,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       }
 
       $popup.find('input').val(text).trigger('change');
-      editor.popups.setContainer('text.edit', $('body'));
+      editor.popups.setContainer('text.edit', editor.$sc);
       editor.popups.show('text.edit', editor.$el.offset().left + editor.$el.outerWidth() / 2, editor.$el.offset().top + editor.$el.outerHeight(), editor.$el.outerHeight());
     }
 
@@ -13723,10 +14286,10 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
     toolbarBottom: false,
-    toolbarButtons: ['fullscreen', 'print', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', '|', 'specialCharacters', 'color', 'emoticons', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting', 'selectAll', 'html', 'applyFormat', 'removeFormat', 'help'],
+    toolbarButtons: ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'color', 'inlineStyle', 'paragraphStyle', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', '|', 'emoticons', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'print', 'spellChecker', 'help', 'html', '|', 'undo', 'redo'],
     toolbarButtonsXS: ['bold', 'italic', 'fontFamily', 'fontSize', '|', 'undo', 'redo'],
     toolbarButtonsSM: ['bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'insertLink', 'insertImage', 'table', '|', 'undo', 'redo'],
-    toolbarButtonsMD: ['fullscreen', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'paragraphStyle', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', 'insertHR', '-', 'insertLink', 'insertImage', 'insertVideo', 'insertFile', 'insertTable', 'undo', 'redo', 'clearFormatting'],
+    toolbarButtonsMD: null,
     toolbarContainer: null,
     toolbarInline: false,
     toolbarSticky: true,
@@ -13844,7 +14407,10 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       }, 0);
     }
 
-    function hide () {
+    function hide (e) {
+
+      // Do not hide toolbar if we press CTRL.
+      if (e && e.type === 'keydown' && editor.keys.ctrlKey(e)) return true;
 
       // Prevent hiding when dropdown is active and we scoll in it.
       // https://github.com/froala/wysiwyg-editor/issues/1290
@@ -14050,23 +14616,25 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       editor.accessibility.registerToolbar(editor.$tb);
 
       // Make sure we don't trigger blur.
-      editor.events.$on(editor.$tb, editor._mousedown + ' ' + editor._mouseup, function (e) {
-        var originalTarget = e.originalEvent ? (e.originalEvent.target || e.originalEvent.originalTarget) : null;
+      if (!editor.helpers.isMobile()) {
+        editor.events.$on(editor.$tb, editor._mousedown + ' ' + editor._mouseup, function (e) {
+          var originalTarget = e.originalEvent ? (e.originalEvent.target || e.originalEvent.originalTarget) : null;
 
-        if (originalTarget && originalTarget.tagName != 'INPUT' && !editor.edit.isDisabled()) {
-          e.stopPropagation();
-          e.preventDefault();
+          if (originalTarget && originalTarget.tagName != 'INPUT' && !editor.edit.isDisabled()) {
+            e.stopPropagation();
+            e.preventDefault();
 
-          return false;
-        }
-      }, true);
+            return false;
+          }
+        }, true);
+      }
     }
 
     /**
      * Initialize
      */
     function _init () {
-      editor.$sc = $(editor.opts.scrollableContainer);
+      editor.$sc = $(editor.opts.scrollableContainer).first();
 
       if (!editor.$wp) return false;
 
