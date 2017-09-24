@@ -16,10 +16,12 @@
 
 package org.wallride.autoconfigure;
 
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.WebMvcProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -27,6 +29,7 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -44,6 +47,7 @@ import org.wallride.support.CodeFormatAnnotationFormatterFactory;
 import org.wallride.support.StringFormatter;
 import org.wallride.web.support.*;
 
+import javax.servlet.ServletContext;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,15 +116,29 @@ public class WallRideWebMvcConfiguration extends WebMvcConfigurerAdapter {
 	// additional webmvc-related beans
 
 	@Bean
-	public SimpleUrlHandlerMapping mediaUrlHandlerMapping() {
-		MediaHttpRequestHandler mediaHttpRequestHandler = new MediaHttpRequestHandler();
-		mediaHttpRequestHandler.setWallRideProperties(wallRideProperties);
-		mediaHttpRequestHandler.setMediaService(mediaService);
-		mediaHttpRequestHandler.setResourceLoader(resourceLoader);
-		mediaHttpRequestHandler.setCacheSeconds(86400);
+	public SimpleUrlHandlerMapping mediaUrlHandlerMapping(
+			ApplicationContext applicationContext,
+			ServletContext servletContext,
+			ContentNegotiationManager contentNegotiationManager) {
+		MediaHttpRequestHandler handler = new MediaHttpRequestHandler();
+
+		handler.setServletContext(servletContext);
+		handler.setApplicationContext(applicationContext);
+		handler.setContentNegotiationManager(contentNegotiationManager);
+
+		handler.setWallRideProperties(wallRideProperties);
+		handler.setMediaService(mediaService);
+		handler.setResourceLoader(resourceLoader);
+		handler.setCacheSeconds(86400);
+
+		try {
+			handler.afterPropertiesSet();
+		} catch (Exception e) {
+			throw new BeanInitializationException("Failed to init MediaHttpRequestHandler", e);
+		}
 
 		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<>();
-		urlMap.put("/media/{key}", mediaHttpRequestHandler);
+		urlMap.put("/media/{key}", handler);
 
 		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
 		handlerMapping.setOrder(0);
