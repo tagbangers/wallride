@@ -27,20 +27,18 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.ServletRequestUtils;
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.support.WebContentGenerator;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.wallride.autoconfigure.WallRideProperties;
 import org.wallride.domain.Media;
 import org.wallride.service.MediaService;
 import org.wallride.support.ExtendedResourceUtils;
 
 import javax.imageio.ImageIO;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
@@ -49,7 +47,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
-public class MediaHttpRequestHandler extends WebContentGenerator implements HttpRequestHandler, InitializingBean {
+public class MediaHttpRequestHandler extends ResourceHttpRequestHandler implements InitializingBean {
+
+	private static final String MEDIA_ATTRIBUTE = MediaHttpRequestHandler.class.getName() + ".MEDIA";
 
 	private WallRideProperties wallRideProperties;
 
@@ -72,53 +72,21 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-
-	}
-
-	@Override
-	public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		checkAndPrepare(request, response, true);
-
+	protected Resource getResource(HttpServletRequest request) throws IOException {
 		Map<String, Object> pathVariables = (Map<String, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		String key = (String) pathVariables.get("key");
 
 		Media media = mediaService.getMedia(key);
+		if (media == null) {
+			return null;
+		}
+
+		RequestContextHolder.getRequestAttributes().setAttribute(MEDIA_ATTRIBUTE, media, RequestAttributes.SCOPE_REQUEST);
+
 		int width = ServletRequestUtils.getIntParameter(request, "w", 0);
 		int height = ServletRequestUtils.getIntParameter(request, "h", 0);
-		int mode = ServletRequestUtils.getIntParameter(request, "m", 0);
+		Media.ResizeMode mode = Media.ResizeMode.values()[ServletRequestUtils.getIntParameter(request, "m", 0)];
 
-		Resource resource = readResource(media, width, height, Media.ResizeMode.values()[mode]);
-
-		if (resource == null) {
-			logger.debug("No matching resource found - returning 404");
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			return;
-		}
-		if (new ServletWebRequest(request, response).checkNotModified(resource.lastModified())) {
-			logger.debug("Resource not modified - returning 304");
-			return;
-		}
-
-		long length = resource.contentLength();
-		if (length > Integer.MAX_VALUE) {
-			throw new IOException("Resource content too long (beyond Integer.MAX_VALUE): " + resource);
-		}
-
-		response.setContentLength((int) length);
-		response.setContentType(media.getMimeType());
-		if (!"image".equals(MediaType.parseMediaType(media.getMimeType()).getType())) {
-			response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + URLEncoder.encode(media.getOriginalName(), "UTF-8"));
-		}
-
-		FileCopyUtils.copy(resource.getInputStream(), response.getOutputStream());
-	}
-
-//	public Resource readResource(Media media) throws IOException, EncoderException {
-//		return readResource(media, 0, 0, null);
-//	}
-
-	private Resource readResource(final Media media, final int width, final int height, final Media.ResizeMode mode) throws IOException {
 //		Blog blog = blogService.getBlogById(Blog.DEFAULT_ID);
 //		final Resource prefix = resourceLoader.getResource(blog.getMediaPath());
 		final Resource prefix = resourceLoader.getResource(wallRideProperties.getMediaLocation());
@@ -141,7 +109,6 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 				temp.deleteOnExit();
 				resizeImage(resource, temp, width, height, mode);
 
-//				AmazonS3ResourceUtils.writeFile(temp, resized);
 				ExtendedResourceUtils.write(resized, temp);
 				FileUtils.deleteQuietly(temp);
 			}
@@ -200,5 +167,20 @@ public class MediaHttpRequestHandler extends WebContentGenerator implements Http
 
 		long stopTime = System.currentTimeMillis();
 		logger.debug("Resized image: time [{}ms]", stopTime - startTime);
+	}
+
+	@Override
+	protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
+		Media media = (Media) RequestContextHolder.getRequestAttributes().getAttribute(MEDIA_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+		return MediaType.parseMediaType(media.getMimeType());
+	}
+
+	@Override
+	protected void setHeaders(HttpServletResponse response, Resource resource, MediaType mediaType) throws IOException {
+		super.setHeaders(response, resource, mediaType);
+		if (!"image".equals(mediaType.getType())) {
+			Media media = (Media) RequestContextHolder.getRequestAttributes().getAttribute(MEDIA_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+			response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + URLEncoder.encode(media.getOriginalName(), "UTF-8"));
+		}
 	}
 }
