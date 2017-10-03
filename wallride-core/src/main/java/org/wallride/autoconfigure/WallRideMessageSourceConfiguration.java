@@ -15,7 +15,7 @@ public class WallRideMessageSourceConfiguration extends MessageSourceAutoConfigu
 	@Override
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = (ResourceBundleMessageSource) super.messageSource();
-		messageSource.setBasenames(
+		messageSource.addBasenames(
 				"messages/messages",
 				"messages/validations",
 				"messages/enumerations",
