@@ -3,7 +3,7 @@ package org.wallride.autoconfigure;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
-import org.thymeleaf.spring4.templateresource.SpringResourceTemplateResource;
+import org.thymeleaf.spring5.templateresource.SpringResourceTemplateResource;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.util.StringUtils;
 import org.thymeleaf.util.Validate;

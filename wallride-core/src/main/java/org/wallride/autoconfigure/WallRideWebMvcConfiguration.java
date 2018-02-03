@@ -19,7 +19,7 @@ package org.wallride.autoconfigure;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
-import org.springframework.boot.autoconfigure.web.WebMvcProperties;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +48,7 @@ import org.wallride.support.StringFormatter;
 import org.wallride.web.support.*;
 
 import javax.servlet.ServletContext;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +79,11 @@ public class WallRideWebMvcConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		Integer cachePeriod = this.resourceProperties.getCachePeriod();
+		Duration cachePeriod = this.resourceProperties.getCache().getPeriod();
 		registry.addResourceHandler("/resources/**").addResourceLocations(wallRideProperties.getHome() + "themes/default/resources/", CLASSPATH_RESOURCE_LOCATION)
-				.setCachePeriod(cachePeriod);
+				.setCachePeriod(cachePeriod == null ? null : (int) cachePeriod.getSeconds());
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/")
-				.setCachePeriod(cachePeriod);
+				.setCachePeriod(cachePeriod == null ? null : (int) cachePeriod.getSeconds());
 		registry.setOrder(Integer.MIN_VALUE);
 	}
 

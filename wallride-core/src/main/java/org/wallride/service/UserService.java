@@ -440,7 +440,7 @@ public class UserService {
 
 //	@Cacheable(value="users", key="'id.'+#id")
 	public User getUserById(long id) {
-		return userRepository.findOne(id);
+		return userRepository.findOneById(id);
 	}
 
 	public User getUserByLoginId(String loginId) {

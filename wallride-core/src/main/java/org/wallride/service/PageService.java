@@ -606,7 +606,7 @@ public class PageService {
 
 	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)
 	public org.springframework.data.domain.Page<Page> getPages(PageSearchRequest request) {
-		return getPages(request, null);
+		return getPages(request, Pageable.unpaged());
 	}
 
 	@Cacheable(value = WallRideCacheConfiguration.PAGE_CACHE)

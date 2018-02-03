@@ -1,12 +1,12 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
-import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
-import org.springframework.boot.web.filter.OrderedHiddenHttpMethodFilter;
-import org.springframework.boot.web.filter.OrderedHttpPutFormContentFilter;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+import org.springframework.boot.web.servlet.filter.OrderedHiddenHttpMethodFilter;
+import org.springframework.boot.web.servlet.filter.OrderedHttpPutFormContentFilter;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,7 +76,7 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 
 	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 	public DispatcherServlet guestDispatcherServlet() {
-		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		AnnotationConfigServletWebServerApplicationContext context = new AnnotationConfigServletWebServerApplicationContext();
 		context.setResourceLoader(getResourceLoader());
 		context.register(WebGuestConfiguration.class);
 		WallRideDispatcherServlet dispatcherServlet = new WallRideDispatcherServlet(context);
@@ -95,7 +95,7 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 
 	@Bean
 	public DispatcherServlet adminDispatcherServlet() {
-		AnnotationConfigEmbeddedWebApplicationContext context = new AnnotationConfigEmbeddedWebApplicationContext();
+		AnnotationConfigServletWebServerApplicationContext context = new AnnotationConfigServletWebServerApplicationContext();
 		context.setResourceLoader(getResourceLoader());
 		context.register(WebAdminConfiguration.class);
 		WallRideDispatcherServlet dispatcherServlet = new WallRideDispatcherServlet(context);

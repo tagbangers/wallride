@@ -20,7 +20,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.context.ApplicationListener;
@@ -30,7 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.StringUtils;
 
-public class WallRideInitializer implements ApplicationListener<ApplicationStartedEvent> {
+public class WallRideInitializer implements ApplicationListener<ApplicationStartingEvent> {
 
 	/**
 	 * @see ConfigFileApplicationListener#DEFAULT_SEARCH_LOCATIONS
@@ -38,12 +38,12 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 	private static final String DEFAULT_CONFIG_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/";
 
 	@Override
-	public void onApplicationEvent(ApplicationStartedEvent event) {
+	public void onApplicationEvent(ApplicationStartingEvent event) {
 		event.getSpringApplication().setEnvironment(createEnvironment(event));
 		event.getSpringApplication().setResourceLoader(createResourceLoader());
 	}
 
-	public static ConfigurableEnvironment createEnvironment(ApplicationStartedEvent event) {
+	public static ConfigurableEnvironment createEnvironment(ApplicationStartingEvent event) {
 		StandardEnvironment environment = new StandardEnvironment();
 
 		String home = environment.getProperty(WallRideProperties.HOME_PROPERTY);

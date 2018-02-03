@@ -65,7 +65,7 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 
 	@Override
 	public Page<CustomField> search(CustomFieldSearchRequest request) {
-		return search(request, null);
+		return search(request, Pageable.unpaged());
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 
 	@Override
 	public List<Long> searchForId(CustomFieldSearchRequest request) {
-		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, Pageable.unpaged(), null);
 		persistenceQuery.setProjection("id");
 		List<Object[]> results = persistenceQuery.getResultList();
 		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
@@ -134,8 +134,8 @@ public class CustomFieldRepositoryImpl implements CustomFieldRepositoryCustom {
 				.createFullTextQuery(searchQuery, CustomField.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		if (pageable != null) {
-			persistenceQuery.setFirstResult(pageable.getOffset());
+		if (pageable.isPaged()) {
+			persistenceQuery.setFirstResult((int) pageable.getOffset());
 			persistenceQuery.setMaxResults(pageable.getPageSize());
 		}
 		return persistenceQuery;

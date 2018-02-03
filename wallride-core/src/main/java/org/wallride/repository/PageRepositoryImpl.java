@@ -53,7 +53,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 	@Override
 	public org.springframework.data.domain.Page<Page> search(PageSearchRequest request) {
-		return search(request, null);
+		return search(request, Pageable.unpaged());
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 
 	@Override
 	public List<Long> searchForId(PageSearchRequest request) {
-		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, Pageable.unpaged(), null);
 		persistenceQuery.setProjection("id");
 		List<Object[]> results = persistenceQuery.getResultList();
 		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
@@ -205,8 +205,8 @@ public class PageRepositoryImpl implements PageRepositoryCustom {
 				.createFullTextQuery(searchQuery, Page.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		if (pageable != null) {
-			persistenceQuery.setFirstResult(pageable.getOffset());
+		if (pageable.isPaged()) {
+			persistenceQuery.setFirstResult((int) pageable.getOffset());
 			persistenceQuery.setMaxResults(pageable.getPageSize());
 		}
 		return persistenceQuery;

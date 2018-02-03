@@ -26,8 +26,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import javax.inject.Inject;

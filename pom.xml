@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>1.5.10.RELEASE</version>
+		<version>2.0.0.RC1</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
@@ -56,10 +56,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<spring-cloud-aws-context.verion>1.1.0.RELEASE</spring-cloud-aws-context.verion>
-		<thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
-		<thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
-		<thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
-		<hibernate.version>5.2.10.Final</hibernate.version>
+		<spring-mobile.version>1.1.5.RELEASE</spring-mobile.version>
 		<hibernate-search.version>5.7.0.Final</hibernate-search.version>
 		<infinispan.version>8.1.0.Final</infinispan.version>
 		<infinispan-spring4.version>8.1.0.Alpha2</infinispan-spring4.version>
@@ -88,6 +85,11 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-aws-context</artifactId>
 				<version>${spring-cloud-aws-context.verion}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.mobile</groupId>
+				<artifactId>spring-mobile-device</artifactId>
+				<version>${spring-mobile.version}</version>
 			</dependency>
 
 			<!-- Hibernate -->
@@ -207,6 +209,17 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<reporting>
 		<plugins>

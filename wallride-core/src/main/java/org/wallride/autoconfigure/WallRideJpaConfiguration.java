@@ -33,17 +33,16 @@ import javax.sql.DataSource;
 
 @Configuration
 @EntityScan(basePackageClasses = DomainObject.class)
-//@EnableJpaAuditing
-public class WallRideJpaConfiguration extends HibernateJpaAutoConfiguration {
+public class WallRideJpaConfiguration /*extends HibernateJpaAutoConfiguration*/ {
 
-	public WallRideJpaConfiguration(DataSource dataSource, JpaProperties jpaProperties, ObjectProvider<JtaTransactionManager> jtaTransactionManager, ObjectProvider<TransactionManagerCustomizers> transactionManagerCustomizers) {
-		super(dataSource, jpaProperties, jtaTransactionManager, transactionManagerCustomizers);
-	}
-
-	@Bean
-	@DependsOn("cacheManager")
-	@Override
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
-		return super.entityManagerFactory(factoryBuilder);
-	}
+//	public WallRideJpaConfiguration(DataSource dataSource, JpaProperties jpaProperties, ObjectProvider<JtaTransactionManager> jtaTransactionManager, ObjectProvider<TransactionManagerCustomizers> transactionManagerCustomizers) {
+//		super(dataSource, jpaProperties, jtaTransactionManager, transactionManagerCustomizers);
+//	}
+//
+//	@Bean
+//	@DependsOn("cacheManager")
+//	@Override
+//	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
+//		return super.entityManagerFactory(factoryBuilder);
+//	}
 }
