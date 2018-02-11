@@ -1,0 +1,194 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" th:content="${#posts.metaDescription(article)}" />
+		<meta name="keywords" th:content="${#posts.metaKeywords(article)}" />
+		<meta name="author" content="" />
+		<title th:text="${#posts.title(article)}">Title</title>
+		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
+		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/atom.xml}" />
+		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/rss.xml}" />
+		<link rel="stylesheet" th:href="@{/resources/bundle.css}" href="/resources/guest/bundle.css" />
+		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:replace="layout::head-script"> /*/-->
+		<script th:src="@{/resources/bundle.js}" src="/resources/guest/bundle.js"></script>
+		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:unless="${#httpServletRequest.getRequestURL().toString().contains('/_admin')}"> /*/-->
+		<script th:replace="google-analytics::ga(page=@{${@requestDataValueProcessor.processUrl(#httpServletRequest, #posts.path(article))}})"></script>
+		<!--/*/ </th:block> /*/-->
+	</head>
+	<body>
+		<div id="wrap">
+			<div th:replace="layout::nav"></div>
+			<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=1200,h=400,m=1)}" class="post-cover" />
+			<article class="container">
+				<div class="alert alert-warning" th:if="${article.language ne #locale.language}">
+					<span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{LanguageNotSupported(${#messages.msg('Language.' + article.language)})}">Please note that this page is available only in English.</span>
+				</div>
+				<div class="page-header">
+					<h1 th:text="${article.title}"></h1>
+				</div>
+				<div class="page-body">
+					<div class="row">
+						<div class="col-sm-12">
+						<p th:utext="${#posts.body(article)}"></p>
+						<time></time>
+						<ul th:if="${article.tags}" class="list-inline">
+							<li th:each="tag : ${article.tags}"><a th:href="@{/tag/{name}(name=${tag.name})}"><span class="glyphicon glyphicon-tag"></span> <span th:text="${tag.name}">Tag Name</span></a></li>
+						</ul>
+						<dl th:each="val : ${article.customFieldValues}">
+							<!--<dt th:if="${val.value ne null}" th:text="${val.customField.name}"></dt>-->
+							<dd th:text="${val.value}"></dd>
+						</dl>
+						</div>
+					</div>
+				</div>
+				<div class="page-footer">
+					<p><a th:href="@{${#users.path(article.author)}}" th:text="${article.author}"></a></p>
+				</div>
+				<div>
+					<h3 th:text="#{Comments}">Comments</h3>
+					<ul id="comment-list" class="list-group">
+						<li class="list-group-item" th:each="comment : ${comments}" th:attr='data-comment-id=${comment.id}'>
+							<div class="dropdown pull-right" th:if="${#authentication.principal eq comment.author}">
+								<button class="btn btn-default btn-link btn-xs dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
+								<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="comment-edit"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></li>
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#" th:attr="data-href=@{/comments/{id}(id=${comment.id})}" class="comment-delete"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{Delete}">Delete</span></a></li>
+								</ul>
+							</div>
+							<span th:text="${comment.authorName}">User Name</span> |
+							<time th:text="${#temporals.format(comment.createdAt, 'yyyy/MM/dd HH:mm', #locale)}">2014-01-01 00:00</time>
+							<p class="comment-content" th:text="${comment.content}">Content</p>
+						</li>
+					</ul>
+					<script id="comment-item-tmpl" type="text/x-jsrender">
+						<li class="list-group-item" data-comment-id="{{:id}}">
+							<div class="dropdown pull-right">
+								<button class="btn btn-default btn-link btn-xs dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
+								<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="comment-edit"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></a></li>
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="#" th:attr="data-href=@{/comments/{{:id}}}" class="comment-delete"><span class="glyphicon glyphicon-trash"></span> <span th:text="#{Delete}">Delete</span></a></li>
+								</ul>
+							</div>
+							<span>{{:authorName}}</span> |
+							<time>{{:date}}</time>
+							<p class="comment-content">{{:content}}</p>
+						</li>
+					</script>
+					<form id="comment-form" th:action="@{/comments/new}" th:if="${#authorization.expression('hasRole(''ROLE_VIEWER'')')}">
+						<button id="comment-write" class="btn btn-default" style="margin-bottom: 20px;"><span class="glyphicon glyphicon-comment"></span> Write a comment</button>
+					</form>
+					<script id="comment-form-tmpl" type="text/x-jsrender">
+						<input type="hidden" name="postId" th:value="${article.id}" />
+						<div class="form-group">
+							<textarea name="content" class="form-control" rows="3"></textarea>
+						</div>
+						<div class="form-group">
+							<button class="comment-cancel btn btn-default" th:text="#{Cancel}">Cancel</button>
+							<button class="comment-post btn btn-primary" data-loading-text="Loading..." th:text="#{PostComment}">Post</button>
+						</div>
+					</script>
+					<script th:inline="javascript">
+						$(function() {
+							$('#comment-write').click(function(e) {
+								e.preventDefault();
+								var $self = $(this);
+								var $form = $self.closest('form');
+								var $fields = $($.templates("#comment-form-tmpl").render());
+								$('.comment-cancel', $fields).click(function(e) {
+									e.preventDefault();
+									$self.show();
+									$fields.remove();
+								});
+								$('.comment-post', $fields).click(function(e) {
+									e.preventDefault();
+									var $button = $(this);
+									$button.button('loading');
+									$.ajax({
+										url: $form.attr('action'),
+										type: 'POST',
+										data: $form.serialize()
+									}).done(function(data) {
+										var $item = $($.templates("#comment-item-tmpl").render(data));
+										$("#comment-list").append($item);
+										$self.show();
+										$fields.remove();
+									}).fail(function(jqXHR) {
+										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+											var $field = $(':input[name="' + field + '"]', $form);
+											$field.closest('.form-group').addClass('has-error');
+										});
+										$button.button('reset');
+									});
+								});
+								$self.hide();
+								$form.append($fields);
+							});
+							$('#comment-list').on('click', '.list-group-item .comment-edit', function(e) {
+								e.preventDefault();
+								var $self = $(this);
+								var $content = $self.closest('.list-group-item').find('.comment-content');
+								var $form = $('<form />');
+								var $fields = $($.templates("#comment-form-tmpl").render());
+								var action = /*[[@{/comments/}]]*/ '';
+								action += $self.closest('.list-group-item').data('comment-id');
+								$form.attr('action', action);
+								$form.append($('<input type="hidden" name="_method" value="put" />'));
+								$form.append($fields);
+								$form.show();
+								$(':input[name="content"]', $form).val($content.text());
+								$('.comment-cancel', $fields).click(function(e) {
+									e.preventDefault();
+									$form.remove();
+									$content.show();
+								});
+								$('.comment-post', $fields).click(function(e) {
+									e.preventDefault();
+									var $button = $(this);
+									$button.button('loading');
+									$.ajax({
+										url: $form.attr('action'),
+										type: 'POST',
+										data: $form.serialize()
+									}).done(function(data) {
+										$form.remove();
+										$content.text(data.content);
+										$content.show();
+									}).fail(function(jqXHR) {
+										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+											var $field = $(':input[name="' + field + '"]', $form);
+											$field.closest('.form-group').addClass('has-error');
+										});
+										$button.button('reset');
+									});
+								});
+								$content.hide();
+								$content.after($form);
+							});
+							$('#comment-list').on('click', '.list-group-item .comment-delete', function(e) {
+								e.preventDefault();
+								var $self = $(this);
+								$.ajax({
+									url: $self.data('href'),
+									type: 'POST',
+									data: {_method: 'delete'}
+								}).done(function(data) {
+									$self.closest('.list-group-item').fadeOut('fast').queue(function() {
+										this.remove();
+									});
+								}).fail(function() {
+									console.dir('fail');
+								});
+							});
+						});
+					</script>
+				</div>
+			</article>
+		</div>
+		<div th:replace="layout::footer" id="footer"></div>
+	</body>
+</html>

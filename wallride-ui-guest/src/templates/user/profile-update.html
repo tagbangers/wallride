@@ -1,0 +1,75 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" />
+		<meta name="keywords" />
+		<meta name="author" content="" />
+		<title>Profile</title>
+		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
+		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/atom.xml}" />
+		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/rss.xml}" />
+		<link rel="stylesheet" th:href="@{/resources/bundle.css}" href="/resources/guest/bundle.css" />
+		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:replace="layout::head-script"> /*/-->
+		<script th:src="@{/resources/bundle.js}" src="/resources/guest/bundle.js"></script>
+		<!--/*/ </th:block> /*/-->
+		<script th:replace="google-analytics::ga(null)"></script>
+	</head>
+	<body>
+		<div id="wrap">
+			<div th:replace="layout::nav"></div>
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="page-header">
+							<h1 th:text="#{EditProfile}">Edit Profile</h1>
+						</div>
+						<div class="alert alert-success" th:if="${updatedUser ne null}">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<span th:text="#{SavedProfile}">Profile saved.</span>
+						</div>
+						<form th:action="@{/settings/profile}" th:object="${form}" method="post" role="form">
+							<input type="hidden" name="_method" value="put" />
+							<p class="alert alert-danger" th:if="${#fields.hasErrors('all')}" th:text="#{Error}">Error</p>
+							<div class="form-group" th:classappend="${#fields.hasErrors('email')}? has-error">
+								<label class="control-label" th:text="#{Email}">E-mail</label>
+								<div>
+									<input type="text" th:field="*{email}" class="form-control" th:attr="placeholder=#{Email}" autocomplete="off" />
+									<span class="help-block" th:each="err : ${#fields.errors('email')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('loginId')}? has-error">
+								<label class="control-label" th:text="#{LoginId}">Login ID</label>
+								<div>
+									<input type="text" th:field="*{loginId}" class="form-control" th:attr="placeholder=#{LoginId}" autocomplete="off" />
+									<span class="help-block" th:each="err : ${#fields.errors('loginId')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('name.firstName')}? has-error">
+								<label class="control-label" th:text="#{FirstName}">FirstName</label>
+								<div>
+									<input type="text" th:field="*{name.firstName}" placeholder="First Name" th:attr="placeholder=#{FirstName}" class="form-control" />
+									<span class="help-block" th:each="err : ${#fields.errors('name.firstName')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group" th:classappend="${#fields.hasErrors('name.lastName')}? has-error">
+								<label class="control-label" th:text="#{LastName}">LastName</label>
+								<div>
+									<input type="text" th:field="*{name.lastName}" placeholder="Last Name" th:attr="placeholder=#{LastName}" class="form-control" />
+									<span class="help-block" th:each="err : ${#fields.errors('name.lastName')}" th:text="${err}" />
+								</div>
+							</div>
+							<div class="form-group">
+								<button class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span> <span th:text="#{Save}">Save</span></button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="layout::footer" id="footer"></div>
+	</body>
+</html>
