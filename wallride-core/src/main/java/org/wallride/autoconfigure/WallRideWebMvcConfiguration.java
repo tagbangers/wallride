@@ -37,7 +37,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
@@ -55,7 +55,7 @@ import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
-public class WallRideWebMvcConfiguration extends WebMvcConfigurerAdapter {
+public class WallRideWebMvcConfiguration implements WebMvcConfigurer {
 
 	private static final String CLASSPATH_RESOURCE_LOCATION = "classpath:/resources/guest/";
 
@@ -89,7 +89,6 @@ public class WallRideWebMvcConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		super.addFormatters(registry);
 		registry.addFormatterForFieldAnnotation(new CodeFormatAnnotationFormatterFactory());
 	}
 
