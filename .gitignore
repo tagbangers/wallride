@@ -1,9 +1,11 @@
+home/
 target/
 dist/
 node_modules/
+.node/
 .settings/
 .project
 .classpath
 .idea
 *.iml
-home/
+npm-debug.log

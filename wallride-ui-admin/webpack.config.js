@@ -23,7 +23,16 @@ module.exports = {
 				use: 'url-loader',
 			},
 			{
-				test: /\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+				test: /src\/.+\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+				loader: 'file-loader',
+				options: {
+					name: '[name].[ext]',
+					publicPath: './font/',
+					emitFile: false
+				}
+			},
+			{
+				test: /node_modules\/.+\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
 				loader: 'file-loader',
 				options: {
 					name: '[path][name].[ext]',
@@ -41,6 +50,8 @@ module.exports = {
 		new ExtractTextPlugin("resources/admin/bundle.css"),
 		new CopyWebpackPlugin([
 			{ from: 'node_modules/bootstrap/dist/fonts/*', to: 'resources/admin' },
+			{ context: 'src/resources', from: 'css/wallride.custom.css', to: 'resources/admin/css' },
+			{ context: 'src/resources', from: 'font/**/*', to: 'resources/admin' },
 			{ context: 'src/resources', from: 'img/**/*', to: 'resources/admin' },
 			{ context: 'src/templates', from: '**/*', to: 'templates/admin' }
 		])

@@ -4,34 +4,17 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<title th:text="${title}"></title>
-		<!--<link rel="shortcut icon" th:href="@{/_admin/resource/favicon.png}" />-->
-
-		<!--<link rel="stylesheet" th:href="@{/_admin/resources/lib/pnotify/pnotify.custom.min.css}" />-->
-
-		<!-- Include Font Awesome. -->
-		<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-
-		<!-- Include Code Mirror style -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.css" />
 
 		<link rel="stylesheet" th:href="@{/_admin/resources/font/flaticon.css}" />
 		<link rel="stylesheet" th:href="@{/_admin/resources/bundle.css}" href="/resources/admin/bundle.css" />
+		<link rel="stylesheet" th:href="@{/_admin/resources/css/wallride.custom.css}" href="/resources/admin/css/wallride.custom.css" />
 
-		<!--<script th:src="@{/_admin/webjars/jsrender/1.0.0-rc.70/jsrender.min.js}"></script>-->
-		<!--<script th:src="@{/_admin/resources/lib/jquery.mjs.nestedSortable.js}"></script>-->
-		<!--<script th:src="@{/_admin/resources/lib/jquery.shiftcheckbox.js}"></script>-->
-		<!--<script th:src="@{/_admin/resources/lib/pnotify/pnotify.custom.min.js}"></script>-->
-
-		<!-- Include Code Mirror. -->
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/mode/xml/xml.min.js"></script>
-
-		<!-- Include Language file if we want to use it. -->
-		<!--<script type="text/javascript" th:src="@{/_admin/resources/lib/froala/js/languages/en_gb.js}"></script>-->
-		
-		<!--<script th:src="@{/_admin/resources/lib/moment-with-locales.js}" src="#"></script>-->
-
 		<script th:src="@{/_admin/resources/bundle.js}" src="/resources/admin/bundle.js"></script>
+
 		<script>
 			$.FroalaEditor.DEFAULTS.key = 'iMFIZJNKLDXIREJI==';
 		</script>

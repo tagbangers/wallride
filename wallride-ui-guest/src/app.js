@@ -1,6 +1,8 @@
 import $ from 'jquery';
 window.$ = $;
 
+import 'jsrender';
+
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 

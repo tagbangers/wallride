@@ -7,10 +7,10 @@ import 'jquery-ui/ui/widgets/sortable';
 import 'jquery-datetimepicker';
 import 'jquery-datetimepicker/jquery.datetimepicker.css';
 
+import 'jsrender';
+
 import 'blueimp-file-upload';
 import 'blueimp-file-upload/css/jquery.fileupload.css';
-
-// import 'nestedSortable';
 
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -72,9 +72,9 @@ import PNotify from 'pnotify';
 window.PNotify = PNotify;
 import 'pnotify/dist/PNotifyBrightTheme.css';
 
-import './resources/lib/jquery.shiftcheckbox';
-import './resources/lib/jquery.mjs.nestedSortable';
+import './resources/js/jquery.shiftcheckbox';
+import './resources/js/jquery.mjs.nestedSortable';
 import './resources/js/common'
 
+import './resources/css/flaticon.css';
 import './resources/css/wallride.css';
-import './resources/css/wallride.custom.css';
