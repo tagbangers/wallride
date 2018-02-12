@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.wallride</groupId>
         <artifactId>wallride-parent</artifactId>
-        <version>1.0.0.M17</version>
+        <version>1.0.0.M18</version>
         <relativePath>../wallride-parent/pom.xml</relativePath>
     </parent>
     <artifactId>wallride-bootstrap</artifactId>
@@ -22,18 +22,6 @@
     <properties>
         <start-class>org.wallride.bootstrap.Bootstrap</start-class>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <executable>true</executable>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
@@ -56,6 +44,19 @@
             <version>9.4-1206-jdbc42</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

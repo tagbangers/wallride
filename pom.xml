@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>1.5.7.RELEASE</version>
+		<version>1.5.10.RELEASE</version>
 	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
-	<version>1.0.0.M17</version>
+	<version>1.0.0.M18</version>
 	<packaging>pom</packaging>
 	<name>WallRide</name>
 	<description>CMS for developers of principles</description>
@@ -80,7 +80,7 @@
 			<dependency>
 				<groupId>org.wallride</groupId>
 				<artifactId>wallride-core</artifactId>
-				<version>1.0.0.M17</version>
+				<version>1.0.0.M18</version>
 			</dependency>
 
 			<!-- Spring -->
@@ -196,6 +196,13 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 		</plugins>
