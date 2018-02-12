@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.7.RELEASE</version>
+        <version>1.5.10.RELEASE</version>
         <relativePath />
     </parent>
     <groupId>org.wallride</groupId>
     <artifactId>wallride-parent</artifactId>
-    <version>1.0.0.M17</version>
+    <version>1.0.0.M18</version>
     <packaging>pom</packaging>
     <name>WallRide Parent</name>
     <description>CMS for developers of principles</description>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>org.wallride</groupId>
             <artifactId>wallride-core</artifactId>
-            <version>1.0.0.M17</version>
+            <version>1.0.0.M18</version>
         </dependency>
 
         <dependency>
