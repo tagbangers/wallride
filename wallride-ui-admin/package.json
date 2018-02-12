@@ -29,7 +29,7 @@
     "jquery-ui": "^1.12.1",
     "jsrender": "^0.9.90",
     "moment": "^2.20.1",
-    "pnotify": "^4.0.0-alpha.1",
+    "pnotify": "^3.2.1",
     "select2": "^3.5.2-browserify"
   }
 }

@@ -45,7 +45,8 @@ module.exports = {
 		new webpack.ProvidePlugin({
 			$: "jquery",
 			jQuery: "jquery",
-			"window.jQuery": "jquery"
+			"window.jQuery": "jquery",
+			"global.jQuery": "jquery"
 		}),
 		new ExtractTextPlugin("resources/admin/bundle.css"),
 		new CopyWebpackPlugin([

@@ -29,7 +29,7 @@
 						<article th:each="article : ${articles}" class="wr-post-summary row">
 							<div class="col-sm-2">
 								<img th:if="${article.cover ne null}" th:src="@{${#medias.link(article.cover)}(w=120,h=120,m=1)}" class="wr-post-cover" />
-								<img th:unless="${article.cover ne null}" th:src="@{/wallride-ui-guest/src/resources/img/noimage.png}" style="width: 120px; height: 120px;" />
+								<img th:unless="${article.cover ne null}" th:src="@{/resources/img/noimage.png}" style="width: 120px; height: 120px;" />
 							</div>
 							<div class="col-sm-10">
 								<h2 class="wr-post-title"><a th:href="@{${#posts.path(article)}}" th:text="${article.title}?:'No Titled'" href="#"></a></h2>

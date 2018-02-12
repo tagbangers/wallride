@@ -35,7 +35,9 @@ module.exports = {
 	plugins: [
 		new webpack.ProvidePlugin({
 			$: "jquery",
-			jQuery: "jquery"
+			jQuery: "jquery",
+			"window.jQuery": "jquery",
+			"global.jQuery": "jquery"
 		}),
 		new ExtractTextPlugin("resources/guest/bundle.css"),
 		new CopyWebpackPlugin([

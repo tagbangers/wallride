@@ -69,8 +69,9 @@ import 'select2';
 import 'select2/select2.css';
 
 import PNotify from 'pnotify';
+import 'pnotify/dist/pnotify.css';
+PNotify.prototype.options.styling = "bootstrap3";
 window.PNotify = PNotify;
-import 'pnotify/dist/PNotifyBrightTheme.css';
 
 import './resources/js/jquery.shiftcheckbox';
 import './resources/js/jquery.mjs.nestedSortable';
