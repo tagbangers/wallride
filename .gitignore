@@ -1,5 +1,6 @@
 target/
 dist/
+node_modules/
 .settings/
 .project
 .classpath

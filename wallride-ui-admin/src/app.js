@@ -44,6 +44,7 @@ import 'froala-editor/js/plugins/save.min';
 import 'froala-editor/js/plugins/url.min';
 import 'froala-editor/js/plugins/video.min';
 import 'froala-editor/js/plugins/word_paste.min';
+import 'froala-editor/js/third_party/image_aviary.min';
 
 import 'froala-editor/css/froala_editor.css';
 import 'froala-editor/css/froala_style.css';

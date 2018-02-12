@@ -4,8 +4,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-	context: path.resolve(__dirname, "src"),
-	entry: "./app.js",
+	entry: "./src/app.js",
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		filename: 'resources/guest/bundle.js'
@@ -20,12 +19,16 @@ module.exports = {
 				})
 			},
 			{
-				test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-				use: 'url-loader?limit=10000&name=./resources/guest/font/[hash].[ext]',
+				test: /\.(jpg|png|gif)$/,
+				use: 'url-loader',
 			},
 			{
-				test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
-				use: 'file-loader?name=./resources/guest/font/[hash].[ext]',
+				test: /\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+				loader: 'file-loader',
+				options: {
+					name: '[path][name].[ext]',
+					emitFile: false
+				}
 			}
 		]
 	},
@@ -36,8 +39,9 @@ module.exports = {
 		}),
 		new ExtractTextPlugin("resources/guest/bundle.css"),
 		new CopyWebpackPlugin([
-			{ from: 'img/**/*', to: 'resources/guest', context: 'resources' },
-			{ from: '**/*', to: 'templates/guest', context: 'templates' }
+			{ from: 'node_modules/bootstrap/dist/fonts/*', to: 'resources/guest' },
+			{ context: 'src/resources', from: 'img/**/*', to: 'resources/guest' },
+			{ context: 'src/templates', from: '**/*', to: 'templates/guest' }
 		])
 	],
 	devServer: {
