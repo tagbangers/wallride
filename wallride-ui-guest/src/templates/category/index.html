@@ -1,0 +1,38 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="" />
+		<meta name="author" content="" />
+		<title th:text="${WEBSITE_TITLE}">Title</title>
+		<!--/*/ <th:block th:replace="layout::head-link"> /*/-->
+		<link rel="alternate" type="application/atom+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/atom.xml}" />
+		<link rel="alternate" type="application/rss+xml" th:title="${WEBSITE_TITLE}" th:href="@{/feed/rss.xml}" />
+		<link rel="stylesheet" th:href="@{/resources/bundle.css}" href="/resources/guest/bundle.css" />
+		<!--/*/ </th:block> /*/-->
+		<!--/*/ <th:block th:replace="layout::head-script"> /*/-->
+		<script th:src="@{/resources/bundle.js}" src="/resources/guest/bundle.js"></script>
+		<!--/*/ </th:block> /*/-->
+		<script th:replace="google-analytics::ga(null)"></script>
+	</head>
+	<body>
+		<div id="wrap">
+			<div th:replace="layout::nav"></div>
+			<div class="container">
+				<div class="page-header">
+					<h1 th:text="#{Categories}"></h1>
+				</div>
+				<div class="row">
+					<div class="col-md-9">
+						<ul>
+							<li th:each="category : ${categories}"><a th:href="@{/category/{name}(name=${category.name})}" th:text="${category.name}">Category</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:replace="layout::footer" id="footer"></div>
+	</body>
+</html>

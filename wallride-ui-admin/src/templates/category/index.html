@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8" th:replace="layout::head('WallRide')" />
+		<title>WallRide</title>
+		<script src="/resources/admin/bundle.js" th:remove="all"></script>
+	</head>
+	<body>
+		<header th:replace="layout::header"></header>
+		<div>
+			<div id="wr-page-header">
+				<div class="page-header container-fluid">
+					<div class="pull-left">
+						<h1 th:text="#{Categories}">Categories</h1>
+					</div>
+					<div class="pull-right">
+						<div class="btn-group">
+							<a th:href="@{__${ADMIN_PATH}__/categories/index?part=category-create-form}" data-toggle="modal" data-target="#category-create-modal" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{AddNewCategory}">Add New</span></a>
+						</div>
+						<div class="btn-group">
+							<button id="update-category-sort" type="submit" class="btn btn-sm btn-primary" data-loading-text="saving..." disabled="true" th:if="!${#lists.isEmpty(categoryNodes)}" th:text="#{SaveOrder}">Save Order</button>
+						</div>
+						<script th:inline="javascript">
+							$(function() {
+								$('#update-category-sort').click(function(e) {
+									e.preventDefault();
+									$(this).button('loading');
+									var data = $('#category-tree').nestedSortable('toArray', {startDepthCount: 0});
+									$.ajax({
+										url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+										type: 'put',
+										dataType: 'json',
+										data: JSON.stringify(data),
+										contentType: 'application/json',
+										success: function() {
+											location = /*[[@{__${ADMIN_PATH}__/categories/index?updated}]]*/ '#';
+										},
+										error: function() {
+										}
+									});
+								});
+							});
+						</script>
+					</div>
+				</div>
+			</div>
+			<div id="wr-page-content">
+				<div class="container-fluid">
+					<div class="alert alert-success" th:if="${savedCategory ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{SavedCategory}">Category saved.</span>
+					</div>
+					<div class="alert alert-success" th:if="${deletedCategory ne null}">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<span th:text="#{DeletedCategory}">Category deleted.</span>
+					</div>
+					<ul th:unless="${#lists.isEmpty(categoryNodes)}" th:replace="category/index::category(${categoryNodes})"></ul>
+					<ul id="category-tree" class="nested-sortable tree" th:fragment="category(nodes)">
+						<li th:each="node : ${nodes}" th:id="${'category-tree_' + node.object.id}">
+							<div class="category clearfix">
+								<div class="wr-tree-options pull-left">
+									<span class="wr-tree-option disclose"><span class="glyphicon glyphicon-chevron-right"></span></span>
+									<span class="wr-tree-option title" th:text="${node.object.name}"></span>
+									<span class="wr-tree-option" th:text="${'/' + node.object.code}">/code</span>
+								</div>
+								<div class="wr-tree-options pull-right">
+									<span class="badge wr-tree-option" th:text="${articleCounts.get(node.object.id)}?:0">16</span>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-edit-form,id=${node.object.id})}" data-toggle="modal" data-target="#category-edit-modal"><span class="glyphicon glyphicon-pencil"></span> <span th:text="#{Edit}">Edit</span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-create-form,parentId=${node.object.id})}" data-toggle="modal" data-target="#category-create-modal"><span class="glyphicon glyphicon-plus"></span> <span th:text="#{Add}">Add</span></button>
+									<button class="btn btn-link wr-tree-option" th:href="@{__${ADMIN_PATH}__/categories/index(part=category-delete-form,id=${node.object.id})}" data-toggle="modal" data-target="#category-delete-modal"><span class="glyphicon glyphicon-remove"></span></button>
+								</div>
+							</div>
+							<ul th:unless="${#lists.isEmpty(node.children)}" th:include="category/index::category(${node.children})"></ul>
+						</li>
+					</ul>
+					<!-- #category-create-modal -->
+					<div id="category-create-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div id="category-create-dialog" class="modal-dialog">
+							<div class="modal-content">
+								<form th:fragment="category-create-form">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h4 class="modal-title" th:text="#{AddNewCategory}">Add New Category</h4>
+									</div>
+									<div class="modal-body">
+										<div class="form-group">
+											<select name="parentId" class="form-control">
+												<option value="" th:text="#{SelectParentCategory}">Select Parent Category</option>
+												<option th:each="category : ${#categories.getAllCategories(true)}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id eq parentId}"></option>
+											</select>
+										</div>
+										<div class="form-group">
+											<input type="text" name="name" class="form-control" th:attr="placeholder=#{CategoryName}" />
+										</div>
+										<div class="form-group">
+											<span th:text="${WEBSITE_LINK + '/category/'}">http://wallride.org/category/</span>
+											<input type="text" name="code" class="form-control input-sm wr-code" th:attr="placeholder=#{URLPath}" />
+										</div>
+										<div class="form-group">
+											<textarea name="description" class="form-control" th:attr="placeholder=#{Description}" style="min-height: 100px"></textarea>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+										<button class="btn btn-primary" id="save-category" th:text="#{Save}">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!--/#category-create-modal -->
+					<script th:inline="javascript">
+						$(function() {
+							$('#wr-page-content').on('click', '#save-category', function(e) {
+								e.preventDefault();
+								var self = this;
+								$(self).button('loading');
+								var form = $(this).closest('form');
+								var data = {
+									parentId: $(':input[name="parentId"]', form).val(),
+									code: $(':input[name="code"]', form).val(),
+									name: $(':input[name="name"]', form).val(),
+									description: $(':input[name="description"]', form).val()
+								};
+								$.ajax({
+									url: /*[[@{__${ADMIN_PATH}__/categories.json}]]*/ '#',
+									type: 'post',
+									data: data,
+									success: function() {
+										location = /*[[@{__${ADMIN_PATH}__/categories/index?created}]]*/ '#';
+									},
+									error: function(jqXHR) {
+										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+											var field = $(':input[name="' + field + '"]', form);
+											$(field).closest('.form-group').addClass('has-error');
+										});
+										$(self).button('reset');
+									}
+								});
+							});
+							$('#wr-page-content').on('hidden.bs.modal', '#category-create-modal', function() {
+								$(this).removeData('bs.modal');
+							});
+						});
+					</script>
+					<!-- #category-edit-modal -->
+					<div id="category-edit-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div id="category-edit-dialog" class="modal-dialog">
+							<div class="modal-content">
+								<form th:fragment="category-edit-form" th:if="${category}">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h4 class="modal-title" th:text="#{EditCategory}">Edit Category</h4>
+									</div>
+									<div class="modal-body">
+										<div class="form-group">
+											<select name="parentId" class="form-control">
+												<option value="" th:text="#{SelectParentCategory}">Select Parent Category</option>
+												<option th:each="parent : ${#categories.getAllCategories(true)}" th:if="${parent ne category}" th:value="${parent.id}" th:text="${parent.name}" th:selected="${parent eq category.parent}"></option>
+											</select>
+										</div>
+										<div class="form-group">
+											<input type="text" name="name" th:value="${category.name}" class="form-control" th:attr="placeholder=#{CategoryName}" placeholder="Category Name" />
+										</div>
+										<div class="form-group">
+											<span th:text="${WEBSITE_LINK + '/category/'}">http://wallride.org/category/</span>
+											<input type="text" name="code" th:value="${category.code}" class="form-control input-sm wr-code" th:attr="placeholder=#{URLPath}" placeholder="URLパス" />
+										</div>
+										<div class="form-group">
+											<textarea name="description" class="form-control" th:attr="placeholder=#{Description}" placeholder="Description" style="min-height: 100px" th:text="${category.description}"></textarea>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button class="btn btn-default" data-dismiss="modal" th:text="#{Cancel}">Cancel</button>
+										<button id="update-category" class="btn btn-primary" th:text="#{Save}" th:attr="data-id=${category.id}">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!--/#category-edit-modal -->
+					<script th:inline="javascript">
+						$(function() {
+							$('#wr-page-content').on('click', '#update-category', function(e) {
+								e.preventDefault();
+								var self = $(this);
+								self.button('loading');
+								var form = self.closest('form');
+								var data = {
+									parentId: $(':input[name="parentId"]', form).val(),
+									code: $(':input[name="code"]', form).val(),
+									name: $(':input[name="name"]', form).val(),
+									description: $(':input[name="description"]', form).val()
+								};
+								/*[+
+								 var url = [[@{__${ADMIN_PATH}__/categories/}]] + self.data('id') + '.json';
+								 +]*/
+								$.ajax({
+									url: url,
+									type: 'post',
+									data: data,
+									success: function() {
+										location = /*[[@{__${ADMIN_PATH}__/categories/index?updated}]]*/ '#';
+									},
+									error: function(jqXHR) {
+										$.each(jqXHR.responseJSON.fieldErrors, function(field, message) {
+											var field = $(':input[name="' + field + '"]', form);
+											$(field).closest('.form-group').addClass('has-error');
+										});
+										$(self).button('reset');
+									}
+								});
+							});
+							$('#wr-page-content').on('hidden.bs.modal', '#category-edit-modal', function() {
+								$(this).removeData('bs.modal');
+							});
+						});
+					</script>
+					<!-- #category-delete-modal -->
+					<div id="category-delete-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+						<div id="category-delete-dialog" class="modal-dialog">
+							<div class="modal-content">
+								<form th:fragment="category-delete-form">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										<h4 class="modal-title">Delete Category</h4>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete?</p>
+									</div>
+									<div class="modal-footer">
+										<button class="btn btn-default">Cancel</button>
+										<button id="delete-category" class="btn btn-primary" th:attr="data-id=${targetId}">Delete</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<!--/#category-delete-modal -->
+					<script th:inline="javascript">
+						$(function() {
+							$('#category-tree').nestedSortable({
+								forcePlaceholderSize: true,
+								handle: 'div',
+								helper:	'clone',
+								items: 'li',
+								opacity: .6,
+								placeholder: 'placeholder',
+								revert: 250,
+								tabSize: 25,
+								tolerance: 'pointer',
+								toleranceElement: '> div',
+								listType: 'ul',
+								isTree: true,
+								expandOnHover: 700
+	//							startCollapsed: true
+							});
+							$('#wr-page-content').on('sortupdate', '#category-tree', function() {
+								$('#update-category-sort').prop('disabled', false);
+								$('button', $(this)).prop('disabled', true);
+							});
+							$('.disclose').on('click', function() {
+								$(this).closest('li').toggleClass('mjs-nestedSortable-collapsed').toggleClass('mjs-nestedSortable-expanded');
+							})
+							$('#wr-page-content').on('click', '#delete-category', function(e) {
+								e.preventDefault();
+								var self = $(this);
+								self.button('loading');
+								/*[+
+								 var url = [[@{__${ADMIN_PATH}__/categories/}]] + self.data('id') + '.json';
+								 +]*/
+								$.ajax({
+									url: url,
+									type: 'delete',
+									success: function() {
+										$('#category-tree_' + self.data('id')).fadeOut(300, function() {
+											location = /*[[@{__${ADMIN_PATH}__/categories/index?deleted}]]*/ '#';
+										});
+									},
+									error: function() {
+									}
+								});
+							});
+						});
+					</script>
+				</div>
+			</div>
+		</div>
+		<footer>
+		</footer>
+	</body>
+</html>

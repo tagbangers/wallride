@@ -171,43 +171,6 @@
 			<version>${thymeleaf-extras-java8time.version}</version>
 		</dependency>
 
-		<!-- WebJars -->
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>3.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>2.1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery-ui</artifactId>
-			<version>1.11.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery-file-upload</artifactId>
-			<version>9.8.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>select2</artifactId>
-			<version>3.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datetimepicker</artifactId>
-			<version>2.3.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars.bower</groupId>
-			<artifactId>jsrender</artifactId>
-			<version>1.0.0-rc.70</version>
-		</dependency>
-
 		<!-- @Inject -->
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -316,4 +279,86 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>../wallride-ui-admin/dist</directory>
+			</resource>
+			<resource>
+				<directory>../wallride-ui-guest/dist</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<installDirectory>${basedir}/../.node</installDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-node-and-npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<nodeVersion>v6.11.0</nodeVersion>
+							<npmVersion>3.10.10</npmVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-install-admin</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<workingDirectory>../wallride-ui-admin</workingDirectory>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-build-admin</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<workingDirectory>../wallride-ui-admin</workingDirectory>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-install-guest</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<workingDirectory>${basedir}/../wallride-ui-guest</workingDirectory>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-build-guest</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<workingDirectory>${basedir}/../wallride-ui-guest</workingDirectory>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
