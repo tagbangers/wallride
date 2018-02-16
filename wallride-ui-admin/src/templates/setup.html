@@ -36,6 +36,9 @@
 								<option value="fr" th:selected="*{defaultLanguage eq 'fr'}">Français</option>
 								<option value="ru" th:selected="*{defaultLanguage eq 'ru'}">русский</option>
 								<option value="vi" th:selected="*{defaultLanguage eq 'vi'}">Tiếng Việt</option>
+								<option value="sr" th:selected="*{defaultLanguage eq 'sr'}">Srpski</option>
+								<option value="zh" th:selected="*{defaultLanguage eq 'zh'}">中文</option>
+								<option value="ko" th:selected="*{defaultLanguage eq 'ko'}">한국어</option>
 							</select>
 							<span class="help-block" th:each="err : ${#fields.errors('defaultLanguage')}" th:text="${err}" />
 						</div>
@@ -51,6 +54,9 @@
 							<div class="checkbox"><label><input type="checkbox" name="languages" value="fr" th:checked="${#lists.contains(form.languages, 'fr')}" /> Français</label></div>
 							<div class="checkbox"><label><input type="checkbox" name="languages" value="ru" th:checked="${#lists.contains(form.languages, 'ru')}" /> русский</label></div>
 							<div class="checkbox"><label><input type="checkbox" name="languages" value="vi" th:checked="${#lists.contains(form.languages, 'vi')}" /> Tiếng Việt</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="sr" th:checked="${#lists.contains(form.languages, 'sr')}" /> Srpski</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="zh" th:checked="${#lists.contains(form.languages, 'zh')}" /> 中文</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="languages" value="ko" th:checked="${#lists.contains(form.languages, 'ko')}" /> 한국어</label></div>
 							<span class="help-block" th:each="err : ${#fields.errors('languages')}" th:text="${err}" />
 						</div>
 					</div>
