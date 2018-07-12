@@ -23,8 +23,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
-import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -115,7 +115,7 @@ public class WebGuestComponentScanRegistrar implements ImportBeanDefinitionRegis
 		public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 			if (DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME.equals(beanName)) {
 				DispatcherServlet dispatcherServlet = (DispatcherServlet) bean;
-				AnnotationConfigEmbeddedWebApplicationContext context = (AnnotationConfigEmbeddedWebApplicationContext) dispatcherServlet.getWebApplicationContext();
+				AnnotationConfigServletWebServerApplicationContext context = (AnnotationConfigServletWebServerApplicationContext) dispatcherServlet.getWebApplicationContext();
 				context.scan(packagesToScan);
 				this.processed = true;
 			}

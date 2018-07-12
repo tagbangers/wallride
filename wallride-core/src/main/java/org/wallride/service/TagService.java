@@ -113,7 +113,7 @@ public class TagService {
 
 		// Delete old tag after merging
 		for (long id : request.getIds()) {
-			tagRepository.delete(id);
+			tagRepository.deleteById(id);
 		}
 
 		// Create a new Tag

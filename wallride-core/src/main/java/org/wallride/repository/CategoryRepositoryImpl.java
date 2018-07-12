@@ -63,7 +63,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 
 	@Override
 	public Page<Category> search(CategorySearchRequest request) {
-		return search(request, null);
+		return search(request, Pageable.unpaged());
 	}
 
 	@Override
@@ -115,8 +115,8 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 				.createFullTextQuery(searchQuery, Category.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		if (pageable != null) {
-			persistenceQuery.setFirstResult(pageable.getOffset());
+		if (pageable.isPaged()) {
+			persistenceQuery.setFirstResult((int) pageable.getOffset());
 			persistenceQuery.setMaxResults(pageable.getPageSize());
 		}
 

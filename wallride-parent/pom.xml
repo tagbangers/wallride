@@ -4,71 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.10.RELEASE</version>
-        <relativePath />
+        <groupId>org.wallride</groupId>
+        <artifactId>wallride-dependencies</artifactId>
+        <version>1.0.0.BUILD-SNAPSHOT</version>
+        <relativePath>../wallride-dependencies</relativePath>
     </parent>
     <groupId>org.wallride</groupId>
     <artifactId>wallride-parent</artifactId>
-    <version>1.0.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WallRide Parent</name>
     <description>CMS for developers of principles</description>
-    <url>http://wallride.org/</url>
-    <organization>
-        <name>Tagbangers, Inc.</name>
-        <url>https://www.tagbangers.co.jp/</url>
-    </organization>
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-    <scm>
-        <url>https://github.com/tagbangers/wallride</url>
-    </scm>
-    <developers>
-        <developer>
-            <name>OGAWA, Takeshi</name>
-            <email>ogawa@tagbangers.co.jp</email>
-            <organization>Tagbangers, Inc.</organization>
-            <organizationUrl>http://www.tagbangers.co.jp/</organizationUrl>
-            <timezone>-9</timezone>
-        </developer>
-        <developer>
-            <name>SASAKI, Alisa</name>
-            <email>sasaki@tagbangers.co.jp</email>
-            <organization>Tagbangers, Inc.</organization>
-            <organizationUrl>http://www.tagbangers.co.jp/</organizationUrl>
-            <timezone>-9</timezone>
-        </developer>
-    </developers>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <properties>
-        <java.version>1.8</java.version>
-        <thymeleaf.version>3.0.0.RELEASE</thymeleaf.version>
-        <thymeleaf-extras-springsecurity4.version>3.0.0.RELEASE</thymeleaf-extras-springsecurity4.version>
-        <thymeleaf-extras-java8time.version>3.0.0.RELEASE</thymeleaf-extras-java8time.version>
-        <hibernate.version>5.2.10.Final</hibernate.version>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.wallride</groupId>
             <artifactId>wallride-core</artifactId>
-            <version>1.0.0.BUILD-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -126,64 +76,24 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/application*.yml</include>
+                    <include>**/application*.yaml</include>
+                    <include>**/application*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <excludes>
+                    <exclude>**/application*.yml</exclude>
+                    <exclude>**/application*.yaml</exclude>
+                    <exclude>**/application*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

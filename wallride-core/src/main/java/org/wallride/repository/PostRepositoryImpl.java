@@ -157,7 +157,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				.createFullTextQuery(searchQuery, Post.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		persistenceQuery.setFirstResult(pageable.getOffset());
+		persistenceQuery.setFirstResult((int) pageable.getOffset());
 		persistenceQuery.setMaxResults(pageable.getPageSize());
 
 		int resultSize = persistenceQuery.getResultSize();

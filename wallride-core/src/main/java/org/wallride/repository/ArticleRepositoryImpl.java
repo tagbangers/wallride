@@ -17,6 +17,7 @@
 package org.wallride.repository;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -54,7 +55,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
 	@Override
 	public Page<Article> search(ArticleSearchRequest request) {
-		return search(request, null);
+		return search(request, Pageable.unpaged());
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
 	@Override
 	public List<Long> searchForId(ArticleSearchRequest request) {
-		FullTextQuery persistenceQuery = buildFullTextQuery(request, null, null);
+		FullTextQuery persistenceQuery = buildFullTextQuery(request, Pageable.unpaged(), null);
 		persistenceQuery.setProjection("id");
 		List<Object[]> results = persistenceQuery.getResultList();
 		List<Long> nos = results.stream().map(result -> (long) result[0]).collect(Collectors.toList());
@@ -97,7 +98,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 		junction.must(qb.keyword().onField("drafted").ignoreAnalyzer().matching("_null_").createQuery());
 
 		if (StringUtils.hasText(request.getKeyword())) {
-			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
+//			Analyzer analyzer = fullTextEntityManager.getSearchFactory().getAnalyzer("synonyms");
+			Analyzer analyzer = new WhitespaceAnalyzer();
 			String[] fields = new String[] {
 					"title", "body",
 					"categories.name", "tags.name",
@@ -214,8 +216,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 				.createFullTextQuery(searchQuery, Article.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		if (pageable != null) {
-			persistenceQuery.setFirstResult(pageable.getOffset());
+		if (pageable.isPaged()) {
+			persistenceQuery.setFirstResult((int) pageable.getOffset());
 			persistenceQuery.setMaxResults(pageable.getPageSize());
 		}
 		return persistenceQuery;

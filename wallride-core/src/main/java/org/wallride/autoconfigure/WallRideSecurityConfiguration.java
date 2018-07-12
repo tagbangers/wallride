@@ -122,15 +122,6 @@ public class WallRideSecurityConfiguration {
 					.disable()
 				.exceptionHandling()
 					.accessDeniedPage("/_admin/login");
-//			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
-//				List<ChannelProcessor> channelProcessors = new ArrayList<>();
-//				channelProcessors.add(new ProxySecureChannelProcessor());
-//				channelProcessors.add(new ProxyInsecureChannelProcessor());
-//
-//				http.requiresChannel()
-//					.channelProcessors(channelProcessors)
-//					.anyRequest().requiresSecure();
-//			}
 			// @formatter:on
 		}
 	}
@@ -201,15 +192,6 @@ public class WallRideSecurityConfiguration {
 					.disable()
 				.exceptionHandling()
 					.accessDeniedPage("/login");
-//			if (environment.getProperty("security.require-ssl", Boolean.class, false)) {
-//				List<ChannelProcessor> channelProcessors = new ArrayList<>();
-//				channelProcessors.add(new ProxySecureChannelProcessor());
-//				channelProcessors.add(new ProxyInsecureChannelProcessor());
-//
-//				http.requiresChannel()
-//					.channelProcessors(channelProcessors)
-//					.anyRequest().requiresSecure();
-//			}
 			// @formatter:on
 		}
 	}

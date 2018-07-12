@@ -7,17 +7,12 @@
 		<groupId>org.wallride</groupId>
 		<artifactId>wallride</artifactId>
 		<version>1.0.0.BUILD-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>wallride-core</artifactId>
 	<packaging>jar</packaging>
 	<name>WallRide Core</name>
 	<description>CMS for developers of principles</description>
-	<url>http://wallride.org/</url>
-	<organization>
-		<name>Tagbangers, Inc.</name>
-		<url>https://www.tagbangers.co.jp/</url>
-	</organization>
 
 	<dependencies>
 		<dependency>
@@ -72,7 +67,7 @@
 
 		<dependency>
 			<groupId>org.thymeleaf</groupId>
-			<artifactId>thymeleaf-spring4</artifactId>
+			<artifactId>thymeleaf-spring5</artifactId>
 			<exclusions>
 				<exclusion>
 					<artifactId>javassist</artifactId>
@@ -82,7 +77,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
@@ -121,7 +116,21 @@
 		<!-- Infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-directory-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-cachestore-jdbc</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-jboss-logging</artifactId>
+					<groupId>org.jboss.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.infinispan</groupId>
@@ -129,7 +138,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-spring4</artifactId>
+			<artifactId>infinispan-spring4-embedded</artifactId>
 		</dependency>
 
 		<!-- Lucene -->
@@ -156,19 +165,17 @@
 		<dependency>
 			<groupId>jp.co.tagbangers</groupId>
 			<artifactId>jgroups-s3-client-ping</artifactId>
-			<version>1.1.0</version>
+			<version>4.0.0</version>
 		</dependency>
 
 		<!-- Thymeleaf -->
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
-			<version>${thymeleaf-extras-springsecurity4.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-java8time</artifactId>
-			<version>${thymeleaf-extras-java8time.version}</version>
 		</dependency>
 
 		<!-- @Inject -->
@@ -221,18 +228,6 @@
 
 		<!-- Commons -->
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.2</version>
@@ -241,7 +236,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.4</version>
 		</dependency>
 
 		<dependency>
@@ -267,7 +261,6 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.38</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -275,7 +268,6 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.4-1206-jdbc42</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

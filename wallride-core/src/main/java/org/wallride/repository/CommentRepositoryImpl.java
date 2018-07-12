@@ -123,7 +123,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 				.createFullTextQuery(searchQuery, Comment.class)
 				.setCriteriaQuery(criteria)
 				.setSort(sort);
-		persistenceQuery.setFirstResult(pageable.getOffset());
+		persistenceQuery.setFirstResult((int) pageable.getOffset());
 		persistenceQuery.setMaxResults(pageable.getPageSize());
 
 		int resultSize = persistenceQuery.getResultSize();

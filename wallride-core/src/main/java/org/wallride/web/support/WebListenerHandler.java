@@ -73,16 +73,11 @@ public class WebListenerHandler implements ServletContextListener {
 //			}
 //		}
 
-		try {
-			// http://stackoverflow.com/questions/18069042/spring-mvc-webapp-schedule-java-sdk-http-connection-reaper-failed-to-stop
-			IdleConnectionReaper.shutdown();
+		// http://stackoverflow.com/questions/18069042/spring-mvc-webapp-schedule-java-sdk-http-connection-reaper-failed-to-stop
+		IdleConnectionReaper.shutdown();
 
-			// MySQL driver leaves around a thread. This static method cleans it up.
-			AbandonedConnectionCleanupThread.shutdown();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// MySQL driver leaves around a thread. This static method cleans it up.
+		AbandonedConnectionCleanupThread.shutdown();
 
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
