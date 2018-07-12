@@ -122,6 +122,12 @@
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-cachestore-jdbc</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-jboss-logging</artifactId>
+					<groupId>org.jboss.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.infinispan</groupId>
@@ -130,6 +136,16 @@
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-spring4</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>jgroups</artifactId>
+					<groupId>org.jgroups</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-slf4j-impl</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Lucene -->
@@ -156,7 +172,7 @@
 		<dependency>
 			<groupId>jp.co.tagbangers</groupId>
 			<artifactId>jgroups-s3-client-ping</artifactId>
-			<version>1.1.0</version>
+			<version>4.0.0</version>
 		</dependency>
 
 		<!-- Thymeleaf -->

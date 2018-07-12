@@ -50,9 +50,9 @@ public class WallRideMailConfiguration extends MailSenderAutoConfiguration {
 	@Inject
 	private ThymeleafProperties properties;
 
-	public WallRideMailConfiguration(MailProperties properties, ObjectProvider<Session> sessionProvider) {
-		super(properties, sessionProvider);
-	}
+//	public WallRideMailConfiguration(MailProperties properties, ObjectProvider<Session> sessionProvider) {
+//		super(properties, sessionProvider);
+//	}
 
 	@Bean(name = "emailTemplateResolver")
 	public ITemplateResolver emailTemplateResolver() {
