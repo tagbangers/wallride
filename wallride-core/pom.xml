@@ -261,7 +261,6 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.38</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -269,7 +268,6 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.4-1206-jdbc42</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
