@@ -7,17 +7,12 @@
 		<groupId>org.wallride</groupId>
 		<artifactId>wallride</artifactId>
 		<version>1.0.0.BUILD-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>wallride-core</artifactId>
 	<packaging>jar</packaging>
 	<name>WallRide Core</name>
 	<description>CMS for developers of principles</description>
-	<url>http://wallride.org/</url>
-	<organization>
-		<name>Tagbangers, Inc.</name>
-		<url>https://www.tagbangers.co.jp/</url>
-	</organization>
 
 	<dependencies>
 		<dependency>
@@ -121,6 +116,14 @@
 		<!-- Infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-directory-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-cachestore-jdbc</artifactId>
 			<exclusions>
 				<exclusion>
@@ -135,21 +138,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-spring4</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>jgroups</artifactId>
-					<groupId>org.jgroups</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>log4j-slf4j-impl</artifactId>
-					<groupId>org.apache.logging.log4j</groupId>
-				</exclusion>
-                <exclusion>
-                    <artifactId>servlet-api</artifactId>
-                    <groupId>javax.servlet</groupId>
-                </exclusion>
-            </exclusions>
+			<artifactId>infinispan-spring4-embedded</artifactId>
 		</dependency>
 
 		<!-- Lucene -->
@@ -183,12 +172,10 @@
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
-			<version>${thymeleaf-extras-springsecurity4.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-java8time</artifactId>
-			<version>${thymeleaf-extras-java8time.version}</version>
 		</dependency>
 
 		<!-- @Inject -->
@@ -241,18 +228,6 @@
 
 		<!-- Commons -->
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2.2</version>
@@ -261,7 +236,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.4</version>
 		</dependency>
 
 		<dependency>

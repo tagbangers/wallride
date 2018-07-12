@@ -17,6 +17,7 @@
 package org.wallride.web.support;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.springframework.web.util.UrlPathHelper;
 import org.wallride.domain.Blog;
 import org.wallride.service.BlogService;
@@ -42,7 +43,7 @@ public class SetupRedirectInterceptor extends HandlerInterceptorAdapter {
         }
 
         final String requestPath = getRequestPath(request);
-        if (!SETUP_PATH.equalsIgnoreCase(requestPath)) {
+        if (!SETUP_PATH.equalsIgnoreCase(requestPath) && !isResourceHandler(handler)) {
             response.sendRedirect(request.getContextPath() + SETUP_PATH);
             return false;
         }
@@ -53,6 +54,9 @@ public class SetupRedirectInterceptor extends HandlerInterceptorAdapter {
     private String getRequestPath(HttpServletRequest request) {
 		UrlPathHelper urlPathHelper = new UrlPathHelper();
 		return urlPathHelper.getPathWithinApplication(request);
-//        return (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
     }
+
+	private boolean isResourceHandler(Object handler) {
+		return handler instanceof ResourceHttpRequestHandler;
+	}
 }

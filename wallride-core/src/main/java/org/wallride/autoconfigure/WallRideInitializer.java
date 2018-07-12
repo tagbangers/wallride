@@ -22,7 +22,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
-import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
@@ -73,12 +72,6 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 		configuration.setMaxConnections(1000);
 		AmazonS3 amazonS3 = new AmazonS3Client(configuration);
 
-		SimpleStorageResourceLoader resourceLoader = new SimpleStorageResourceLoader(amazonS3);
-		try {
-			resourceLoader.afterPropertiesSet();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceLoader, new PathMatchingResourcePatternResolver());
+		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, new PathMatchingResourcePatternResolver());
 	}
 }

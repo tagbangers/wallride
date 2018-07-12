@@ -1,11 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-dependencies</artifactId>
-		<version>2.0.3.RELEASE</version>
-	</parent>
 	<groupId>org.wallride</groupId>
 	<artifactId>wallride</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
@@ -54,152 +49,36 @@
 	</distributionManagement>
 
 	<properties>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<spring-cloud-aws-context.verion>1.1.0.RELEASE</spring-cloud-aws-context.verion>
-		<spring-mobile.version>1.1.5.RELEASE</spring-mobile.version>
-		<hibernate-search.version>5.7.0.Final</hibernate-search.version>
-		<infinispan.version>8.1.0.Final</infinispan.version>
-		<infinispan-spring4.version>8.1.0.Alpha2</infinispan-spring4.version>
-		<lucene.version>5.5.4</lucene.version>
-		<amazonaws-version>1.11.145</amazonaws-version>
+		<resource.delimiter>@</resource.delimiter>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
 
 	<modules>
 		<module>wallride-bootstrap</module>
 		<module>wallride-core</module>
+		<module>wallride-dependencies</module>
 		<module>wallride-parent</module>
 		<module>wallride-tools</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- WallRide -->
 			<dependency>
 				<groupId>org.wallride</groupId>
-				<artifactId>wallride-core</artifactId>
-				<version>1.0.0.BUILD-SNAPSHOT</version>
-			</dependency>
-
-			<!-- Spring -->
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-aws-context</artifactId>
-				<version>${spring-cloud-aws-context.verion}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.mobile</groupId>
-				<artifactId>spring-mobile-device</artifactId>
-				<version>${spring-mobile.version}</version>
-			</dependency>
-
-			<!-- Hibernate -->
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-entitymanager</artifactId>
-				<version>${hibernate.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-java8</artifactId>
-				<version>${hibernate.version}</version>
-			</dependency>
-
-			<!-- Hibernate Search -->
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-search-orm</artifactId>
-				<version>${hibernate-search.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-search-infinispan</artifactId>
-				<version>${hibernate-search.version}</version>
-			</dependency>
-
-			<!-- Hibernate Metamodel -->
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-jpamodelgen</artifactId>
-				<version>${hibernate.version}</version>
-			</dependency>
-
-			<!-- Infinispan -->
-			<dependency>
-				<groupId>org.infinispan</groupId>
-				<artifactId>infinispan-cachestore-jdbc</artifactId>
-				<version>${infinispan.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.infinispan</groupId>
-				<artifactId>infinispan-lucene-directory</artifactId>
-				<version>${infinispan.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.infinispan</groupId>
-				<artifactId>infinispan-spring4</artifactId>
-				<version>${infinispan-spring4.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>commons-logging</artifactId>
-						<groupId>commons-logging</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>log4j-core</artifactId>
-						<groupId>org.apache.logging.log4j</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>log4j-slf4j-impl</artifactId>
-						<groupId>org.apache.logging.log4j</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>log4j-jcl</artifactId>
-						<groupId>org.apache.logging.log4j</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
-			<!-- Lucene -->
-			<dependency>
-				<groupId>org.apache.lucene</groupId>
-				<artifactId>lucene-core</artifactId>
-				<version>${lucene.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.lucene</groupId>
-				<artifactId>lucene-queryparser</artifactId>
-				<version>${lucene.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.lucene</groupId>
-				<artifactId>lucene-analyzers-kuromoji</artifactId>
-				<version>${lucene.version}</version>
-			</dependency>
-
-			<!-- AWS -->
-			<dependency>
-				<groupId>com.amazonaws</groupId>
-				<artifactId>aws-java-sdk-s3</artifactId>
-				<version>${amazonaws-version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>commons-logging</artifactId>
-						<groupId>commons-logging</groupId>
-					</exclusion>
-				</exclusions>
+				<artifactId>wallride-dependencies</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -209,43 +88,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/libs-milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.5.3</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.12</version>
-				<configuration>
-					<configLocation>src/site/checkstyle.xml</configLocation>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
 
 	<profiles>
 		<profile>

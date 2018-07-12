@@ -7,22 +7,27 @@
         <groupId>org.wallride</groupId>
         <artifactId>wallride</artifactId>
         <version>1.0.0.BUILD-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>..</relativePath>
     </parent>
     <artifactId>wallride-tools</artifactId>
     <packaging>jar</packaging>
     <name>WallRide Tools</name>
     <description>CMS for developers of principles</description>
-    <url>http://wallride.org/</url>
-    <organization>
-        <name>Tagbangers, Inc.</name>
-        <url>https://www.tagbangers.co.jp/</url>
-    </organization>
 
     <dependencies>
         <dependency>
             <groupId>org.wallride</groupId>
             <artifactId>wallride-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
         </dependency>
     </dependencies>
 </project>
