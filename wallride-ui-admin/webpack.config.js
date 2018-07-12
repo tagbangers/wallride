@@ -23,22 +23,24 @@ module.exports = {
 				use: 'url-loader',
 			},
 			{
-				test: /src\/.+\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-				loader: 'file-loader',
-				options: {
-					name: '[name].[ext]',
-					publicPath: './font/',
-					emitFile: false
-				}
-			},
-			{
-				test: /node_modules\/.+\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-				loader: 'file-loader',
-				options: {
-					name: '[path][name].[ext]',
-					emitFile: false
-				}
-			}
+                                test: /\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                                exclude: /node_modules/,
+                                loader: 'file-loader',
+                                options: {
+                                        name: '[path][name].[ext]',
+                                        publicPath: './font/',
+                                        emitFile: false
+                                }
+                        },
+                        {
+                                test: /\.(ttf|otf|eot|svg|woff2?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                                include: /node_modules/,
+                                loader: 'file-loader',
+                                options: {
+                                        name: '[path][name].[ext]',
+                                        emitFile: false
+                                }
+                        }
 		]
 	},
 	plugins: [
