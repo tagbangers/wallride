@@ -22,11 +22,14 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.cloud.aws.core.io.s3.PathMatchingSimpleStorageResourcePatternResolver;
+import org.springframework.cloud.aws.core.io.s3.SimpleStorageProtocolResolver;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.StringUtils;
 
 public class WallRideInitializer implements ApplicationListener<ApplicationStartingEvent> {
@@ -72,6 +75,11 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 		configuration.setMaxConnections(1000);
 		AmazonS3 amazonS3 = new AmazonS3Client(configuration);
 
-		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, new PathMatchingResourcePatternResolver());
+		SimpleStorageProtocolResolver protocolResolver = new SimpleStorageProtocolResolver(amazonS3);
+		protocolResolver.afterPropertiesSet();
+		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+		resourceLoader.addProtocolResolver(protocolResolver);
+		ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver(resourceLoader);
+		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceResolver);
 	}
 }

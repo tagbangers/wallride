@@ -27,7 +27,7 @@
             <dependency>
                 <groupId>org.wallride</groupId>
                 <artifactId>wallride-core</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
 
             <!-- Spring -->
