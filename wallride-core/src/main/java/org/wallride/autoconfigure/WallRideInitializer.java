@@ -38,7 +38,7 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 	 * @see ConfigFileApplicationListener#DEFAULT_SEARCH_LOCATIONS
 	 */
 	private static final String DEFAULT_CONFIG_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/,file:\\\\config\\\\";
-	private static final String FALLBACK_WALLRIDE_HOME = "file:/srv/wallride-home/";
+	private static final String FALLBACK_WALLRIDE_HOME = "/srv/wallride-home/";
 
 	@Override
 	public void onApplicationEvent(ApplicationStartingEvent event) {
