@@ -99,7 +99,7 @@ public class MediaHttpRequestHandler extends ResourceHttpRequestHandler implemen
 		Resource resized = resource;
 		boolean doResize = (width > 0 || height > 0);
 		if (doResize && "image".equals(MediaType.parseMediaType(media.getMimeType()).getType())) {
-			resized = prefix.createRelative(String.format("%s.resized/%dx%d-%d",
+			resized = prefix.createRelative(String.format("%s.resized.%dx%d-%d",
 					media.getId(),
 					width, height, mode.ordinal()));
 			if (!resized.exists() || resource.lastModified() > resized.lastModified()) {
