@@ -37,7 +37,8 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 	/**
 	 * @see ConfigFileApplicationListener#DEFAULT_SEARCH_LOCATIONS
 	 */
-	private static final String DEFAULT_CONFIG_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/";
+	private static final String DEFAULT_CONFIG_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/,file:\\\\config\\\\";
+	private static final String FALLBACK_WALLRIDE_HOME = "/srv/wallride-home/";
 
 	@Override
 	public void onApplicationEvent(ApplicationStartingEvent event) {
@@ -50,11 +51,15 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 
 		String home = environment.getProperty(WallRideProperties.HOME_PROPERTY);
 		if (!StringUtils.hasText(home)) {
-			throw new IllegalStateException(WallRideProperties.HOME_PROPERTY + " is empty");
+			//if wallride.home is empty use fallback
+			System.out.println("wallride.home not set, using "+FALLBACK_WALLRIDE_HOME+" as fallback");
+			home = FALLBACK_WALLRIDE_HOME;
 		}
 		if (!home.endsWith("/")) {
 			home = home + "/";
 		}
+
+		System.out.println("Running Franz Stumpner Version of Wallride");
 
 		String config = home + WallRideProperties.DEFAULT_CONFIG_PATH_NAME;
 		String media = home + WallRideProperties.DEFAULT_MEDIA_PATH_NAME;
