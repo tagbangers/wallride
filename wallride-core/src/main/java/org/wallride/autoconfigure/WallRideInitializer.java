@@ -31,6 +31,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.StringUtils;
+import java.io.*;
+import java.net.URL;
+import java.util.Properties;
 
 public class WallRideInitializer implements ApplicationListener<ApplicationStartingEvent> {
 
@@ -50,7 +53,13 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 
 		String home = environment.getProperty(WallRideProperties.HOME_PROPERTY);
 		if (!StringUtils.hasText(home)) {
-			throw new IllegalStateException(WallRideProperties.HOME_PROPERTY + " is empty");
+			//try to get config-File with wallride.home parameter under webroot
+			String configFileHome = getConfigFileHome(event);
+			if (configFileHome!=null) {
+				home = configFileHome;
+			} else {
+				throw new IllegalStateException(WallRideProperties.HOME_PROPERTY + " is empty");
+			}
 		}
 		if (!home.endsWith("/")) {
 			home = home + "/";
@@ -81,5 +90,76 @@ public class WallRideInitializer implements ApplicationListener<ApplicationStart
 		resourceLoader.addProtocolResolver(protocolResolver);
 		ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver(resourceLoader);
 		return new PathMatchingSimpleStorageResourcePatternResolver(amazonS3, resourceResolver);
+	}
+
+	private static String getConfigFileHome(ApplicationStartingEvent event) {
+
+		File configFile = getConfigFileFromWebroot(event);
+		if (configFile!=null) {
+			Properties properties = getProperties(configFile);
+			if (properties.getProperty(WallRideProperties.HOME_PROPERTY) != null) {
+				String home = properties.getProperty(WallRideProperties.HOME_PROPERTY);
+				if (!home.startsWith("file:")) {
+					home = "file:"+home;
+				}
+				return home;
+			} else {
+				throw new IllegalStateException(WallRideProperties.HOME_PROPERTY + " not found in config file " + configFile.getAbsolutePath());
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Try to find a config file where the wallride.home parameter is configured
+	 * Config file must be placed under the webroot directory and can be named wallride.conf or webroot-name.conf
+	 * Example: if webroot is /srv/webapps/myblog the config file can be /srv/webapps/wallride.conf or /srv/webapps/myblog.conf
+	 * @param event
+	 * @return
+	 */
+	private static File getConfigFileFromWebroot(ApplicationStartingEvent event) {
+
+		URL resource = event.getClass().getClassLoader().getResource("");
+
+		File classPath = new File(resource.getPath()); // ROOT/WEB-INF/classes/
+		File webInfPath = classPath.getParentFile(); // ROOT/WEB-INF/
+		if (webInfPath.getName().equalsIgnoreCase("WEB-INF")) {
+			File rootPath = webInfPath.getParentFile(); // ROOT/
+			File wallrideConfigFile = new File(rootPath.getParentFile(), "wallride.conf");
+			if (wallrideConfigFile.exists()) { return wallrideConfigFile; }
+
+			File configFile = new File(rootPath.getParentFile(), rootPath.getName()+".conf");
+			if (configFile.exists()) { return configFile; }
+
+		} else {
+			//there is no web-inf directory -> webroot can not be determined
+		}
+
+		return null;
+	}
+
+	private static Properties getProperties(File configFile) {
+
+		Properties confFileProperties = new Properties();
+		InputStream is = null;
+		try {
+			is = new FileInputStream(configFile);
+			confFileProperties.load(is);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (is!=null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return confFileProperties;
 	}
 }
