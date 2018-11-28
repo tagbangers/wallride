@@ -27,6 +27,7 @@ import org.wallride.domain.Media;
 import org.wallride.service.MediaService;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/{language}/media/create")
@@ -38,8 +39,8 @@ public class MediaCreateController {
 	private WallRideProperties wallRideProperties;
 
 	@RequestMapping(method=RequestMethod.POST)
-	public @ResponseBody MediaCreatedModel create(@RequestParam MultipartFile file) {
+	public @ResponseBody MediaCreatedModel create(@RequestParam MultipartFile file, HttpServletRequest request) {
 		Media media = mediaService.createMedia(file);
-		return new MediaCreatedModel(media, wallRideProperties);
+		return new MediaCreatedModel(media, request.getContextPath(), wallRideProperties);
 	}
 }

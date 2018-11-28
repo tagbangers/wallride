@@ -29,9 +29,9 @@ public class MediaCreatedModel implements Serializable {
 
 	private String name;
 
-	public MediaCreatedModel(Media media, WallRideProperties wallRideProperties) {
+	public MediaCreatedModel(Media media, String contextPath, WallRideProperties wallRideProperties) {
 		this.id = media.getId();
-		this.link = wallRideProperties.getMediaUrlPrefix() + media.getId();
+		this.link = contextPath + wallRideProperties.getMediaUrlPrefix() + media.getId();
 		this.name = media.getOriginalName();
 	}
 
