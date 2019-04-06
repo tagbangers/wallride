@@ -2,6 +2,7 @@ package org.wallride.autoconfigure;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletRegistrationBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
+import org.wallride.service.BlogService;
 import org.wallride.web.support.ExtendedUrlRewriteFilter;
 
 import javax.servlet.DispatcherType;
@@ -56,8 +58,8 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 
 	@Bean
 	@ConditionalOnMissingBean(UrlRewriteFilter.class)
-	public UrlRewriteFilter urlRewriteFilter() {
-		return new ExtendedUrlRewriteFilter();
+	public UrlRewriteFilter urlRewriteFilter(BlogService blogService) {
+		return new ExtendedUrlRewriteFilter(blogService);
 	}
 
 	@Bean
@@ -85,11 +87,10 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
-	public ServletRegistrationBean guestServletRegistrationBean(DispatcherServlet dispatcherServlet) {
-		ServletRegistrationBean registration = new ServletRegistrationBean(dispatcherServlet);
+	public DispatcherServletRegistrationBean guestServletRegistrationBean(DispatcherServlet dispatcherServlet) {
+		DispatcherServletRegistrationBean registration = new DispatcherServletRegistrationBean(dispatcherServlet, GUEST_SERVLET_PATH + "/*");
 		registration.setName(GUEST_SERVLET_NAME);
 		registration.setLoadOnStartup(1);
-		registration.addUrlMappings(GUEST_SERVLET_PATH + "/*");
 		return registration;
 	}
 

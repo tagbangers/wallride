@@ -26,6 +26,11 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Domain object representing a blog.
+ *
+ * @author Takeshi Ogawa
+ */
 @Entity
 @NamedEntityGraphs({
 		@NamedEntityGraph(name = Blog.DEEP_GRAPH_NAME,
@@ -52,14 +57,6 @@ public class Blog extends DomainObject<Long> {
 	@Column(length = 3, nullable = false)
 	@Field
 	private String defaultLanguage;
-
-//	@Column(name = "media_url_prefix", length = 300, nullable = false)
-//	@Field
-//	private String mediaUrlPrefix;
-//
-//	@Column(name = "media_path", length = 300, nullable = false)
-//	@Field
-//	private String mediaPath;
 
 	@Embedded
 	@IndexedEmbedded(includeEmbeddedObjectId = true)
@@ -92,22 +89,6 @@ public class Blog extends DomainObject<Long> {
 	public void setDefaultLanguage(String defaultLanguage) {
 		this.defaultLanguage = defaultLanguage;
 	}
-
-//	public String getMediaUrlPrefix() {
-//		return mediaUrlPrefix;
-//	}
-//
-//	public void setMediaUrlPrefix(String mediaUrlPrefix) {
-//		this.mediaUrlPrefix = mediaUrlPrefix;
-//	}
-//
-//	public String getMediaPath() {
-//		return mediaPath;
-//	}
-//
-//	public void setMediaPath(String mediaPath) {
-//		this.mediaPath = mediaPath;
-//	}
 
 	public GoogleAnalytics getGoogleAnalytics() {
 		return googleAnalytics;
