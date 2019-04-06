@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.0.3.RELEASE</version>
+        <version>2.0.9.RELEASE</version>
         <relativePath />
     </parent>
     <groupId>org.wallride</groupId>
@@ -15,9 +15,9 @@
     <description>CMS for developers of principles</description>
 
     <properties>
-        <spring-cloud-aws.verion>2.0.0.RELEASE</spring-cloud-aws.verion>
+        <spring-cloud-aws.verion>2.0.2.RELEASE</spring-cloud-aws.verion>
         <spring-mobile.version>1.1.5.RELEASE</spring-mobile.version>
-        <hibernate-search.version>5.7.0.Final</hibernate-search.version>
+        <hibernate-search.version>5.7.3.Final</hibernate-search.version>
         <lucene.version>5.5.4</lucene.version>
     </properties>
 

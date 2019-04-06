@@ -36,10 +36,13 @@ import java.util.List;
 
 public class ExtendedUrlRewriteFilter extends UrlRewriteFilter {
 
-	@Autowired
-	private BlogService blogService;
+	private final BlogService blogService;
 
 	private static Logger logger = LoggerFactory.getLogger(UrlRewriteFilter.class);
+
+	public ExtendedUrlRewriteFilter(BlogService blogService) {
+		this.blogService = blogService;
+	}
 
 	@Override
 	protected void loadUrlRewriter(FilterConfig filterConfig) throws ServletException {
