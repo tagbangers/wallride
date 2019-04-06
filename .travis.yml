@@ -1,10 +1,14 @@
 language: java
+install: true
+addons:
+  sonarcloud:
+    organization: "tagbangers"
+    token:
+      secure: $SONAR_TOKEN
 jdk:
   - oraclejdk8
-install:
-  - ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -Pjar
 script:
-  - ./mvnw test -Pjar
+  - ./mvnw clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Pjar
 cache:
   directories:
   - $HOME/.m2
