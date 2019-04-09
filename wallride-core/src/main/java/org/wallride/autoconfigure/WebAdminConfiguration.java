@@ -35,7 +35,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
-import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;

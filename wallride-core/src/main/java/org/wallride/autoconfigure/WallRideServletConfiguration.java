@@ -6,16 +6,17 @@ import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletRegis
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
 import org.springframework.boot.web.servlet.filter.OrderedHiddenHttpMethodFilter;
-import org.springframework.boot.web.servlet.filter.OrderedHttpPutFormContentFilter;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.filter.DelegatingFilterProxy;
+import org.springframework.web.filter.FormContentFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
-import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 import org.wallride.service.BlogService;
@@ -51,12 +52,13 @@ public class WallRideServletConfiguration implements ResourceLoaderAware {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(HttpPutFormContentFilter.class)
-	public OrderedHttpPutFormContentFilter httpPutFormContentFilter() {
-		return new OrderedHttpPutFormContentFilter();
+	@ConditionalOnMissingBean(FormContentFilter.class)
+	public OrderedFormContentFilter httpPutFormContentFilter() {
+		return new OrderedFormContentFilter();
 	}
 
 	@Bean
+	@DependsOn("cacheManager")
 	@ConditionalOnMissingBean(UrlRewriteFilter.class)
 	public UrlRewriteFilter urlRewriteFilter(BlogService blogService) {
 		return new ExtendedUrlRewriteFilter(blogService);
