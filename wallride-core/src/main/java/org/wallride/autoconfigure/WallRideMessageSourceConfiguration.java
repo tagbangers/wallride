@@ -1,6 +1,7 @@
 package org.wallride.autoconfigure;
 
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.context.MessageSourceProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +14,8 @@ import org.springframework.validation.MessageCodesResolver;
 public class WallRideMessageSourceConfiguration extends MessageSourceAutoConfiguration {
 
 	@Override
-	public MessageSource messageSource() {
-		ResourceBundleMessageSource messageSource = (ResourceBundleMessageSource) super.messageSource();
+	public MessageSource messageSource(MessageSourceProperties properties) {
+		ResourceBundleMessageSource messageSource = (ResourceBundleMessageSource) super.messageSource(properties);
 		messageSource.addBasenames(
 				"messages/messages",
 				"messages/validations",
@@ -25,8 +26,8 @@ public class WallRideMessageSourceConfiguration extends MessageSourceAutoConfigu
 	}
 
 	@Bean
-	public MessageSourceAccessor messageSourceAccessor() {
-		MessageSourceAccessor messageSourceAccessor = new MessageSourceAccessor(messageSource());
+	public MessageSourceAccessor messageSourceAccessor(MessageSourceProperties properties) {
+		MessageSourceAccessor messageSourceAccessor = new MessageSourceAccessor(messageSource(properties));
 		return messageSourceAccessor;
 	}
 

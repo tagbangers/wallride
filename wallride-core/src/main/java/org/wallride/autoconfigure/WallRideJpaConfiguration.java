@@ -16,33 +16,15 @@
 
 package org.wallride.autoconfigure;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.jta.JtaTransactionManager;
 import org.wallride.domain.DomainObject;
 
-import javax.sql.DataSource;
-
+/**
+ * @author Takeshi Ogawa
+ */
 @Configuration
 @EntityScan(basePackageClasses = DomainObject.class)
-public class WallRideJpaConfiguration /*extends HibernateJpaAutoConfiguration*/ {
+public class WallRideJpaConfiguration {
 
-//	public WallRideJpaConfiguration(DataSource dataSource, JpaProperties jpaProperties, ObjectProvider<JtaTransactionManager> jtaTransactionManager, ObjectProvider<TransactionManagerCustomizers> transactionManagerCustomizers) {
-//		super(dataSource, jpaProperties, jtaTransactionManager, transactionManagerCustomizers);
-//	}
-//
-//	@Bean
-//	@DependsOn("cacheManager")
-//	@Override
-//	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder factoryBuilder) {
-//		return super.entityManagerFactory(factoryBuilder);
-//	}
 }
